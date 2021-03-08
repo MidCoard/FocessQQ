@@ -1,2 +1,6 @@
 # Project exclude paths
 /target/
+/.idea
+MiraiQQ.iml
+device.json
+captcha.jpg
