@@ -59,7 +59,11 @@ public abstract class IOHandler {
 
             @Override
             public <T> void handle(T t) {
-                this.sentString = (String) t;
+                try {
+                    this.sentString = (String) t;
+                } catch (ClassCastException e) {
+                    this.sentString = null;
+                }
                 this.hasSent = true;
             }
 

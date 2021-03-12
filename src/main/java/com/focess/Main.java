@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main{
 
-    private static Map<CommandSender,Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
+    private static final Map<CommandSender,Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
 
     public static void registerIOHandler(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         quests.compute(commandSender,(k,v)->{
@@ -74,13 +74,13 @@ public class Main{
 
     private final static MainPlugin mainPlugin = new MainPlugin();
 
-    private static long user = 3418652527l;
+    private static long user = 3418652527L;
 
     private static String password = "asnbot371237";
 
     public static Bot bot;
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         if (args.length == 2) {
             user = Long.parseLong(args[0]);
             password = args[1];
@@ -102,8 +102,7 @@ public class Main{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String str = scanner.nextLine();
-                return str;
+                return scanner.nextLine();
             }
 
             @Nullable
