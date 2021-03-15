@@ -5,7 +5,10 @@ import com.focess.api.util.IOHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.MemberPermission;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,13 +69,10 @@ public abstract class Command{
         this.permission = permission;
     }
 
-
-    public static boolean register(Plugin plugin,final Command command) {
+    public static boolean register(@NonNull Plugin plugin,@NonNull final Command command) {
         for (Command c:commands)
             if (c.getName().equals(command.getName()))
                 return false;
-        if (plugin == null)
-            return false;
         command.registered = true;
         command.plugin = plugin;
         Command.commands.add(command);
@@ -114,6 +114,7 @@ public abstract class Command{
         return true;
     }
 
+    @NonNull
     protected List<String> getCompleteLists(CommandSender sender, String cmd, String[] args) {
         return Lists.newArrayList();
     }
@@ -124,7 +125,7 @@ public abstract class Command{
         final List<String> ret = this.getCompleteLists(sender, cmd, args);
         if (args == null || args.length == 0)
             return ret;
-        if (ret == null || ret.size() == 0) {
+        if (ret.size() == 0) {
             for (final Executor executor : this.executors)
                 if (checkPermission(sender,executor)&& args.length - 1 >= executor.getSubCommandsSize() && executor.checkArgs(args)) {
                     int pos = args.length - executor.getSubCommandsSize();
@@ -154,9 +155,9 @@ public abstract class Command{
         private final String[] subCommands;
         private CommandExecutor executor;
         private MemberPermission permission = MemberPermission.MEMBER;
-        private TabCompleter[] tabCompletes = new TabCompleter[0];
-        private Map<CommandResult,CommandResultExecutor> results = Maps.newHashMap();
-        private DataConverter[] dataConverters;
+        private TabCompleter<?>[] tabCompletes = new TabCompleter[0];
+        private final Map<CommandResult,CommandResultExecutor> results = Maps.newHashMap();
+        private DataConverter<?>[] dataConverters;
         private boolean useDefaultConverter = true;
 
         private Executor(final int count, final String... subCommands) {
@@ -187,8 +188,7 @@ public abstract class Command{
         private CommandResult execute(final CommandSender sender, final String[] args, IOHandler ioHandler) {
             if (this.useDefaultConverter) {
                 List<DataConverter<?>> dataConverters = Lists.newArrayList();
-                for (TabCompleter tabCompleter:this.tabCompletes)
-                    dataConverters.add(tabCompleter);
+                Collections.addAll(dataConverters, this.tabCompletes);
                 int size = args.length - dataConverters.size();
                 for (int i = 0;i<size;i++)
                     dataConverters.add(DataConverter.DEFAULT_DATA_CONVERTER);
@@ -218,7 +218,7 @@ public abstract class Command{
             return this;
         }
 
-        public Executor addTabComplete(TabCompleter... tabCompleters) {
+        public Executor addTabComplete(TabCompleter<?>... tabCompleters) {
             this.tabCompletes = tabCompleters;
             return this;
         }
@@ -228,7 +228,7 @@ public abstract class Command{
             return this;
         }
 
-        public Executor addDataConverter(DataConverter...dataConverters) {
+        public Executor addDataConverter(DataConverter<?>...dataConverters) {
             this.dataConverters = dataConverters;
             this.useDefaultConverter = false;
             return this;

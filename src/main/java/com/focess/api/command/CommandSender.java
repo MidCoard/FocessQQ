@@ -44,9 +44,9 @@ public class CommandSender {
             case MEMBER:
                 return true;
             case ADMINISTRATOR:
-                return this.member.getPermission() == MemberPermission.ADMINISTRATOR || this.member.getPermission() == MemberPermission.OWNER;
+                return this.getPermission() == MemberPermission.ADMINISTRATOR || this.getPermission() == MemberPermission.OWNER;
             case OWNER:
-                return this.member.getPermission() == MemberPermission.OWNER;
+                return this.getPermission() == MemberPermission.OWNER;
         }
         return false;
     }
@@ -86,9 +86,7 @@ public class CommandSender {
         else if (this.isFriend() && sender.isFriend()) {
             return sender.getFriend().getId() == this.getFriend().getId();
         }
-        else if (this.isConsole() && sender.isConsole())
-            return true;
-        else return false;
+        else return this.isConsole() && sender.isConsole();
     }
 
     @Override

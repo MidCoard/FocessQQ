@@ -19,9 +19,7 @@ public class UnloadCommand extends Command {
                 Plugin plugin = data.getPlugin();
                 if (plugin.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader) {
                     ioHandler.output(ChatConstants.CONSOLE_HEADER + "Disable " + plugin.getName());
-                    Command.unregister(plugin);
-                    plugin.disable();
-                    LoadCommand.registeredPlugins.remove(plugin);
+                    LoadCommand.disablePlugin(plugin);
                     System.gc();
                     ioHandler.output(ChatConstants.CONSOLE_HEADER + "End unloading...");
                     return CommandResult.ALLOW;

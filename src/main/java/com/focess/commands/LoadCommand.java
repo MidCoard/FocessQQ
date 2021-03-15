@@ -3,17 +3,21 @@ package com.focess.commands;
 import com.focess.api.Plugin;
 import com.focess.api.annotation.CommandType;
 import com.focess.api.annotation.PluginType;
+import com.focess.api.exception.CommandDuplicateException;
 import com.focess.api.exception.IllegalCommandClassException;
 import com.focess.api.exception.IllegalPluginClassException;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
+import com.focess.api.exception.PluginDuplicateException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.util.AnnotationHandler;
 import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -26,36 +30,44 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class LoadCommand extends Command {
-    static List<Plugin> registeredPlugins = Lists.newCopyOnWriteArrayList();
+    private static final List<Plugin> registeredPlugins = Lists.newCopyOnWriteArrayList();
 
     public LoadCommand() {
         super("load", Lists.newArrayList());
     }
 
+    @Nullable
     public static Plugin getPlugin(Class<? extends Plugin> plugin) {
         for (Plugin p:registeredPlugins)
-            if (p.getClass().isAssignableFrom(plugin))
+            if (p.getClass().equals(plugin))
                 return p;
         return null;
     }
 
+    @NonNull
     public static List<Plugin> getPlugins() {
         return registeredPlugins;
     }
 
-    public static void addPlugin(Plugin plugin) {
+    public static void loadPlugin(Plugin plugin) {
+        if (getPlugin(plugin.getClass()) != null)
+            throw new PluginDuplicateException(plugin.getName());
         registeredPlugins.add(plugin);
+        plugin.enable();
     }
 
-    public static void removePlugin(Plugin plugin){
+    public static void disablePlugin(Plugin plugin){
+        plugin.disable();
+        Command.unregister(plugin);
         registeredPlugins.remove(plugin);
     }
 
+    @Nullable
     public static Plugin getPlugin(String name) {
         for (Plugin plugin:registeredPlugins)
             if (plugin.getName().equals(name))
                 return plugin;
-            return null;
+        return null;
     }
 
     @Override
@@ -94,17 +106,17 @@ public class LoadCommand extends Command {
 
     public static class PluginClassLoader extends URLClassLoader {
 
-        private File file;
+        private final File file;
 
-        private static Map<Class<? extends Annotation>,AnnotationHandler> handlers = Maps.newHashMap();
+        private static final Map<Class<? extends Annotation>,AnnotationHandler> handlers = Maps.newHashMap();
 
         private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c,annotation,classLoader)->{
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
-                    classLoader.addPlugin((Plugin) c.newInstance());
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                    Plugin plugin;
+                    if (!classLoader.addPlugin( plugin = (Plugin) c.newInstance()))
+                        throw new PluginDuplicateException(plugin.getName());
+                } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -114,14 +126,13 @@ public class LoadCommand extends Command {
         static {
             handlers.put(CommandType.class,(c,annotation,classLoader) ->{
                 CommandType commandType = (CommandType) annotation;
-                if (commandType.plugin() == null)
-                    throw new IllegalArgumentException();
                 if (Command.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                     try {
-                        Command.register(getPlugin(commandType.plugin()),(Command)c.newInstance());
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                        //NullPointer maybe thrown
+                        Command command;
+                        if (Command.register(Objects.requireNonNull(getPlugin(commandType.plugin())),command = (Command)c.newInstance()))
+                            throw new CommandDuplicateException(command.getName());
+                    } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
@@ -129,13 +140,11 @@ public class LoadCommand extends Command {
             });
         }
 
-        private List<Plugin> plugins = Lists.newArrayList();
+        private final List<Plugin> plugins = Lists.newArrayList();
 
-        private boolean addPlugin(Plugin plugin) {
-            if (plugin == null)
-                return false;
+        private boolean addPlugin(@NonNull Plugin plugin) {
             for (Plugin p:plugins)
-                if (p.getName().equals(p.getName()))
+                if (p.getName().equals(plugin.getName()))
                     return false;
             for (Plugin p:registeredPlugins)
                 if (p.getName().equals(plugin.getName()))
@@ -144,12 +153,12 @@ public class LoadCommand extends Command {
             return true;
         }
 
-        public PluginClassLoader(File file, ClassLoader parent) throws MalformedURLException {
+        public PluginClassLoader(@NonNull File file,ClassLoader parent) throws MalformedURLException {
             super(new URL[]{file.toURI().toURL()},parent);
             this.file = file;
         }
 
-        private final List<Class> loadedClasses = Lists.newArrayList();
+        private final List<Class<?>> loadedClasses = Lists.newArrayList();
 
         public void load() {
             try {
@@ -160,35 +169,32 @@ public class LoadCommand extends Command {
                     String name = jarEntry.getName();
                     if (!name.endsWith(".class"))
                         continue;
-                    Class c = this.loadClass(name.replace("/", ".").substring(0,name.length() - 6));
+                    Class<?> c = this.loadClass(name.replace("/", ".").substring(0,name.length() - 6));
                     loadedClasses.add(c);
                     analyseClass0(c);
                 }
-                for (Plugin plugin:plugins) {
-                    registeredPlugins.add(plugin);
-                    plugin.enable();
-                }
-                for (Class c:loadedClasses)
+                for (Plugin plugin:plugins)
+                    loadPlugin(plugin);
+                for (Class<?> c:loadedClasses)
                     analyseClass(c);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        private void analyseClass0(Class c) {
+        private void analyseClass0(@NonNull Class<?> c) {
             Annotation annotation;
             if ((annotation = c.getAnnotation(PluginType.class)) != null)
                 PLUGIN_TYPE_HANDLER.handle(c,annotation,this);
         }
 
-        private <T extends Annotation> void analyseClass(Class c)  {
+        private <T extends Annotation> void analyseClass(@NonNull Class<?> c)  {
             for (Class<? extends Annotation> annotation:handlers.keySet()) {
                 Annotation a;
                 if ((a = c.getAnnotation(annotation)) != null)
                     handlers.get(annotation).handle(c, a, this);
             }
         }
-
 
     }
 }

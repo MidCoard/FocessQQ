@@ -7,7 +7,6 @@ import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
 
 import com.focess.util.Pair;
-import com.focess.util.yaml.YamlConfiguration;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -24,7 +23,6 @@ import net.mamoe.mirai.message.data.SingleMessage;
 import net.mamoe.mirai.utils.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.yaml.snakeyaml.Yaml;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.*;
@@ -45,6 +43,10 @@ public class Main{
     }
 
     public static Scanner scanner;
+
+    public static Bot getBot() {
+        return bot;
+    }
 
     public static class MainPlugin extends Plugin {
 
@@ -72,21 +74,23 @@ public class Main{
 
     }
 
-    private final static MainPlugin mainPlugin = new MainPlugin();
+    private final static MainPlugin MAIN_PLUGIN = new MainPlugin();
 
     private static long user = 3418652527L;
 
     private static String password = "asnbot371237";
 
+    @Deprecated
     public static Bot bot;
 
     public static void main(String[] args) {
         if (args.length == 2) {
-            user = Long.parseLong(args[0]);
-            password = args[1];
+            try {
+                user = Long.parseLong(args[0]);
+                password = args[1];
+            } catch (Exception ignored) {}
         }
-        LoadCommand.addPlugin(mainPlugin);
-        mainPlugin.enable();
+        LoadCommand.loadPlugin(MAIN_PLUGIN);
         init();
         scanner = new Scanner(System.in);
         BotConfiguration configuration = BotConfiguration.getDefault();
@@ -123,7 +127,7 @@ public class Main{
         });
         configuration.setBotLoggerSupplier((b) -> new MiraiLoggerWithSwitch(Utils.getDefaultLogger().invoke(""), false));
         bot = BotFactoryJvm.newBot(user, password, configuration);
-        bot.login();
+        getBot().login();
         Events.registerEvents(new SimpleListenerHost() {
             @Override
             public void handleException(@NotNull CoroutineContext context, @NotNull Throwable exception) {
@@ -191,22 +195,20 @@ public class Main{
     }
 
     private static void init() {
-        Command.register(mainPlugin,new LoadCommand());
-        Command.register(mainPlugin,new UnloadCommand());
-        Command.register(mainPlugin,new StopCommand());
+        Command.register(MAIN_PLUGIN,new LoadCommand());
+        Command.register(MAIN_PLUGIN,new UnloadCommand());
+        Command.register(MAIN_PLUGIN,new StopCommand());
         File plugins = new File("plugins");
         if (plugins.exists())
-        for (File file: Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
-            CommandLine.exec(CommandSender.CONSOLE,"load plugins/" + file.getName(),IOHandler.IO_HANDLER);
+            for (File file: Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
+                CommandLine.exec(CommandSender.CONSOLE,"load plugins/" + file.getName(),IOHandler.IO_HANDLER);
     }
 
     public static void exit() {
         for (Plugin plugin:LoadCommand.getPlugins())
-            if(!plugin.equals(mainPlugin))
+            if(!plugin.equals(MAIN_PLUGIN))
                 CommandLine.exec(CommandSender.CONSOLE,"unload " + plugin.getName(),IOHandler.IO_HANDLER);
-        mainPlugin.disable();
-        UnloadCommand.unregister(mainPlugin);
-        LoadCommand.removePlugin(mainPlugin);
+        LoadCommand.disablePlugin(MAIN_PLUGIN);
         System.exit(0);
     }
 
@@ -236,7 +238,7 @@ public class Main{
         private static void exec1(CommandSender sender, String command, String[] args,IOHandler ioHandler) {
             for (Command com: Command.getCommands())
                 if (com.getAli().contains(command) || com.getName().equals(command))
-                    com.execute(sender, args,ioHandler);
+                    com.execute(sender,args,ioHandler);
         }
     }
 
