@@ -1,5 +1,6 @@
 package com.focess.api.command;
 
+import com.focess.api.util.IOHandler;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
@@ -8,7 +9,12 @@ import java.util.Objects;
 
 public class CommandSender {
 
-    public static final CommandSender CONSOLE = new CommandSender(new MemberOrConsoleOrFriend());
+    public static final CommandSender CONSOLE = new CommandSender(new MemberOrConsoleOrFriend()) {
+        @Override
+        public IOHandler getIOHandler() {
+            return IOHandler.IO_HANDLER;
+        }
+    };
 
     private final Member member;
     private final Friend friend;
@@ -128,6 +134,10 @@ public class CommandSender {
             this.member = null;
             this.friend = null;
         }
+    }
+
+    public IOHandler getIOHandler() {
+        return IOHandler.getIoHandlerByCommandSender(this);
     }
 
 }

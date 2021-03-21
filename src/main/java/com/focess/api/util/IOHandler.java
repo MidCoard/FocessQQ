@@ -85,7 +85,6 @@ public abstract class IOHandler {
                 return this.sentString;
             }
 
-
         };
     }
 

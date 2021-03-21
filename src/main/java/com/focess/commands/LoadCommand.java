@@ -130,7 +130,7 @@ public class LoadCommand extends Command {
                     try {
                         //NullPointer maybe thrown
                         Command command;
-                        if (Command.register(Objects.requireNonNull(getPlugin(commandType.plugin())),command = (Command)c.newInstance()))
+                        if (!Command.register(Objects.requireNonNull(getPlugin(commandType.plugin())),command = (Command)c.newInstance()))
                             throw new CommandDuplicateException(command.getName());
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();

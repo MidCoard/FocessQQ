@@ -19,7 +19,6 @@ import net.mamoe.mirai.event.Events;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.message.FriendMessageEvent;
 import net.mamoe.mirai.message.GroupMessageEvent;
-import net.mamoe.mirai.message.data.SingleMessage;
 import net.mamoe.mirai.utils.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,18 +41,22 @@ public class Main{
         });
     }
 
+    private static boolean isRunning = false;
+
     public static Scanner scanner;
 
     public static Bot getBot() {
         return bot;
     }
 
-    public static class MainPlugin extends Plugin {
+    public final static class MainPlugin extends Plugin {
 
         private static Map<String,Object> properties;
 
-        public MainPlugin() {
+        private MainPlugin() {
             super("Main");
+            if (isRunning)
+                Main.exit();
         }
 
         public static Map<String, Object> getProperties() {
@@ -76,6 +79,10 @@ public class Main{
 
     private final static MainPlugin MAIN_PLUGIN = new MainPlugin();
 
+    public static MainPlugin getMainPlugin() {
+        return MAIN_PLUGIN;
+    }
+
     private static long user = 3418652527L;
 
     private static String password = "asnbot371237";
@@ -88,9 +95,13 @@ public class Main{
             try {
                 user = Long.parseLong(args[0]);
                 password = args[1];
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                user = 3418652527L;
+                password = "asnbot371237";
+            }
         }
         LoadCommand.loadPlugin(MAIN_PLUGIN);
+        isRunning  = true;
         init();
         scanner = new Scanner(System.in);
         BotConfiguration configuration = BotConfiguration.getDefault();
@@ -140,9 +151,6 @@ public class Main{
                 IOHandler.IO_HANDLER.output("Permission: " + event.getPermission());
                 IOHandler.IO_HANDLER.output("NameCard: " + event.getSender().getNameCard());
                 IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
-                IOHandler.IO_HANDLER.output("Message: " + event.getMessage().contentToString());
-                IOHandler.IO_HANDLER.output("MessageChain: " );
-                event.getMessage().forEach(SingleMessage::contentToString);
                 IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
                 IOHandler.IO_HANDLER.output("RawMessageChain: ");
                 event.getMessage().forEach(System.out::println);
@@ -166,9 +174,6 @@ public class Main{
             public void onMessage(FriendMessageEvent event) {
                 IOHandler.IO_HANDLER.output("F--------" + event.getFriend().getNick()  + ":" + event.getFriend().getId()+ "--------");
                 IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
-                IOHandler.IO_HANDLER.output("Message: " + event.getMessage().contentToString());
-                IOHandler.IO_HANDLER.output("MessageChain: " );
-                event.getMessage().forEach(SingleMessage::contentToString);
                 IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
                 IOHandler.IO_HANDLER.output("RawMessageChain: ");
                 event.getMessage().forEach(System.out::println);
@@ -202,6 +207,17 @@ public class Main{
         if (plugins.exists())
             for (File file: Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
                 CommandLine.exec(CommandSender.CONSOLE,"load plugins/" + file.getName(),IOHandler.IO_HANDLER);
+        Runtime.getRuntime().addShutdownHook(new Thread("SavingData"){
+            @Override
+            public void run() {
+                if (isRunning) {
+                    for (Plugin plugin:LoadCommand.getPlugins())
+                        if(!plugin.equals(MAIN_PLUGIN))
+                            CommandLine.exec(CommandSender.CONSOLE,"unload " + plugin.getName(),IOHandler.IO_HANDLER);
+                    LoadCommand.disablePlugin(MAIN_PLUGIN);
+                }
+            }
+        });
     }
 
     public static void exit() {
@@ -209,6 +225,7 @@ public class Main{
             if(!plugin.equals(MAIN_PLUGIN))
                 CommandLine.exec(CommandSender.CONSOLE,"unload " + plugin.getName(),IOHandler.IO_HANDLER);
         LoadCommand.disablePlugin(MAIN_PLUGIN);
+        isRunning = false;
         System.exit(0);
     }
 
