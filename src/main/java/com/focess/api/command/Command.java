@@ -96,9 +96,9 @@ public abstract class Command{
             return true;
         final int amount = args.length;
         boolean flag = false;
+        CommandResult result = CommandResult.NONE;
         for (final Executor executor : this.executors) {
             if (executor.checkCount(amount) && executor.checkArgs(args)) {
-                CommandResult result;
                 if (this.checkPermission(sender, executor))
                     result = executor.execute(sender, Arrays.copyOfRange(args, executor.getSubCommandsSize(), args.length),ioHandler);
                 else result = CommandResult.REFUSE;
@@ -109,7 +109,7 @@ public abstract class Command{
                 break;
             }
         }
-        if (!flag)
+        if (!flag || result == CommandResult.ARGS)
             this.usage(sender,ioHandler);
         return true;
     }

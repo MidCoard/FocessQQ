@@ -15,6 +15,7 @@ import com.focess.commands.util.AnnotationHandler;
 import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
@@ -81,7 +82,8 @@ public class LoadCommand extends Command {
                     try {
                         ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start PluginClassLoader");
                         PluginClassLoader classLoader = new PluginClassLoader(file, this.getClass().getClassLoader());
-                        classLoader.load();
+                        if (!classLoader.load())
+                            ioHandler.output(ChatConstants.CONSOLE_HEADER + "Plugin need load after some other plugins.");
                         classLoader.close();
                         ioHandler.output(ChatConstants.CONSOLE_HEADER + "End PluginClassLoader");
                     } catch (IOException e) {
@@ -94,7 +96,6 @@ public class LoadCommand extends Command {
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "End loading...");
                 return CommandResult.REFUSE;
             }
-            ioHandler.output(ChatConstants.CONSOLE_HEADER + "Permission denied.");
             return CommandResult.REFUSE;
         });
     }
@@ -106,18 +107,35 @@ public class LoadCommand extends Command {
 
     public static class PluginClassLoader extends URLClassLoader {
 
+        private static final Map<String,Set<File>> afterPlugins = Maps.newHashMap();
+
+        private static final Set<File> afterPluginFiles = Sets.newConcurrentHashSet();
+
         private final File file;
 
         private static final Map<Class<? extends Annotation>,AnnotationHandler> handlers = Maps.newHashMap();
 
         private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c,annotation,classLoader)->{
+            PluginType pluginType = (PluginType) annotation;
+            if (!pluginType.loadAfter().equals("") && getPlugin(pluginType.loadAfter()) == null) {
+                afterPlugins.compute(pluginType.loadAfter(),(key,value)->{
+                    if (value == null)
+                        return Sets.newHashSet(classLoader.file);
+                    else value.add(classLoader.file);
+                    return value;
+                });
+                afterPluginFiles.add(classLoader.file);
+                return false;
+            }
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
                     Plugin plugin;
                     if (!classLoader.addPlugin( plugin = (Plugin) c.newInstance()))
                         throw new PluginDuplicateException(plugin.getName());
+                    return true;
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
+                    return false;
                 }
             }
             else throw new IllegalPluginClassException();
@@ -137,6 +155,7 @@ public class LoadCommand extends Command {
                     }
                 }
                 else throw new IllegalCommandClassException();
+                return true;
             });
         }
 
@@ -160,7 +179,7 @@ public class LoadCommand extends Command {
 
         private final List<Class<?>> loadedClasses = Lists.newArrayList();
 
-        public void load() {
+        public boolean load() {
             try {
                 JarFile jarFile = new JarFile(file);
                 Enumeration<JarEntry> entries = jarFile.entries();
@@ -171,21 +190,42 @@ public class LoadCommand extends Command {
                         continue;
                     Class<?> c = this.loadClass(name.replace("/", ".").substring(0,name.length() - 6));
                     loadedClasses.add(c);
-                    analyseClass0(c);
+                    if (!analyseClass0(c))
+                        return false;
                 }
                 for (Plugin plugin:plugins)
                     loadPlugin(plugin);
                 for (Class<?> c:loadedClasses)
                     analyseClass(c);
+                for (Plugin plugin:plugins) {
+                    for (File file : afterPlugins.getOrDefault(plugin.getName(), Sets.newHashSet())) {
+                        if (afterPluginFiles.contains(file)) {
+                            PluginClassLoader pluginClassLoader = new PluginClassLoader(file,new ParentClassLoader(this,this.getParent()) );
+                            if (pluginClassLoader.load()) {
+                                CommandSender.CONSOLE.getIOHandler().output("Successfully load some other plugins after " + plugin.getName() + ".");
+                                afterPluginFiles.remove(file);
+                            }
+                            pluginClassLoader.close();
+                        }
+                    }
+                    afterPlugins.remove(plugin.getName());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            return true;
         }
 
-        private void analyseClass0(@NonNull Class<?> c) {
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            return super.loadClass(name);
+        }
+
+        private boolean analyseClass0(@NonNull Class<?> c) {
             Annotation annotation;
             if ((annotation = c.getAnnotation(PluginType.class)) != null)
-                PLUGIN_TYPE_HANDLER.handle(c,annotation,this);
+                return PLUGIN_TYPE_HANDLER.handle(c, annotation, this);
+            return true;
         }
 
         private <T extends Annotation> void analyseClass(@NonNull Class<?> c)  {
@@ -193,6 +233,35 @@ public class LoadCommand extends Command {
                 Annotation a;
                 if ((a = c.getAnnotation(annotation)) != null)
                     handlers.get(annotation).handle(c, a, this);
+            }
+        }
+
+        private static class ParentClassLoader extends ClassLoader {
+            private final ClassLoader classLoader;
+            private final ClassLoader parent;
+
+            public ParentClassLoader(ClassLoader classLoader, ClassLoader parent) {
+                this.classLoader = classLoader;
+                this.parent = parent;
+            }
+
+            @Override
+            public Class<?> loadClass(String name) throws ClassNotFoundException {
+                Class<?> cls;
+                try {
+                    cls = this.classLoader.loadClass(name);
+                } catch (Exception e) {
+                    cls = this.parent.loadClass(name);
+                }
+                return cls;
+            }
+
+            @Override
+            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                Class<?> cls = loadClass(name);
+                if (resolve)
+                    this.resolveClass(cls);
+                return cls;
             }
         }
 

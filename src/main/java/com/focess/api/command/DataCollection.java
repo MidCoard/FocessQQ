@@ -115,10 +115,10 @@ public class DataCollection {
 
     public Plugin getPlugin(){return this.pluginBuffer.get();}
 
-    private static Map<Class<?>,BufferGetter> registeredBuffers = Maps.newHashMap();
+    private static final Map<Class<?>,BufferGetter> registeredBuffers = Maps.newHashMap();
 
-    public <T> void writeT(T t) {
-        buffers.compute(t.getClass(),(Key,value)->{
+    public <T> void writeT(Class<T> cls,T t) {
+        buffers.compute(cls,(Key,value)->{
             if (value == null)
                 throw new UnsupportedOperationException();
             value.put(t);
@@ -131,7 +131,7 @@ public class DataCollection {
     }
 
     public interface BufferGetter {
-        DataBuffer newBuffer(int size);
+        DataBuffer<?> newBuffer(int size);
     }
 
     public static void registeredBuffer(Class<?> c,BufferGetter bufferGetter) {

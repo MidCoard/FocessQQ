@@ -5,5 +5,5 @@ import com.focess.commands.LoadCommand.PluginClassLoader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public interface AnnotationHandler {
-    void handle(@NonNull Class<?> c, @NonNull Annotation annotation,@NonNull PluginClassLoader classLoader);
+    boolean handle(@NonNull Class<?> c, @NonNull Annotation annotation,@NonNull PluginClassLoader classLoader);
 }

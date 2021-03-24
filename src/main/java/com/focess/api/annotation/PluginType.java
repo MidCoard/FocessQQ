@@ -1,12 +1,16 @@
 package com.focess.api.annotation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.*;
-
-@Target(TYPE)
-@Retention(RUNTIME)
+@Target(value = ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface PluginType {
+
+    String loadAfter() default "";
+
 }

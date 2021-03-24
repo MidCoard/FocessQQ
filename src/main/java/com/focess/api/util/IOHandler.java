@@ -17,7 +17,7 @@ public abstract class IOHandler {
 
         @Override
         public String input() {
-            return Main.scanner.nextLine();
+            return Main.getScanner().nextLine();
         }
 
         @Override
@@ -27,7 +27,7 @@ public abstract class IOHandler {
 
         @Override
         public boolean hasInput(boolean flag) {
-            return Main.scanner.hasNextLine();
+            return Main.getScanner().hasNextLine();
         }
     };
 

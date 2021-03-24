@@ -14,14 +14,17 @@ import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactoryJvm;
+import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.Events;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.message.FriendMessageEvent;
 import net.mamoe.mirai.message.GroupMessageEvent;
 import net.mamoe.mirai.utils.*;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import sun.reflect.annotation.AnnotationParser;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.*;
@@ -43,7 +46,12 @@ public class Main{
 
     private static boolean isRunning = false;
 
+    @Deprecated
     public static Scanner scanner;
+
+    public static Scanner getScanner() {
+        return scanner;
+    }
 
     public static Bot getBot() {
         return bot;
@@ -54,7 +62,7 @@ public class Main{
         private static Map<String,Object> properties;
 
         private MainPlugin() {
-            super("Main");
+            super("MainPlugin");
             if (isRunning)
                 Main.exit();
         }
@@ -72,6 +80,8 @@ public class Main{
 
         @Override
         public void disable() {
+            for (String key:properties.keySet())
+                getConfig().set(key,properties.get(key));
             getConfig().save(getConfigFile());
         }
 
@@ -85,7 +95,34 @@ public class Main{
 
     private static long user = 3418652527L;
 
+    public static long getUser() {
+        return user;
+    }
+
+    private static final long AUTHOR_USER = 2624646185L;
+
+    public static long getAuthorUser() {
+        return AUTHOR_USER;
+    }
+
+    public static Friend getAuthor() {
+        return getBot().getFriend(getAuthorUser());
+    }
+
     private static String password = "asnbot371237";
+
+    private static void updateMessage(CommandSender now,String content,String valueOf,AtomicBoolean flag) {
+        quests.compute(now,(k,v)->{
+            if (v !=null && !v.isEmpty()) {
+                Pair<IOHandler,Boolean> element = v.poll();
+                if (element.getValue())
+                    element.getKey().handle(content);
+                else element.getKey().handle(valueOf);
+                flag.set(true);
+            }
+            return v;
+        });
+    }
 
     @Deprecated
     public static Bot bot;
@@ -102,8 +139,12 @@ public class Main{
         }
         LoadCommand.loadPlugin(MAIN_PLUGIN);
         isRunning  = true;
-        init();
         scanner = new Scanner(System.in);
+        try {
+            init();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.fileBasedDeviceInfo();
         configuration.setLoginSolver(new LoginSolver() {
@@ -156,18 +197,9 @@ public class Main{
                 event.getMessage().forEach(System.out::println);
                 CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
                 AtomicBoolean flag = new AtomicBoolean(false);
-                quests.compute(now,(k,v)->{
-                    if (v !=null && !v.isEmpty()) {
-                        Pair<IOHandler,Boolean> element = v.poll();
-                        if (element.getValue())
-                            element.getKey().handle(event.getMessage().contentToString());
-                        else element.getKey().handle(event.getMessage().toString());
-                        flag.set(true);
-                    }
-                    return v;
-                });
+                updateMessage(now,event.getMessage().contentToString(),event.getMessage().toString(),flag);
                 if (!flag.get())
-                    CommandLine.exec(now,event.getMessage().contentToString(),IOHandler.getIoHandlerByCommandSender(now));
+                    CommandLine.exec(now,event.getMessage().contentToString());
             }
 
             @EventHandler(ignoreCancelled = true)
@@ -179,23 +211,18 @@ public class Main{
                 event.getMessage().forEach(System.out::println);
                 CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
                 AtomicBoolean flag = new AtomicBoolean(false);
-                quests.compute(now,(k,v)->{
-                    if (v !=null && !v.isEmpty()) {
-                        Pair<IOHandler,Boolean> element = v.poll();
-                        if (element.getValue())
-                            element.getKey().handle(event.getMessage().contentToString());
-                        else element.getKey().handle(event.getMessage().toString());
-                        flag.set(true);
-                    }
-                    return v;
-                });
+                updateMessage(now,event.getMessage().contentToString(),event.getMessage().toString(),flag);
                 if (!flag.get())
-                    CommandLine.exec(now,event.getMessage().contentToString(),IOHandler.getIoHandlerByCommandSender(now));
+                    CommandLine.exec(now,event.getMessage().contentToString());
             }
 
         });
         while (IOHandler.getIoHandler().hasInput(true))
-            CommandLine.exec(CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend()),IOHandler.IO_HANDLER.input(), IOHandler.IO_HANDLER);
+            try {
+                CommandLine.exec(IOHandler.IO_HANDLER.input());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         scanner.close();
     }
 
@@ -206,14 +233,14 @@ public class Main{
         File plugins = new File("plugins");
         if (plugins.exists())
             for (File file: Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
-                CommandLine.exec(CommandSender.CONSOLE,"load plugins/" + file.getName(),IOHandler.IO_HANDLER);
+                CommandLine.exec("load plugins/" + file.getName());
         Runtime.getRuntime().addShutdownHook(new Thread("SavingData"){
             @Override
             public void run() {
                 if (isRunning) {
                     for (Plugin plugin:LoadCommand.getPlugins())
                         if(!plugin.equals(MAIN_PLUGIN))
-                            CommandLine.exec(CommandSender.CONSOLE,"unload " + plugin.getName(),IOHandler.IO_HANDLER);
+                            CommandLine.exec("unload " + plugin.getName());
                     LoadCommand.disablePlugin(MAIN_PLUGIN);
                 }
             }
@@ -223,13 +250,21 @@ public class Main{
     public static void exit() {
         for (Plugin plugin:LoadCommand.getPlugins())
             if(!plugin.equals(MAIN_PLUGIN))
-                CommandLine.exec(CommandSender.CONSOLE,"unload " + plugin.getName(),IOHandler.IO_HANDLER);
+                CommandLine.exec("unload " + plugin.getName());
         LoadCommand.disablePlugin(MAIN_PLUGIN);
         isRunning = false;
         System.exit(0);
     }
 
     public static class CommandLine {
+
+        public static void exec(String command) {
+            exec(CommandSender.CONSOLE,command);
+        }
+
+        public static void exec(CommandSender sender,String command) {
+            exec(sender,command,sender.getIOHandler());
+        }
 
         public static void exec(CommandSender sender, String command, IOHandler ioHandler) {
             IOHandler.IO_HANDLER.output(sender + " EXEC: \"" + command + "\"");
@@ -242,9 +277,10 @@ public class Main{
                     stringBuilder.delete(0,stringBuilder.length());
                 }
                 else {
-                    stringBuilder.append(c);
                     if (c == '"')
                         stack = !stack;
+                    else
+                        stringBuilder.append(c);
                 }
             args.add(stringBuilder.toString());
             String name = args.get(0);

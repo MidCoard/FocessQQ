@@ -23,7 +23,6 @@ public class StopCommand extends Command {
                 Main.exit();
                 return CommandResult.ALLOW;
             }
-            ioHandler.output(ChatConstants.CONSOLE_HEADER + "Permission denied.");
             return CommandResult.REFUSE;
         });
     }

@@ -27,7 +27,6 @@ public class UnloadCommand extends Command {
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "End unloading...");
                 return CommandResult.REFUSE;
             }
-            ioHandler.output(ChatConstants.CONSOLE_HEADER + "Permission denied.");
             return CommandResult.REFUSE;
         }).addDataConverter(PluginDataConverter.PLUGIN_DATA_CONVERTER);
     }
