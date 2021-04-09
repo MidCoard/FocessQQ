@@ -22,14 +22,6 @@ public class CommandSender {
     private final boolean isFriend;
     private final MemberPermission permission;
 
-    public Friend getFriend() {
-        return friend;
-    }
-
-    public boolean isFriend() {
-        return isFriend;
-    }
-
     public CommandSender(MemberOrConsoleOrFriend memberOrConsoleOrFriend) {
         this.member = memberOrConsoleOrFriend.member;
         this.friend = memberOrConsoleOrFriend.friend;
@@ -42,6 +34,13 @@ public class CommandSender {
         return new CommandSender(memberOrConsoleOrFriend);
     }
 
+    public Friend getFriend() {
+        return friend;
+    }
+
+    public boolean isFriend() {
+        return isFriend;
+    }
 
     public boolean hasPermission(MemberPermission permission) {
         if (isAuthor())
@@ -88,24 +87,26 @@ public class CommandSender {
         CommandSender sender = (CommandSender) o;
         if (this.isMember() && sender.isMember()) {
             return sender.getMember().getGroup() == this.getMember().getGroup() && sender.getMember().getId() == this.getMember().getId();
-        }
-        else if (this.isFriend() && sender.isFriend()) {
+        } else if (this.isFriend() && sender.isFriend()) {
             return sender.getFriend().getId() == this.getFriend().getId();
-        }
-        else return this.isConsole() && sender.isConsole();
+        } else return this.isConsole() && sender.isConsole();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(member == null ? null:member.getId(), friend == null ? null : friend.getId(), isMember, isFriend);
+        return Objects.hash(member == null ? null : member.getId(), friend == null ? null : friend.getId(), isMember, isFriend);
     }
 
     public boolean isSimilar(CommandSender sender) {
-       return this.equals(sender);
+        return this.equals(sender);
     }
 
     public boolean isConsole() {
         return !isFriend() && !isMember();
+    }
+
+    public IOHandler getIOHandler() {
+        return IOHandler.getIoHandlerByCommandSender(this);
     }
 
     public static class MemberOrConsoleOrFriend {
@@ -134,10 +135,6 @@ public class CommandSender {
             this.member = null;
             this.friend = null;
         }
-    }
-
-    public IOHandler getIOHandler() {
-        return IOHandler.getIoHandlerByCommandSender(this);
     }
 
 }

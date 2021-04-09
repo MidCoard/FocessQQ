@@ -1,8 +1,8 @@
 package com.focess.api.command;
 
 import com.focess.api.Plugin;
-import com.focess.api.command.data.*;
 import com.focess.api.command.data.StringBuffer;
+import com.focess.api.command.data.*;
 import com.google.common.collect.Maps;
 
 import java.nio.*;
@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public class DataCollection {
 
+    private static final Map<Class<?>, BufferGetter> registeredBuffers = Maps.newHashMap();
     private final IntBuffer intBuffer;
     private final DoubleBuffer doubleBuffer;
     private final FloatBuffer floatBuffer;
@@ -24,8 +25,7 @@ public class DataCollection {
     private final ObjectBuffer objectBuffer;
     private final StringBuffer defaultBuffer;
     private final PluginBuffer pluginBuffer;
-
-    private Map<Class<?>,DataBuffer> buffers = Maps.newHashMap();
+    private Map<Class<?>, DataBuffer> buffers = Maps.newHashMap();
 
     public DataCollection(int size) {
         this.defaultBuffer = StringBuffer.allocate(size);
@@ -41,8 +41,12 @@ public class DataCollection {
         this._UUIDBuffer = UUIDBuffer.allocate(size);
         this.objectBuffer = ObjectBuffer.allocate(size);
         this.pluginBuffer = PluginBuffer.allocate(size);
-        for (Class<?> c:registeredBuffers.keySet())
-            buffers.put(c,registeredBuffers.get(c).newBuffer(size));
+        for (Class<?> c : registeredBuffers.keySet())
+            buffers.put(c, registeredBuffers.get(c).newBuffer(size));
+    }
+
+    public static void registeredBuffer(Class<?> c, BufferGetter bufferGetter) {
+        registeredBuffers.put(c, bufferGetter);
     }
 
     public void flip() {
@@ -59,66 +63,116 @@ public class DataCollection {
         this._UUIDBuffer.flip();
         this.objectBuffer.flip();
         this.pluginBuffer.flip();
-        for (Class<?> c:buffers.keySet())
+        for (Class<?> c : buffers.keySet())
             buffers.get(c).flip();
     }
 
-    void write(String s) {defaultBuffer.put(s);}
+    void write(String s) {
+        defaultBuffer.put(s);
+    }
 
-    void writeInt(int i) { intBuffer.put(i); }
+    void writeInt(int i) {
+        intBuffer.put(i);
+    }
 
-    void writeDouble(double d) { doubleBuffer.put(d); }
+    void writeDouble(double d) {
+        doubleBuffer.put(d);
+    }
 
-    void writeFloat(float f) {floatBuffer.put(f);}
+    void writeFloat(float f) {
+        floatBuffer.put(f);
+    }
 
-    void writeBoolean(boolean b){booleanBuffer.put(b);}
+    void writeBoolean(boolean b) {
+        booleanBuffer.put(b);
+    }
 
-    void writeByte(byte b){byteBuffer.put(b);}
+    void writeByte(byte b) {
+        byteBuffer.put(b);
+    }
 
-    void writeLong(long l){longBuffer.put(l);}
+    void writeLong(long l) {
+        longBuffer.put(l);
+    }
 
-    void writeChar(char c){charBuffer.put(c);}
+    void writeChar(char c) {
+        charBuffer.put(c);
+    }
 
-    void writeShort(short s){shortBuffer.put(s);}
+    void writeShort(short s) {
+        shortBuffer.put(s);
+    }
 
-    void writeString(String s){stringBuffer.put(s);}
+    void writeString(String s) {
+        stringBuffer.put(s);
+    }
 
-    void writeUUID(UUID u){_UUIDBuffer.put(u);}
+    void writeUUID(UUID u) {
+        _UUIDBuffer.put(u);
+    }
 
-    void writeObject(Object o){objectBuffer.put(o);}
+    void writeObject(Object o) {
+        objectBuffer.put(o);
+    }
 
-    public String get() {return defaultBuffer.get();}
+    public String get() {
+        return defaultBuffer.get();
+    }
 
-    public int getInt() {return intBuffer.get();}
+    public int getInt() {
+        return intBuffer.get();
+    }
 
-    public double getDouble(){return doubleBuffer.get();}
+    public double getDouble() {
+        return doubleBuffer.get();
+    }
 
-    public float getFloat(){return floatBuffer.get();}
+    public float getFloat() {
+        return floatBuffer.get();
+    }
 
-    public boolean getBoolean(){return booleanBuffer.get();}
+    public boolean getBoolean() {
+        return booleanBuffer.get();
+    }
 
-    public byte getByte(){return byteBuffer.get();}
+    public byte getByte() {
+        return byteBuffer.get();
+    }
 
-    public long getLong(){return longBuffer.get();}
+    public long getLong() {
+        return longBuffer.get();
+    }
 
-    public char getChar(){return charBuffer.get();}
+    public char getChar() {
+        return charBuffer.get();
+    }
 
-    public short getShort(){return shortBuffer.get();}
+    public short getShort() {
+        return shortBuffer.get();
+    }
 
-    public String getString() {return stringBuffer.get(); }
+    public String getString() {
+        return stringBuffer.get();
+    }
 
-    public UUID getUUID() {return _UUIDBuffer.get();}
+    public UUID getUUID() {
+        return _UUIDBuffer.get();
+    }
 
-    public Object getObject() {return objectBuffer.get();}
+    public Object getObject() {
+        return objectBuffer.get();
+    }
 
-    public void writePlugin(Plugin p) {this.pluginBuffer.put(p);}
+    public void writePlugin(Plugin p) {
+        this.pluginBuffer.put(p);
+    }
 
-    public Plugin getPlugin(){return this.pluginBuffer.get();}
+    public Plugin getPlugin() {
+        return this.pluginBuffer.get();
+    }
 
-    private static final Map<Class<?>,BufferGetter> registeredBuffers = Maps.newHashMap();
-
-    public <T> void writeT(Class<T> cls,T t) {
-        buffers.compute(cls,(Key,value)->{
+    public <T> void writeT(Class<T> cls, T t) {
+        buffers.compute(cls, (Key, value) -> {
             if (value == null)
                 throw new UnsupportedOperationException();
             value.put(t);
@@ -132,9 +186,5 @@ public class DataCollection {
 
     public interface BufferGetter {
         DataBuffer<?> newBuffer(int size);
-    }
-
-    public static void registeredBuffer(Class<?> c,BufferGetter bufferGetter) {
-        registeredBuffers.put(c,bufferGetter);
     }
 }

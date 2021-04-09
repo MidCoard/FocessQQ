@@ -4,50 +4,54 @@ import com.focess.api.Plugin;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
 import com.focess.api.util.IOHandler;
-import com.focess.commands.*;
-
+import com.focess.commands.LoadCommand;
+import com.focess.commands.StopCommand;
+import com.focess.commands.UnloadCommand;
 import com.focess.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import kotlin.coroutines.Continuation;
-import kotlin.coroutines.CoroutineContext;
 import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.BotFactoryJvm;
+import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.event.EventHandler;
-import net.mamoe.mirai.event.Events;
-import net.mamoe.mirai.event.SimpleListenerHost;
-import net.mamoe.mirai.message.FriendMessageEvent;
-import net.mamoe.mirai.message.GroupMessageEvent;
-import net.mamoe.mirai.utils.*;
-import org.checkerframework.checker.units.qual.A;
+import net.mamoe.mirai.event.Listener;
+import net.mamoe.mirai.event.events.FriendMessageEvent;
+import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.utils.BotConfiguration;
+import net.mamoe.mirai.utils.LoginSolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import sun.reflect.annotation.AnnotationParser;
 
 import javax.imageio.stream.FileImageOutputStream;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Main{
+public class Main {
 
-    private static final Map<CommandSender,Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
+    private static final Map<CommandSender, Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
+    private final static MainPlugin MAIN_PLUGIN = new MainPlugin();
+    private static final long AUTHOR_USER = 2624646185L;
+    @Deprecated
+    public static Scanner scanner;
+    @Deprecated
+    public static Bot bot;
+    private static boolean isRunning = false;
+    private static Listener<GroupMessageEvent> groupMessageEventListener;
+    private static Listener<FriendMessageEvent> friendMessageEventListener;
+    private static long user = 3418652527L;
+    private static String password = "asnbot371237";
 
     public static void registerIOHandler(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
-        quests.compute(commandSender,(k,v)->{
+        quests.compute(commandSender, (k, v) -> {
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
-            v.offer(Pair.of(ioHandler,flag));
+            v.offer(Pair.of(ioHandler, flag));
             return v;
         });
     }
-
-    private static boolean isRunning = false;
-
-    @Deprecated
-    public static Scanner scanner;
 
     public static Scanner getScanner() {
         return scanner;
@@ -57,49 +61,13 @@ public class Main{
         return bot;
     }
 
-    public final static class MainPlugin extends Plugin {
-
-        private static Map<String,Object> properties;
-
-        private MainPlugin() {
-            super("MainPlugin");
-            if (isRunning)
-                Main.exit();
-        }
-
-        public static Map<String, Object> getProperties() {
-            return properties;
-        }
-
-        @Override
-        public void enable() {
-            properties = getConfig().getValues();
-            if (properties == null)
-                properties = Maps.newHashMap();
-        }
-
-        @Override
-        public void disable() {
-            for (String key:properties.keySet())
-                getConfig().set(key,properties.get(key));
-            getConfig().save(getConfigFile());
-        }
-
-    }
-
-    private final static MainPlugin MAIN_PLUGIN = new MainPlugin();
-
     public static MainPlugin getMainPlugin() {
         return MAIN_PLUGIN;
     }
 
-    private static long user = 3418652527L;
-
     public static long getUser() {
         return user;
     }
-
-    private static final long AUTHOR_USER = 2624646185L;
 
     public static long getAuthorUser() {
         return AUTHOR_USER;
@@ -109,12 +77,10 @@ public class Main{
         return getBot().getFriend(getAuthorUser());
     }
 
-    private static String password = "asnbot371237";
-
-    private static void updateMessage(CommandSender now,String content,String valueOf,AtomicBoolean flag) {
-        quests.compute(now,(k,v)->{
-            if (v !=null && !v.isEmpty()) {
-                Pair<IOHandler,Boolean> element = v.poll();
+    private static void updateMessage(CommandSender now, String content, String valueOf, AtomicBoolean flag) {
+        quests.compute(now, (k, v) -> {
+            if (v != null && !v.isEmpty()) {
+                Pair<IOHandler, Boolean> element = v.poll();
                 if (element.getValue())
                     element.getKey().handle(content);
                 else element.getKey().handle(valueOf);
@@ -123,9 +89,6 @@ public class Main{
             return v;
         });
     }
-
-    @Deprecated
-    public static Bot bot;
 
     public static void main(String[] args) {
         if (args.length == 2) {
@@ -138,7 +101,7 @@ public class Main{
             }
         }
         LoadCommand.loadPlugin(MAIN_PLUGIN);
-        isRunning  = true;
+        isRunning = true;
         scanner = new Scanner(System.in);
         try {
             init();
@@ -146,11 +109,12 @@ public class Main{
             e.printStackTrace();
         }
         BotConfiguration configuration = BotConfiguration.getDefault();
+        configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
         configuration.fileBasedDeviceInfo();
         configuration.setLoginSolver(new LoginSolver() {
             @Nullable
             @Override
-            public Object onSolvePicCaptcha(@NotNull Bot bot, @NotNull byte[] bytes, @NotNull Continuation<? super String> continuation) {
+            public Object onSolvePicCaptcha(@NotNull Bot bot, byte[] bytes, @NotNull Continuation<? super String> continuation) {
                 try {
                     FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
                     outputStream.write(bytes);
@@ -177,45 +141,33 @@ public class Main{
                 return null;
             }
         });
-        configuration.setBotLoggerSupplier((b) -> new MiraiLoggerWithSwitch(Utils.getDefaultLogger().invoke(""), false));
-        bot = BotFactoryJvm.newBot(user, password, configuration);
+        bot = BotFactory.INSTANCE.newBot(user, password, configuration);
         getBot().login();
-        Events.registerEvents(new SimpleListenerHost() {
-            @Override
-            public void handleException(@NotNull CoroutineContext context, @NotNull Throwable exception) {
-                super.handleException(context, exception);
-            }
-
-            @EventHandler(ignoreCancelled = true)
-            public void onMessage(GroupMessageEvent event) {
-                IOHandler.IO_HANDLER.output("G--------" + event.getGroup().getName() + ":"  + event.getGroup().getId() + "--------");
-                IOHandler.IO_HANDLER.output("Permission: " + event.getPermission());
-                IOHandler.IO_HANDLER.output("NameCard: " + event.getSender().getNameCard());
-                IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
-                IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
-                IOHandler.IO_HANDLER.output("RawMessageChain: ");
-                event.getMessage().forEach(System.out::println);
-                CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
-                AtomicBoolean flag = new AtomicBoolean(false);
-                updateMessage(now,event.getMessage().contentToString(),event.getMessage().toString(),flag);
-                if (!flag.get())
-                    CommandLine.exec(now,event.getMessage().contentToString());
-            }
-
-            @EventHandler(ignoreCancelled = true)
-            public void onMessage(FriendMessageEvent event) {
-                IOHandler.IO_HANDLER.output("F--------" + event.getFriend().getNick()  + ":" + event.getFriend().getId()+ "--------");
-                IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
-                IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
-                IOHandler.IO_HANDLER.output("RawMessageChain: ");
-                event.getMessage().forEach(System.out::println);
-                CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
-                AtomicBoolean flag = new AtomicBoolean(false);
-                updateMessage(now,event.getMessage().contentToString(),event.getMessage().toString(),flag);
-                if (!flag.get())
-                    CommandLine.exec(now,event.getMessage().contentToString());
-            }
-
+        groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
+            IOHandler.IO_HANDLER.output("G--------" + event.getGroup().getName() + ":" + event.getGroup().getId() + "--------");
+            IOHandler.IO_HANDLER.output("Permission: " + event.getPermission());
+            IOHandler.IO_HANDLER.output("NameCard: " + event.getSender().getNameCard());
+            IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
+            IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
+            IOHandler.IO_HANDLER.output("RawMessageChain: ");
+            event.getMessage().forEach(System.out::println);
+            CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
+            AtomicBoolean flag = new AtomicBoolean(false);
+            updateMessage(now, event.getMessage().contentToString(), event.getMessage().toString(), flag);
+            if (!flag.get())
+                CommandLine.exec(now, event.getMessage().contentToString());
+        });
+        friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
+            IOHandler.IO_HANDLER.output("F--------" + event.getFriend().getNick() + ":" + event.getFriend().getId() + "--------");
+            IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
+            IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
+            IOHandler.IO_HANDLER.output("RawMessageChain: ");
+            event.getMessage().forEach(System.out::println);
+            CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
+            AtomicBoolean flag = new AtomicBoolean(false);
+            updateMessage(now, event.getMessage().contentToString(), event.getMessage().toString(), flag);
+            if (!flag.get())
+                CommandLine.exec(now, event.getMessage().contentToString());
         });
         while (IOHandler.getIoHandler().hasInput(true))
             try {
@@ -223,23 +175,31 @@ public class Main{
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        scanner.close();
     }
 
     private static void init() {
-        Command.register(MAIN_PLUGIN,new LoadCommand());
-        Command.register(MAIN_PLUGIN,new UnloadCommand());
-        Command.register(MAIN_PLUGIN,new StopCommand());
+        Command.register(MAIN_PLUGIN, new LoadCommand());
+        Command.register(MAIN_PLUGIN, new UnloadCommand());
+        Command.register(MAIN_PLUGIN, new StopCommand());
         File plugins = new File("plugins");
         if (plugins.exists())
-            for (File file: Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
+            for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
                 CommandLine.exec("load plugins/" + file.getName());
-        Runtime.getRuntime().addShutdownHook(new Thread("SavingData"){
+        new Thread(() -> {
+            while (true) {
+                if (!getBot().isOnline()) {
+                    getBot().login();
+                }
+            }
+        }).start();
+        Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
             @Override
             public void run() {
                 if (isRunning) {
-                    for (Plugin plugin:LoadCommand.getPlugins())
-                        if(!plugin.equals(MAIN_PLUGIN))
+                    friendMessageEventListener.complete();
+                    groupMessageEventListener.complete();
+                    for (Plugin plugin : LoadCommand.getPlugins())
+                        if (!plugin.equals(MAIN_PLUGIN))
                             CommandLine.exec("unload " + plugin.getName());
                     LoadCommand.disablePlugin(MAIN_PLUGIN);
                 }
@@ -248,22 +208,54 @@ public class Main{
     }
 
     public static void exit() {
-        for (Plugin plugin:LoadCommand.getPlugins())
-            if(!plugin.equals(MAIN_PLUGIN))
+        friendMessageEventListener.complete();
+        groupMessageEventListener.complete();
+        for (Plugin plugin : LoadCommand.getPlugins())
+            if (!plugin.equals(MAIN_PLUGIN))
                 CommandLine.exec("unload " + plugin.getName());
         LoadCommand.disablePlugin(MAIN_PLUGIN);
         isRunning = false;
         System.exit(0);
     }
 
+    public final static class MainPlugin extends Plugin {
+
+        private static Map<String, Object> properties;
+
+        private MainPlugin() {
+            super("MainPlugin");
+            if (isRunning)
+                Main.exit();
+        }
+
+        public static Map<String, Object> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public void enable() {
+            properties = getConfig().getValues();
+            if (properties == null)
+                properties = Maps.newHashMap();
+        }
+
+        @Override
+        public void disable() {
+            for (String key : properties.keySet())
+                getConfig().set(key, properties.get(key));
+            getConfig().save(getConfigFile());
+        }
+
+    }
+
     public static class CommandLine {
 
         public static void exec(String command) {
-            exec(CommandSender.CONSOLE,command);
+            exec(CommandSender.CONSOLE, command);
         }
 
-        public static void exec(CommandSender sender,String command) {
-            exec(sender,command,sender.getIOHandler());
+        public static void exec(CommandSender sender, String command) {
+            exec(sender, command, sender.getIOHandler());
         }
 
         public static void exec(CommandSender sender, String command, IOHandler ioHandler) {
@@ -271,12 +263,11 @@ public class Main{
             List<String> args = Lists.newArrayList();
             StringBuilder stringBuilder = new StringBuilder();
             boolean stack = false;
-            for (char c:command.toCharArray())
-                if(c == ' ' && !stack){
+            for (char c : command.toCharArray())
+                if (c == ' ' && !stack) {
                     args.add(stringBuilder.toString());
-                    stringBuilder.delete(0,stringBuilder.length());
-                }
-                else {
+                    stringBuilder.delete(0, stringBuilder.length());
+                } else {
                     if (c == '"')
                         stack = !stack;
                     else
@@ -285,13 +276,13 @@ public class Main{
             args.add(stringBuilder.toString());
             String name = args.get(0);
             args.remove(0);
-            exec1(sender,name,args.toArray(new String[0]),ioHandler);
+            exec1(sender, name, args.toArray(new String[0]), ioHandler);
         }
 
-        private static void exec1(CommandSender sender, String command, String[] args,IOHandler ioHandler) {
-            for (Command com: Command.getCommands())
+        private static void exec1(CommandSender sender, String command, String[] args, IOHandler ioHandler) {
+            for (Command com : Command.getCommands())
                 if (com.getAli().contains(command) || com.getName().equals(command))
-                    com.execute(sender,args,ioHandler);
+                    com.execute(sender, args, ioHandler);
         }
     }
 

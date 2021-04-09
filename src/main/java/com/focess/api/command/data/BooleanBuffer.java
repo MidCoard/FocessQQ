@@ -9,9 +9,11 @@ public class BooleanBuffer extends DataBuffer<Boolean> {
     public BooleanBuffer(int size) {
         this.byteBuffer = ByteBuffer.allocate(size);
     }
+
     public static BooleanBuffer allocate(int size) {
         return new BooleanBuffer(size);
     }
+
     @Override
     public void put(Boolean b) {
         byteBuffer.put((byte) (b ? 1 : 0));

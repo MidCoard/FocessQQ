@@ -13,7 +13,7 @@ public class UnloadCommand extends Command {
 
     @Override
     public void init() {
-        this.addExecutor(1, (sender, data, ioHandler)->{
+        this.addExecutor(1, (sender, data, ioHandler) -> {
             if (sender.isConsole()) {
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start unloading...");
                 Plugin plugin = data.getPlugin();

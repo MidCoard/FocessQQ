@@ -5,10 +5,6 @@ import com.focess.api.command.CommandSender;
 
 public abstract class IOHandler {
 
-    public static IOHandler getIoHandler() {
-        return IO_HANDLER;
-    }
-
     public static volatile IOHandler IO_HANDLER = new IOHandler() {
         @Override
         public void output(String output) {
@@ -31,12 +27,19 @@ public abstract class IOHandler {
         }
     };
 
+    public static IOHandler getIoHandler() {
+        return IO_HANDLER;
+    }
+
     public static void setIoHandler(IOHandler ioHandler) {
         IO_HANDLER = ioHandler;
     }
 
     public static IOHandler getIoHandlerByCommandSender(CommandSender commandSender) {
         return new IOHandler() {
+            private volatile String sentString = null;
+            private volatile boolean hasSent = false;
+
             public boolean hasSent() {
                 return hasSent;
             }
@@ -69,14 +72,10 @@ public abstract class IOHandler {
 
             @Override
             public boolean hasInput(boolean flag) {
-                Main.registerIOHandler(this,commandSender,flag);
-                while (!hasSent());
+                Main.registerIOHandler(this, commandSender, flag);
+                while (!hasSent()) ;
                 return this.sentString != null;
             }
-
-            private volatile String sentString = null;
-
-            private volatile boolean hasSent = false;
 
             private String waitForInput() {
                 if (!this.hasSent())
@@ -92,7 +91,7 @@ public abstract class IOHandler {
 
     public abstract String input();
 
-    public abstract <T> void handle(T  t);
+    public abstract <T> void handle(T t);
 
     public boolean hasInput() {
         return hasInput(false);

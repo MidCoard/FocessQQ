@@ -17,7 +17,7 @@ public class StopCommand extends Command {
 
     @Override
     public void init() {
-        this.addExecutor(0, (sender, data, ioHandler)->{
+        this.addExecutor(0, (sender, data, ioHandler) -> {
             if (sender.isConsole()) {
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start stopping...");
                 Main.exit();

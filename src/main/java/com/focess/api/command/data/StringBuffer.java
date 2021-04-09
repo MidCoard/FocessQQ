@@ -8,6 +8,7 @@ public class StringBuffer extends DataBuffer<String> {
     private final IntBuffer intBuffer;
 
     private final CharBuffer[] charBuffers;
+    private int pos = 0;
 
     public StringBuffer(int size) {
         this.intBuffer = IntBuffer.allocate(size);
@@ -21,8 +22,6 @@ public class StringBuffer extends DataBuffer<String> {
     public void flip() {
         this.intBuffer.flip();
     }
-
-    private int pos = 0;
 
     public void put(String s) {
         charBuffers[pos] = CharBuffer.allocate(s.length()).put(s);

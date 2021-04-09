@@ -4,12 +4,12 @@ import com.focess.api.Plugin;
 
 public class PluginBuffer extends DataBuffer<Plugin> {
 
+    private StringBuffer stringBuffer;
+
+
     public PluginBuffer(int size) {
         this.stringBuffer = StringBuffer.allocate(size);
     }
-
-
-    private StringBuffer stringBuffer;
 
     public static PluginBuffer allocate(int size) {
         return new PluginBuffer(size);

@@ -18,20 +18,6 @@ public abstract class DataConverter<T> {
             dataCollection.write(arg);
         }
     };
-
-    protected abstract boolean accept(String arg);
-
-    public abstract T convert(String arg);
-
-    boolean put(DataCollection dataCollection, String arg) {
-        if (this.accept(arg))
-            this.connect(dataCollection,convert(arg));
-        else return false;
-        return true;
-    }
-
-    protected abstract void connect(DataCollection dataCollection,T arg);
-
     public static DataConverter<Integer> integerDataConverter = new DataConverter<Integer>() {
         @Override
         protected boolean accept(String arg) {
@@ -48,7 +34,6 @@ public abstract class DataConverter<T> {
             dataCollection.writeInt(arg);
         }
     };
-
     public static DataConverter<Long> longDataConverter = new DataConverter<Long>() {
         @Override
         protected boolean accept(String arg) {
@@ -65,4 +50,17 @@ public abstract class DataConverter<T> {
             dataCollection.writeLong(arg);
         }
     };
+
+    protected abstract boolean accept(String arg);
+
+    public abstract T convert(String arg);
+
+    boolean put(DataCollection dataCollection, String arg) {
+        if (this.accept(arg))
+            this.connect(dataCollection, convert(arg));
+        else return false;
+        return true;
+    }
+
+    protected abstract void connect(DataCollection dataCollection, T arg);
 }

@@ -35,7 +35,7 @@ public abstract class TabCompleter<T> extends DataConverter<T> {
         }
     };
 
-    public static final Predicate<String> longPredicate = i ->{
+    public static final Predicate<String> longPredicate = i -> {
         try {
             Long.parseLong(i);
             return true;
