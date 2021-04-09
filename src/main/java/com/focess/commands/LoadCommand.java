@@ -81,10 +81,9 @@ public class LoadCommand extends Command {
                 if (file.exists() && file.getName().endsWith(".jar")) {
                     try {
                         ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start PluginClassLoader");
-                        PluginClassLoader classLoader = new PluginClassLoader(file, this.getClass().getClassLoader());
+                        PluginClassLoader classLoader = new PluginClassLoader(file);
                         if (!classLoader.load())
                             ioHandler.output(ChatConstants.CONSOLE_HEADER + "Plugin need load after some other plugins.");
-                        classLoader.close();
                         ioHandler.output(ChatConstants.CONSOLE_HEADER + "End PluginClassLoader");
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -105,7 +104,22 @@ public class LoadCommand extends Command {
         ioHandler.output("Use: load [jar-path]");
     }
 
-    public static class PluginClassLoader extends URLClassLoader {
+
+    public static final PluginURLClassLoader DEFAULT_CLASS_LOADER = new PluginURLClassLoader(LoadCommand.class.getClassLoader());
+
+    private static class PluginURLClassLoader extends URLClassLoader {
+
+        public PluginURLClassLoader(ClassLoader parent) {
+            super(new URL[]{}, parent);
+        }
+
+        @Override
+        public void addURL(URL url) {
+            super.addURL(url);
+        }
+    }
+
+    public static class PluginClassLoader{
 
         private static final Map<String, Set<File>> afterPlugins = Maps.newHashMap();
 
@@ -122,7 +136,8 @@ public class LoadCommand extends Command {
                 });
                 afterPluginFiles.add(classLoader.file);
                 return false;
-            }
+            } else
+                CommandSender.CONSOLE.getIOHandler().output(ChatConstants.CONSOLE_HEADER + "Successfully load some other plugins after " + pluginType.loadAfter() + ".");
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
                     Plugin plugin;
@@ -157,8 +172,8 @@ public class LoadCommand extends Command {
         private final List<Plugin> plugins = Lists.newArrayList();
         private final List<Class<?>> loadedClasses = Lists.newArrayList();
 
-        public PluginClassLoader(@NonNull File file, ClassLoader parent) throws MalformedURLException {
-            super(new URL[]{file.toURI().toURL()}, parent);
+        public PluginClassLoader(@NonNull File file) throws MalformedURLException {
+            DEFAULT_CLASS_LOADER.addURL(file.toURI().toURL());
             this.file = file;
         }
 
@@ -173,6 +188,8 @@ public class LoadCommand extends Command {
             return true;
         }
 
+        private final List<String> notLoadedClasses = Lists.newArrayList();
+
         public boolean load() {
             try {
                 JarFile jarFile = new JarFile(file);
@@ -182,7 +199,12 @@ public class LoadCommand extends Command {
                     String name = jarEntry.getName();
                     if (!name.endsWith(".class"))
                         continue;
-                    Class<?> c = this.loadClass(name.replace("/", ".").substring(0, name.length() - 6));
+                    Class<?> c;
+                    try {
+                        c = DEFAULT_CLASS_LOADER.loadClass(name.replace("/", ".").substring(0, name.length() - 6));
+                    } catch (ClassNotFoundException e) {
+                        continue;
+                    }
                     loadedClasses.add(c);
                     if (!analyseClass0(c))
                         return false;
@@ -194,12 +216,11 @@ public class LoadCommand extends Command {
                 for (Plugin plugin : plugins) {
                     for (File file : afterPlugins.getOrDefault(plugin.getName(), Sets.newHashSet())) {
                         if (afterPluginFiles.contains(file)) {
-                            PluginClassLoader pluginClassLoader = new PluginClassLoader(file, new ParentClassLoader(this, this.getParent()));
+                            PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
                             if (pluginClassLoader.load()) {
-                                CommandSender.CONSOLE.getIOHandler().output("Successfully load some other plugins after " + plugin.getName() + ".");
+                                CommandSender.CONSOLE.getIOHandler().output(ChatConstants.CONSOLE_HEADER + "Successfully load some other plugins after " + plugin.getName() + ".");
                                 afterPluginFiles.remove(file);
                             }
-                            pluginClassLoader.close();
                         }
                     }
                     afterPlugins.remove(plugin.getName());
@@ -208,11 +229,6 @@ public class LoadCommand extends Command {
                 e.printStackTrace();
             }
             return true;
-        }
-
-        @Override
-        public Class<?> loadClass(String name) throws ClassNotFoundException {
-            return super.loadClass(name);
         }
 
         private boolean analyseClass0(@NonNull Class<?> c) {
@@ -229,35 +245,5 @@ public class LoadCommand extends Command {
                     handlers.get(annotation).handle(c, a, this);
             }
         }
-
-        private static class ParentClassLoader extends ClassLoader {
-            private final ClassLoader classLoader;
-            private final ClassLoader parent;
-
-            public ParentClassLoader(ClassLoader classLoader, ClassLoader parent) {
-                this.classLoader = classLoader;
-                this.parent = parent;
-            }
-
-            @Override
-            public Class<?> loadClass(String name) throws ClassNotFoundException {
-                Class<?> cls;
-                try {
-                    cls = this.classLoader.loadClass(name);
-                } catch (Exception e) {
-                    cls = this.parent.loadClass(name);
-                }
-                return cls;
-            }
-
-            @Override
-            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                Class<?> cls = loadClass(name);
-                if (resolve)
-                    this.resolveClass(cls);
-                return cls;
-            }
-        }
-
     }
 }

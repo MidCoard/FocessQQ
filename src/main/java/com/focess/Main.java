@@ -100,14 +100,8 @@ public class Main {
                 password = "asnbot371237";
             }
         }
-        LoadCommand.loadPlugin(MAIN_PLUGIN);
         isRunning = true;
         scanner = new Scanner(System.in);
-        try {
-            init();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
         configuration.fileBasedDeviceInfo();
@@ -153,7 +147,7 @@ public class Main {
             event.getMessage().forEach(System.out::println);
             CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
             AtomicBoolean flag = new AtomicBoolean(false);
-            updateMessage(now, event.getMessage().contentToString(), event.getMessage().toString(), flag);
+            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
             if (!flag.get())
                 CommandLine.exec(now, event.getMessage().contentToString());
         });
@@ -165,10 +159,15 @@ public class Main {
             event.getMessage().forEach(System.out::println);
             CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
             AtomicBoolean flag = new AtomicBoolean(false);
-            updateMessage(now, event.getMessage().contentToString(), event.getMessage().toString(), flag);
+            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
             if (!flag.get())
                 CommandLine.exec(now, event.getMessage().contentToString());
         });
+        try {
+            LoadCommand.loadPlugin(MAIN_PLUGIN);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         while (IOHandler.getIoHandler().hasInput(true))
             try {
                 CommandLine.exec(IOHandler.IO_HANDLER.input());
@@ -177,43 +176,13 @@ public class Main {
             }
     }
 
-    private static void init() {
-        Command.register(MAIN_PLUGIN, new LoadCommand());
-        Command.register(MAIN_PLUGIN, new UnloadCommand());
-        Command.register(MAIN_PLUGIN, new StopCommand());
-        File plugins = new File("plugins");
-        if (plugins.exists())
-            for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
-                CommandLine.exec("load plugins/" + file.getName());
-        new Thread(() -> {
-            while (true) {
-                if (!getBot().isOnline()) {
-                    getBot().login();
-                }
-            }
-        }).start();
-        Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
-            @Override
-            public void run() {
-                if (isRunning) {
-                    friendMessageEventListener.complete();
-                    groupMessageEventListener.complete();
-                    for (Plugin plugin : LoadCommand.getPlugins())
-                        if (!plugin.equals(MAIN_PLUGIN))
-                            CommandLine.exec("unload " + plugin.getName());
-                    LoadCommand.disablePlugin(MAIN_PLUGIN);
-                }
-            }
-        });
-    }
-
     public static void exit() {
-        friendMessageEventListener.complete();
-        groupMessageEventListener.complete();
         for (Plugin plugin : LoadCommand.getPlugins())
             if (!plugin.equals(MAIN_PLUGIN))
                 CommandLine.exec("unload " + plugin.getName());
         LoadCommand.disablePlugin(MAIN_PLUGIN);
+        friendMessageEventListener.complete();
+        groupMessageEventListener.complete();
         isRunning = false;
         System.exit(0);
     }
@@ -237,6 +206,33 @@ public class Main {
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
+            Command.register(MAIN_PLUGIN, new LoadCommand());
+            Command.register(MAIN_PLUGIN, new UnloadCommand());
+            Command.register(MAIN_PLUGIN, new StopCommand());
+            File plugins = new File("plugins");
+            if (plugins.exists())
+                for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
+                    CommandLine.exec("load plugins/" + file.getName());
+            new Thread(() -> {
+                while (true) {
+                    if (!getBot().isOnline()) {
+                        getBot().login();
+                    }
+                }
+            }).start();
+            Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
+                @Override
+                public void run() {
+                    if (isRunning) {
+                        for (Plugin plugin : LoadCommand.getPlugins())
+                            if (!plugin.equals(MAIN_PLUGIN))
+                                CommandLine.exec("unload " + plugin.getName());
+                        LoadCommand.disablePlugin(MAIN_PLUGIN);
+                        friendMessageEventListener.complete();
+                        groupMessageEventListener.complete();
+                    }
+                }
+            });
         }
 
         @Override

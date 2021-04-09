@@ -18,7 +18,9 @@ public abstract class DataConverter<T> {
             dataCollection.write(arg);
         }
     };
-    public static DataConverter<Integer> integerDataConverter = new DataConverter<Integer>() {
+
+
+    public static final DataConverter<Integer> INTEGER_DATA_CONVERTER = new DataConverter<Integer>() {
         @Override
         protected boolean accept(String arg) {
             return TabCompleter.integerPredicate.test(arg);
@@ -34,7 +36,11 @@ public abstract class DataConverter<T> {
             dataCollection.writeInt(arg);
         }
     };
-    public static DataConverter<Long> longDataConverter = new DataConverter<Long>() {
+
+    @Deprecated
+    public static DataConverter<Integer> integerDataConverter = INTEGER_DATA_CONVERTER;
+
+    public static final DataConverter<Long> LONG_DATA_CONVERTER = new DataConverter<Long>() {
         @Override
         protected boolean accept(String arg) {
             return TabCompleter.longPredicate.test(arg);
@@ -50,6 +56,9 @@ public abstract class DataConverter<T> {
             dataCollection.writeLong(arg);
         }
     };
+
+    @Deprecated
+    public static DataConverter<Long> longDataConverter = LONG_DATA_CONVERTER;
 
     protected abstract boolean accept(String arg);
 
