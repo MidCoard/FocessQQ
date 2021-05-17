@@ -73,12 +73,12 @@ public class LoadCommand extends Command {
     public static void disablePlugin(Plugin plugin) {
         try {
             plugin.disable();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         Command.unregister(plugin);
         registeredPlugins.remove(plugin);
-        if (plugin != Main.getMainPlugin())
+        if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
                 loaders.remove(plugin).close();
             } catch (IOException e) {

@@ -41,8 +41,8 @@ public class Main {
     private static boolean isRunning = false;
     private static Listener<GroupMessageEvent> groupMessageEventListener;
     private static Listener<FriendMessageEvent> friendMessageEventListener;
-    private static long user = 3418652527L;
-    private static String password = "asnbot371237";
+    private static long user;
+    private static String password;
 
     public static void registerIOHandler(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         quests.compute(commandSender, (k, v) -> {
@@ -90,16 +90,27 @@ public class Main {
         });
     }
 
+    private static void requestQQ() {
+        try {
+            IOHandler.IO_HANDLER.output("please input your QQ user number:");
+            user = scanner.nextLong();
+            IOHandler.IO_HANDLER.output("please input your QQ password:");
+            password = scanner.next();
+        } catch (Exception e) {
+            requestQQ();
+        }
+    }
+
     public static void main(String[] args) {
+        scanner = new Scanner(System.in);
         if (args.length == 2) {
             try {
                 user = Long.parseLong(args[0]);
                 password = args[1];
             } catch (Exception ignored) {
-                user = 3418652527L;
-                password = "asnbot371237";
+                requestQQ();
             }
-        }
+        } else requestQQ();
         try {
             MAIN_PLUGIN = LoadCommand.loadPlugin(MainPlugin.class);
         } catch (Exception e) {
@@ -137,7 +148,6 @@ public class Main {
             if (properties == null)
                 properties = Maps.newHashMap();
             isRunning = true;
-            scanner = new Scanner(System.in);
             BotConfiguration configuration = BotConfiguration.getDefault();
             configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
             configuration.fileBasedDeviceInfo();
