@@ -1,15 +1,13 @@
 package com.focess.commands;
 
+import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.annotation.CommandType;
 import com.focess.api.annotation.PluginType;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
-import com.focess.api.exception.CommandDuplicateException;
-import com.focess.api.exception.IllegalCommandClassException;
-import com.focess.api.exception.IllegalPluginClassException;
-import com.focess.api.exception.PluginDuplicateException;
+import com.focess.api.exception.*;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.util.AnnotationHandler;
 import com.focess.commands.util.ChatConstants;
@@ -38,10 +36,10 @@ public class LoadCommand extends Command {
     }
 
     @Nullable
-    public static Plugin getPlugin(Class<? extends Plugin> plugin) {
+    public static <T extends Plugin> T getPlugin(Class<? extends T> plugin) {
         for (Plugin p : registeredPlugins)
             if (p.getClass().equals(plugin))
-                return p;
+                return (T) p;
         return null;
     }
 
@@ -50,17 +48,42 @@ public class LoadCommand extends Command {
         return registeredPlugins;
     }
 
+    public static <T extends Plugin> T loadPlugin(Class<T> cls) {
+        try {
+            T plugin = cls.newInstance();
+            if (getPlugin(cls) != null)
+                throw new PluginDuplicateException(cls.getName());
+            registeredPlugins.add(plugin);
+            plugin.enable();
+            return plugin;
+        } catch (Exception e) {
+            throw new PluginLoadException(cls);
+        }
+    }
+
     public static void loadPlugin(Plugin plugin) {
-        if (getPlugin(plugin.getClass()) != null)
-            throw new PluginDuplicateException(plugin.getName());
-        registeredPlugins.add(plugin);
-        plugin.enable();
+        if (plugin.getClass().getClassLoader() instanceof PluginClassLoader) {
+            if (getPlugin(plugin.getClass()) != null)
+                throw new PluginDuplicateException(plugin.getName());
+            registeredPlugins.add(plugin);
+            plugin.enable();
+        } else throw new PluginLoaderException(plugin.getName());
     }
 
     public static void disablePlugin(Plugin plugin) {
-        plugin.disable();
+        try {
+            plugin.disable();
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
         Command.unregister(plugin);
         registeredPlugins.remove(plugin);
+        if (plugin != Main.getMainPlugin())
+            try {
+                loaders.remove(plugin).close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     @Nullable
@@ -101,25 +124,36 @@ public class LoadCommand extends Command {
 
     @Override
     public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        ioHandler.output("Use: load [jar-path]");
+        if (commandSender.isConsole())
+            ioHandler.output("Use: load [jar-path]");
     }
 
+    private static final Map<Plugin, PluginClassLoader> loaders = Maps.newHashMap();
 
-    public static final PluginURLClassLoader DEFAULT_CLASS_LOADER = new PluginURLClassLoader(LoadCommand.class.getClassLoader());
+    public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(LoadCommand.class.getClassLoader());
 
-    private static class PluginURLClassLoader extends URLClassLoader {
+    private static class PluginCoreClassLoader extends ClassLoader {
 
-        public PluginURLClassLoader(ClassLoader parent) {
-            super(new URL[]{}, parent);
+        public PluginCoreClassLoader(ClassLoader parent) {
+            super(parent);
         }
 
         @Override
-        public void addURL(URL url) {
-            super.addURL(url);
+        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            try {
+                return super.loadClass(name, resolve);
+            } catch (ClassNotFoundException e) {
+                for (PluginClassLoader classLoader : loaders.values())
+                    try {
+                        return classLoader.findClass(name, resolve);
+                    } catch (ClassNotFoundException ignored) {
+                    }
+            }
+            throw new ClassNotFoundException();
         }
     }
 
-    public static class PluginClassLoader{
+    public static class PluginClassLoader extends URLClassLoader {
 
         private static final Map<String, Set<File>> afterPlugins = Maps.newHashMap();
 
@@ -136,7 +170,7 @@ public class LoadCommand extends Command {
                 });
                 afterPluginFiles.add(classLoader.file);
                 return false;
-            } else
+            } else if (!pluginType.loadAfter().equals(""))
                 CommandSender.CONSOLE.getIOHandler().output(ChatConstants.CONSOLE_HEADER + "Successfully load some other plugins after " + pluginType.loadAfter() + ".");
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
@@ -145,8 +179,7 @@ public class LoadCommand extends Command {
                         throw new PluginDuplicateException(plugin.getName());
                     return true;
                 } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                    return false;
+                    throw new PluginLoadException((Class<? extends Plugin>) c);
                 }
             } else throw new IllegalPluginClassException();
         };
@@ -161,7 +194,7 @@ public class LoadCommand extends Command {
                         if (!Command.register(Objects.requireNonNull(getPlugin(commandType.plugin())), command = (Command) c.newInstance()))
                             throw new CommandDuplicateException(command.getName());
                     } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
+                        throw new CommandLoadException((Class<? extends Command>) c);
                     }
                 } else throw new IllegalCommandClassException();
                 return true;
@@ -173,7 +206,7 @@ public class LoadCommand extends Command {
         private final List<Class<?>> loadedClasses = Lists.newArrayList();
 
         public PluginClassLoader(@NonNull File file) throws MalformedURLException {
-            DEFAULT_CLASS_LOADER.addURL(file.toURI().toURL());
+            super(new URL[]{file.toURI().toURL()}, DEFAULT_CLASS_LOADER);
             this.file = file;
         }
 
@@ -188,8 +221,6 @@ public class LoadCommand extends Command {
             return true;
         }
 
-        private final List<String> notLoadedClasses = Lists.newArrayList();
-
         public boolean load() {
             try {
                 JarFile jarFile = new JarFile(file);
@@ -199,12 +230,7 @@ public class LoadCommand extends Command {
                     String name = jarEntry.getName();
                     if (!name.endsWith(".class"))
                         continue;
-                    Class<?> c;
-                    try {
-                        c = DEFAULT_CLASS_LOADER.loadClass(name.replace("/", ".").substring(0, name.length() - 6));
-                    } catch (ClassNotFoundException e) {
-                        continue;
-                    }
+                    Class<?> c = this.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true);
                     loadedClasses.add(c);
                     if (!analyseClass0(c))
                         return false;
@@ -214,6 +240,7 @@ public class LoadCommand extends Command {
                 for (Class<?> c : loadedClasses)
                     analyseClass(c);
                 for (Plugin plugin : plugins) {
+                    loaders.put(plugin, this);
                     for (File file : afterPlugins.getOrDefault(plugin.getName(), Sets.newHashSet())) {
                         if (afterPluginFiles.contains(file)) {
                             PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
@@ -244,6 +271,20 @@ public class LoadCommand extends Command {
                 if ((a = c.getAnnotation(annotation)) != null)
                     handlers.get(annotation).handle(c, a, this);
             }
+        }
+
+        @Override
+        public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            return super.loadClass(name, resolve);
+        }
+
+        public Class<?> findClass(String name,boolean resolve) throws ClassNotFoundException {
+            Class<?> c = this.findLoadedClass(name);
+            if (c == null)
+                c = this.findClass(name);
+            if (resolve)
+                resolveClass(c);
+            return c;
         }
     }
 }

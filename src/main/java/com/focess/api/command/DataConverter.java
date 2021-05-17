@@ -57,6 +57,23 @@ public abstract class DataConverter<T> {
         }
     };
 
+    public static final DataConverter<Double> DOUBLE_DATA_CONVERTER = new DataConverter<Double>() {
+        @Override
+        protected boolean accept(String s) {
+            return TabCompleter.doublePredicate.test(s);
+        }
+
+        @Override
+        public Double convert(String s) {
+            return Double.parseDouble(s);
+        }
+
+        @Override
+        protected void connect(DataCollection dataCollection, Double arg) {
+            dataCollection.writeDouble(arg);
+        }
+    };
+
     @Deprecated
     public static DataConverter<Long> longDataConverter = LONG_DATA_CONVERTER;
 

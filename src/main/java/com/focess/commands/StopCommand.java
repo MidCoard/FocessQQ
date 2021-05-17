@@ -29,6 +29,7 @@ public class StopCommand extends Command {
 
     @Override
     public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        ioHandler.output("Use: stop");
+        if (commandSender.isConsole())
+            ioHandler.output("Use: stop");
     }
 }

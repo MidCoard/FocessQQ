@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Main {
 
     private static final Map<CommandSender, Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
-    private final static MainPlugin MAIN_PLUGIN = new MainPlugin();
+    private static MainPlugin MAIN_PLUGIN;
     private static final long AUTHOR_USER = 2624646185L;
     @Deprecated
     public static Scanner scanner;
@@ -100,71 +100,8 @@ public class Main {
                 password = "asnbot371237";
             }
         }
-        isRunning = true;
-        scanner = new Scanner(System.in);
-        BotConfiguration configuration = BotConfiguration.getDefault();
-        configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
-        configuration.fileBasedDeviceInfo();
-        configuration.setLoginSolver(new LoginSolver() {
-            @Nullable
-            @Override
-            public Object onSolvePicCaptcha(@NotNull Bot bot, byte[] bytes, @NotNull Continuation<? super String> continuation) {
-                try {
-                    FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
-                    outputStream.write(bytes);
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return scanner.nextLine();
-            }
-
-            @Nullable
-            @Override
-            public Object onSolveSliderCaptcha(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                IOHandler.IO_HANDLER.output(s);
-                scanner.nextLine();
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public Object onSolveUnsafeDeviceLoginVerify(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                IOHandler.IO_HANDLER.output(s);
-                scanner.nextLine();
-                return null;
-            }
-        });
-        bot = BotFactory.INSTANCE.newBot(user, password, configuration);
-        getBot().login();
-        groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-            IOHandler.IO_HANDLER.output("G--------" + event.getGroup().getName() + ":" + event.getGroup().getId() + "--------");
-            IOHandler.IO_HANDLER.output("Permission: " + event.getPermission());
-            IOHandler.IO_HANDLER.output("NameCard: " + event.getSender().getNameCard());
-            IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
-            IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
-            IOHandler.IO_HANDLER.output("RawMessageChain: ");
-            event.getMessage().forEach(System.out::println);
-            CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
-            AtomicBoolean flag = new AtomicBoolean(false);
-            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
-            if (!flag.get())
-                CommandLine.exec(now, event.getMessage().contentToString());
-        });
-        friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-            IOHandler.IO_HANDLER.output("F--------" + event.getFriend().getNick() + ":" + event.getFriend().getId() + "--------");
-            IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
-            IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
-            IOHandler.IO_HANDLER.output("RawMessageChain: ");
-            event.getMessage().forEach(System.out::println);
-            CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
-            AtomicBoolean flag = new AtomicBoolean(false);
-            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
-            if (!flag.get())
-                CommandLine.exec(now, event.getMessage().contentToString());
-        });
         try {
-            LoadCommand.loadPlugin(MAIN_PLUGIN);
+            MAIN_PLUGIN = LoadCommand.loadPlugin(MainPlugin.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -177,14 +114,7 @@ public class Main {
     }
 
     public static void exit() {
-        for (Plugin plugin : LoadCommand.getPlugins())
-            if (!plugin.equals(MAIN_PLUGIN))
-                CommandLine.exec("unload " + plugin.getName());
         LoadCommand.disablePlugin(MAIN_PLUGIN);
-        friendMessageEventListener.complete();
-        groupMessageEventListener.complete();
-        isRunning = false;
-        System.exit(0);
     }
 
     public final static class MainPlugin extends Plugin {
@@ -206,6 +136,69 @@ public class Main {
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
+            isRunning = true;
+            scanner = new Scanner(System.in);
+            BotConfiguration configuration = BotConfiguration.getDefault();
+            configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
+            configuration.fileBasedDeviceInfo();
+            configuration.setLoginSolver(new LoginSolver() {
+                @Nullable
+                @Override
+                public Object onSolvePicCaptcha(@NotNull Bot bot, byte[] bytes, @NotNull Continuation<? super String> continuation) {
+                    try {
+                        FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
+                        outputStream.write(bytes);
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return scanner.nextLine();
+                }
+
+                @Nullable
+                @Override
+                public Object onSolveSliderCaptcha(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
+                    IOHandler.IO_HANDLER.output(s);
+                    scanner.nextLine();
+                    return null;
+                }
+
+                @Nullable
+                @Override
+                public Object onSolveUnsafeDeviceLoginVerify(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
+                    IOHandler.IO_HANDLER.output(s);
+                    scanner.nextLine();
+                    return null;
+                }
+            });
+            bot = BotFactory.INSTANCE.newBot(user, password, configuration);
+            getBot().login();
+            groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
+                IOHandler.IO_HANDLER.output("G--------" + event.getGroup().getName() + ":" + event.getGroup().getId() + "--------");
+                IOHandler.IO_HANDLER.output("Permission: " + event.getPermission());
+                IOHandler.IO_HANDLER.output("NameCard: " + event.getSender().getNameCard());
+                IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
+                IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
+                IOHandler.IO_HANDLER.output("RawMessageChain: ");
+                event.getMessage().forEach(System.out::println);
+                CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
+                AtomicBoolean flag = new AtomicBoolean(false);
+                updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+                if (!flag.get())
+                    CommandLine.exec(now, event.getMessage().contentToString());
+            });
+            friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
+                IOHandler.IO_HANDLER.output("F--------" + event.getFriend().getNick() + ":" + event.getFriend().getId() + "--------");
+                IOHandler.IO_HANDLER.output("ID: " + event.getSender().getId());
+                IOHandler.IO_HANDLER.output("RawMessage: " + event.getMessage());
+                IOHandler.IO_HANDLER.output("RawMessageChain: ");
+                event.getMessage().forEach(System.out::println);
+                CommandSender now = CommandSender.getCommandSender(new CommandSender.MemberOrConsoleOrFriend(event.getSender()));
+                AtomicBoolean flag = new AtomicBoolean(false);
+                updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+                if (!flag.get())
+                    CommandLine.exec(now, event.getMessage().contentToString());
+            });
             Command.register(MAIN_PLUGIN, new LoadCommand());
             Command.register(MAIN_PLUGIN, new UnloadCommand());
             Command.register(MAIN_PLUGIN, new StopCommand());
@@ -213,13 +206,6 @@ public class Main {
             if (plugins.exists())
                 for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
                     CommandLine.exec("load plugins/" + file.getName());
-            new Thread(() -> {
-                while (true) {
-                    if (!getBot().isOnline()) {
-                        getBot().login();
-                    }
-                }
-            }).start();
             Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
                 @Override
                 public void run() {
@@ -240,6 +226,13 @@ public class Main {
             for (String key : properties.keySet())
                 getConfig().set(key, properties.get(key));
             getConfig().save(getConfigFile());
+            for (Plugin plugin : LoadCommand.getPlugins())
+                if (!plugin.equals(MAIN_PLUGIN))
+                    CommandLine.exec("unload " + plugin.getName());
+            friendMessageEventListener.complete();
+            groupMessageEventListener.complete();
+            isRunning = false;
+            System.exit(0);
         }
 
     }

@@ -17,15 +17,13 @@ public class UnloadCommand extends Command {
             if (sender.isConsole()) {
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start unloading...");
                 Plugin plugin = data.getPlugin();
-                if (plugin.getClass().getClassLoader().equals(LoadCommand.DEFAULT_CLASS_LOADER)) {
-                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "Disable " + plugin.getName());
-                    LoadCommand.disablePlugin(plugin);
-                    System.gc();
-                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "End unloading...");
-                    return CommandResult.ALLOW;
-                } else ioHandler.output(ChatConstants.CONSOLE_HEADER + "Error: Plugin is invalid");
+                if (!(plugin.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader))
+                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "Note: Plugin not load from PluginClassLoader");
+                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Disable " + plugin.getName());
+                LoadCommand.disablePlugin(plugin);
+                System.gc();
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "End unloading...");
-                return CommandResult.REFUSE;
+                return CommandResult.ALLOW;
             }
             return CommandResult.REFUSE;
         }).addDataConverter(PluginDataConverter.PLUGIN_DATA_CONVERTER);
@@ -33,7 +31,8 @@ public class UnloadCommand extends Command {
 
     @Override
     public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        ioHandler.output("Use: unload [plugin-name]");
+        if (commandSender.isConsole())
+            ioHandler.output("Use: unload [plugin-name]");
     }
 
     public static class PluginDataConverter extends DataConverter<Plugin> {
