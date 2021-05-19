@@ -209,9 +209,9 @@ public class Main {
                 if (!flag.get())
                     CommandLine.exec(now, event.getMessage().contentToString());
             });
-            Command.register(MAIN_PLUGIN, new LoadCommand());
-            Command.register(MAIN_PLUGIN, new UnloadCommand());
-            Command.register(MAIN_PLUGIN, new StopCommand());
+            Command.register(this, new LoadCommand());
+            Command.register(this, new UnloadCommand());
+            Command.register(this, new StopCommand());
             File plugins = new File("plugins");
             if (plugins.exists())
                 for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
@@ -221,9 +221,9 @@ public class Main {
                 public void run() {
                     if (isRunning) {
                         for (Plugin plugin : LoadCommand.getPlugins())
-                            if (!plugin.equals(MAIN_PLUGIN))
+                            if (!plugin.equals(MainPlugin.this))
                                 CommandLine.exec("unload " + plugin.getName());
-                        LoadCommand.disablePlugin(MAIN_PLUGIN);
+                        LoadCommand.disablePlugin(MainPlugin.this);
                         friendMessageEventListener.complete();
                         groupMessageEventListener.complete();
                     }
@@ -237,7 +237,7 @@ public class Main {
                 getConfig().set(key, properties.get(key));
             getConfig().save(getConfigFile());
             for (Plugin plugin : LoadCommand.getPlugins())
-                if (!plugin.equals(MAIN_PLUGIN))
+                if (!plugin.equals(this))
                     CommandLine.exec("unload " + plugin.getName());
             friendMessageEventListener.complete();
             groupMessageEventListener.complete();

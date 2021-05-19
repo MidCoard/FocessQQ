@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+@SuppressWarnings("unchecked")
 public class LoadCommand extends Command {
     private static final List<Plugin> registeredPlugins = Lists.newCopyOnWriteArrayList();
 
@@ -73,6 +74,9 @@ public class LoadCommand extends Command {
     }
 
     public static void disablePlugin(Plugin plugin) {
+        if (!(plugin instanceof Main.MainPlugin)) {
+            System.out.println("here");
+        }
         try {
             plugin.disable();
         } catch (Exception e) {
@@ -267,7 +271,7 @@ public class LoadCommand extends Command {
             return true;
         }
 
-        private <T extends Annotation> void analyseClass(@NonNull Class<?> c) {
+        private void analyseClass(@NonNull Class<?> c) {
             for (Class<? extends Annotation> annotation : handlers.keySet()) {
                 Annotation a;
                 if ((a = c.getAnnotation(annotation)) != null)
