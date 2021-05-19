@@ -132,7 +132,7 @@ public class Main {
 
         private static Map<String, Object> properties;
 
-        private MainPlugin() {
+        public MainPlugin() {
             super("MainPlugin");
             if (isRunning)
                 Main.exit();

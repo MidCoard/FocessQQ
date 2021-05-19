@@ -57,7 +57,9 @@ public class LoadCommand extends Command {
             plugin.enable();
             return plugin;
         } catch (Exception e) {
-            throw new PluginLoadException(cls);
+            if (e instanceof PluginDuplicateException)
+                throw (PluginDuplicateException)e;
+            else throw new PluginLoadException(cls);
         }
     }
 
