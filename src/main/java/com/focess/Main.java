@@ -43,6 +43,15 @@ public class Main {
     private static Listener<FriendMessageEvent> friendMessageEventListener;
     private static long user;
     private static String password;
+    private static final Thread CONSOLE_THREAD = new Thread(()->{
+        scanner = new Scanner(System.in);
+        while (IOHandler.getIoHandler().hasInput(true))
+            try {
+                CommandLine.exec(IOHandler.IO_HANDLER.input());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    });
 
     public static void registerIOHandler(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         quests.compute(commandSender, (k, v) -> {
@@ -102,7 +111,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        scanner = new Scanner(System.in);
+        CONSOLE_THREAD.start();
         if (args.length == 2) {
             try {
                 user = Long.parseLong(args[0]);
@@ -116,12 +125,6 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        while (IOHandler.getIoHandler().hasInput(true))
-            try {
-                CommandLine.exec(IOHandler.IO_HANDLER.input());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
     }
 
     public static void exit() {
@@ -144,10 +147,10 @@ public class Main {
 
         @Override
         public void enable() {
-            properties = getConfig().getValues();
-            if (properties == null)
-                properties = Maps.newHashMap();
             isRunning = true;
+            Command.register(this, new LoadCommand());
+            Command.register(this, new UnloadCommand());
+            Command.register(this, new StopCommand());
             BotConfiguration configuration = BotConfiguration.getDefault();
             configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
             configuration.fileBasedDeviceInfo();
@@ -209,9 +212,9 @@ public class Main {
                 if (!flag.get())
                     CommandLine.exec(now, event.getMessage().contentToString());
             });
-            Command.register(this, new LoadCommand());
-            Command.register(this, new UnloadCommand());
-            Command.register(this, new StopCommand());
+            properties = getConfig().getValues();
+            if (properties == null)
+                properties = Maps.newHashMap();
             File plugins = new File("plugins");
             if (plugins.exists())
                 for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))

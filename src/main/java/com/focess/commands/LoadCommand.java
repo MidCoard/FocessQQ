@@ -74,9 +74,6 @@ public class LoadCommand extends Command {
     }
 
     public static void disablePlugin(Plugin plugin) {
-        if (!(plugin instanceof Main.MainPlugin)) {
-            System.out.println("here");
-        }
         try {
             plugin.disable();
         } catch (Exception e) {

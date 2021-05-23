@@ -1,5 +1,6 @@
 package com.focess.api.command;
 
+import com.focess.Main;
 import com.focess.api.util.IOHandler;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
@@ -107,6 +108,10 @@ public class CommandSender {
 
     public IOHandler getIOHandler() {
         return IOHandler.getIoHandlerByCommandSender(this);
+    }
+
+    public void exec(String command) {
+        Main.CommandLine.exec(this,command);
     }
 
     public static class MemberOrConsoleOrFriend {
