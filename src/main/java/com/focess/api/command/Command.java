@@ -47,6 +47,10 @@ public abstract class Command {
         return commands;
     }
 
+    public boolean isRegistered() {
+        return this.registered;
+    }
+
     public static boolean register(@NonNull Plugin plugin, @NonNull final Command command) {
         for (Command c : commands)
             if (c.getName().equals(command.getName()))
@@ -89,9 +93,9 @@ public abstract class Command {
     }
 
     public final boolean execute(final CommandSender sender, final String[] args, IOHandler ioHandler) {
-        if (!this.registered)
+        if (!this.isRegistered())
             return true;
-        if (!sender.hasPermission(permission))
+        if (!sender.hasPermission(this.getPermission()))
             return true;
         final int amount = args.length;
         boolean flag = false;
@@ -102,7 +106,7 @@ public abstract class Command {
                     result = executor.execute(sender, Arrays.copyOfRange(args, executor.getSubCommandsSize(), args.length), ioHandler);
                 else result = CommandResult.REFUSE;
                 for (CommandResult r : executor.results.keySet())
-                    if ((r.getPos() & result.getPos()) == 1)
+                    if ((r.getPos() & result.getPos()) != 0)
                         executor.results.get(r).execute();
                 flag = true;
                 break;
@@ -111,6 +115,10 @@ public abstract class Command {
         if (!flag || result == CommandResult.ARGS)
             this.usage(sender, ioHandler);
         return true;
+    }
+
+    public MemberPermission getPermission() {
+        return this.permission;
     }
 
     @NonNull
@@ -210,23 +218,47 @@ public abstract class Command {
             return this.subCommands.length;
         }
 
-
+        @Deprecated
         public Executor addPermission(MemberPermission permission) {
             this.permission = permission;
             return this;
         }
 
+        public Executor setPermission(MemberPermission permission) {
+            this.permission = permission;
+            return this;
+        }
+
+        @Deprecated
         public Executor addTabComplete(TabCompleter<?>... tabCompleters) {
             this.tabCompletes = tabCompleters;
             return this;
         }
 
+        public Executor setTabCompleters(TabCompleter<?>... tabCompleters) {
+            this.tabCompletes = tabCompleters;
+            return this;
+        }
+
+        @Deprecated
         public Executor addCommandResult(CommandResult result, CommandResultExecutor executor) {
             results.put(result, executor);
             return this;
         }
 
+        public Executor setCommandResultExecutors(CommandResult result, CommandResultExecutor executor) {
+            results.put(result, executor);
+            return this;
+        }
+
+        @Deprecated
         public Executor addDataConverter(DataConverter<?>... dataConverters) {
+            this.dataConverters = dataConverters;
+            this.useDefaultConverter = false;
+            return this;
+        }
+
+        public Executor setDataConverters(DataConverter<?>... dataConverters) {
             this.dataConverters = dataConverters;
             this.useDefaultConverter = false;
             return this;

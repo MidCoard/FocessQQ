@@ -26,7 +26,7 @@ public class UnloadCommand extends Command {
                 return CommandResult.ALLOW;
             }
             return CommandResult.REFUSE;
-        }).addDataConverter(PluginDataConverter.PLUGIN_DATA_CONVERTER);
+        }).setDataConverters(PluginDataConverter.PLUGIN_DATA_CONVERTER);
     }
 
     @Override

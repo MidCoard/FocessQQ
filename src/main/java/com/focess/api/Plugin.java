@@ -10,8 +10,8 @@ public abstract class Plugin {
 
     private static final String path = Plugin.class.getProtectionDomain().getCodeSource().getLocation().getFile();
     private final String name;
-    private YamlConfiguration configuration;
-    private File config;
+    private final YamlConfiguration configuration;
+    private final File config;
 
     public Plugin(String name) {
         this.name = name;

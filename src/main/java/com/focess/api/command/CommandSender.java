@@ -10,10 +10,10 @@ import java.util.Objects;
 
 public class CommandSender {
 
-    public static final CommandSender CONSOLE = new CommandSender(new MemberOrConsoleOrFriend()) {
+    public static final CommandSender CONSOLE = new CommandSender() {
         @Override
         public IOHandler getIOHandler() {
-            return IOHandler.IO_HANDLER;
+            return IOHandler.getIoHandler();
         }
     };
 
@@ -23,6 +23,31 @@ public class CommandSender {
     private final boolean isFriend;
     private final MemberPermission permission;
 
+    private CommandSender() {
+        this.member = null;
+        this.friend = null;
+        this.isFriend = false;
+        this.isMember = false;
+        this.permission = MemberPermission.OWNER;
+    }
+
+    public CommandSender(Friend friend) {
+        this.member = null;
+        this.friend = friend;
+        this.isFriend = true;
+        this.isMember = false;
+        this.permission = MemberPermission.OWNER;
+    }
+
+    public CommandSender(Member member) {
+        this.member = member;
+        this.friend = null;
+        this.isMember = true;
+        this.isFriend = false;
+        this.permission = member.getPermission();
+    }
+
+    @Deprecated
     public CommandSender(MemberOrConsoleOrFriend memberOrConsoleOrFriend) {
         this.member = memberOrConsoleOrFriend.member;
         this.friend = memberOrConsoleOrFriend.friend;
@@ -31,6 +56,7 @@ public class CommandSender {
         this.permission = memberOrConsoleOrFriend.isMember ? this.member.getPermission() : MemberPermission.OWNER;
     }
 
+    @Deprecated
     public static CommandSender getCommandSender(MemberOrConsoleOrFriend memberOrConsoleOrFriend) {
         return new CommandSender(memberOrConsoleOrFriend);
     }
@@ -66,7 +92,7 @@ public class CommandSender {
     }
 
     public boolean isAuthor() {
-        return this.isFriend ? this.friend.getId() == 2624646185L : isMember && this.member.getId() == 2624646185L;
+        return this.isFriend ? this.friend.getId() == Main.getAuthorUser() : isMember && this.member.getId() == Main.getAuthorUser();
     }
 
     public MemberPermission getPermission() {
@@ -98,6 +124,7 @@ public class CommandSender {
         return Objects.hash(member == null ? null : member.getId(), friend == null ? null : friend.getId(), isMember, isFriend);
     }
 
+    @Deprecated
     public boolean isSimilar(CommandSender sender) {
         return this.equals(sender);
     }
@@ -111,9 +138,10 @@ public class CommandSender {
     }
 
     public void exec(String command) {
-        Main.CommandLine.exec(this,command);
+        Main.CommandLine.exec(this, command);
     }
 
+    @Deprecated
     public static class MemberOrConsoleOrFriend {
         private final boolean isMember;
         private final Member member;

@@ -5,6 +5,10 @@ import com.focess.api.command.CommandSender;
 
 public abstract class IOHandler {
 
+    /***
+     * Console CommandSender output and system output
+     */
+    @Deprecated
     public static volatile IOHandler IO_HANDLER = new IOHandler() {
         @Override
         public void output(String output) {
@@ -36,6 +40,8 @@ public abstract class IOHandler {
     }
 
     public static IOHandler getIoHandlerByCommandSender(CommandSender commandSender) {
+        if (commandSender.isConsole())
+            return getIoHandler();
         return new IOHandler() {
             private volatile String sentString = null;
             private volatile boolean hasSent = false;
@@ -50,13 +56,10 @@ public abstract class IOHandler {
                     commandSender.getMember().getGroup().sendMessage(output);
                 else if (commandSender.isFriend())
                     commandSender.getFriend().sendMessage(output);
-                else IO_HANDLER.output(output);
             }
 
             @Override
             public String input() {
-                if (commandSender.isConsole())
-                    return IO_HANDLER.input();
                 return this.waitForInput();
             }
 

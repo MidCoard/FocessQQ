@@ -58,7 +58,7 @@ public class YamlConfiguration {
 
     public YamlConfigurationSection getSection(String key) {
         if (get(key) instanceof Map)
-            return new YamlConfigurationSection(this, (Map<String, Object>) get(key));
+            return new YamlConfigurationSection(this, get(key));
         else throw new IllegalStateException("This " + key + " is not a valid section.");
     }
 }
