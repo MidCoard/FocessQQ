@@ -44,7 +44,6 @@ public class Main {
     private static long user;
     private static String password;
     private static final Thread CONSOLE_THREAD = new Thread(()->{
-        scanner = new Scanner(System.in);
         while (IOHandler.getIoHandler().hasInput())
             try {
                 CommandLine.exec(IOHandler.getIoHandler().input());
@@ -52,6 +51,7 @@ public class Main {
                 e.printStackTrace();
             }
     });
+    private static boolean debug = false;
 
     public static void registerIOHandler(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         quests.compute(commandSender, (k, v) -> {
@@ -68,6 +68,11 @@ public class Main {
 
     public static Bot getBot() {
         return bot;
+    }
+
+    public static void relogin() {
+        bot.close();
+        bot.login();
     }
 
     public static MainPlugin getMainPlugin() {
@@ -111,7 +116,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        CONSOLE_THREAD.start();
+        scanner = new Scanner(System.in);
         if (args.length == 2) {
             try {
                 user = Long.parseLong(args[0]);
@@ -120,6 +125,7 @@ public class Main {
                 requestQQ();
             }
         } else requestQQ();
+        CONSOLE_THREAD.start();
         try {
             MAIN_PLUGIN = LoadCommand.loadPlugin(MainPlugin.class);
         } catch (Exception e) {
@@ -129,6 +135,10 @@ public class Main {
 
     public static void exit() {
         LoadCommand.disablePlugin(MAIN_PLUGIN);
+    }
+
+    public static void setDebug(boolean debug) {
+        Main.debug = debug;
     }
 
     public final static class MainPlugin extends Plugin {
@@ -187,13 +197,11 @@ public class Main {
             bot = BotFactory.INSTANCE.newBot(user, password, configuration);
             getBot().login();
             groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-                IOHandler.getIoHandler().output("G--------" + event.getGroup().getName() + ":" + event.getGroup().getId() + "--------");
-                IOHandler.getIoHandler().output("Permission: " + event.getPermission());
-                IOHandler.getIoHandler().output("NameCard: " + event.getSender().getNameCard());
-                IOHandler.getIoHandler().output("ID: " + event.getSender().getId());
-                IOHandler.getIoHandler().output("RawMessage: " + event.getMessage());
-                IOHandler.getIoHandler().output("RawMessageChain: ");
-                event.getMessage().forEach(System.out::println);
+                if (debug) {
+                    IOHandler.getIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s",event.getSender().getNameCard(),event.getSender().getId(),event.getPermission(),event.getGroup().getName(),event.getGroup().getId(),event.getMessage()));
+                    IOHandler.getIoHandler().output("MessageChain: ");
+                    event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler() :: output);
+                }
                 CommandSender now = new CommandSender(event.getSender());
                 AtomicBoolean flag = new AtomicBoolean(false);
                 updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
@@ -201,11 +209,11 @@ public class Main {
                     CommandLine.exec(now, event.getMessage().contentToString());
             });
             friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-                IOHandler.getIoHandler().output("F--------" + event.getFriend().getNick() + ":" + event.getFriend().getId() + "--------");
-                IOHandler.getIoHandler().output("ID: " + event.getSender().getId());
-                IOHandler.getIoHandler().output("RawMessage: " + event.getMessage());
-                IOHandler.getIoHandler().output("RawMessageChain: ");
-                event.getMessage().forEach(System.out::println);
+                if (debug) {
+                    IOHandler.getIoHandler().output(String.format("%s(%d)",event.getFriend().getNick(),event.getFriend().getId()));
+                    IOHandler.getIoHandler().output("RawMessageChain: ");
+                    event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler() :: output);
+                }
                 CommandSender now = new CommandSender(event.getSender());
                 AtomicBoolean flag = new AtomicBoolean(false);
                 updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
@@ -261,7 +269,8 @@ public class Main {
         }
 
         public static void exec(CommandSender sender, String command, IOHandler ioHandler) {
-            IOHandler.getIoHandler().output(sender + " EXEC: " + command);
+            if (sender != CommandSender.CONSOLE)
+                IOHandler.getIoHandler().output(sender + " EXEC: " + command);
             List<String> args = Lists.newArrayList();
             StringBuilder stringBuilder = new StringBuilder();
             boolean stack = false;
@@ -282,9 +291,14 @@ public class Main {
         }
 
         private static void exec1(CommandSender sender, String command, String[] args, IOHandler ioHandler) {
+            boolean flag = false;
             for (Command com : Command.getCommands())
-                if (com.getAli().contains(command) || com.getName().equals(command))
+                if (com.getAli().contains(command) || com.getName().equals(command)) {
+                    flag = true;
                     com.execute(sender, args, ioHandler);
+                }
+            if (!flag && sender == CommandSender.CONSOLE)
+                ioHandler.output("");
         }
     }
 

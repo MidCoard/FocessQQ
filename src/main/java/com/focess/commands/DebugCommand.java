@@ -8,19 +8,23 @@ import com.focess.api.util.IOHandler;
 import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 
-public class StopCommand extends Command {
+import java.util.List;
 
+public class DebugCommand extends Command {
 
-    public StopCommand() {
-        super("stop", Lists.newArrayList());
+    private static boolean debug = false;
+
+    public DebugCommand() {
+        super("debug", Lists.newArrayList());
     }
 
     @Override
     public void init() {
-        this.addExecutor(0, (sender, data, ioHandler) -> {
+        this.addExecutor(0,(sender, dataCollection, ioHandler) -> {
             if (sender.isConsole()) {
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Stop");
-                Main.exit();
+                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Debug :" + !debug);
+                Main.setDebug(debug);
+                Main.relogin();
                 return CommandResult.ALLOW;
             }
             return CommandResult.REFUSE;
@@ -30,6 +34,6 @@ public class StopCommand extends Command {
     @Override
     public void usage(CommandSender commandSender, IOHandler ioHandler) {
         if (commandSender.isConsole())
-            ioHandler.output("Use: stop");
+            ioHandler.output("Use: debug");
     }
 }

@@ -101,24 +101,20 @@ public class LoadCommand extends Command {
     public void init() {
         this.addExecutor(1, (sender, data, ioHandler) -> {
             if (sender.isConsole()) {
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start loading...");
                 String path = data.get();
                 File file = new File(path);
                 if (file.exists() && file.getName().endsWith(".jar")) {
+                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "Load " + file.getName());
                     try {
-                        ioHandler.output(ChatConstants.CONSOLE_HEADER + "Start PluginClassLoader");
                         PluginClassLoader classLoader = new PluginClassLoader(file);
                         if (!classLoader.load())
                             ioHandler.output(ChatConstants.CONSOLE_HEADER + "Plugin need load after some other plugins.");
-                        ioHandler.output(ChatConstants.CONSOLE_HEADER + "End PluginClassLoader");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "End loading...");
                     return CommandResult.ALLOW;
                 }
                 ioHandler.output(ChatConstants.CONSOLE_HEADER + "File is not existed.");
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "End loading...");
                 return CommandResult.REFUSE;
             }
             return CommandResult.REFUSE;

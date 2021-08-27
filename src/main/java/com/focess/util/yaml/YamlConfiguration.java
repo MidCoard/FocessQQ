@@ -35,8 +35,6 @@ public class YamlConfiguration {
     }
 
     public <T> T get(String key) {
-        if (values.get(key) == null)
-            return null;
         return (T) values.get(key);
     }
 

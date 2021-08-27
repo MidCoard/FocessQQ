@@ -8,19 +8,19 @@ import com.focess.api.util.IOHandler;
 import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 
-public class StopCommand extends Command {
+import java.util.List;
 
-
-    public StopCommand() {
-        super("stop", Lists.newArrayList());
+public class ReloginCommand extends Command {
+    public ReloginCommand() {
+        super("relogin", Lists.newArrayList());
     }
 
     @Override
     public void init() {
-        this.addExecutor(0, (sender, data, ioHandler) -> {
+        this.addExecutor(0,(sender, dataCollection, ioHandler) -> {
             if (sender.isConsole()) {
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Stop");
-                Main.exit();
+                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Relogin");
+                Main.relogin();
                 return CommandResult.ALLOW;
             }
             return CommandResult.REFUSE;
@@ -30,6 +30,6 @@ public class StopCommand extends Command {
     @Override
     public void usage(CommandSender commandSender, IOHandler ioHandler) {
         if (commandSender.isConsole())
-            ioHandler.output("Use: stop");
+            ioHandler.output("Use: relogin");
     }
 }
