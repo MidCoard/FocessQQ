@@ -3,10 +3,13 @@ package com.focess;
 import com.focess.api.Plugin;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
+import com.focess.api.event.BotReloginEvent;
+import com.focess.api.event.EventManager;
+import com.focess.api.event.FriendChatEvent;
+import com.focess.api.event.GroupChatEvent;
+import com.focess.api.exception.EventSubmitException;
 import com.focess.api.util.IOHandler;
-import com.focess.commands.LoadCommand;
-import com.focess.commands.StopCommand;
-import com.focess.commands.UnloadCommand;
+import com.focess.commands.*;
 import com.focess.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -32,18 +35,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Main {
 
     private static final Map<CommandSender, Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
-    private static MainPlugin MAIN_PLUGIN;
     private static final long AUTHOR_USER = 2624646185L;
     @Deprecated
     public static Scanner scanner;
     @Deprecated
     public static Bot bot;
+    private static MainPlugin MAIN_PLUGIN;
     private static boolean isRunning = false;
     private static Listener<GroupMessageEvent> groupMessageEventListener;
     private static Listener<FriendMessageEvent> friendMessageEventListener;
     private static long user;
     private static String password;
-    private static final Thread CONSOLE_THREAD = new Thread(()->{
+    private static BotConfiguration configuration;
+    private static volatile boolean isReady = false;
+    private static final Thread CONSOLE_THREAD = new Thread(() -> {
+        while (!isReady);
         while (IOHandler.getIoHandler().hasInput())
             try {
                 CommandLine.exec(IOHandler.getIoHandler().input());
@@ -70,9 +76,60 @@ public class Main {
         return bot;
     }
 
-    public static void relogin() {
-        bot.close();
+    private static void login() {
+        bot = BotFactory.INSTANCE.newBot(user, password, configuration);
         bot.login();
+        isReady = true;
+        groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
+            GroupChatEvent e = new GroupChatEvent(event.getSender(), event.getMessage());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException eventSubmitException) {
+                eventSubmitException.printStackTrace();
+            }
+            if (debug) {
+                IOHandler.getIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getSender().getNameCard(), event.getSender().getId(), event.getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
+                IOHandler.getIoHandler().output("MessageChain: ");
+                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler()::output);
+            }
+            CommandSender now = new CommandSender(event.getSender());
+            AtomicBoolean flag = new AtomicBoolean(false);
+            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+            if (!flag.get())
+                CommandLine.exec(now, event.getMessage().contentToString());
+        });
+        friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
+            FriendChatEvent e = new FriendChatEvent(event.getFriend(), event.getMessage());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException eventSubmitException) {
+                eventSubmitException.printStackTrace();
+            }
+            if (debug) {
+                IOHandler.getIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
+                IOHandler.getIoHandler().output("RawMessageChain: ");
+                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler()::output);
+            }
+            CommandSender now = new CommandSender(event.getSender());
+            AtomicBoolean flag = new AtomicBoolean(false);
+            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+            if (!flag.get())
+                CommandLine.exec(now, event.getMessage().contentToString());
+        });
+    }
+
+    public static void relogin() {
+        BotReloginEvent event = new BotReloginEvent();
+        try {
+            EventManager.submit(event);
+        } catch (EventSubmitException e) {
+            e.printStackTrace();
+        }
+        if (event.isCancelled())
+            return;
+        //todo need to be checked
+        bot.close();
+        login();
     }
 
     public static MainPlugin getMainPlugin() {
@@ -107,9 +164,9 @@ public class Main {
     private static void requestQQ() {
         try {
             IOHandler.getIoHandler().output("please input your QQ user number:");
-            user = scanner.nextLong();
+            user = Long.parseLong(scanner.nextLine());
             IOHandler.getIoHandler().output("please input your QQ password:");
-            password = scanner.next();
+            password = scanner.nextLine();
         } catch (Exception e) {
             requestQQ();
         }
@@ -161,7 +218,10 @@ public class Main {
             Command.register(this, new LoadCommand());
             Command.register(this, new UnloadCommand());
             Command.register(this, new StopCommand());
-            BotConfiguration configuration = BotConfiguration.getDefault();
+            Command.register(this, new DebugCommand());
+            Command.register(this, new ReloginCommand());
+            Command.register(this, new FriendCommand());
+            configuration = BotConfiguration.getDefault();
             configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
             configuration.fileBasedDeviceInfo();
             configuration.setLoginSolver(new LoginSolver() {
@@ -194,32 +254,7 @@ public class Main {
                     return null;
                 }
             });
-            bot = BotFactory.INSTANCE.newBot(user, password, configuration);
-            getBot().login();
-            groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-                if (debug) {
-                    IOHandler.getIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s",event.getSender().getNameCard(),event.getSender().getId(),event.getPermission(),event.getGroup().getName(),event.getGroup().getId(),event.getMessage()));
-                    IOHandler.getIoHandler().output("MessageChain: ");
-                    event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler() :: output);
-                }
-                CommandSender now = new CommandSender(event.getSender());
-                AtomicBoolean flag = new AtomicBoolean(false);
-                updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
-                if (!flag.get())
-                    CommandLine.exec(now, event.getMessage().contentToString());
-            });
-            friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-                if (debug) {
-                    IOHandler.getIoHandler().output(String.format("%s(%d)",event.getFriend().getNick(),event.getFriend().getId()));
-                    IOHandler.getIoHandler().output("RawMessageChain: ");
-                    event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler() :: output);
-                }
-                CommandSender now = new CommandSender(event.getSender());
-                AtomicBoolean flag = new AtomicBoolean(false);
-                updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
-                if (!flag.get())
-                    CommandLine.exec(now, event.getMessage().contentToString());
-            });
+            login();
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
@@ -298,7 +333,7 @@ public class Main {
                     com.execute(sender, args, ioHandler);
                 }
             if (!flag && sender == CommandSender.CONSOLE)
-                ioHandler.output("");
+                ioHandler.output("Unknown Command");
         }
     }
 

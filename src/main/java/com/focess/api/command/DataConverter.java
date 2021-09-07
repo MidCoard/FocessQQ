@@ -36,10 +36,6 @@ public abstract class DataConverter<T> {
             dataCollection.writeInt(arg);
         }
     };
-
-    @Deprecated
-    public static DataConverter<Integer> integerDataConverter = INTEGER_DATA_CONVERTER;
-
     public static final DataConverter<Long> LONG_DATA_CONVERTER = new DataConverter<Long>() {
         @Override
         protected boolean accept(String arg) {
@@ -56,7 +52,6 @@ public abstract class DataConverter<T> {
             dataCollection.writeLong(arg);
         }
     };
-
     public static final DataConverter<Double> DOUBLE_DATA_CONVERTER = new DataConverter<Double>() {
         @Override
         protected boolean accept(String s) {
@@ -73,7 +68,8 @@ public abstract class DataConverter<T> {
             dataCollection.writeDouble(arg);
         }
     };
-
+    @Deprecated
+    public static DataConverter<Integer> integerDataConverter = INTEGER_DATA_CONVERTER;
     @Deprecated
     public static DataConverter<Long> longDataConverter = LONG_DATA_CONVERTER;
 

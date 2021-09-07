@@ -47,10 +47,6 @@ public abstract class Command {
         return commands;
     }
 
-    public boolean isRegistered() {
-        return this.registered;
-    }
-
     public static boolean register(@NonNull Plugin plugin, @NonNull final Command command) {
         for (Command c : commands)
             if (c.getName().equals(command.getName()))
@@ -59,6 +55,10 @@ public abstract class Command {
         command.plugin = plugin;
         Command.commands.add(command);
         return true;
+    }
+
+    public boolean isRegistered() {
+        return this.registered;
     }
 
     public Plugin getPlugin() {
@@ -76,10 +76,6 @@ public abstract class Command {
 
     public List<String> getAli() {
         return ali;
-    }
-
-    public final void setPermission(MemberPermission permission) {
-        this.permission = permission;
     }
 
     public final Executor addExecutor(final int count, final CommandExecutor executor, final String... subCommands) {
@@ -119,6 +115,10 @@ public abstract class Command {
 
     public MemberPermission getPermission() {
         return this.permission;
+    }
+
+    public final void setPermission(MemberPermission permission) {
+        this.permission = permission;
     }
 
     @NonNull

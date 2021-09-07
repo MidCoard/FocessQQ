@@ -8,8 +8,6 @@ import com.focess.api.util.IOHandler;
 import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 
-import java.util.List;
-
 public class DebugCommand extends Command {
 
     private static boolean debug = false;
@@ -20,11 +18,11 @@ public class DebugCommand extends Command {
 
     @Override
     public void init() {
-        this.addExecutor(0,(sender, dataCollection, ioHandler) -> {
+        this.addExecutor(0, (sender, dataCollection, ioHandler) -> {
             if (sender.isConsole()) {
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Debug :" + !debug);
+                debug = !debug;
+                ioHandler.output(ChatConstants.CONSOLE_HEADER + "DebugStatus :" + debug);
                 Main.setDebug(debug);
-                Main.relogin();
                 return CommandResult.ALLOW;
             }
             return CommandResult.REFUSE;

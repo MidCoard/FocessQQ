@@ -1,6 +1,7 @@
 # Project exclude paths
 /target/
 /.idea
+/cache
 MiraiQQ.iml
 device.json
 captcha.jpg

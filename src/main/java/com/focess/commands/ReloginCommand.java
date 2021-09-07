@@ -8,8 +8,6 @@ import com.focess.api.util.IOHandler;
 import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 
-import java.util.List;
-
 public class ReloginCommand extends Command {
     public ReloginCommand() {
         super("relogin", Lists.newArrayList());
@@ -17,9 +15,9 @@ public class ReloginCommand extends Command {
 
     @Override
     public void init() {
-        this.addExecutor(0,(sender, dataCollection, ioHandler) -> {
+        this.addExecutor(0, (sender, dataCollection, ioHandler) -> {
             if (sender.isConsole()) {
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Relogin");
+                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Relogining...");
                 Main.relogin();
                 return CommandResult.ALLOW;
             }

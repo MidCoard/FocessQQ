@@ -1,10 +1,17 @@
 package com.focess.api;
 
+import com.focess.api.annotation.EventHandler;
+import com.focess.api.event.Event;
+import com.focess.api.event.Listener;
+import com.focess.api.event.ListenerHandler;
 import com.focess.commands.LoadCommand;
 import com.focess.util.yaml.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public abstract class Plugin {
 
@@ -54,5 +61,28 @@ public abstract class Plugin {
 
     public YamlConfiguration getConfig() {
         return configuration;
+    }
+
+    public void registerListener(Listener listener) {
+        ListenerHandler.addListener(this, listener);
+        for (Method method : listener.getClass().getDeclaredMethods()) {
+            EventHandler handler;
+            if ((handler = method.getAnnotation(EventHandler.class)) != null) {
+                if (method.getParameterTypes().length == 1) {
+                    Class<?> eventClass = method.getParameterTypes()[0];
+                    if (Event.class.isAssignableFrom(eventClass) && !Modifier.isAbstract(eventClass.getModifiers())) {
+                        try {
+                            Field field = eventClass.getDeclaredField("LISTENER_HANDLER");
+                            boolean flag = field.isAccessible();
+                            field.setAccessible(true);
+                            ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
+                            field.setAccessible(flag);
+                            listenerHandler.addListener(listener, method, handler);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }
+            }
+        }
     }
 }

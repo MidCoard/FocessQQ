@@ -1,12 +1,12 @@
 package com.focess.commands;
 
-import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.annotation.CommandType;
 import com.focess.api.annotation.PluginType;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
+import com.focess.api.event.ListenerHandler;
 import com.focess.api.exception.*;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.util.AnnotationHandler;
@@ -24,13 +24,18 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 @SuppressWarnings("unchecked")
 public class LoadCommand extends Command {
+    public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(LoadCommand.class.getClassLoader());
     private static final List<Plugin> registeredPlugins = Lists.newCopyOnWriteArrayList();
+    private static final Map<Plugin, PluginClassLoader> loaders = Maps.newHashMap();
 
     public LoadCommand() {
         super("load", Lists.newArrayList());
@@ -59,7 +64,7 @@ public class LoadCommand extends Command {
             return plugin;
         } catch (Exception e) {
             if (e instanceof PluginDuplicateException)
-                throw (PluginDuplicateException)e;
+                throw (PluginDuplicateException) e;
             else throw new PluginLoadException(cls);
         }
     }
@@ -79,6 +84,7 @@ public class LoadCommand extends Command {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        ListenerHandler.unregisterPlugin(plugin);
         Command.unregister(plugin);
         registeredPlugins.remove(plugin);
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
@@ -126,10 +132,6 @@ public class LoadCommand extends Command {
         if (commandSender.isConsole())
             ioHandler.output("Use: load [jar-path]");
     }
-
-    private static final Map<Plugin, PluginClassLoader> loaders = Maps.newHashMap();
-
-    public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(LoadCommand.class.getClassLoader());
 
     private static class PluginCoreClassLoader extends ClassLoader {
 
@@ -188,9 +190,11 @@ public class LoadCommand extends Command {
                 CommandType commandType = (CommandType) annotation;
                 if (Command.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                     try {
-                        //NullPointer maybe thrown
+                        Plugin plugin = getPlugin(commandType.plugin());
+                        if (plugin == null)
+                            throw new IllegalCommandClassException();
                         Command command;
-                        if (!Command.register(Objects.requireNonNull(getPlugin(commandType.plugin())), command = (Command) c.newInstance()))
+                        if (!Command.register(plugin, command = (Command) c.newInstance()))
                             throw new CommandDuplicateException(command.getName());
                     } catch (InstantiationException | IllegalAccessException e) {
                         throw new CommandLoadException((Class<? extends Command>) c);
@@ -277,7 +281,7 @@ public class LoadCommand extends Command {
             return super.loadClass(name, resolve);
         }
 
-        public Class<?> findClass(String name,boolean resolve) throws ClassNotFoundException {
+        public Class<?> findClass(String name, boolean resolve) throws ClassNotFoundException {
             Class<?> c = this.findLoadedClass(name);
             if (c == null)
                 c = this.findClass(name);
