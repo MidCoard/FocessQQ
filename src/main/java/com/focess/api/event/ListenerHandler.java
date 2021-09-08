@@ -1,5 +1,6 @@
 package com.focess.api.event;
 
+import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.annotation.EventHandler;
 import com.focess.util.Pair;
@@ -62,7 +63,7 @@ public class ListenerHandler {
                             method.invoke(listener, event);
                             method.setAccessible(flag);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Main.getLogger().thr("Invoke Event Exception",e);
                         }
                     }
             );

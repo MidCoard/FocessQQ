@@ -1,5 +1,6 @@
 package com.focess.util.yaml;
 
+import com.focess.Main;
 import com.google.common.collect.Maps;
 import org.yaml.snakeyaml.Yaml;
 
@@ -25,7 +26,7 @@ public class YamlConfiguration {
             reader.close();
             return yamlConfiguration;
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.getLogger().thr("Load Config File Exception",e);
         }
         return null;
     }
@@ -50,7 +51,7 @@ public class YamlConfiguration {
         try {
             YAML.dump(this.values, new FileWriter(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.getLogger().thr("Save Config File Exception",e);
         }
     }
 

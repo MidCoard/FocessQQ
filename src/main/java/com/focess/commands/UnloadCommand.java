@@ -1,5 +1,6 @@
 package com.focess.commands;
 
+import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.command.*;
 import com.focess.api.util.IOHandler;
@@ -17,7 +18,7 @@ public class UnloadCommand extends Command {
                 Plugin plugin = data.getPlugin();
                 ioHandler.output("Unload " + plugin.getName());
                 if (!(plugin.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader))
-                    ioHandler.output("Note: Plugin not load from PluginClassLoader");
+                    Main.getLogger().debug("Plugin " + plugin.getName() + " is not loaded from PluginClassLoader");
                 LoadCommand.disablePlugin(plugin);
                 System.gc();
                 return CommandResult.ALLOW;

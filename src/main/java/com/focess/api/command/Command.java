@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public abstract class Command {
 
@@ -84,10 +83,6 @@ public abstract class Command {
         return executor1;
     }
 
-    private boolean checkPermission(CommandSender sender, Executor executor) {
-        return sender.hasPermission(executor.permission);
-    }
-
     public final boolean execute(final CommandSender sender, final String[] args, IOHandler ioHandler) {
         if (!this.isRegistered())
             return false;
@@ -98,7 +93,7 @@ public abstract class Command {
         CommandResult result = CommandResult.NONE;
         for (final Executor executor : this.executors) {
             if (executor.checkCount(amount) && executor.checkArgs(args)) {
-                if (this.checkPermission(sender, executor))
+                if (sender.hasPermission(executor.permission))
                     result = executor.execute(sender, Arrays.copyOfRange(args, executor.getSubCommandsSize(), args.length), ioHandler);
                 else result = CommandResult.REFUSE;
                 for (CommandResult r : executor.results.keySet())
@@ -123,39 +118,7 @@ public abstract class Command {
         this.permission = permission;
     }
 
-    @NonNull
-    protected List<String> getCompleteLists(CommandSender sender, String cmd, String[] args) {
-        return Lists.newArrayList();
-    }
-
     public abstract void init();
-
-    public final List<String> tabComplete(final CommandSender sender, final String cmd, final String[] args) {
-        final List<String> ret = this.getCompleteLists(sender, cmd, args);
-        if (args == null || args.length == 0)
-            return ret;
-        if (ret.size() == 0) {
-            for (final Executor executor : this.executors)
-                if (checkPermission(sender, executor) && args.length - 1 >= executor.getSubCommandsSize() && executor.checkArgs(args)) {
-                    int pos = args.length - executor.getSubCommandsSize();
-                    if (executor.tabCompletes.length < pos)
-                        continue;
-                    boolean flag = false;
-                    for (int i = 0; i < pos - 1; i++)
-                        if (!executor.tabCompletes[i].accept(args[i + executor.getSubCommandsSize()])) {
-                            flag = true;
-                            break;
-                        }
-                    if (!flag)
-                        ret.addAll(executor.tabCompletes[pos - 1].getTabComplete(sender));
-                }
-            for (Executor executor : this.executors)
-                if (checkPermission(sender, executor) && args.length <= executor.getSubCommandsSize() && executor.checkArgs(args, executor.getSubCommandsSize() - 1))
-                    ret.add(executor.subCommands[executor.getSubCommandsSize() - 1]);
-        }
-        return ret.parallelStream().filter(str -> str.startsWith(args[args.length - 1]))
-                .collect(Collectors.toList());
-    }
 
     public abstract void usage(CommandSender commandSender, IOHandler ioHandler);
 
@@ -220,20 +183,8 @@ public abstract class Command {
             return this.subCommands.length;
         }
 
-        @Deprecated
-        public Executor addPermission(MemberPermission permission) {
-            this.permission = permission;
-            return this;
-        }
-
         public Executor setPermission(MemberPermission permission) {
             this.permission = permission;
-            return this;
-        }
-
-        @Deprecated
-        public Executor addTabComplete(TabCompleter<?>... tabCompleters) {
-            this.tabCompletes = tabCompleters;
             return this;
         }
 
@@ -242,21 +193,8 @@ public abstract class Command {
             return this;
         }
 
-        @Deprecated
-        public Executor addCommandResult(CommandResult result, CommandResultExecutor executor) {
-            results.put(result, executor);
-            return this;
-        }
-
         public Executor setCommandResultExecutors(CommandResult result, CommandResultExecutor executor) {
             results.put(result, executor);
-            return this;
-        }
-
-        @Deprecated
-        public Executor addDataConverter(DataConverter<?>... dataConverters) {
-            this.dataConverters = dataConverters;
-            this.useDefaultConverter = false;
             return this;
         }
 

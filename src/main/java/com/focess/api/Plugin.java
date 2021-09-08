@@ -1,5 +1,6 @@
 package com.focess.api;
 
+import com.focess.Main;
 import com.focess.api.annotation.EventHandler;
 import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Objects;
 
 public abstract class Plugin {
 
@@ -29,7 +31,7 @@ public abstract class Plugin {
             try {
                 config.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                Main.getLogger().thr("Create Config File Exception",e);
             }
         }
         configuration = YamlConfiguration.loadFile(getConfigFile());
@@ -61,6 +63,21 @@ public abstract class Plugin {
 
     public YamlConfiguration getConfig() {
         return configuration;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Plugin plugin = (Plugin) o;
+
+        return Objects.equals(name, plugin.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 
     public void registerListener(Listener listener) {

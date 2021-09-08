@@ -112,6 +112,7 @@ public class CommandSender {
     public IOHandler getIOHandler() {
         if (this.isConsole())
             return IOHandler.getConsoleIoHandler();
+
         return new IOHandler() {
             private volatile String value = null;
             private volatile boolean flag = false;

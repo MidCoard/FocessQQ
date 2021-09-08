@@ -49,24 +49,35 @@ public class Main {
     private static Scanner scanner;
     private static Bot bot;
     private static MainPlugin MAIN_PLUGIN;
-    private static boolean isRunning = false;
+    private static boolean running = false;
     private static Listener<GroupMessageEvent> groupMessageEventListener;
     private static Listener<FriendMessageEvent> friendMessageEventListener;
     private static long user;
     private static String password;
     private static BotConfiguration configuration;
-    private static volatile boolean isReady = false;
+    private static volatile boolean ready = false;
+    private static boolean saved = false;
 
     private static final Thread CONSOLE_THREAD = new Thread(() -> {
-        while (!isReady) ;
+        Main.getLogger().debug("Wait for Bot is ready.");
+        while (!ready);
+        Main.getLogger().debug("Bot is ready.");
+        Main.getLogger().debug("Start listening console input.");
         while (IOHandler.getConsoleIoHandler().hasInput())
             try {
                 CommandLine.exec(IOHandler.getConsoleIoHandler().input());
             } catch (Exception e) {
-                e.printStackTrace();
+                Main.getLogger().thr("Exec Command Exception",e);
             }
     });
-    private static boolean debug = false;
+
+    public static boolean isRunning() {
+        return running;
+    }
+
+    public static boolean isReady() {
+        return ready;
+    }
 
     public static FocessLogger getLogger() {
         return LOG;
@@ -77,6 +88,19 @@ public class Main {
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
             v.offer(Pair.of(ioHandler, flag));
+            return v;
+        });
+    }
+
+    private static void updateInput(CommandSender sender, String content, String miraiContent, AtomicBoolean flag) {
+        quests.compute(sender, (k, v) -> {
+            if (v != null && !v.isEmpty()) {
+                Pair<IOHandler, Boolean> element = v.poll();
+                if (element.getValue())
+                    element.getKey().input(content);
+                else element.getKey().input(miraiContent);
+                flag.set(true);
+            }
             return v;
         });
     }
@@ -92,43 +116,40 @@ public class Main {
     private static void login() {
         bot = BotFactory.INSTANCE.newBot(user, password, configuration);
         bot.login();
-        isReady = true;
+        ready = true;
         groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
             GroupChatEvent e = new GroupChatEvent(event.getSender(), event.getMessage());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
-                eventSubmitException.printStackTrace();
+                Main.getLogger().thr("Submit Group Message Exception",eventSubmitException);
             }
-            if (debug) {
-                IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getSender().getNameCard(), event.getSender().getId(), event.getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-                IOHandler.getConsoleIoHandler().output("MessageChain: ");
-                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
-            }
-            CommandSender now = new CommandSender(event.getSender());
+            Main.getLogger().debug(String.format("%s(%d,%s) in %s(%d): %s", event.getSender().getNameCard(), event.getSender().getId(), event.getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
+            Main.getLogger().debug("MessageChain: ");
+            event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
+            CommandSender sender = new CommandSender(event.getSender());
             AtomicBoolean flag = new AtomicBoolean(false);
-            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+            updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
             if (!flag.get())
-                CommandLine.exec(now, event.getMessage().contentToString());
+                CommandLine.exec(sender, event.getMessage().contentToString());
         });
         friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
             FriendChatEvent e = new FriendChatEvent(event.getFriend(), event.getMessage());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
-                eventSubmitException.printStackTrace();
+                Main.getLogger().thr("Submit Friend Message Exception",eventSubmitException);
             }
-            if (debug) {
-                IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-                IOHandler.getConsoleIoHandler().output("RawMessageChain: ");
-                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
-            }
-            CommandSender now = new CommandSender(event.getSender());
+            Main.getLogger().debug(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
+            Main.getLogger().debug("MessageChain: ");
+            event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
+            CommandSender sender = new CommandSender(event.getSender());
             AtomicBoolean flag = new AtomicBoolean(false);
-            updateMessage(now, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+            updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
             if (!flag.get())
-                CommandLine.exec(now, event.getMessage().contentToString());
+                CommandLine.exec(sender, event.getMessage().contentToString());
         });
+        Main.getLogger().debug("Register message listeners.");
     }
 
     public static void relogin() {
@@ -136,13 +157,14 @@ public class Main {
         try {
             EventManager.submit(event);
         } catch (EventSubmitException e) {
-            e.printStackTrace();
+            Main.getLogger().thr("Submit Relogin Exception",e);
         }
         if (event.isCancelled())
             return;
         //todo need to be checked
         bot.close();
         login();
+        Main.getLogger().debug("Relogin.");
     }
 
     public static MainPlugin getMainPlugin() {
@@ -161,59 +183,52 @@ public class Main {
         return getBot().getFriend(getAuthorUser());
     }
 
-    private static void updateMessage(CommandSender now, String content, String valueOf, AtomicBoolean flag) {
-        quests.compute(now, (k, v) -> {
-            if (v != null && !v.isEmpty()) {
-                Pair<IOHandler, Boolean> element = v.poll();
-                if (element.getValue())
-                    element.getKey().input(content);
-                else element.getKey().input(valueOf);
-                flag.set(true);
-            }
-            return v;
-        });
-    }
-
-    private static void requestQQ() {
+    private static void requestAccountInfomation() {
         try {
-            IOHandler.getConsoleIoHandler().output("please input your QQ user number:");
+            IOHandler.getConsoleIoHandler().output("Please input your QQ user id: ");
             user = Long.parseLong(scanner.nextLine());
-            IOHandler.getConsoleIoHandler().output("please input your QQ password:");
+            IOHandler.getConsoleIoHandler().output("Please input your QQ password: ");
             password = scanner.nextLine();
         } catch (Exception e) {
-            requestQQ();
+            requestAccountInfomation();
         }
     }
 
     public static void main(String[] args) {
+        Main.getLogger().info("MiraiQQ Bot Start!");
+        Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
+            Main.getLogger().thr("Uncaught Exception",e);
+            Main.getLogger().fatal("Main Thread throws an uncaught exception. Force shutdown!");
+            Main.exit();
+        });
+        Main.getLogger().debug("Setup default UncaughtExceptionHandler.");
         scanner = new Scanner(System.in);
         if (args.length == 2) {
             try {
                 user = Long.parseLong(args[0]);
                 password = args[1];
+                Main.getLogger().debug("Use username and password as given.");
             } catch (Exception ignored) {
-                requestQQ();
+                requestAccountInfomation();
             }
-        } else requestQQ();
+        } else requestAccountInfomation();
         CONSOLE_THREAD.start();
+        Main.getLogger().debug("Start Console Thread.");
         try {
-            MAIN_PLUGIN = LoadCommand.loadPlugin(MainPlugin.class);
+            MAIN_PLUGIN = LoadCommand.enablePlugin(MainPlugin.class);
+            Main.getLogger().debug("Load MainPlugin.");
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.getLogger().thr("Load MainPlugin Exception",e);
         }
     }
 
     public static void exit() {
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
         scheduledExecutorService.schedule(() -> {
-            System.out.println("Force shutdown!");
+            Main.getLogger().fatal("Main Thread waits for more than 5 sec before shutdown. Force shutdown!");
             System.exit(0);
         }, 5, TimeUnit.SECONDS);
         LoadCommand.disablePlugin(MAIN_PLUGIN);
-    }
-
-    public static void setDebug(boolean debug) {
-        Main.debug = debug;
     }
 
     private static void saveLogFile() {
@@ -235,7 +250,7 @@ public class Main {
                 target.delete();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.getLogger().thr("Save Log Exception",e);
         }
     }
 
@@ -245,7 +260,7 @@ public class Main {
 
         public MainPlugin() {
             super("MainPlugin");
-            if (isRunning)
+            if (running)
                 Main.exit();
         }
 
@@ -255,13 +270,14 @@ public class Main {
 
         @Override
         public void enable() {
-            isRunning = true;
+            Main.getLogger().debug("Enable MainPlugin.");
+            running = true;
             Command.register(this, new LoadCommand());
             Command.register(this, new UnloadCommand());
             Command.register(this, new StopCommand());
-            Command.register(this, new DebugCommand());
             Command.register(this, new ReloginCommand());
             Command.register(this, new FriendCommand());
+            Main.getLogger().debug("Register default commands.");
             configuration = BotConfiguration.getDefault();
             configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
             configuration.fileBasedDeviceInfo();
@@ -274,7 +290,7 @@ public class Main {
                         outputStream.write(bytes);
                         outputStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Main.getLogger().thr("CAPTCHA Picture Load Exception",e);
                     }
                     return scanner.nextLine();
                 }
@@ -295,45 +311,54 @@ public class Main {
                     return null;
                 }
             });
+            Main.getLogger().debug("Setup default Bot configuration.");
             login();
+            Main.getLogger().debug("Login.");
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
+            Main.getLogger().debug("Load properties.");
             File plugins = new File("plugins");
             if (plugins.exists())
                 for (File file : Objects.requireNonNull(plugins.listFiles(file -> file.getName().endsWith(".jar"))))
                     CommandLine.exec("load plugins/" + file.getName());
+            Main.getLogger().debug("Load plugins in 'plugins' folder.");
             Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
                 @Override
                 public void run() {
-                    if (isRunning) {
+                    if (running) {
+                        Main.getLogger().fatal("Main Thread shuts down without saving Data. Try to save data now!");
+                        Main.getLogger().debug("Save log file.");
                         saveLogFile();
-                        for (String key : properties.keySet())
-                            getConfig().set(key, properties.get(key));
-                        getConfig().save(getConfigFile());
-                        for (Plugin plugin : LoadCommand.getPlugins())
-                            if (!plugin.equals(MainPlugin.this))
-                                CommandLine.exec("unload " + plugin.getName());
+                        saved = true;
                         LoadCommand.disablePlugin(MainPlugin.this);
-                        friendMessageEventListener.complete();
-                        groupMessageEventListener.complete();
                     }
                 }
             });
+            Main.getLogger().debug("Setup shutdown hook.");
         }
 
         @Override
         public void disable() {
-            saveLogFile();
+            Main.getLogger().debug("Disable MainPlugin.");
             for (String key : properties.keySet())
                 getConfig().set(key, properties.get(key));
             getConfig().save(getConfigFile());
+            Main.getLogger().debug("Save properties.");
             for (Plugin plugin : LoadCommand.getPlugins())
                 if (!plugin.equals(this))
                     CommandLine.exec("unload " + plugin.getName());
+            Main.getLogger().debug("Unload all loaded plugins without MainPlugin.");
             friendMessageEventListener.complete();
             groupMessageEventListener.complete();
-            isRunning = false;
+            Main.getLogger().debug("Complete all registered listeners.");
+            if (!saved) {
+                Main.getLogger().debug("Save log file.");
+                saveLogFile();
+                saved = true;
+            }
+            ready = false;
+            running = false;
             System.exit(0);
         }
 

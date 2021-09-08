@@ -8,6 +8,8 @@ public class FocessLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(FocessLogger.class);
 
+    private static final boolean DEBUG = true;
+
     private static FocessLogger FOCESS_LOG;
 
     public FocessLogger() {
@@ -22,5 +24,16 @@ public class FocessLogger {
 
     public void consoleInput(String message) {
         LOG.debug(ChatConstants.CONSOLE_INPUT_HEADER + message);
+    }
+
+    public void thr(String message,Throwable e) {
+        LOG.error(message,e);
+    }
+
+    public void fatal(String message) {LOG.error(ChatConstants.CONSOLE_FATAL_HEADER + message);}
+
+    public void debug(String message) {
+        if (DEBUG)
+            LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
     }
 }
