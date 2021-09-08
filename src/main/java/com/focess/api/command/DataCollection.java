@@ -25,7 +25,7 @@ public class DataCollection {
     private final ObjectBuffer objectBuffer;
     private final StringBuffer defaultBuffer;
     private final PluginBuffer pluginBuffer;
-    private Map<Class<?>, DataBuffer> buffers = Maps.newHashMap();
+    private final Map<Class<?>, DataBuffer> buffers = Maps.newHashMap();
 
     public DataCollection(int size) {
         this.defaultBuffer = StringBuffer.allocate(size);

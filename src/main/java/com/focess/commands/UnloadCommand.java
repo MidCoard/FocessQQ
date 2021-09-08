@@ -3,7 +3,6 @@ package com.focess.commands;
 import com.focess.api.Plugin;
 import com.focess.api.command.*;
 import com.focess.api.util.IOHandler;
-import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 
 public class UnloadCommand extends Command {
@@ -16,9 +15,9 @@ public class UnloadCommand extends Command {
         this.addExecutor(1, (sender, data, ioHandler) -> {
             if (sender.isConsole()) {
                 Plugin plugin = data.getPlugin();
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Unload " + plugin.getName());
+                ioHandler.output("Unload " + plugin.getName());
                 if (!(plugin.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader))
-                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "Note: Plugin not load from PluginClassLoader");
+                    ioHandler.output("Note: Plugin not load from PluginClassLoader");
                 LoadCommand.disablePlugin(plugin);
                 System.gc();
                 return CommandResult.ALLOW;

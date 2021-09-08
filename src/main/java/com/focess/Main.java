@@ -11,9 +11,11 @@ import com.focess.api.exception.EventSubmitException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
 import com.focess.util.Pair;
+import com.focess.util.logger.FocessLogger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.google.common.io.Files;
 import kotlin.coroutines.Continuation;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
@@ -28,18 +30,24 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.GZIPOutputStream;
 
 public class Main {
 
+    private static final FocessLogger LOG = new FocessLogger();
     private static final Map<CommandSender, Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
     private static final long AUTHOR_USER = 2624646185L;
-    @Deprecated
-    public static Scanner scanner;
-    @Deprecated
-    public static Bot bot;
+    private static Scanner scanner;
+    private static Bot bot;
     private static MainPlugin MAIN_PLUGIN;
     private static boolean isRunning = false;
     private static Listener<GroupMessageEvent> groupMessageEventListener;
@@ -48,18 +56,23 @@ public class Main {
     private static String password;
     private static BotConfiguration configuration;
     private static volatile boolean isReady = false;
+
     private static final Thread CONSOLE_THREAD = new Thread(() -> {
-        while (!isReady);
-        while (IOHandler.getIoHandler().hasInput())
+        while (!isReady) ;
+        while (IOHandler.getConsoleIoHandler().hasInput())
             try {
-                CommandLine.exec(IOHandler.getIoHandler().input());
+                CommandLine.exec(IOHandler.getConsoleIoHandler().input());
             } catch (Exception e) {
                 e.printStackTrace();
             }
     });
     private static boolean debug = false;
 
-    public static void registerIOHandler(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
+    public static FocessLogger getLogger() {
+        return LOG;
+    }
+
+    public static void registerInputListener(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         quests.compute(commandSender, (k, v) -> {
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
@@ -88,9 +101,9 @@ public class Main {
                 eventSubmitException.printStackTrace();
             }
             if (debug) {
-                IOHandler.getIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getSender().getNameCard(), event.getSender().getId(), event.getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-                IOHandler.getIoHandler().output("MessageChain: ");
-                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler()::output);
+                IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getSender().getNameCard(), event.getSender().getId(), event.getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
+                IOHandler.getConsoleIoHandler().output("MessageChain: ");
+                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
             }
             CommandSender now = new CommandSender(event.getSender());
             AtomicBoolean flag = new AtomicBoolean(false);
@@ -106,9 +119,9 @@ public class Main {
                 eventSubmitException.printStackTrace();
             }
             if (debug) {
-                IOHandler.getIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-                IOHandler.getIoHandler().output("RawMessageChain: ");
-                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getIoHandler()::output);
+                IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
+                IOHandler.getConsoleIoHandler().output("RawMessageChain: ");
+                event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
             }
             CommandSender now = new CommandSender(event.getSender());
             AtomicBoolean flag = new AtomicBoolean(false);
@@ -153,8 +166,8 @@ public class Main {
             if (v != null && !v.isEmpty()) {
                 Pair<IOHandler, Boolean> element = v.poll();
                 if (element.getValue())
-                    element.getKey().handle(content);
-                else element.getKey().handle(valueOf);
+                    element.getKey().input(content);
+                else element.getKey().input(valueOf);
                 flag.set(true);
             }
             return v;
@@ -163,9 +176,9 @@ public class Main {
 
     private static void requestQQ() {
         try {
-            IOHandler.getIoHandler().output("please input your QQ user number:");
+            IOHandler.getConsoleIoHandler().output("please input your QQ user number:");
             user = Long.parseLong(scanner.nextLine());
-            IOHandler.getIoHandler().output("please input your QQ password:");
+            IOHandler.getConsoleIoHandler().output("please input your QQ password:");
             password = scanner.nextLine();
         } catch (Exception e) {
             requestQQ();
@@ -191,11 +204,39 @@ public class Main {
     }
 
     public static void exit() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService.schedule(() -> {
+            System.out.println("Force shutdown!");
+            System.exit(0);
+        }, 5, TimeUnit.SECONDS);
         LoadCommand.disablePlugin(MAIN_PLUGIN);
     }
 
     public static void setDebug(boolean debug) {
         Main.debug = debug;
+    }
+
+    private static void saveLogFile() {
+        try {
+            File latest = new File("logs", "latest.log");
+            if (latest.exists()) {
+                String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+                File target = new File("logs", name + ".log");
+                Files.copy(latest, target);
+                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(new File("logs", name + ".gz")));
+                FileInputStream inputStream = new FileInputStream(target);
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = inputStream.read(buf)) > 0)
+                    gzipOutputStream.write(buf, 0, len);
+                inputStream.close();
+                gzipOutputStream.finish();
+                gzipOutputStream.close();
+                target.delete();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public final static class MainPlugin extends Plugin {
@@ -241,7 +282,7 @@ public class Main {
                 @Nullable
                 @Override
                 public Object onSolveSliderCaptcha(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                    IOHandler.getIoHandler().output(s);
+                    IOHandler.getConsoleIoHandler().output(s);
                     scanner.nextLine();
                     return null;
                 }
@@ -249,7 +290,7 @@ public class Main {
                 @Nullable
                 @Override
                 public Object onSolveUnsafeDeviceLoginVerify(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                    IOHandler.getIoHandler().output(s);
+                    IOHandler.getConsoleIoHandler().output(s);
                     scanner.nextLine();
                     return null;
                 }
@@ -266,6 +307,10 @@ public class Main {
                 @Override
                 public void run() {
                     if (isRunning) {
+                        saveLogFile();
+                        for (String key : properties.keySet())
+                            getConfig().set(key, properties.get(key));
+                        getConfig().save(getConfigFile());
                         for (Plugin plugin : LoadCommand.getPlugins())
                             if (!plugin.equals(MainPlugin.this))
                                 CommandLine.exec("unload " + plugin.getName());
@@ -279,6 +324,7 @@ public class Main {
 
         @Override
         public void disable() {
+            saveLogFile();
             for (String key : properties.keySet())
                 getConfig().set(key, properties.get(key));
             getConfig().save(getConfigFile());
@@ -305,7 +351,8 @@ public class Main {
 
         public static void exec(CommandSender sender, String command, IOHandler ioHandler) {
             if (sender != CommandSender.CONSOLE)
-                IOHandler.getIoHandler().output(sender + " EXEC: " + command);
+                IOHandler.getConsoleIoHandler().output(sender + " exec: " + command);
+            else Main.getLogger().consoleInput(command);
             List<String> args = Lists.newArrayList();
             StringBuilder stringBuilder = new StringBuilder();
             boolean stack = false;

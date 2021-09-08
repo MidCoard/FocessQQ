@@ -10,7 +10,6 @@ import com.focess.api.event.ListenerHandler;
 import com.focess.api.exception.*;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.util.AnnotationHandler;
-import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -79,14 +78,14 @@ public class LoadCommand extends Command {
     }
 
     public static void disablePlugin(Plugin plugin) {
+        ListenerHandler.unregisterPlugin(plugin);
+        registeredPlugins.remove(plugin);
+        Command.unregister(plugin);
         try {
             plugin.disable();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ListenerHandler.unregisterPlugin(plugin);
-        Command.unregister(plugin);
-        registeredPlugins.remove(plugin);
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
                 loaders.remove(plugin).close();
@@ -110,17 +109,16 @@ public class LoadCommand extends Command {
                 String path = data.get();
                 File file = new File(path);
                 if (file.exists() && file.getName().endsWith(".jar")) {
-                    ioHandler.output(ChatConstants.CONSOLE_HEADER + "Load " + file.getName());
                     try {
                         PluginClassLoader classLoader = new PluginClassLoader(file);
-                        if (!classLoader.load())
-                            ioHandler.output(ChatConstants.CONSOLE_HEADER + "Plugin need load after some other plugins.");
+                        if (classLoader.load())
+                            ioHandler.output("Load " + file.getName());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     return CommandResult.ALLOW;
                 }
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "File is not existed.");
+                ioHandler.output("File is not existed.");
                 return CommandResult.REFUSE;
             }
             return CommandResult.REFUSE;
@@ -172,7 +170,7 @@ public class LoadCommand extends Command {
                 afterPluginFiles.add(classLoader.file);
                 return false;
             } else if (!pluginType.loadAfter().equals(""))
-                CommandSender.CONSOLE.getIOHandler().output(ChatConstants.CONSOLE_HEADER + "Successfully load some other plugins after " + pluginType.loadAfter() + ".");
+                CommandSender.CONSOLE.getIOHandler().output("Load " + classLoader.file.getName());
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
                     Plugin plugin;
@@ -248,7 +246,7 @@ public class LoadCommand extends Command {
                         if (afterPluginFiles.contains(file)) {
                             PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
                             if (pluginClassLoader.load()) {
-                                CommandSender.CONSOLE.getIOHandler().output(ChatConstants.CONSOLE_HEADER + "Successfully load some other plugins after " + plugin.getName() + ".");
+                                CommandSender.CONSOLE.getIOHandler().output("Load " + file.getName());
                                 afterPluginFiles.remove(file);
                             }
                         }

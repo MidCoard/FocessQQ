@@ -4,7 +4,7 @@ import com.focess.api.Plugin;
 
 public class PluginBuffer extends DataBuffer<Plugin> {
 
-    private StringBuffer stringBuffer;
+    private final StringBuffer stringBuffer;
 
 
     public PluginBuffer(int size) {

@@ -5,7 +5,6 @@ import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
 import com.focess.api.util.IOHandler;
-import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 
 public class StopCommand extends Command {
@@ -19,7 +18,7 @@ public class StopCommand extends Command {
     public void init() {
         this.addExecutor(0, (sender, data, ioHandler) -> {
             if (sender.isConsole()) {
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + "Stop");
+                ioHandler.output("Stopping...");
                 Main.exit();
                 return CommandResult.ALLOW;
             }

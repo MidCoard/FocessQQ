@@ -10,12 +10,7 @@ import java.util.Objects;
 
 public class CommandSender {
 
-    public static final CommandSender CONSOLE = new CommandSender() {
-        @Override
-        public IOHandler getIOHandler() {
-            return IOHandler.getIoHandler();
-        }
-    };
+    public static final CommandSender CONSOLE = new CommandSender();
 
     private final Member member;
     private final Friend friend;
@@ -45,20 +40,6 @@ public class CommandSender {
         this.isMember = true;
         this.isFriend = false;
         this.permission = member.getPermission();
-    }
-
-    @Deprecated
-    public CommandSender(MemberOrConsoleOrFriend memberOrConsoleOrFriend) {
-        this.member = memberOrConsoleOrFriend.member;
-        this.friend = memberOrConsoleOrFriend.friend;
-        this.isMember = memberOrConsoleOrFriend.isMember;
-        this.isFriend = memberOrConsoleOrFriend.isFriend;
-        this.permission = memberOrConsoleOrFriend.isMember ? this.member.getPermission() : MemberPermission.OWNER;
-    }
-
-    @Deprecated
-    public static CommandSender getCommandSender(MemberOrConsoleOrFriend memberOrConsoleOrFriend) {
-        return new CommandSender(memberOrConsoleOrFriend);
     }
 
     public Friend getFriend() {
@@ -124,50 +105,55 @@ public class CommandSender {
         return Objects.hash(member == null ? null : member.getId(), friend == null ? null : friend.getId(), isMember, isFriend);
     }
 
-    @Deprecated
-    public boolean isSimilar(CommandSender sender) {
-        return this.equals(sender);
-    }
-
     public boolean isConsole() {
         return !isFriend() && !isMember();
     }
 
     public IOHandler getIOHandler() {
-        return IOHandler.getIoHandlerByCommandSender(this);
+        if (this.isConsole())
+            return IOHandler.getConsoleIoHandler();
+        return new IOHandler() {
+            private volatile String value = null;
+            private volatile boolean flag = false;
+
+            @Override
+            public void output(String output) {
+                if (isMember())
+                    getMember().getGroup().sendMessage(output);
+                else if (isFriend())
+                    getFriend().sendMessage(output);
+            }
+
+            @Override
+            public String input() {
+                return this.waitForInput();
+            }
+
+            @Override
+            public void input(String input) {
+                this.value = input;
+                this.flag = true;
+            }
+
+            @Override
+            public boolean hasInput(boolean flag) {
+                Main.registerInputListener(this, CommandSender.this, flag);
+                while (!this.flag) ;
+                return true;
+            }
+
+            private String waitForInput() {
+                if (!this.flag)
+                    hasInput();
+                this.flag = false;
+                return this.value;
+            }
+
+        };
     }
 
     public void exec(String command) {
         Main.CommandLine.exec(this, command);
-    }
-
-    @Deprecated
-    public static class MemberOrConsoleOrFriend {
-        private final boolean isMember;
-        private final Member member;
-        private final boolean isFriend;
-        private final Friend friend;
-
-        public MemberOrConsoleOrFriend(Friend friend) {
-            this.isFriend = true;
-            this.isMember = false;
-            this.member = null;
-            this.friend = friend;
-        }
-
-        public MemberOrConsoleOrFriend(Member member) {
-            this.isMember = true;
-            this.isFriend = false;
-            this.member = member;
-            this.friend = null;
-        }
-
-        public MemberOrConsoleOrFriend() {
-            this.isMember = false;
-            this.isFriend = false;
-            this.member = null;
-            this.friend = null;
-        }
     }
 
 }

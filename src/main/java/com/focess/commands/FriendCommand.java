@@ -5,7 +5,6 @@ import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
 import com.focess.api.util.IOHandler;
-import com.focess.commands.util.ChatConstants;
 import com.google.common.collect.Lists;
 import net.mamoe.mirai.contact.Friend;
 
@@ -21,7 +20,7 @@ public class FriendCommand extends Command {
                 StringBuilder stringBuilder = new StringBuilder("朋友列表: ");
                 for (Friend friend : Main.getBot().getFriends())
                     stringBuilder.append(friend.getNick()).append("(").append(friend.getId()).append("),");
-                ioHandler.output(ChatConstants.CONSOLE_HEADER + stringBuilder.substring(0, stringBuilder.length() - 1));
+                ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
                 return CommandResult.ALLOW;
             }
             return CommandResult.REFUSE;

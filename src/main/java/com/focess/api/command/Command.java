@@ -90,9 +90,9 @@ public abstract class Command {
 
     public final boolean execute(final CommandSender sender, final String[] args, IOHandler ioHandler) {
         if (!this.isRegistered())
-            return true;
+            return false;
         if (!sender.hasPermission(this.getPermission()))
-            return true;
+            return false;
         final int amount = args.length;
         boolean flag = false;
         CommandResult result = CommandResult.NONE;
@@ -108,8 +108,10 @@ public abstract class Command {
                 break;
             }
         }
-        if (!flag || result == CommandResult.ARGS)
+        if (!flag || result == CommandResult.ARGS) {
             this.usage(sender, ioHandler);
+            return false;
+        }
         return true;
     }
 

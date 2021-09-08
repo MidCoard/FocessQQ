@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 public abstract class TabCompleter<T> extends DataConverter<T> {
 
 
-    public static final Predicate<String> integerPredicate = i -> {
+    public static final Predicate<String> INTEGER_PREDICATE = i -> {
         try {
             Integer.parseInt(i);
             return true;
@@ -17,7 +17,7 @@ public abstract class TabCompleter<T> extends DataConverter<T> {
         }
     };
 
-    public static final Predicate<String> UUIDPredicate = i -> {
+    public static final Predicate<String> UUID_PREDICATE = i -> {
         try {
             UUID.fromString(i);
             return true;
@@ -26,7 +26,7 @@ public abstract class TabCompleter<T> extends DataConverter<T> {
         }
     };
 
-    public static final Predicate<String> doublePredicate = i -> {
+    public static final Predicate<String> DOUBLE_PREDICATE = i -> {
         try {
             Double.parseDouble(i);
             return true;
@@ -35,7 +35,7 @@ public abstract class TabCompleter<T> extends DataConverter<T> {
         }
     };
 
-    public static final Predicate<String> longPredicate = i -> {
+    public static final Predicate<String> LONG_PREDICATE = i -> {
         try {
             Long.parseLong(i);
             return true;

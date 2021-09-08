@@ -23,7 +23,7 @@ public abstract class DataConverter<T> {
     public static final DataConverter<Integer> INTEGER_DATA_CONVERTER = new DataConverter<Integer>() {
         @Override
         protected boolean accept(String arg) {
-            return TabCompleter.integerPredicate.test(arg);
+            return TabCompleter.INTEGER_PREDICATE.test(arg);
         }
 
         @Override
@@ -39,7 +39,7 @@ public abstract class DataConverter<T> {
     public static final DataConverter<Long> LONG_DATA_CONVERTER = new DataConverter<Long>() {
         @Override
         protected boolean accept(String arg) {
-            return TabCompleter.longPredicate.test(arg);
+            return TabCompleter.LONG_PREDICATE.test(arg);
         }
 
         @Override
@@ -55,7 +55,7 @@ public abstract class DataConverter<T> {
     public static final DataConverter<Double> DOUBLE_DATA_CONVERTER = new DataConverter<Double>() {
         @Override
         protected boolean accept(String s) {
-            return TabCompleter.doublePredicate.test(s);
+            return TabCompleter.DOUBLE_PREDICATE.test(s);
         }
 
         @Override
@@ -68,10 +68,6 @@ public abstract class DataConverter<T> {
             dataCollection.writeDouble(arg);
         }
     };
-    @Deprecated
-    public static DataConverter<Integer> integerDataConverter = INTEGER_DATA_CONVERTER;
-    @Deprecated
-    public static DataConverter<Long> longDataConverter = LONG_DATA_CONVERTER;
 
     protected abstract boolean accept(String arg);
 
