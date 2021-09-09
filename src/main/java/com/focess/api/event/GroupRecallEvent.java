@@ -2,26 +2,25 @@ package com.focess.api.event;
 
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.Member;
-import net.mamoe.mirai.message.data.MessageChain;
 
-public class GroupChatEvent extends Event {
+public class GroupRecallEvent extends Event{
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
+
     private final Member member;
-    private final MessageChain message;
+    private final int[] messageIds;
 
-    public GroupChatEvent(Member member, MessageChain message) {
-
+    public GroupRecallEvent(Member member, int[] messageIds) {
         this.member = member;
-        this.message = message;
+        this.messageIds = messageIds;
     }
 
     public Member getMember() {
         return member;
     }
 
-    public MessageChain getMessage() {
-        return message;
+    public int[] getMessageIds() {
+        return messageIds;
     }
 
     public Group getGroup() {

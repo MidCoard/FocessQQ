@@ -114,7 +114,9 @@ public class LoadCommand extends Command {
         Main.getLogger().debug("Remove Plugin.");
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
-                LOADERS.remove(plugin).close();
+                PluginClassLoader loader = LOADERS.remove(plugin);
+                if (loader != null)
+                    loader.close();
             } catch (IOException e) {
                 Main.getLogger().thr("Remove Plugin Loader Exception",e);
             }

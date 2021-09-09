@@ -1,5 +1,6 @@
 package com.focess.util.logger;
 
+import com.focess.api.exception.EventSubmitException;
 import com.focess.commands.util.ChatConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,5 +36,9 @@ public class FocessLogger {
     public void debug(String message) {
         if (DEBUG)
             LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
+    }
+
+    public void trace(String message,Throwable e) {
+        LOG.trace(message,e);
     }
 }

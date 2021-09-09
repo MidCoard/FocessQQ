@@ -2,6 +2,8 @@ package com.focess.api.util;
 
 import com.focess.Main;
 
+import java.util.Arrays;
+
 public abstract class IOHandler {
 
     /***
@@ -10,7 +12,8 @@ public abstract class IOHandler {
     private static volatile IOHandler CONSOLE_IO_HANDLER = new IOHandler() {
         @Override
         public void output(String output) {
-            Main.getLogger().info(output);
+            String[] messages = output.split("\n");
+            Arrays.stream(messages).forEachOrdered(Main.getLogger()::info);
         }
 
         @Override
