@@ -2,6 +2,7 @@ package com.focess.api.command;
 
 import com.focess.Main;
 import com.focess.api.util.IOHandler;
+import com.focess.listener.ChatListener;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
@@ -73,7 +74,7 @@ public class CommandSender {
     }
 
     public boolean isAuthor() {
-        return this.isFriend ? this.friend.getId() == Main.getAuthorUser() : isMember && this.member.getId() == Main.getAuthorUser();
+        return this.isFriend ? this.friend.getId() == Main.getAuthorId() : isMember && this.member.getId() == Main.getAuthorId();
     }
 
     public MemberPermission getPermission() {
@@ -112,10 +113,7 @@ public class CommandSender {
     public IOHandler getIOHandler() {
         if (this.isConsole())
             return IOHandler.getConsoleIoHandler();
-
         return new IOHandler() {
-            private volatile String value = null;
-            private volatile boolean flag = false;
 
             @Override
             public void output(String output) {
@@ -126,28 +124,10 @@ public class CommandSender {
             }
 
             @Override
-            public String input() {
-                return this.waitForInput();
-            }
-
-            @Override
-            public void input(String input) {
-                this.value = input;
-                this.flag = true;
-            }
-
-            @Override
             public boolean hasInput(boolean flag) {
-                Main.registerInputListener(this, CommandSender.this, flag);
+                ChatListener.registerInputListener(this, CommandSender.this, flag);
                 while (!this.flag) ;
                 return true;
-            }
-
-            private String waitForInput() {
-                if (!this.flag)
-                    hasInput();
-                this.flag = false;
-                return this.value;
             }
 
         };

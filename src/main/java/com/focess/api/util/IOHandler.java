@@ -1,6 +1,7 @@
 package com.focess.api.util;
 
 import com.focess.Main;
+import com.focess.listener.ConsoleListener;
 
 import java.util.Arrays;
 
@@ -10,6 +11,8 @@ public abstract class IOHandler {
      * Console input and output handler
      */
     private static volatile IOHandler CONSOLE_IO_HANDLER = new IOHandler() {
+
+
         @Override
         public void output(String output) {
             String[] messages = output.split("\n");
@@ -17,18 +20,10 @@ public abstract class IOHandler {
         }
 
         @Override
-        public String input() {
-            return Main.getScanner().nextLine();
-        }
-
-        @Override
-        public void input(String input) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public boolean hasInput(boolean flag) {
-            return Main.getScanner().hasNextLine();
+            ConsoleListener.registerInputListener(this);
+            while (!this.flag);
+            return true;
         }
     };
 
@@ -40,16 +35,28 @@ public abstract class IOHandler {
         CONSOLE_IO_HANDLER = consoleIoHandler;
     }
 
+    protected volatile String value = null;
+
+    protected volatile boolean flag = false;
+
     public abstract void output(String output);
 
-    public abstract String input();
+    public String input() {
+        if (!this.flag)
+            hasInput();
+        this.flag = false;
+        return this.value;
+    }
 
-    public abstract void input(String input);
+    public void input(String input) {
+        this.value = input;
+        this.flag = true;
+    }
 
     /***
      *
      * @see #hasInput(boolean)
-     * @return whether there is a string or not.
+     * @return whether there is an input string or not.
      */
     public boolean hasInput() {
         return hasInput(false);

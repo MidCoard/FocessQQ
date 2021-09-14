@@ -9,11 +9,13 @@ import com.focess.api.event.chat.GroupChatEvent;
 import com.focess.api.exception.EventSubmitException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
+import com.focess.listener.ChatListener;
+import com.focess.listener.ConsoleListener;
+import com.focess.util.CombinedFuture;
 import com.focess.util.Pair;
 import com.focess.util.logger.FocessLogger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
 import com.google.common.io.Files;
 import kotlin.coroutines.Continuation;
 import net.mamoe.mirai.Bot;
@@ -36,25 +38,35 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.*;
 import java.util.zip.GZIPOutputStream;
 
 public class Main {
 
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
+    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
+
     private static final FocessLogger LOG = new FocessLogger();
-    private static final Map<CommandSender, Queue<Pair<IOHandler, Boolean>>> quests = Maps.newHashMap();
-    private static final long AUTHOR_USER = 2624646185L;
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final long AUTHOR_ID = 2624646185L;
+    private static final Scanner SCANNER = new Scanner(System.in);
+
+    private static final ConsoleListener CONSOLE_LISTENER = new ConsoleListener();
+    /**
+     * The Mirai API Bot Instance
+     */
     private static Bot bot;
     private static MainPlugin MAIN_PLUGIN;
     private static boolean running = false;
     private static Listener<GroupMessageEvent> groupMessageEventListener;
     private static Listener<FriendMessageEvent> friendMessageEventListener;
     private static Listener<MessageRecallEvent.GroupRecall> groupRecallEventListener;
+    /**
+     *
+     */
     private static long user;
+    /**
+     *
+     */
     private static String password;
     private static BotConfiguration configuration;
     private static volatile boolean ready = false;
@@ -65,17 +77,12 @@ public class Main {
         while (!ready);
         Main.getLogger().debug("Bot is ready.");
         Main.getLogger().debug("Start listening console input.");
-        while (ready && IOHandler.getConsoleIoHandler().hasInput()) {
-            String input = IOHandler.getConsoleIoHandler().input();
+        while (ready && SCANNER.hasNextLine()) {
+            String input = SCANNER.nextLine();
             try {
                 EventManager.submit(new ConsoleInputEvent(input));
             } catch (EventSubmitException e) {
                 Main.getLogger().thr("Submit Console Input Exception",e);
-            }
-            try {
-                CommandLine.exec(input);
-            } catch (Exception e) {
-                Main.getLogger().thr("Exec Command Exception", e);
             }
         }
     });
@@ -92,56 +99,36 @@ public class Main {
         return LOG;
     }
 
-    public static Scanner getScanner() {
-        return scanner;
-    }
-
     public static Bot getBot() {
         return bot;
-    }
-
-    public static MainPlugin getMainPlugin() {
-        return MAIN_PLUGIN;
     }
 
     public static long getUser() {
         return user;
     }
 
-    public static long getAuthorUser() {
-        return AUTHOR_USER;
+    public static long getAuthorId() {
+        return AUTHOR_ID;
     }
 
+    public static ConsoleListener getConsoleListener() {
+        return CONSOLE_LISTENER;
+    }
+
+    /**
+     *
+     * get Author as a Friend
+     *
+     * @return Author as a Friend
+     */
     public static Friend getAuthor() {
-        return getBot().getFriend(getAuthorUser());
+        return getBot().getFriend(getAuthorId());
     }
 
-    public static void registerInputListener(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
-        quests.compute(commandSender, (k, v) -> {
-            if (v == null)
-                v = Queues.newConcurrentLinkedQueue();
-            v.offer(Pair.of(ioHandler, flag));
-            return v;
-        });
-    }
-
-    private static void updateInput(CommandSender sender, String content, String miraiContent, AtomicBoolean flag) {
-        quests.compute(sender, (k, v) -> {
-            if (v != null && !v.isEmpty()) {
-                Pair<IOHandler, Boolean> element = v.poll();
-                if (element.getValue())
-                    element.getKey().input(content);
-                else element.getKey().input(miraiContent);
-                flag.set(true);
-            }
-            return v;
-        });
-    }
-
-    private static void requestAccountInfomation() {
+    private static void requestAccountInformation() {
         try {
             IOHandler.getConsoleIoHandler().output("Please input your QQ user id: ");
-            String str = scanner.nextLine();
+            String str = SCANNER.nextLine();
             if (str.equals("stop")) {
                 if (LoadCommand.getPlugin(MainPlugin.class) != null)
                     Main.exit();
@@ -153,9 +140,9 @@ public class Main {
             }
             user = Long.parseLong(str);
             IOHandler.getConsoleIoHandler().output("Please input your QQ password: ");
-            password = scanner.nextLine();
+            password = SCANNER.nextLine();
         } catch (Exception e) {
-            requestAccountInfomation();
+            requestAccountInformation();
         }
     }
 
@@ -167,6 +154,17 @@ public class Main {
             Main.exit();
         });
         Main.getLogger().debug("Setup default UncaughtExceptionHandler.");
+
+        SCHEDULED_EXECUTOR_SERVICE.schedule(()->{
+            while (ConsoleListener.QUESTS.size() != 0 && (System.currentTimeMillis() -  ConsoleListener.QUESTS.get(0).getValue())  > 60 * 1000 )
+                ConsoleListener.QUESTS.remove(0);
+            for (CommandSender sender : ChatListener.QUESTS.keySet()) {
+                Queue<Pair<IOHandler, Pair<Boolean,Long>>> queue = ChatListener.QUESTS.get(sender);
+                while (queue.size() > 0 && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 1000)
+                    queue.poll();
+            }
+        },1,TimeUnit.MINUTES);
+
         CONSOLE_THREAD.start();
         Main.getLogger().debug("Start Console Thread.");
         if (args.length == 2) {
@@ -175,9 +173,9 @@ public class Main {
                 password = args[1];
                 Main.getLogger().debug("Use username and password as given.");
             } catch (Exception ignored) {
-                requestAccountInfomation();
+                requestAccountInformation();
             }
-        } else requestAccountInfomation();
+        } else requestAccountInformation();
         try {
             LoadCommand.enablePlugin(MainPlugin.class);
             Main.getLogger().debug("Load MainPlugin.");
@@ -193,7 +191,7 @@ public class Main {
         } catch(Exception e) {
             if (e instanceof WrongPasswordException) {
                 IOHandler.getConsoleIoHandler().output("Wrong username or password.");
-                requestAccountInfomation();
+                requestAccountInformation();
                 login();
             } else Main.getLogger().thr("Bot Login Exception",e);
         }
@@ -205,14 +203,6 @@ public class Main {
             } catch (EventSubmitException eventSubmitException) {
                 Main.getLogger().thr("Submit Group Message Exception",eventSubmitException);
             }
-            Main.getLogger().debug(String.format("%s(%d,%s) in %s(%d): %s", event.getSender().getNameCard(), event.getSender().getId(), event.getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-            Main.getLogger().debug("MessageChain: ");
-            event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
-            CommandSender sender = new CommandSender(event.getSender());
-            AtomicBoolean flag = new AtomicBoolean(false);
-            updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
-            if (!flag.get())
-                CommandLine.exec(sender, event.getMessage().contentToString());
         });
         friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
             FriendChatEvent e = new FriendChatEvent(event.getFriend(), event.getMessage());
@@ -221,14 +211,6 @@ public class Main {
             } catch (EventSubmitException eventSubmitException) {
                 Main.getLogger().thr("Submit Friend Message Exception",eventSubmitException);
             }
-            Main.getLogger().debug(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-            Main.getLogger().debug("MessageChain: ");
-            event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
-            CommandSender sender = new CommandSender(event.getSender());
-            AtomicBoolean flag = new AtomicBoolean(false);
-            updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
-            if (!flag.get())
-                CommandLine.exec(sender, event.getMessage().contentToString());
         });
         groupRecallEventListener = bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
             GroupRecallEvent e = new GroupRecallEvent(event.getAuthor(),event.getMessageIds());
@@ -241,6 +223,9 @@ public class Main {
         Main.getLogger().debug("Register message listeners.");
     }
 
+    /**
+     * relogin Bot use given username and password
+     */
     public static void relogin() {
         BotReloginEvent event = new BotReloginEvent();
         try {
@@ -256,9 +241,11 @@ public class Main {
         Main.getLogger().debug("Relogin.");
     }
 
+    /**
+     *
+     */
     public static void exit() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-        scheduledExecutorService.schedule(() -> {
+        SCHEDULED_EXECUTOR_SERVICE.schedule(() -> {
             Main.getLogger().fatal("Main Thread waits for more than 5 sec before shutdown. Force shutdown!");
             System.exit(0);
         }, 5, TimeUnit.SECONDS);
@@ -309,6 +296,9 @@ public class Main {
         public void enable() {
             Main.getLogger().debug("Enable MainPlugin.");
             running = true;
+            this.registerListener(CONSOLE_LISTENER);
+            this.registerListener(new ChatListener());
+            Main.getLogger().debug("Register default listeners.");
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
@@ -335,14 +325,14 @@ public class Main {
                         Main.getLogger().thr("CAPTCHA Picture Load Exception",e);
                     }
                     IOHandler.getConsoleIoHandler().output("Please input CAPTCHA: ");
-                    return scanner.nextLine();
+                    return SCANNER.nextLine();
                 }
 
                 @Nullable
                 @Override
                 public Object onSolveSliderCaptcha(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
                     IOHandler.getConsoleIoHandler().output(s);
-                    scanner.nextLine();
+                    SCANNER.nextLine();
                     return null;
                 }
 
@@ -350,7 +340,7 @@ public class Main {
                 @Override
                 public Object onSolveUnsafeDeviceLoginVerify(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
                     IOHandler.getConsoleIoHandler().output(s);
-                    scanner.nextLine();
+                    SCANNER.nextLine();
                     return null;
                 }
             });
@@ -407,56 +397,81 @@ public class Main {
                 Main.getLogger().debug("Save log file.");
                 saveLogFile();
                 saved = true;
+                ready = false;
+                running = false;
+                System.exit(0);
             }
-            ready = false;
-            running = false;
-            System.exit(0);
         }
 
     }
 
     public static class CommandLine {
 
-        public static void exec(String command) {
-            exec(CommandSender.CONSOLE, command);
+        public static Future<Boolean> exec(String command) {
+            return exec(CommandSender.CONSOLE, command);
         }
 
-        public static void exec(CommandSender sender, String command) {
-            exec(sender, command, sender.getIOHandler());
+        public static Future<Boolean> exec(CommandSender sender, String command) {
+            return exec(sender, command, sender.getIOHandler());
         }
 
-        public static void exec(CommandSender sender, String command, IOHandler ioHandler) {
+        public static Future<Boolean> exec(CommandSender sender, String command, IOHandler ioHandler) {
             if (sender != CommandSender.CONSOLE)
                 IOHandler.getConsoleIoHandler().output(sender + " exec: " + command);
             else Main.getLogger().consoleInput(command);
             List<String> args = Lists.newArrayList();
             StringBuilder stringBuilder = new StringBuilder();
             boolean stack = false;
-            for (char c : command.toCharArray())
-                if (c == ' ' && !stack) {
-                    args.add(stringBuilder.toString());
-                    stringBuilder.delete(0, stringBuilder.length());
-                } else {
-                    if (c == '"')
-                        stack = !stack;
-                    else
+            boolean ignore = false;
+            for (char c : command.toCharArray()) {
+                if (ignore) {
+                    ignore = false;
+                    switch (c) {
+                        case 'a':stringBuilder.append((char)7);break;
+                        case 'b':stringBuilder.append((char)8);break;
+                        case 'f':stringBuilder.append((char)12);break;
+                        case 'n':stringBuilder.append((char)10);break;
+                        case 'r':stringBuilder.append((char)13);break;
+                        case 't':stringBuilder.append((char)9);break;
+                        case 'v':stringBuilder.append((char)11);break;
+                        case '0':stringBuilder.append((char)0);break;
+                        default:stringBuilder.append(c);break;
+                    }
+                } else if (c == '\\')
+                    ignore = true;
+                else if (c == ' ') {
+                    if (!stack) {
+                        if (stringBuilder.length() > 0){
+                            args.add(stringBuilder.toString());
+                            stringBuilder.delete(0, stringBuilder.length());
+                        }
+                    } else
                         stringBuilder.append(c);
-                }
-            args.add(stringBuilder.toString());
+                } else if (c == '"')
+                    stack = !stack;
+                else
+                    stringBuilder.append(c);
+            }
+            if (stringBuilder.length() != 0)
+                args.add(stringBuilder.toString());
+            if (args.size() == 0)
+                return CompletableFuture.completedFuture(false);
             String name = args.get(0);
             args.remove(0);
-            exec0(sender, name, args.toArray(new String[0]), ioHandler);
+            return exec0(sender, name, args.toArray(new String[0]), ioHandler);
         }
 
-        private static void exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler) {
+        private static Future<Boolean> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler) {
             boolean flag = false;
+            CombinedFuture ret = new CombinedFuture();
             for (Command com : Command.getCommands())
                 if (com.getAli().contains(command) || com.getName().equals(command)) {
                     flag = true;
-                    com.execute(sender, args, ioHandler);
+                    ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
                 }
             if (!flag && sender == CommandSender.CONSOLE)
                 ioHandler.output("Unknown Command");
+            return ret;
         }
     }
 

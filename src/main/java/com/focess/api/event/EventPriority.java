@@ -2,7 +2,7 @@ package com.focess.api.event;
 
 public enum EventPriority {
 
-    LOWEST(0), LOWER(1), LOW(2), NORMAL(3), HIGH(4), HIGHER(5), HIGHEST(6);
+    LOWEST(6), LOWER(5), LOW(4), NORMAL(3), HIGH(2), HIGHER(1), HIGHEST(0);
 
     private final int priority;
 

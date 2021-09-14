@@ -69,6 +69,4 @@ public class EventManager {
         } else throw new EventSubmitException(event, "This event is an abstract class.");
     }
 
-
-
 }

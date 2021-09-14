@@ -52,7 +52,7 @@ public class ListenerHandler {
 
     public <T extends Event> void submit(T event) {
         for (Listener listener : this.listeners.keySet()) {
-            this.listeners.get(listener).stream().sorted(Comparator.comparing(pair -> pair.getValue().priority())).forEachOrdered(
+            this.listeners.get(listener).stream().sorted(Comparator.comparing(pair -> pair.getValue().priority().getPriority())).forEachOrdered(
                     i -> {
                         if (event instanceof Cancelable && ((Cancelable) event).isCancelled() && i.getValue().notCallIfCancelled())
                             return;
