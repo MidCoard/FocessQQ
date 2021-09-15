@@ -39,6 +39,10 @@ public class YamlConfiguration {
         return (T) values.get(key);
     }
 
+    public void remove(String key) {
+        values.remove(key);
+    }
+
     public boolean contains(String key) {
         return this.values.containsKey(key);
     }

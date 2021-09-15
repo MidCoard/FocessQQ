@@ -213,7 +213,7 @@ public class Main {
             }
         });
         groupRecallEventListener = bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-            GroupRecallEvent e = new GroupRecallEvent(event.getAuthor(),event.getMessageIds());
+            GroupRecallEvent e = new GroupRecallEvent(event.getAuthor(),event.getMessageIds(),event.getOperator());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -399,8 +399,10 @@ public class Main {
                 saved = true;
                 ready = false;
                 running = false;
-                System.exit(0);
             }
+            EXECUTOR.shutdownNow();
+            SCHEDULED_EXECUTOR_SERVICE.shutdownNow();
+            System.exit(0);
         }
 
     }

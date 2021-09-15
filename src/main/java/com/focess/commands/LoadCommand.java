@@ -37,7 +37,7 @@ public class LoadCommand extends Command {
     private static final List<Plugin> REGISTERED_PLUGINS = Lists.newCopyOnWriteArrayList();
     private static final Map<String,Plugin> NAME_PLUGIN_MAP = Maps.newHashMap();
     private static final Map<Class<? extends Plugin>,Plugin> CLASS_PLUGIN_MAP = Maps.newHashMap();
-    private static final Map<Plugin, PluginClassLoader> LOADERS = Maps.newHashMap();
+    private static final Map<Plugin, PluginClassLoader> LOADERS = Maps.newConcurrentMap();
 
     public LoadCommand() {
         super("load", Lists.newArrayList());
@@ -198,8 +198,7 @@ public class LoadCommand extends Command {
                 });
                 AFTER_PLUGIN_FILES.add(classLoader.file);
                 return false;
-            } else if (!pluginType.loadAfter().equals(""))
-                CommandSender.CONSOLE.getIOHandler().output("Load " + classLoader.file.getName());
+            }
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
                     Plugin plugin;
