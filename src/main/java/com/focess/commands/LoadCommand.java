@@ -17,8 +17,7 @@ import com.google.common.collect.Sets;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -37,7 +36,8 @@ public class LoadCommand extends Command {
     private static final List<Plugin> REGISTERED_PLUGINS = Lists.newCopyOnWriteArrayList();
     private static final Map<String,Plugin> NAME_PLUGIN_MAP = Maps.newHashMap();
     private static final Map<Class<? extends Plugin>,Plugin> CLASS_PLUGIN_MAP = Maps.newHashMap();
-    private static final Map<Plugin, PluginClassLoader> LOADERS = Maps.newConcurrentMap();
+    private static final Map<Plugin, PluginClassLoader> LOADER_MAP = Maps.newConcurrentMap();
+    private static final List<PluginClassLoader> LOADERS = Lists.newCopyOnWriteArrayList();
 
     public LoadCommand() {
         super("load", Lists.newArrayList());
@@ -114,7 +114,7 @@ public class LoadCommand extends Command {
         Main.getLogger().debug("Remove Plugin.");
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
-                PluginClassLoader loader = LOADERS.remove(plugin);
+                PluginClassLoader loader = LOADER_MAP.remove(plugin);
                 if (loader != null)
                     loader.close();
             } catch (IOException e) {
@@ -171,13 +171,13 @@ public class LoadCommand extends Command {
             try {
                 return super.loadClass(name, resolve);
             } catch (ClassNotFoundException e) {
-                for (PluginClassLoader classLoader : LOADERS.values())
+                for (PluginClassLoader classLoader : LOADERS)
                     try {
                         return classLoader.findClass(name, resolve);
                     } catch (ClassNotFoundException ignored) {
                     }
             }
-            throw new ClassNotFoundException();
+            throw new ClassNotFoundException(name);
         }
     }
 
@@ -237,6 +237,7 @@ public class LoadCommand extends Command {
         public PluginClassLoader(@NonNull File file) throws MalformedURLException {
             super(new URL[]{file.toURI().toURL()}, DEFAULT_CLASS_LOADER);
             this.file = file;
+            LOADERS.add(this);
         }
 
         private boolean addPlugin(@NonNull Plugin plugin) {
@@ -258,10 +259,13 @@ public class LoadCommand extends Command {
                     String name = jarEntry.getName();
                     if (!name.endsWith(".class"))
                         continue;
-                    Class<?> c = this.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true);
-                    if (!analyseClass0(c))
-                        return false;
+                    this.loadedClasses.add(this.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
                 }
+                for (Class<?> c : loadedClasses)
+                    if (!analyseClass0(c)) {
+                        LOADERS.remove(this);
+                        return false;
+                    }
                 Main.getLogger().debug("Load And Analyse All Plugin Classes.");
                 for (Plugin plugin : plugins)
                     enablePlugin(plugin);
@@ -270,7 +274,7 @@ public class LoadCommand extends Command {
                     analyseClass(c);
                 Main.getLogger().debug("Analyse All Non-Plugin Classes.");
                 for (Plugin plugin : plugins) {
-                    LOADERS.put(plugin, this);
+                    LOADER_MAP.put(plugin, this);
                     for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
                         if (AFTER_PLUGIN_FILES.contains(file)) {
                             PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
@@ -296,7 +300,6 @@ public class LoadCommand extends Command {
             Annotation annotation;
             if ((annotation = c.getAnnotation(PluginType.class)) != null)
                 return PLUGIN_TYPE_HANDLER.handle(c, annotation, this);
-            loadedClasses.add(c);
             return true;
         }
 
@@ -315,6 +318,27 @@ public class LoadCommand extends Command {
             if (resolve)
                 resolveClass(c);
             return c;
+        }
+    }
+
+    public static class ObjectInputCoreStream extends ObjectInputStream {
+
+        public ObjectInputCoreStream(InputStream inputStream) throws IOException {
+            super(inputStream);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+            try {
+                return super.resolveClass(desc);
+            } catch (ClassNotFoundException e) {
+                for (PluginClassLoader classLoader : LOADERS)
+                    try {
+                        return classLoader.findClass(desc.getName(),true);
+                    } catch (ClassNotFoundException ignored) {
+                    }
+            }
+            throw new ClassNotFoundException(desc.getName());
         }
     }
 }

@@ -4,8 +4,11 @@ import com.focess.api.Plugin;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
 import com.focess.api.event.*;
+import com.focess.api.event.BotReloginEvent;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
+import com.focess.api.event.request.FriendRequestEvent;
+import com.focess.api.event.request.GroupRequestEvent;
 import com.focess.api.exception.EventSubmitException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
@@ -22,9 +25,7 @@ import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.event.Listener;
-import net.mamoe.mirai.event.events.FriendMessageEvent;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.MessageRecallEvent;
+import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.network.WrongPasswordException;
 import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.LoginSolver;
@@ -60,6 +61,8 @@ public class Main {
     private static Listener<GroupMessageEvent> groupMessageEventListener;
     private static Listener<FriendMessageEvent> friendMessageEventListener;
     private static Listener<MessageRecallEvent.GroupRecall> groupRecallEventListener;
+    private static Listener<NewFriendRequestEvent> newFriendRequestEventListener;
+    private static Listener<BotInvitedJoinGroupRequestEvent> botInvitedJoinGroupRequestEvent;
     /**
      *
      */
@@ -220,6 +223,30 @@ public class Main {
                 Main.getLogger().thr("Submit Group Recall Exception",ex);
             }
         });
+        newFriendRequestEventListener = bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class,event ->{
+            FriendRequestEvent e = new FriendRequestEvent(event.getFromId(),event.getFromNick(),event.getFromGroup(),event.getMessage());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                Main.getLogger().thr("Submit Friend Request Exception",ex);
+            }
+            if (e.getAccept() != null)
+                if (e.getAccept())
+                    event.accept();
+                else event.reject(e.isBlackList());
+        });
+        botInvitedJoinGroupRequestEvent = bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
+            GroupRequestEvent e = new GroupRequestEvent(event.getGroupId(),event.getGroupName(),event.getInvitor());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                Main.getLogger().thr("Submit Group Request Exception",ex);
+            }
+            if (e.getAccept() != null)
+                if (e.getAccept())
+                    event.accept();
+                else event.ignore();
+        });
         Main.getLogger().debug("Register message listeners.");
     }
 
@@ -351,10 +378,16 @@ public class Main {
             if (plugins.exists())
                 for (File file : plugins.listFiles(file -> file.getName().endsWith(".jar")))
                     try {
-                        CommandLine.exec("load plugins/" + file.getName());
+                        Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
+                        future.get();
                     } catch (Exception e) {
                         Main.getLogger().thr("Load Target Plugin Exception",e);
                     }
+            try {
+                EventManager.submit(new ServerStartEvent());
+            } catch (EventSubmitException e) {
+                Main.getLogger().thr("Submit Server Start Exception", e);
+            }
             Main.getLogger().debug("Load plugins in 'plugins' folder.");
             Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
                 @Override
@@ -392,6 +425,10 @@ public class Main {
                 groupMessageEventListener.complete();
             if (groupRecallEventListener != null)
                 groupRecallEventListener.complete();
+            if (newFriendRequestEventListener != null)
+                newFriendRequestEventListener.complete();
+            if (botInvitedJoinGroupRequestEvent != null)
+                botInvitedJoinGroupRequestEvent.complete();
             Main.getLogger().debug("Complete all registered listeners.");
             if (!saved) {
                 Main.getLogger().debug("Save log file.");
