@@ -1,4 +1,4 @@
-package com.focess.api.exception;
+package com.focess.api.exceptions;
 
 public class IllegalPluginClassException extends RuntimeException {
 }

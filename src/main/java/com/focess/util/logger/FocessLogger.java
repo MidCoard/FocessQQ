@@ -1,6 +1,5 @@
 package com.focess.util.logger;
 
-import com.focess.api.exception.EventSubmitException;
 import com.focess.commands.util.ChatConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

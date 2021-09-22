@@ -1,6 +1,7 @@
 package com.focess.util.yaml;
 
 import com.focess.Main;
+import com.focess.api.util.SectionMap;
 import com.focess.commands.LoadCommand;
 import com.focess.util.Base64;
 import com.google.common.collect.Maps;
@@ -13,7 +14,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class YamlConfiguration {
+@Deprecated
+public class YamlConfiguration implements SectionMap {
 
     private static final Yaml YAML = new Yaml();
     private final Map<String, Object> values;
@@ -34,13 +36,14 @@ public class YamlConfiguration {
         return null;
     }
 
+    @Override
     public YamlConfigurationSection createSection(String name) {
         Map<String,Object> values = Maps.newHashMap();
         this.values.put(name,values);
         return new YamlConfigurationSection(this,values);
     }
 
-
+    @Override
     public void set(String key, Object value) {
         if (value == null) {
             values.put(key,"null");
@@ -60,8 +63,9 @@ public class YamlConfiguration {
         }
     }
 
+    @Override
     public <T> T get(String key) {
-        Object value = values.get(key);
+        Object value = SectionMap.super.get(key);
         if (value.getClass().isPrimitive() || value.getClass().equals(Double.class) || value.getClass().equals(Float.class) || value.getClass().equals(Short.class) || value.getClass().equals(Character.class) || value.getClass().equals(Long.class) || value.getClass().equals(Integer.class) || value.getClass().equals(Boolean.class) || value.getClass().equals(Byte.class))
             return (T) value;
         else {
@@ -81,20 +85,9 @@ public class YamlConfiguration {
         }
     }
 
-    public void remove(String key) {
-        values.remove(key);
-    }
-
-    public boolean contains(String key) {
-        return this.values.containsKey(key);
-    }
-
+    @Override
     public Map<String, Object> getValues() {
         return this.values;
-    }
-
-    public Set<String> keys() {
-        return this.values.keySet();
     }
 
     public void save(File file) {
@@ -105,6 +98,7 @@ public class YamlConfiguration {
         }
     }
 
+    @Override
     public YamlConfigurationSection getSection(String key) {
         if (get(key) instanceof Map)
             return new YamlConfigurationSection(this, get(key));

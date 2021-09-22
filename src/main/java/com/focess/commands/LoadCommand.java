@@ -8,7 +8,7 @@ import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
 import com.focess.api.event.ListenerHandler;
-import com.focess.api.exception.*;
+import com.focess.api.exceptions.*;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.util.AnnotationHandler;
 import com.google.common.collect.Lists;

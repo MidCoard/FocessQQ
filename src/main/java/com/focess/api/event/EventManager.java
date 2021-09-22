@@ -1,7 +1,7 @@
 package com.focess.api.event;
 
 import com.focess.Main;
-import com.focess.api.exception.EventSubmitException;
+import com.focess.api.exceptions.EventSubmitException;
 import com.google.common.collect.Maps;
 
 import java.lang.reflect.Field;

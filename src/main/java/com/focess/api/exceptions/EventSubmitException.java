@@ -1,4 +1,4 @@
-package com.focess.api.exception;
+package com.focess.api.exceptions;
 
 import com.focess.api.event.Event;
 

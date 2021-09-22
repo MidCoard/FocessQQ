@@ -2,6 +2,7 @@ package com.focess.util.yaml;
 
 import java.util.Map;
 
+@Deprecated
 public class YamlConfigurationSection extends YamlConfiguration {
 
 

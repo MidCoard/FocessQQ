@@ -9,7 +9,7 @@ import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
 import com.focess.api.event.request.FriendRequestEvent;
 import com.focess.api.event.request.GroupRequestEvent;
-import com.focess.api.exception.EventSubmitException;
+import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
 import com.focess.listener.ChatListener;
