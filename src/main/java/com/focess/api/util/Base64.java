@@ -1,4 +1,4 @@
-package com.focess.util;
+package com.focess.api.util;
 
 import java.nio.charset.StandardCharsets;
 

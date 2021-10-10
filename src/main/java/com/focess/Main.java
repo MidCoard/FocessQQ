@@ -14,9 +14,9 @@ import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
 import com.focess.listener.ChatListener;
 import com.focess.listener.ConsoleListener;
-import com.focess.util.CombinedFuture;
+import com.focess.api.util.CombinedFuture;
 import com.focess.util.Pair;
-import com.focess.util.logger.FocessLogger;
+import com.focess.api.util.logger.FocessLogger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -504,7 +504,7 @@ public class Main {
             boolean flag = false;
             CombinedFuture ret = new CombinedFuture();
             for (Command com : Command.getCommands())
-                if (com.getAli().contains(command) || com.getName().equals(command)) {
+                if (com.getAli().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
                     flag = true;
                     ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
                 }

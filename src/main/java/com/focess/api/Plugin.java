@@ -6,7 +6,7 @@ import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.commands.LoadCommand;
-import com.focess.util.yaml.YamlConfiguration;
+import com.focess.api.util.yaml.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;

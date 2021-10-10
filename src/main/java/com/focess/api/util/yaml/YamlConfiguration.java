@@ -1,20 +1,15 @@
-package com.focess.util.yaml;
+package com.focess.api.util.yaml;
 
 import com.focess.Main;
 import com.focess.api.util.SectionMap;
 import com.focess.commands.LoadCommand;
-import com.focess.util.Base64;
+import com.focess.api.util.Base64;
 import com.google.common.collect.Maps;
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
-@Deprecated
 public class YamlConfiguration implements SectionMap {
 
     private static final Yaml YAML = new Yaml();

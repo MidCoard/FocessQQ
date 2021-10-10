@@ -16,6 +16,7 @@ public class ListenerHandler {
 
     private static final List<ListenerHandler> LISTENER_HANDLER_LIST = Lists.newArrayList();
     private static final Map<Plugin, List<Listener>> PLUGIN_LISTENER_MAP = Maps.newHashMap();
+    private static final Map<Listener,Plugin> LISTENER_PLUGIN_MAP = Maps.newHashMap();
     private final Map<Listener, List<Pair<Method, EventHandler>>> listeners = Maps.newHashMap();
 
     public ListenerHandler() {
@@ -23,9 +24,13 @@ public class ListenerHandler {
     }
 
     public static void unregisterPlugin(Plugin plugin) {
+        List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
         for (ListenerHandler handler : LISTENER_HANDLER_LIST)
-            for (Listener listener : PLUGIN_LISTENER_MAP.getOrDefault(plugin, Lists.newArrayList()))
+            for (Listener listener : listeners) {
+                LISTENER_PLUGIN_MAP.remove(listener);
                 handler.unregisterListener(listener);
+            }
+        PLUGIN_LISTENER_MAP.remove(plugin);
     }
 
     public static void addListener(Plugin plugin, Listener listener) {
@@ -35,6 +40,7 @@ public class ListenerHandler {
             v.add(listener);
             return v;
         });
+        LISTENER_PLUGIN_MAP.put(listener,plugin);
     }
 
     public void unregisterListener(Listener listener) {

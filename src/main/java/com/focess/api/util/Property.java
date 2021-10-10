@@ -1,4 +1,4 @@
-package com.focess.util;
+package com.focess.api.util;
 
 import com.focess.Main;
 

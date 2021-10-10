@@ -2,14 +2,19 @@ package com.focess.api.command;
 
 import com.focess.Main;
 import com.focess.api.util.IOHandler;
+import com.focess.api.util.session.Session;
 import com.focess.listener.ChatListener;
+import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class CommandSender {
+
+    private static final Map<CommandSender, Session> SESSIONS = Maps.newHashMap();
 
     public static final CommandSender CONSOLE = new CommandSender();
 
@@ -135,6 +140,16 @@ public class CommandSender {
 
     public void exec(String command) {
         Main.CommandLine.exec(this, command);
+    }
+
+    public Session getSession() {
+        if (SESSIONS.containsKey(this))
+            return SESSIONS.get(this);
+        else {
+            Session session = new Session();
+            SESSIONS.put(this,session);
+            return session;
+        }
     }
 
 }
