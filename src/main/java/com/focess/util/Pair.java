@@ -1,8 +1,23 @@
 package com.focess.util;
 
-public class Pair<K, V> {
+import java.io.Serializable;
 
+/**
+ * This is an Easy Util Class to store two Instances.
+ *
+ * @param <K> the type of first element of the Pair
+ * @param <V> the type of second element of the Pair
+ */
+public class Pair<K, V> implements Serializable {
+
+    /**
+     * The first element
+     */
     private final K key;
+
+    /**
+     * The second element
+     */
     private final V value;
 
     public Pair(K key, V value) {
@@ -20,6 +35,22 @@ public class Pair<K, V> {
 
     public V getValue() {
         return value;
+    }
+
+    public K getLeft() {
+        return this.key;
+    }
+
+    public V getRight() {
+        return this.value;
+    }
+
+    public K getFirst() {
+        return this.key;
+    }
+
+    public V getSecond() {
+        return this.value;
     }
 
     @Override

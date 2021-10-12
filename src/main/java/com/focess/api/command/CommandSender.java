@@ -9,13 +9,20 @@ import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * This class present an executor to execute command. We can use it to distinguish different permissions.
+ */
 public class CommandSender {
 
     private static final Map<CommandSender, Session> SESSIONS = Maps.newHashMap();
 
+    /**
+     * Present CONSOLE or we call it Terminate
+     */
     public static final CommandSender CONSOLE = new CommandSender();
 
     private final Member member;
@@ -32,6 +39,10 @@ public class CommandSender {
         this.permission = MemberPermission.OWNER;
     }
 
+    /**
+     * Present Friend
+     * @param friend The Mirai Friend Instance
+     */
     public CommandSender(Friend friend) {
         this.member = null;
         this.friend = friend;
@@ -40,6 +51,10 @@ public class CommandSender {
         this.permission = MemberPermission.OWNER;
     }
 
+    /**
+     * Present Member in Group
+     * @param member The Mirai Member Instance
+     */
     public CommandSender(Member member) {
         this.member = member;
         this.friend = null;
@@ -48,6 +63,11 @@ public class CommandSender {
         this.permission = member.getPermission();
     }
 
+    /**
+     *
+     * @return
+     */
+    @Nullable
     public Friend getFriend() {
         return friend;
     }
@@ -56,6 +76,12 @@ public class CommandSender {
         return isFriend;
     }
 
+    /**
+     *
+     *
+     * @param permission the compared permission
+     * @return {@link true} if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
+     */
     public boolean hasPermission(MemberPermission permission) {
         if (isAuthor())
             return true;
@@ -70,6 +96,7 @@ public class CommandSender {
         return false;
     }
 
+    @Nullable
     public Member getMember() {
         return member;
     }
@@ -82,6 +109,10 @@ public class CommandSender {
         return this.isFriend ? this.friend.getId() == Main.getAuthorId() : isMember && this.member.getId() == Main.getAuthorId();
     }
 
+    /**
+     * Get Mirai Permission
+     * @return Mirai Permission of this sender
+     */
     public MemberPermission getPermission() {
         return permission;
     }
@@ -111,10 +142,20 @@ public class CommandSender {
         return Objects.hash(member == null ? null : member.getId(), friend == null ? null : friend.getId(), isMember, isFriend);
     }
 
+    /**
+     * indicate whether it is CONSOLE
+     *
+     * @return true if it is {@link CommandSender#CONSOLE}, false otherwise
+     */
     public boolean isConsole() {
-        return !isFriend() && !isMember();
+        return this == CONSOLE;
     }
 
+    /**
+     * Get the receiver by this CommandSender
+     *
+     * @return the receiver by this CommandSender
+     */
     public IOHandler getIOHandler() {
         if (this.isConsole())
             return IOHandler.getConsoleIoHandler();
@@ -138,10 +179,22 @@ public class CommandSender {
         };
     }
 
+    /**
+     * Execute command with this CommandSender
+     *
+     * @see com.focess.Main.CommandLine#exec(CommandSender, String)
+     * @param command the command CommandSender execute
+     */
     public void exec(String command) {
         Main.CommandLine.exec(this, command);
     }
 
+    /**
+     * Get Session of a special CommandSender. It can be used to store some data for future using.
+     * But the data it stored will be lost after Bot exiting.
+     *
+     * @return Session of sender
+     */
     public Session getSession() {
         if (SESSIONS.containsKey(this))
             return SESSIONS.get(this);

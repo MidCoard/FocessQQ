@@ -47,31 +47,49 @@ public class Main {
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
 
+    /**
+     * The Focess Logger
+     */
     private static final FocessLogger LOG = new FocessLogger();
+
+    /**
+     * The Author QQ number
+     */
     private static final long AUTHOR_ID = 2624646185L;
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    private static final ConsoleListener CONSOLE_LISTENER = new ConsoleListener();
     /**
-     * The Mirai API Bot Instance
+     * The Mirai Bot Instance
      */
     private static Bot bot;
     private static MainPlugin MAIN_PLUGIN;
+
+    /**
+     * Indicate MainPlugin is running. True after MainPlugin is loaded.
+     * @see #isReady
+     */
     private static boolean running = false;
     private static Listener<GroupMessageEvent> groupMessageEventListener;
     private static Listener<FriendMessageEvent> friendMessageEventListener;
     private static Listener<MessageRecallEvent.GroupRecall> groupRecallEventListener;
     private static Listener<NewFriendRequestEvent> newFriendRequestEventListener;
     private static Listener<BotInvitedJoinGroupRequestEvent> botInvitedJoinGroupRequestEvent;
+
     /**
-     *
+     * The Mirai Bot user or we call it QQ number
      */
     private static long user;
+
     /**
-     *
+     * The Mirai Bot password
      */
     private static String password;
     private static BotConfiguration configuration;
+
+    /**
+     * Indicate Mirai Bot logins. True after Mirai Bot logins.
+     * @see #isRunning()
+     */
     private static volatile boolean ready = false;
     private static boolean saved = false;
 
@@ -98,10 +116,12 @@ public class Main {
         return ready;
     }
 
+    @NotNull
     public static FocessLogger getLogger() {
         return LOG;
     }
 
+    @NotNull
     public static Bot getBot() {
         return bot;
     }
@@ -114,18 +134,15 @@ public class Main {
         return AUTHOR_ID;
     }
 
-    public static ConsoleListener getConsoleListener() {
-        return CONSOLE_LISTENER;
-    }
-
     /**
      *
      * get Author as a Friend
      *
      * @return Author as a Friend
      */
+    @NotNull
     public static Friend getAuthor() {
-        return getBot().getFriend(getAuthorId());
+        return getBot().getFriendOrFail(getAuthorId());
     }
 
     private static void requestAccountInformation() {
@@ -251,7 +268,7 @@ public class Main {
     }
 
     /**
-     * relogin Bot use given username and password
+     * Relogin Bot using given username and password
      */
     public static void relogin() {
         BotReloginEvent event = new BotReloginEvent();
@@ -269,7 +286,7 @@ public class Main {
     }
 
     /**
-     *
+     * Exit Bot
      */
     public static void exit() {
         SCHEDULED_EXECUTOR_SERVICE.schedule(() -> {
@@ -302,6 +319,12 @@ public class Main {
         }
     }
 
+    /**
+     *
+     * The MainPlugin Plugin is a core plugin in Bot. It will initialize all default settings and make the Bot login.
+     * Never instance it! It will be instanced when it bootstraps automatically.
+     *
+     */
     public final static class MainPlugin extends Plugin {
 
         private static Map<String, Object> properties;
@@ -323,7 +346,7 @@ public class Main {
         public void enable() {
             Main.getLogger().debug("Enable MainPlugin.");
             running = true;
-            this.registerListener(CONSOLE_LISTENER);
+            this.registerListener(new ConsoleListener());
             this.registerListener(new ChatListener());
             Main.getLogger().debug("Register default listeners.");
             properties = getConfig().getValues();
@@ -444,16 +467,44 @@ public class Main {
 
     }
 
+
+    /**
+     * The CommandLine Tool Class can be used to exec command with customize executor, arguments and receiver.
+     */
     public static class CommandLine {
 
+        /**
+         * Execute command using {@link CommandSender#CONSOLE}
+         *
+         * @param command the command Console executes.
+         * @return a Future representing pending completion of the command
+         */
+        @NotNull
         public static Future<Boolean> exec(String command) {
             return exec(CommandSender.CONSOLE, command);
         }
 
+        /**
+         * Execute command with sender
+         *
+         * @param sender the executor
+         * @param command the command CommandSender executes.
+         * @return a Future representing pending completion of the command
+         */
+        @NotNull
         public static Future<Boolean> exec(CommandSender sender, String command) {
             return exec(sender, command, sender.getIOHandler());
         }
 
+        /**
+         * Execute command with sender executing and ioHandler receiving
+         *
+         * @param sender the executor
+         * @param command the command CommandSender executes.
+         * @param ioHandler the receiver
+         * @return a Future representing pending completion of the command
+         */
+        @NotNull
         public static Future<Boolean> exec(CommandSender sender, String command, IOHandler ioHandler) {
             if (sender != CommandSender.CONSOLE)
                 IOHandler.getConsoleIoHandler().output(sender + " exec: " + command);

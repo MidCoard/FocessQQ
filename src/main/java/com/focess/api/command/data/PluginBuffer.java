@@ -6,7 +6,6 @@ public class PluginBuffer extends DataBuffer<Plugin> {
 
     private final StringBuffer stringBuffer;
 
-
     public PluginBuffer(int size) {
         this.stringBuffer = StringBuffer.allocate(size);
     }

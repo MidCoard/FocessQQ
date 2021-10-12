@@ -128,7 +128,6 @@ public abstract class Command {
         private final Map<CommandResult, CommandResultExecutor> results = Maps.newHashMap();
         private CommandExecutor executor;
         private MemberPermission permission = MemberPermission.MEMBER;
-        private TabCompleter<?>[] tabCompletes = new TabCompleter[0];
         private DataConverter<?>[] dataConverters;
         private boolean useDefaultConverter = true;
 
@@ -158,14 +157,9 @@ public abstract class Command {
         }
 
         private CommandResult execute(final CommandSender sender, final String[] args, IOHandler ioHandler) {
-            if (this.useDefaultConverter) {
-                List<DataConverter<?>> dataConverters = Lists.newArrayList();
-                Collections.addAll(dataConverters, this.tabCompletes);
-                int size = args.length - dataConverters.size();
-                for (int i = 0; i < size; i++)
-                    dataConverters.add(DataConverter.DEFAULT_DATA_CONVERTER);
-                this.dataConverters = dataConverters.toArray(new DataConverter[0]);
-            } else if (this.dataConverters.length < args.length) {
+            if (this.useDefaultConverter)
+                this.dataConverters = Collections.nCopies(args.length,DataConverter.DEFAULT_DATA_CONVERTER).toArray(new DataConverter[0]);
+            else if (this.dataConverters.length < args.length) {
                 List<DataConverter<?>> dataConverters = Lists.newArrayList(this.dataConverters);
                 for (int i = 0; i < args.length - this.dataConverters.length; i++)
                     dataConverters.add(DataConverter.DEFAULT_DATA_CONVERTER);
@@ -185,11 +179,6 @@ public abstract class Command {
 
         public Executor setPermission(MemberPermission permission) {
             this.permission = permission;
-            return this;
-        }
-
-        public Executor setTabCompleters(TabCompleter<?>... tabCompleters) {
-            this.tabCompletes = tabCompleters;
             return this;
         }
 

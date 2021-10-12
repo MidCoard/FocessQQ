@@ -10,6 +10,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class NetworkHandler {
 
@@ -44,7 +45,7 @@ public class NetworkHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        CLIENT = new OkHttpClient.Builder().sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
+        CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
     }
 
     public HttpResponse request(String url,Map<String,Object> data,RequestType requestType) {
@@ -70,6 +71,21 @@ public class NetworkHandler {
         if (stringBuilder.length() != 0)
             return stringBuilder.substring(0,stringBuilder.length() - 1);
         return "";
+    }
+
+    public HttpResponse put(String url, Map<String, Object> data,Map<String,String> header,MediaType mediaType) {
+        String value;
+        if (mediaType.equals(JSON))
+            value = new com.focess.api.util.json.JSON(data).toJson();
+        else value = process(data);
+        RequestBody requestBody = RequestBody.create(mediaType,value);
+        Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
+        try {
+            Response response = CLIENT.newCall(request).execute();
+            return new HttpResponse(response.code(),response.headers(),response.body().string());
+        } catch (IOException e) {
+            return new HttpResponse(e);
+        }
     }
 
     public HttpResponse post(String url, Map<String, Object> data,Map<String,String> header,MediaType mediaType) {

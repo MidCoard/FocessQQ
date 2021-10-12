@@ -1,9 +1,10 @@
 package com.focess.api.util;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-public interface SectionMap {
+public interface SectionMap extends Serializable {
 
     default void set(String name, Object value) {
         this.getValues().put(name,value);
