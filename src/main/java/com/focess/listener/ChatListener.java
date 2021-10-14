@@ -20,6 +20,13 @@ public class ChatListener implements Listener {
 
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean,Long>>>> QUESTS = Maps.newHashMap();
 
+    /**
+     * Register input String listener. (Used to communicate with CommandSender with ioHandler)
+     *
+     * @param ioHandler the receiver
+     * @param commandSender the commandSender
+     * @param flag true if you want to get the string value of this message, false if you want to get MiraiCode of this message
+     */
     public static void registerInputListener(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         QUESTS.compute(commandSender, (k, v) -> {
             if (v == null)

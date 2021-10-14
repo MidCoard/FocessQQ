@@ -7,12 +7,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Represent a event listener method. It means this method mush own one argument whose class is an implemented Event.
+ */
 @Target(value = ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EventHandler {
 
+    /**
+     * Set the priority of this event listener method
+     *
+     * @return the priority of this event listener method
+     */
     EventPriority priority() default EventPriority.NORMAL;
 
+    /**
+     * Set whether this method should be called when the event is cancelled
+     *
+     * @return true if this method should be called when the event is cancelled, false otherwise
+     */
     boolean notCallIfCancelled() default false;
 
 }

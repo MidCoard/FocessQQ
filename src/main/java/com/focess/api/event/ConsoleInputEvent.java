@@ -1,5 +1,8 @@
 package com.focess.api.event;
 
+/**
+ *
+ */
 public class ConsoleInputEvent extends Event{
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
@@ -9,7 +12,11 @@ public class ConsoleInputEvent extends Event{
         this.input = input;
     }
 
-
+    /**
+     * Get the console input String
+     *
+     * @return the console input String
+     */
     public String getInput() {
         return input;
     }

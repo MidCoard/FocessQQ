@@ -33,8 +33,14 @@ public class UnloadCommand extends Command {
             ioHandler.output("Use: unload [plugin-name]");
     }
 
+    /**
+     * Convert the String argument to Plugin argument
+     */
     public static class PluginDataConverter extends DataConverter<Plugin> {
 
+        /**
+         * Convert the String argument to Plugin argument
+         */
         public static final PluginDataConverter PLUGIN_DATA_CONVERTER = new PluginDataConverter();
 
         @Override

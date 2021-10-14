@@ -28,6 +28,11 @@ public class ConsoleListener implements Listener {
         }
     }
 
+    /**
+     * Register input String listener. (Used to communicate with CommandSender with ioHandler)
+     *
+     * @param ioHandler the {@link com.focess.api.command.CommandSender#CONSOLE} CommandSender
+     */
     public static void registerInputListener(IOHandler ioHandler) {
         QUESTS.add(Pair.of(ioHandler,System.currentTimeMillis()));
     }

@@ -8,8 +8,9 @@ import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -41,7 +42,8 @@ public class CommandSender {
 
     /**
      * Present Friend
-     * @param friend The Mirai Friend Instance
+     *
+     * @param friend the Mirai Friend instance
      */
     public CommandSender(Friend friend) {
         this.member = null;
@@ -53,6 +55,7 @@ public class CommandSender {
 
     /**
      * Present Member in Group
+     *
      * @param member The Mirai Member Instance
      */
     public CommandSender(Member member) {
@@ -64,23 +67,29 @@ public class CommandSender {
     }
 
     /**
+     * Get the Mirai Friend instance, or null if this CommandSender does not present a Mirai Friend instance.
      *
-     * @return
+     * @return the Mirai Friend instance
      */
     @Nullable
     public Friend getFriend() {
         return friend;
     }
 
+    /**
+     * Indicate whether this is a Mirai Friend instance
+     *
+     * @return true if this CommandSender presents a Mirai Friend instance, false otherwise
+     */
     public boolean isFriend() {
         return isFriend;
     }
 
     /**
-     *
+     * Indicate whether this CommandSender owns the permission
      *
      * @param permission the compared permission
-     * @return {@link true} if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
+     * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
      */
     public boolean hasPermission(MemberPermission permission) {
         if (isAuthor())
@@ -96,15 +105,31 @@ public class CommandSender {
         return false;
     }
 
+    /**
+     * Get the Mirai Member instance, or null if this CommandSender does not present a Mirai Member instance.
+     *
+     * @return the Mirai Member instance
+     */
     @Nullable
     public Member getMember() {
         return member;
     }
 
+    /**
+     * Indicate whether this is a Mirai Member instance
+     *
+     * @return true if this CommandSender presents a Mirai Member instance, false otherwise
+     */
     public boolean isMember() {
         return isMember;
     }
 
+    /**
+     * Indicate whether this is an Author Mirai Friend Instance
+     * @see CommandSender#isFriend()
+     *
+     * @return true if this CommandSender presents a Mirai Friend instance and its friend id is equal to the id of the author, false otherwise
+     */
     public boolean isAuthor() {
         return this.isFriend ? this.friend.getId() == Main.getAuthorId() : isMember && this.member.getId() == Main.getAuthorId();
     }
@@ -113,6 +138,7 @@ public class CommandSender {
      * Get Mirai Permission
      * @return Mirai Permission of this sender
      */
+    @NotNull
     public MemberPermission getPermission() {
         return permission;
     }

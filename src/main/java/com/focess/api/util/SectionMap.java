@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * todo
+ */
 public interface SectionMap extends Serializable {
 
     default void set(String name, Object value) {

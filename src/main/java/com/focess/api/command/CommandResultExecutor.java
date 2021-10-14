@@ -1,6 +1,19 @@
 package com.focess.api.command;
 
+import com.focess.api.util.IOHandler;
+
+/**
+ * Represents a CommandResult executor to define how to execute the CommandResult after executing a special CommandExecutor.
+ *
+ * This is a functional interface whose functional method is {@link CommandResultExecutor#execute(CommandResult)}.
+ */
+@FunctionalInterface
 public interface CommandResultExecutor {
 
-    void execute();
+    /**
+     * Used to have response to CommandResult after executing a special CommandExecutor
+     *
+     * @param commandResult the CommandResult after executing a special CommandExecutor
+     */
+    void execute(CommandResult commandResult);
 }

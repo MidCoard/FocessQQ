@@ -5,9 +5,12 @@ import com.focess.listener.ConsoleListener;
 
 import java.util.Arrays;
 
+/**
+ * This class is used to handle input and output when executing Command.
+ */
 public abstract class IOHandler {
 
-    /***
+    /**
      * Console input and output handler
      */
     private static volatile IOHandler CONSOLE_IO_HANDLER = new IOHandler() {
@@ -39,8 +42,18 @@ public abstract class IOHandler {
 
     protected volatile boolean flag = false;
 
+    /**
+     * Used to output String
+     *
+     * @param output output String
+     */
     public abstract void output(String output);
 
+    /**
+     * Used to get input String
+     *
+     * @return the input String
+     */
     public String input() {
         if (!this.flag)
             hasInput();
@@ -48,25 +61,31 @@ public abstract class IOHandler {
         return this.value;
     }
 
+    /**
+     * Used to input String
+     *
+     * @param input the inputted String
+     */
     public void input(String input) {
         this.value = input;
         this.flag = true;
     }
 
-    /***
+    /**
+     * Indicate there needs the MiraiCode of this input if it is a Mirai Message, or the string value of this input.
      *
      * @see #hasInput(boolean)
-     * @return whether there is an input string or not.
+     * @return true if there is an input String, false otherwise
      */
     public boolean hasInput() {
         return hasInput(false);
     }
 
-    /***
+    /**
+     * Indicate there needs an input String.
      *
-     *
-     * @param flag true indicates that this will get a toString-like str, false indicates that this will get a miraiCode-like str.
-     * @return whether there is a string or not.
+     * @param flag true if you need the MiraiCode of this input when it is a Mirai Message, false if you need the string value of this input
+     * @return true if there is an input String, false otherwise
      */
     public abstract boolean hasInput(boolean flag);
 }

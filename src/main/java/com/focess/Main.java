@@ -75,6 +75,19 @@ public class Main {
     private static Listener<NewFriendRequestEvent> newFriendRequestEventListener;
     private static Listener<BotInvitedJoinGroupRequestEvent> botInvitedJoinGroupRequestEvent;
 
+    private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
+        @Override
+        public void run() {
+            if (running) {
+                Main.getLogger().fatal("Main Thread shuts down without saving Data. Try to save data now!");
+                Main.getLogger().debug("Save log file.");
+                saveLogFile();
+                saved = true;
+                LoadCommand.disablePlugin(MAIN_PLUGIN);
+            }
+        }
+    };
+
     /**
      * The Mirai Bot user or we call it QQ number
      */
@@ -291,6 +304,7 @@ public class Main {
     public static void exit() {
         SCHEDULED_EXECUTOR_SERVICE.schedule(() -> {
             Main.getLogger().fatal("Main Thread waits for more than 5 sec before shutdown. Force shutdown!");
+            Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
             System.exit(0);
         }, 5, TimeUnit.SECONDS);
         LoadCommand.disablePlugin(MAIN_PLUGIN);
@@ -412,18 +426,7 @@ public class Main {
                 Main.getLogger().thr("Submit Server Start Exception", e);
             }
             Main.getLogger().debug("Load plugins in 'plugins' folder.");
-            Runtime.getRuntime().addShutdownHook(new Thread("SavingData") {
-                @Override
-                public void run() {
-                    if (running) {
-                        Main.getLogger().fatal("Main Thread shuts down without saving Data. Try to save data now!");
-                        Main.getLogger().debug("Save log file.");
-                        saveLogFile();
-                        saved = true;
-                        LoadCommand.disablePlugin(MainPlugin.this);
-                    }
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
             Main.getLogger().debug("Setup shutdown hook.");
         }
 
@@ -555,7 +558,7 @@ public class Main {
             boolean flag = false;
             CombinedFuture ret = new CombinedFuture();
             for (Command com : Command.getCommands())
-                if (com.getAli().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
+                if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
                     flag = true;
                     ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
                 }

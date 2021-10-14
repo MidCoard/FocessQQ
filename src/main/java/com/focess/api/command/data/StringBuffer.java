@@ -3,6 +3,9 @@ package com.focess.api.command.data;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 
+/**
+ * Represent a buffer of String.
+ */
 public class StringBuffer extends DataBuffer<String> {
 
     private final IntBuffer intBuffer;
@@ -15,6 +18,12 @@ public class StringBuffer extends DataBuffer<String> {
         this.charBuffers = new CharBuffer[size];
     }
 
+    /**
+     * Allocate a StringBuffer with fixed size
+     *
+     * @param size the target buffer size
+     * @return a StringBuffer with fixed size
+     */
     public static StringBuffer allocate(int size) {
         return new StringBuffer(size);
     }

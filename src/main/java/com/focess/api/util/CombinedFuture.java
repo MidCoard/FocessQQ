@@ -9,10 +9,18 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Represent a Future of Boolean instance
+ */
 public class CombinedFuture implements Future<Boolean> {
 
     private final List<Future<Boolean>> futures = Lists.newArrayList();
 
+    /**
+     * Combine a Future of Boolean
+     *
+     * @param future the future need to be combined
+     */
     public void combine(Future<Boolean> future) {
         futures.add(future);
     }

@@ -1,7 +1,15 @@
 package com.focess.api.command;
 
+/**
+ * This class used to convert String data to target T type data.
+ *
+ * @param <T> target type
+ */
 public abstract class DataConverter<T> {
 
+    /**
+     * Never convert it! Put them into DataCollection with their original values.
+     */
     public static final DataConverter<String> DEFAULT_DATA_CONVERTER = new DataConverter<String>() {
         @Override
         protected boolean accept(String arg) {
@@ -20,6 +28,9 @@ public abstract class DataConverter<T> {
     };
 
 
+    /**
+     * Convert the String argument to Integer argument
+     */
     public static final DataConverter<Integer> INTEGER_DATA_CONVERTER = new DataConverter<Integer>() {
         @Override
         protected boolean accept(String arg) {
@@ -36,6 +47,10 @@ public abstract class DataConverter<T> {
             dataCollection.writeInt(arg);
         }
     };
+
+    /**
+     * Convert the String argument to Long argument
+     */
     public static final DataConverter<Long> LONG_DATA_CONVERTER = new DataConverter<Long>() {
         @Override
         protected boolean accept(String arg) {
@@ -52,6 +67,10 @@ public abstract class DataConverter<T> {
             dataCollection.writeLong(arg);
         }
     };
+
+    /**
+     * Convert the String argument to Double argument
+     */
     public static final DataConverter<Double> DOUBLE_DATA_CONVERTER = new DataConverter<Double>() {
         @Override
         protected boolean accept(String s) {
@@ -69,8 +88,20 @@ public abstract class DataConverter<T> {
         }
     };
 
+    /**
+     * Indicate whether this String argument is this target type or not
+     *
+     * @param arg the target argument in String
+     * @return true if this String argument can convert to this target type, false otherwise
+     */
     protected abstract boolean accept(String arg);
 
+    /**
+     * Convert String argument to target argument
+     *
+     * @param arg the target argument in String
+     * @return the target argument
+     */
     public abstract T convert(String arg);
 
     boolean put(DataCollection dataCollection, String arg) {
@@ -80,5 +111,12 @@ public abstract class DataConverter<T> {
         return true;
     }
 
+    /**
+     * Used to put data into the dataCollection
+     *
+     * @see DataCollection#write(Class, Object)
+     * @param dataCollection where stores the data
+     * @param arg the target argument
+     */
     protected abstract void connect(DataCollection dataCollection, T arg);
 }

@@ -1,5 +1,11 @@
 package com.focess.api.command;
 
+/**
+ * Simplify the {@link DataConverter} class.
+ * Implement the accept method. The accept method returns true if there is no exception in converting the String argument, false otherwise.
+ *
+ * @param <T> the target type
+ */
 public abstract class ExceptionDataConverter<T> extends DataConverter<T>{
 
     @Override

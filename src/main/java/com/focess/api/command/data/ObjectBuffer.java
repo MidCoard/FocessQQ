@@ -2,8 +2,10 @@ package com.focess.api.command.data;
 
 import java.nio.BufferOverflowException;
 
+/**
+ * Represent a buffer of Object.
+ */
 public class ObjectBuffer extends DataBuffer<Object> {
-
 
     private final Object[] objects;
 
@@ -11,12 +13,17 @@ public class ObjectBuffer extends DataBuffer<Object> {
 
     private int limit;
 
-    public ObjectBuffer(int size) {
+    private ObjectBuffer(int size) {
         this.objects = new Object[size];
         this.pos = 0;
         this.limit = size;
     }
-
+    /**
+     * Allocate a ObjectBuffer with fixed size
+     *
+     * @param size the target buffer size
+     * @return a ObjectBuffer with fixed size
+     */
     public static ObjectBuffer allocate(int size) {
         return new ObjectBuffer(size);
     }

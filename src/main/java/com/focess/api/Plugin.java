@@ -7,6 +7,7 @@ import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.commands.LoadCommand;
 import com.focess.api.util.yaml.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +16,27 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 
+/**
+ * Represent a Plugin class that can be load, enable and disable. Also, provide plenty of API for the plugin to get better with this framework.
+ * You should declare {@link com.focess.api.annotation.PluginType} to this class.
+ */
 public abstract class Plugin {
 
     private static final String path = Plugin.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+
+    /**
+     * The plugin name
+     */
     private final String name;
+
+    /**
+     * The plugin configuration stored in YAML
+     */
     private final YamlConfiguration configuration;
+
+    /**
+     * The plugin configuration file
+     */
     private final File config;
 
     public Plugin(String name) {
@@ -37,30 +54,54 @@ public abstract class Plugin {
         configuration = YamlConfiguration.loadFile(getConfigFile());
     }
 
+    /**
+     * Get Plugin instance by the class instance
+     *
+     * @see LoadCommand#getPlugin(Class)
+     * @param plugin
+     * @return
+     */
     public static Plugin getPlugin(Class<? extends Plugin> plugin) {
         return LoadCommand.getPlugin(plugin);
     }
 
+    /**
+     * Get Plugin instance by the name
+     *
+     * @see LoadCommand#getPlugin(String)
+     * @param name
+     * @return
+     */
     public static Plugin getPlugin(String name) {
         return LoadCommand.getPlugin(name);
     }
 
+    @NotNull
     public String getName() {
         return name;
     }
 
+    /**
+     * Used to initialize the plugin
+     */
     public abstract void enable();
 
+    /**
+     * Used to save some data of the plugin
+     */
     public abstract void disable();
 
+    @NotNull
     public File getDefaultFolder() {
         return new File(new File(new File(path).getParent(), "plugins"), this.getName());
     }
 
+    @NotNull
     public File getConfigFile() {
         return config;
     }
 
+    @NotNull
     public YamlConfiguration getConfig() {
         return configuration;
     }
@@ -80,6 +121,11 @@ public abstract class Plugin {
         return name != null ? name.hashCode() : 0;
     }
 
+    /**
+     * Register the listener into the Event chain
+     *
+     * @param listener the listener need to be registered
+     */
     public void registerListener(Listener listener) {
         ListenerHandler.addListener(this, listener);
         for (Method method : listener.getClass().getDeclaredMethods()) {

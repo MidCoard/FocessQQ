@@ -14,9 +14,9 @@ import com.focess.commands.util.AnnotationHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-@SuppressWarnings("unchecked")
 public class LoadCommand extends Command {
     public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(LoadCommand.class.getClassLoader());
     private static final List<Plugin> REGISTERED_PLUGINS = Lists.newCopyOnWriteArrayList();
@@ -43,17 +42,39 @@ public class LoadCommand extends Command {
         super("load", Lists.newArrayList());
     }
 
+    /**
+     * Get Plugin instance by the class instance
+     *
+     * @see Plugin#getPlugin(Class)
+     * @param plugin the class instance of the plugin
+     * @param <T> the plugin type
+     * @return the plugin instance
+     */
     @Nullable
-    public static <T extends Plugin> T getPlugin(Class<? extends T> plugin) {
+    public static <T extends Plugin> T getPlugin(Class<T> plugin) {
         return (T) CLASS_PLUGIN_MAP.get(plugin);
     }
 
-    @NonNull
+    /**
+     * Get all plugins registered
+     *
+     * @return a list of registered plugins
+     */
+    @NotNull
     public static List<Plugin> getPlugins() {
         return REGISTERED_PLUGINS;
     }
 
-
+    /**
+     * Used to enable plugin with class instance
+     *
+     * @param cls the class instance of the plugin
+     * @param <T> the plugin type
+     * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
+     * @throws PluginLoadException if there is any exception thrown in the loading process.
+     * @return the plugin instance
+     */
+    @NotNull
     public static <T extends Plugin> T enablePlugin(Class<T> cls) {
         try {
             T plugin = cls.newInstance();
@@ -75,6 +96,11 @@ public class LoadCommand extends Command {
         }
     }
 
+    /**
+     * Used to enable plugin
+     *
+     * @param plugin the plugin need to be enabled
+     */
     public static void enablePlugin(Plugin plugin) {
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader) {
             try {
@@ -96,6 +122,11 @@ public class LoadCommand extends Command {
         } else throw new PluginLoaderException(plugin.getName());
     }
 
+    /**
+     * Used to disable plugin
+     *
+     * @param plugin the plugin need to be disabled
+     */
     public static void disablePlugin(Plugin plugin) {
         Main.getLogger().debug("Start Disable Plugin " + plugin.getName());
         ListenerHandler.unregisterPlugin(plugin);
@@ -123,7 +154,13 @@ public class LoadCommand extends Command {
         Main.getLogger().debug("Remove Plugin Loader.");
         Main.getLogger().debug("End Disable Plugin " + plugin.getName());
     }
-
+    /**
+     * Get Plugin instance by the name
+     *
+     * @see Plugin#getPlugin(String)
+     * @param name the name of the plugin
+     * @return the plugin instance
+     */
     @Nullable
     public static Plugin getPlugin(String name) {
         return NAME_PLUGIN_MAP.get(name);
@@ -234,13 +271,13 @@ public class LoadCommand extends Command {
         private final Set<Plugin> plugins = Sets.newHashSet();
         private final Set<Class<?>> loadedClasses = Sets.newHashSet();
 
-        public PluginClassLoader(@NonNull File file) throws MalformedURLException {
+        public PluginClassLoader(@NotNull File file) throws MalformedURLException {
             super(new URL[]{file.toURI().toURL()}, DEFAULT_CLASS_LOADER);
             this.file = file;
             LOADERS.add(this);
         }
 
-        private boolean addPlugin(@NonNull Plugin plugin) {
+        private boolean addPlugin(@NotNull Plugin plugin) {
             if (plugins.contains(plugin))
                 return false;
             if (NAME_PLUGIN_MAP.containsKey(plugin.getName()))
@@ -296,14 +333,14 @@ public class LoadCommand extends Command {
             return true;
         }
 
-        private boolean analyseClass0(@NonNull Class<?> c) {
+        private boolean analyseClass0(@NotNull Class<?> c) {
             Annotation annotation;
             if ((annotation = c.getAnnotation(PluginType.class)) != null)
                 return PLUGIN_TYPE_HANDLER.handle(c, annotation, this);
             return true;
         }
 
-        private void analyseClass(@NonNull Class<?> c) {
+        private void analyseClass(@NotNull Class<?> c) {
             for (Class<? extends Annotation> annotation : HANDLERS.keySet()) {
                 Annotation a;
                 if ((a = c.getAnnotation(annotation)) != null)
