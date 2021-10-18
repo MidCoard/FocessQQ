@@ -1,6 +1,9 @@
 package com.focess.api.event;
 
-public class BotReloginEvent extends Event implements Cancelable {
+/**
+ * Called when bot is relogined
+ */
+public class BotReloginEvent extends Event implements Cancellable {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 

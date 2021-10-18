@@ -1,6 +1,7 @@
 package com.focess.api.command;
 
 import com.focess.api.Plugin;
+import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.util.IOHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -19,7 +20,7 @@ import java.util.Map;
 public abstract class Command {
 
 
-    private static final List<Command> commands = Lists.newCopyOnWriteArrayList();
+    private static final Map<String,Command> COMMANDS_MAP = Maps.newConcurrentMap();
 
     private final List<Executor> executors = Lists.newArrayList();
 
@@ -67,7 +68,7 @@ public abstract class Command {
      * @param plugin the plugin that the commands that need to be unregistered belongs to
      */
     public static void unregister(Plugin plugin) {
-        for (Command command : commands)
+        for (Command command : COMMANDS_MAP.values())
             if (command.getPlugin().equals(plugin))
                 command.unregister();
     }
@@ -76,7 +77,7 @@ public abstract class Command {
      * Unregister all commands
      */
     public static void unregisterAll() {
-        for (Command command : commands)
+        for (Command command : COMMANDS_MAP.values())
             command.unregister();
     }
 
@@ -86,7 +87,7 @@ public abstract class Command {
      * @return All commands as a <code>List</code>
      */
     public static List<Command> getCommands() {
-        return commands;
+        return Lists.newArrayList(COMMANDS_MAP.values());
     }
 
 
@@ -95,16 +96,14 @@ public abstract class Command {
      *
      * @param plugin the plugin the command belongs to
      * @param command the command that need to be registered
-     * @return true if there is no conflict with other plugins, false otherwise
+     * @throws com.focess.api.exceptions.CommandDuplicateException if the command name already exists in the registered commands
      */
-    public static boolean register(@NotNull Plugin plugin, @NotNull final Command command) {
-        for (Command c : commands)
-            if (c.getName().equals(command.getName()))
-                return false;
+    public static void register(@NotNull Plugin plugin, @NotNull final Command command) {
+        if (COMMANDS_MAP.containsKey(command.getName()))
+            throw new CommandDuplicateException(command.getName());
         command.registered = true;
         command.plugin = plugin;
-        Command.commands.add(command);
-        return true;
+        Command.COMMANDS_MAP.put(command.getName(),command);
     }
 
     public boolean isRegistered() {
@@ -121,7 +120,7 @@ public abstract class Command {
      */
     public void unregister() {
         this.registered = false;
-        commands.remove(this);
+        COMMANDS_MAP.remove(this);
     }
 
     @NotNull

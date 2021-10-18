@@ -1,9 +1,10 @@
 package com.focess.api.util.json;
 
-import com.focess.api.util.SectionMap;
-
 import java.util.Map;
 
+/**
+ * Section of JSON.
+ */
 public class JSONSection extends JSON {
     private final JSON parent;
 
@@ -12,6 +13,11 @@ public class JSONSection extends JSON {
         this.parent = parent;
     }
 
+    /**
+     * Get the parent section
+     *
+     * @return the parent section
+     */
     public JSON getParent() {
         return parent;
     }

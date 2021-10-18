@@ -5,6 +5,7 @@ import com.focess.api.annotation.EventHandler;
 import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
+import com.focess.api.exceptions.PluginLoaderException;
 import com.focess.commands.LoadCommand;
 import com.focess.api.util.yaml.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,16 @@ public abstract class Plugin {
      */
     private final File config;
 
+    /**
+     * Initialize a Plugin instance by its name.
+     * Never instance it! It will be instanced when bot bootstraps automatically.
+     *
+     * @param name the plugin name
+     * @throws PluginLoaderException if the classloader of the plugin is not {@link LoadCommand.PluginClassLoader}
+     */
     public Plugin(String name) {
+        if (!(this.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
+            throw new PluginLoaderException(name);
         this.name = name;
         if (!getDefaultFolder().exists())
             getDefaultFolder().mkdirs();
@@ -58,8 +68,8 @@ public abstract class Plugin {
      * Get Plugin instance by the class instance
      *
      * @see LoadCommand#getPlugin(Class)
-     * @param plugin
-     * @return
+     * @param plugin the class instance of the plugin
+     * @return the plugin instance
      */
     public static Plugin getPlugin(Class<? extends Plugin> plugin) {
         return LoadCommand.getPlugin(plugin);
@@ -69,8 +79,8 @@ public abstract class Plugin {
      * Get Plugin instance by the name
      *
      * @see LoadCommand#getPlugin(String)
-     * @param name
-     * @return
+     * @param name the name of the plugin
+     * @return the plugin instance
      */
     public static Plugin getPlugin(String name) {
         return LoadCommand.getPlugin(name);

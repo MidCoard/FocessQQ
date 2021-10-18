@@ -2,6 +2,9 @@ package com.focess.api.util.session;
 
 import java.util.Map;
 
+/**
+ * Section of Session.
+ */
 public class SessionSection extends Session{
     private final Session parent;
 
@@ -10,6 +13,11 @@ public class SessionSection extends Session{
         this.parent = session;
     }
 
+    /**
+     * Get the parent section
+     *
+     * @return the parent section
+     */
     public Session getParent() {
         return parent;
     }

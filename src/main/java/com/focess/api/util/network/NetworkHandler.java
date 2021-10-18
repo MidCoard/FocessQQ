@@ -12,9 +12,19 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This is a network util class.
+ */
 public class NetworkHandler {
 
+    /**
+     * Used to indicate this http-request accepts JSON
+     */
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    /**
+     * Used to indicate this http-request accepts normal String
+     */
     public static final MediaType TEXT = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
     private static final OkHttpClient CLIENT;
@@ -48,19 +58,47 @@ public class NetworkHandler {
         CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
     }
 
+    /**
+     * Send a http-request
+     *
+     * @param url the request url
+     * @param data the request data
+     * @param requestType the request type
+     * @return the response of this request
+     */
     public HttpResponse request(String url,Map<String,Object> data,RequestType requestType) {
         return this.request(url,data,Maps.newHashMap(),TEXT,requestType);
     }
 
+    /**
+     * Send a http-request
+     *
+     * @see NetworkHandler#request(String, Map, RequestType)
+     * @param url the request url
+     * @param requestType the request type
+     * @return the response of this request
+     */
     public HttpResponse request(String url,RequestType requestType) {
         return this.request(url, Maps.newHashMap(),requestType);
     }
 
+    /**
+     * Send a http-request
+     *
+     * @param url the request url
+     * @param data the request data
+     * @param header the request header
+     * @param mediaType the request acceptable type
+     * @param requestType the request type
+     * @return the response of this request
+     */
     public HttpResponse request(String url, Map<String,Object> data,Map<String,String> header,MediaType mediaType, RequestType requestType) {
         if (requestType == RequestType.GET)
             return get(url,data,header);
         else if (requestType == RequestType.POST)
             return post(url,data,header,mediaType);
+        else if (requestType == RequestType.PUT)
+            return put(url,data,header,mediaType);
         return HttpResponse.ofNull();
     }
 
@@ -73,6 +111,15 @@ public class NetworkHandler {
         return "";
     }
 
+    /**
+     * Send a PUT http-request
+     *
+     * @param url the request url
+     * @param data the request data
+     * @param header the request header
+     * @param mediaType the request acceptable type
+     * @return the response of this request
+     */
     public HttpResponse put(String url, Map<String, Object> data,Map<String,String> header,MediaType mediaType) {
         String value;
         if (mediaType.equals(JSON))
@@ -88,6 +135,15 @@ public class NetworkHandler {
         }
     }
 
+    /**
+     * Send a POST http-request
+     *
+     * @param url the request url
+     * @param data the request data
+     * @param header the request header
+     * @param mediaType the request acceptable type
+     * @return the response of this request
+     */
     public HttpResponse post(String url, Map<String, Object> data,Map<String,String> header,MediaType mediaType) {
         String value;
         if (mediaType.equals(JSON))
@@ -103,6 +159,14 @@ public class NetworkHandler {
         }
     }
 
+    /**
+     * Send a GET http-request
+     *
+     * @param url the request url
+     * @param data the request data
+     * @param header the request header
+     * @return the response of this request
+     */
     public HttpResponse get(String url, Map<String,Object> data,Map<String,String> header) {
         Request request;
         if (data.size() != 0)
@@ -118,7 +182,18 @@ public class NetworkHandler {
     }
 
     public enum RequestType {
-        GET,POST;
+        /**
+         * HTTP GET Request Method
+         */
+        GET,
+        /**
+         * HTTP POST Request Method
+         */
+        POST,
+        /**
+         * HTTP PUT Request Method
+         */
+        PUT;
     }
 
 }

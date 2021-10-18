@@ -2,6 +2,9 @@ package com.focess.api.util.yaml;
 
 import java.util.Map;
 
+/**
+ * Section of YamlConfiguration.
+ */
 public class YamlConfigurationSection extends YamlConfiguration {
 
 
@@ -12,6 +15,11 @@ public class YamlConfigurationSection extends YamlConfiguration {
         this.parent = parent;
     }
 
+    /**
+     * Get the parent section
+     *
+     * @return the parent section
+     */
     public YamlConfiguration getParent() {
         return parent;
     }

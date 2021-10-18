@@ -225,7 +225,7 @@ public class CommandSender {
         if (SESSIONS.containsKey(this))
             return SESSIONS.get(this);
         else {
-            Session session = new Session();
+            Session session = new Session(null);
             SESSIONS.put(this,session);
             return session;
         }

@@ -66,46 +66,18 @@ public class LoadCommand extends Command {
     }
 
     /**
-     * Used to enable plugin with class instance
-     *
-     * @param cls the class instance of the plugin
-     * @param <T> the plugin type
-     * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
-     * @throws PluginLoadException if there is any exception thrown in the loading process.
-     * @return the plugin instance
-     */
-    @NotNull
-    public static <T extends Plugin> T enablePlugin(Class<T> cls) {
-        try {
-            T plugin = cls.newInstance();
-            Main.getLogger().debug("Start Enable Plugin " + plugin.getName());
-            if (getPlugin(cls) != null)
-                throw new PluginDuplicateException(plugin.getName());
-            REGISTERED_PLUGINS.add(plugin);
-            CLASS_PLUGIN_MAP.put(cls,plugin);
-            NAME_PLUGIN_MAP.put(plugin.getName(),plugin);
-            Main.getLogger().debug("Add Plugin.");
-            plugin.enable();
-            Main.getLogger().debug("Enable Plugin.");
-            Main.getLogger().debug("End Enable Plugin " + plugin.getName());
-            return plugin;
-        } catch (Exception e) {
-            if (e instanceof PluginDuplicateException)
-                throw (PluginDuplicateException) e;
-            else throw new PluginLoadException(cls,e);
-        }
-    }
-
-    /**
      * Used to enable plugin
      *
      * @param plugin the plugin need to be enabled
+     * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
+     * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
+     * @throws PluginLoadException if there is any exception thrown in the initializing process
      */
     public static void enablePlugin(Plugin plugin) {
-        if (plugin.getClass().getClassLoader() instanceof PluginClassLoader) {
+        if (plugin.getClass().getClassLoader() instanceof PluginClassLoader || plugin.getClass() == Main.MainPlugin.class) {
             try {
                 Main.getLogger().debug("Start Enable Plugin " + plugin.getName());
-                if (getPlugin(plugin.getClass()) != null)
+                if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
                     throw new PluginDuplicateException(plugin.getName());
                 REGISTERED_PLUGINS.add(plugin);
                 CLASS_PLUGIN_MAP.put(plugin.getClass(),plugin);
@@ -256,9 +228,7 @@ public class LoadCommand extends Command {
                         Plugin plugin = getPlugin(commandType.plugin());
                         if (plugin == null)
                             throw new IllegalCommandClassException();
-                        Command command;
-                        if (!Command.register(plugin, command = (Command) c.newInstance()))
-                            throw new CommandDuplicateException(command.getName());
+                        Command.register(plugin, (Command) c.newInstance());
                     } catch (InstantiationException | IllegalAccessException e) {
                         throw new CommandLoadException((Class<? extends Command>) c);
                     }
@@ -279,8 +249,6 @@ public class LoadCommand extends Command {
 
         private boolean addPlugin(@NotNull Plugin plugin) {
             if (plugins.contains(plugin))
-                return false;
-            if (NAME_PLUGIN_MAP.containsKey(plugin.getName()))
                 return false;
             plugins.add(plugin);
             return true;

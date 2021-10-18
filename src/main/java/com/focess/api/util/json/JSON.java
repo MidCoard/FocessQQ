@@ -10,6 +10,9 @@ import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * This class is used to define a JSON object as Map.
+ */
 public class JSON implements SectionMap {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -30,9 +33,9 @@ public class JSON implements SectionMap {
     }
 
     @Override
-    public JSONSection createSection(String name) {
+    public JSONSection createSection(String key) {
         Map<String,Object> values = Maps.newHashMap();
-        this.values.put(name,values);
+        this.values.put(key,values);
         return new JSONSection(this,values);
     }
 
@@ -42,12 +45,17 @@ public class JSON implements SectionMap {
     }
 
     @Override
-    public JSONSection getSection(String name) {
-        if (get(name) instanceof Map)
-            return new JSONSection(this,get(name));
-        else throw new IllegalStateException("This " + name + " is not a valid section.");
+    public JSONSection getSection(String key) {
+        if (get(key) instanceof Map)
+            return new JSONSection(this,get(key));
+        else throw new IllegalStateException("This " + key + " is not a valid section.");
     }
 
+    /**
+     * Translate this JSON instance into json String
+     *
+     * @return json String translated from this JSON instance
+     */
     public String toJson() {
         try {
             return OBJECT_MAPPER.writeValueAsString(this.values);

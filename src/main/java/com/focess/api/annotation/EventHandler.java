@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Represent a event listener method. It means this method mush own one argument whose class is an implemented Event.
+ * Represent an event listener method. It means this method mush own one argument whose class is an implemented Event.
  */
 @Target(value = ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

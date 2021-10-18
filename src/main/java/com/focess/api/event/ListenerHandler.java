@@ -12,6 +12,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is used to help invoke listener methods
+ */
 public class ListenerHandler {
 
     private static final List<ListenerHandler> LISTENER_HANDLER_LIST = Lists.newArrayList();
@@ -23,6 +26,11 @@ public class ListenerHandler {
         LISTENER_HANDLER_LIST.add(this);
     }
 
+    /**
+     *  Unregister all listeners bundle to the plugin
+     *
+     * @param plugin the plugin which need to unregister all its listeners
+     */
     public static void unregisterPlugin(Plugin plugin) {
         List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
         for (ListenerHandler handler : LISTENER_HANDLER_LIST)
@@ -33,6 +41,12 @@ public class ListenerHandler {
         PLUGIN_LISTENER_MAP.remove(plugin);
     }
 
+    /**
+     * Add the listener and bundle to the plugin
+     *
+     * @param plugin the plugin
+     * @param listener the listener
+     */
     public static void addListener(Plugin plugin, Listener listener) {
         PLUGIN_LISTENER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
@@ -43,6 +57,11 @@ public class ListenerHandler {
         LISTENER_PLUGIN_MAP.put(listener,plugin);
     }
 
+    /**
+     * Unregister the listener
+     *
+     * @param listener the listener need to be unregistered
+     */
     public void unregisterListener(Listener listener) {
         listeners.remove(listener);
     }
@@ -56,11 +75,17 @@ public class ListenerHandler {
         });
     }
 
+    /**
+     * Submit the event to this listener handler
+     *
+     * @param event the event need to be submitted
+     * @param <T> the event type
+     */
     public <T extends Event> void submit(T event) {
         for (Listener listener : this.listeners.keySet()) {
             this.listeners.get(listener).stream().sorted(Comparator.comparing(pair -> pair.getValue().priority().getPriority())).forEachOrdered(
                     i -> {
-                        if (event instanceof Cancelable && ((Cancelable) event).isCancelled() && i.getValue().notCallIfCancelled())
+                        if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
                             return;
                         Method method = i.getKey();
                         try {

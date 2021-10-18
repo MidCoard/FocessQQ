@@ -5,20 +5,35 @@ import com.focess.api.util.SectionMap;
 import com.focess.commands.LoadCommand;
 import com.focess.api.util.Base64;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.Map;
 
+/**
+ * This class is used to define a YAML configuration.
+ */
 public class YamlConfiguration implements SectionMap {
 
     private static final Yaml YAML = new Yaml();
     private final Map<String, Object> values;
 
-    public YamlConfiguration(Map<String, Object> values) {
-        this.values = values == null ? Maps.newLinkedHashMap() : values;
+    /**
+     * Initialize the YamlConfiguration with existed key-value pairs or not
+     *
+     * @param values the YAML configuration key-value pairs
+     */
+    public YamlConfiguration(@Nullable Map<String, Object> values) {
+        this.values = values == null ? Maps.newHashMap() : values;
     }
 
+    /**
+     * Load the file as a YAML configuration
+     *
+     * @param file where to load
+     * @return YAML configuration
+     */
     public static YamlConfiguration loadFile(File file) {
         try {
             FileReader reader = new FileReader(file);
@@ -32,9 +47,9 @@ public class YamlConfiguration implements SectionMap {
     }
 
     @Override
-    public YamlConfigurationSection createSection(String name) {
+    public YamlConfigurationSection createSection(String key) {
         Map<String,Object> values = Maps.newHashMap();
-        this.values.put(name,values);
+        this.values.put(key,values);
         return new YamlConfigurationSection(this,values);
     }
 
@@ -85,6 +100,11 @@ public class YamlConfiguration implements SectionMap {
         return this.values;
     }
 
+    /**
+     * Save the YAML configuration as a file
+     *
+     * @param file where to save
+     */
     public void save(File file) {
         try {
             YAML.dump(this.values, new FileWriter(file));

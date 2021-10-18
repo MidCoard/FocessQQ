@@ -8,6 +8,9 @@ import com.focess.api.exceptions.JSONParseException;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * This class is used to define a JSON object as List.
+ */
 public class ListJSON {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -31,6 +34,11 @@ public class ListJSON {
         return this.values;
     }
 
+    /**
+     * Translate this JSON instance into json String
+     *
+     * @return json String translated from this JSON instance
+     */
     public String toJson() {
         try {
             return OBJECT_MAPPER.writeValueAsString(this.values);

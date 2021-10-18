@@ -210,7 +210,7 @@ public class Main {
             }
         } else requestAccountInformation();
         try {
-            LoadCommand.enablePlugin(MainPlugin.class);
+            LoadCommand.enablePlugin(new MainPlugin());
             Main.getLogger().debug("Load MainPlugin.");
         } catch (Exception e) {
             Main.getLogger().thr("Load MainPlugin Exception",e);
@@ -336,7 +336,7 @@ public class Main {
     /**
      *
      * The MainPlugin Plugin is a core plugin in Bot. It will initialize all default settings and make the Bot login.
-     * Never instance it! It will be instanced when it bootstraps automatically.
+     * Never instance it! It will be instanced when bot bootstraps automatically.
      *
      */
     public final static class MainPlugin extends Plugin {
@@ -420,14 +420,14 @@ public class Main {
                     } catch (Exception e) {
                         Main.getLogger().thr("Load Target Plugin Exception",e);
                     }
+            Main.getLogger().debug("Load plugins in 'plugins' folder.");
+            Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
+            Main.getLogger().debug("Setup shutdown hook.");
             try {
                 EventManager.submit(new ServerStartEvent());
             } catch (EventSubmitException e) {
                 Main.getLogger().thr("Submit Server Start Exception", e);
             }
-            Main.getLogger().debug("Load plugins in 'plugins' folder.");
-            Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
-            Main.getLogger().debug("Setup shutdown hook.");
         }
 
         @Override
