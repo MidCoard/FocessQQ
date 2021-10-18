@@ -189,12 +189,12 @@ public class Main {
         Main.getLogger().debug("Setup default UncaughtExceptionHandler.");
 
         SCHEDULED_EXECUTOR_SERVICE.schedule(()->{
-            while (ConsoleListener.QUESTS.size() != 0 && (System.currentTimeMillis() -  ConsoleListener.QUESTS.get(0).getValue())  > 60 * 1000 )
-                ConsoleListener.QUESTS.remove(0);
+            while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() -  ConsoleListener.QUESTS.peek().getValue())  > 60 * 10 * 1000 )
+                ConsoleListener.QUESTS.poll().getKey().input(null);
             for (CommandSender sender : ChatListener.QUESTS.keySet()) {
                 Queue<Pair<IOHandler, Pair<Boolean,Long>>> queue = ChatListener.QUESTS.get(sender);
-                while (queue.size() > 0 && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 1000)
-                    queue.poll();
+                while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 10 * 1000)
+                    queue.poll().getKey().input(null);
             }
         },1,TimeUnit.MINUTES);
 

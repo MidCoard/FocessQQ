@@ -193,7 +193,7 @@ public class NetworkHandler {
         /**
          * HTTP PUT Request Method
          */
-        PUT;
+        PUT
     }
 
 }

@@ -40,6 +40,12 @@ public class ChatListener implements Listener {
         QUESTS.compute(sender, (k, v) -> {
             if (v != null && !v.isEmpty()) {
                 Pair<IOHandler,  Pair<Boolean,Long>> element = v.poll();
+                while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 10) {
+                    element.getKey().input(null);
+                    element = v.poll();
+                }
+                if (element == null)
+                    return v;
                 if (element.getValue().getKey())
                     element.getKey().input(content);
                 else element.getKey().input(miraiContent);

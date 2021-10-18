@@ -6,6 +6,7 @@ import com.focess.api.annotation.EventHandler;
 import com.focess.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.extern.java.Log;
 
 import java.lang.reflect.Method;
 import java.util.Comparator;
@@ -85,6 +86,8 @@ public class ListenerHandler {
         for (Listener listener : this.listeners.keySet()) {
             this.listeners.get(listener).stream().sorted(Comparator.comparing(pair -> pair.getValue().priority().getPriority())).forEachOrdered(
                     i -> {
+                        if (event.isPrevent() && i.getValue().notCallIfPrevented())
+                            return;
                         if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
                             return;
                         Method method = i.getKey();

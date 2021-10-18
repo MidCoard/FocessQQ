@@ -10,15 +10,23 @@ import com.focess.util.Pair;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.Queue;
 
 public class ConsoleListener implements Listener {
 
-    public static final List<Pair<IOHandler,Long>> QUESTS = Lists.newLinkedList();
+    public static final Queue<Pair<IOHandler,Long>> QUESTS = Lists.newLinkedList();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onConsoleInput(ConsoleInputEvent event) {
-        if (QUESTS.size() != 0) {
-            QUESTS.remove(0).getKey().input(event.getInput());
+        if (!QUESTS.isEmpty()) {
+            Pair<IOHandler,Long> element = QUESTS.poll();
+            while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 10 * 1000) {
+                element.getKey().input(null);
+                element = QUESTS.poll();
+            }
+            if (element == null)
+                return;
+            element.getKey().input(event.getInput());
             return;
         }
         try {

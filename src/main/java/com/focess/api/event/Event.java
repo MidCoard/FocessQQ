@@ -8,5 +8,13 @@ import java.io.Serializable;
  */
 public abstract class Event implements Serializable {
 
+    private boolean prevent = false;
 
+    public void setPrevent(boolean prevent) {
+        this.prevent = prevent;
+    }
+
+    public boolean isPrevent() {
+        return prevent;
+    }
 }

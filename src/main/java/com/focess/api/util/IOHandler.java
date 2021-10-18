@@ -1,7 +1,9 @@
 package com.focess.api.util;
 
 import com.focess.Main;
+import com.focess.api.exceptions.InputTimeoutException;
 import com.focess.listener.ConsoleListener;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -53,11 +55,14 @@ public abstract class IOHandler {
      * Used to get input String
      *
      * @return the input String
+     * @throws InputTimeoutException if the command has waited for more than 10 minutes to get executor input string
      */
     public String input() {
         if (!this.flag)
             hasInput();
         this.flag = false;
+        if (this.value == null)
+            throw new InputTimeoutException();
         return this.value;
     }
 
@@ -66,7 +71,7 @@ public abstract class IOHandler {
      *
      * @param input the inputted String
      */
-    public void input(String input) {
+    public void input(@Nullable String input) {
         this.value = input;
         this.flag = true;
     }
@@ -88,4 +93,5 @@ public abstract class IOHandler {
      * @return true if there is an input String, false otherwise
      */
     public abstract boolean hasInput(boolean flag);
+
 }

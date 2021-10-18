@@ -28,4 +28,10 @@ public @interface EventHandler {
      */
     boolean notCallIfCancelled() default false;
 
+    /**
+     * Set whether this method should be called when the event is prevented
+     *
+     * @return true if this method should be called when the event is prevented, false otherwise
+     */
+    boolean notCallIfPrevented() default false;
 }
