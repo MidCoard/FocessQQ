@@ -5,7 +5,6 @@ import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
 import com.focess.api.util.IOHandler;
-import com.google.common.collect.Lists;
 
 public class ReloginCommand extends Command {
     public ReloginCommand() {

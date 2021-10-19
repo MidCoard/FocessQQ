@@ -161,7 +161,7 @@ public abstract class Plugin {
                             field.setAccessible(true);
                             ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
                             field.setAccessible(flag);
-                            listenerHandler.addListener(listener, method, handler);
+                            listenerHandler.registerListener(listener, method, handler);
                         } catch (Exception ignored) {
                         }
                     }

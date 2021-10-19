@@ -7,7 +7,6 @@ import com.focess.api.command.CommandSender;
 import com.focess.api.command.DataConverter;
 import com.focess.api.exceptions.InputTimeoutException;
 import com.focess.api.util.IOHandler;
-import com.google.common.collect.Lists;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.message.code.MiraiCode;
 

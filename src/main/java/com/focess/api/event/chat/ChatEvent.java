@@ -2,7 +2,6 @@ package com.focess.api.event.chat;
 
 import com.focess.api.event.Event;
 import com.focess.api.event.ListenerHandler;
-import net.mamoe.mirai.message.data.Message;
 import net.mamoe.mirai.message.data.MessageChain;
 
 /**

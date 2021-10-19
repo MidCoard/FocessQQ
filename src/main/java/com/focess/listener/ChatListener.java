@@ -8,7 +8,6 @@ import com.focess.api.event.EventPriority;
 import com.focess.api.event.Listener;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
-import com.focess.api.event.message.ConsoleMessageEvent;
 import com.focess.api.event.message.FriendMessageEvent;
 import com.focess.api.event.message.GroupMessageEvent;
 import com.focess.api.exceptions.InputTimeoutException;

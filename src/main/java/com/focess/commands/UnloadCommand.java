@@ -4,7 +4,6 @@ import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.command.*;
 import com.focess.api.util.IOHandler;
-import com.google.common.collect.Lists;
 
 public class UnloadCommand extends Command {
     public UnloadCommand() {

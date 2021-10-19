@@ -1,7 +1,5 @@
 package com.focess.api.command;
 
-import com.focess.api.util.IOHandler;
-
 /**
  * Represents a CommandResult executor to define how to execute the CommandResult after executing a special CommandExecutor.
  *

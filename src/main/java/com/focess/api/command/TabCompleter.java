@@ -2,7 +2,6 @@ package com.focess.api.command;
 
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 /**

@@ -6,7 +6,6 @@ import com.focess.api.annotation.EventHandler;
 import com.focess.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.extern.java.Log;
 
 import java.lang.reflect.Method;
 import java.util.Comparator;
@@ -67,13 +66,30 @@ public class ListenerHandler {
         listeners.remove(listener);
     }
 
-    public <T extends Event> void addListener(Listener listener, Method method, EventHandler handler) {
+    /**
+     * Register the listener
+     *
+     * @param listener the listener
+     * @param method the listener method to this Event listener handler
+     * @param handler the event handler
+     * @param <T> the event type
+     */
+    public <T extends Event> void registerListener(Listener listener, Method method, EventHandler handler) {
         listeners.compute(listener, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
             v.add(Pair.of(method, handler));
             return v;
         });
+    }
+
+    /**
+     * Get the plugin of the listener
+     *
+     * @return the plugin of the listener
+     */
+    public Plugin getPlugin() {
+        return LISTENER_PLUGIN_MAP.get(this);
     }
 
     /**

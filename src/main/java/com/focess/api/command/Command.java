@@ -8,12 +8,10 @@ import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.exceptions.CommandLoadException;
 import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.util.IOHandler;
-import com.focess.commands.LoadCommand;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.NotNull;
-import sun.reflect.Reflection;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -257,6 +255,10 @@ public abstract class Command {
      */
     public abstract void usage(CommandSender sender, IOHandler ioHandler);
 
+    public boolean isInitialize() {
+        return initialize;
+    }
+
     /**
      * This class is used to help define the executor of certain command.
      * There is some special methods used to give more details of this executor.
@@ -417,6 +419,15 @@ public abstract class Command {
         public Executor overrideExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
             this.executorPermission = executorPermission;
             return this;
+        }
+
+        /**
+         * Get the command this Executor belongs to
+         *
+         * @return the command this Executor belongs to
+         */
+        public Command getCommand() {
+            return command;
         }
     }
 }

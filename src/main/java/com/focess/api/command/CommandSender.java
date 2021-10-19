@@ -45,7 +45,7 @@ public class CommandSender {
      *
      * @param friend the Mirai Friend instance
      */
-    public CommandSender(Friend friend) {
+    public CommandSender(@NotNull Friend friend) {
         this.member = null;
         this.friend = friend;
         this.isFriend = true;
@@ -58,7 +58,7 @@ public class CommandSender {
      *
      * @param member The Mirai Member Instance
      */
-    public CommandSender(Member member) {
+    public CommandSender(@NotNull Member member) {
         this.member = member;
         this.friend = null;
         this.isMember = true;
