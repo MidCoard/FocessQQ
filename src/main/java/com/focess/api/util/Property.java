@@ -38,4 +38,13 @@ public class Property {
     public static <T> T get(String key) {
         return (T) Main.MainPlugin.getProperties().get(key);
     }
+
+    /**
+     * Remove the property
+     *
+     * @param key the MiraiQQ framework properties' key
+     */
+    public static void remove(String key) {
+        Main.MainPlugin.getProperties().remove(key);
+    }
 }

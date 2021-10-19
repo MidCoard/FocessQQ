@@ -9,6 +9,7 @@ import com.focess.api.exceptions.PluginLoaderException;
 import com.focess.commands.LoadCommand;
 import com.focess.api.util.yaml.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
+import sun.reflect.Reflection;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,17 +29,19 @@ public abstract class Plugin {
     /**
      * The plugin name
      */
-    private final String name;
+    private String name;
 
     /**
      * The plugin configuration stored in YAML
      */
-    private final YamlConfiguration configuration;
+    private YamlConfiguration configuration;
 
     /**
      * The plugin configuration file
      */
-    private final File config;
+    private File config;
+
+    private boolean initialized;
 
     /**
      * Initialize a Plugin instance by its name.
@@ -66,10 +69,11 @@ public abstract class Plugin {
 
     /**
      * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
-     * This method should not be called in any situation.
+     * Never instance it! It will be instanced when bot bootstraps automatically.
      */
     protected Plugin() {
-        throw new UnsupportedOperationException();
+        if (!(this.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader))
+            throw new PluginLoaderException(this.getClass());
     }
 
     /**

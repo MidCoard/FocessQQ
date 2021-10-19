@@ -15,7 +15,7 @@ import net.mamoe.mirai.message.code.MiraiCode;
 public class GroupCommand extends Command {
 
     public GroupCommand() {
-        super("group", Lists.newArrayList());
+        super("group");
     }
 
     @Override

@@ -4,10 +4,12 @@ import com.focess.api.Plugin;
 import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.exceptions.CommandLoadException;
 import com.focess.api.util.IOHandler;
+import com.focess.commands.LoadCommand;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.NotNull;
+import sun.reflect.Reflection;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,11 +31,11 @@ public abstract class Command {
     /**
      * The name of the command
      */
-    private final String name;
+    private String name;
     /**
      * The aliases of the command
      */
-    private final List<String> ali;
+    private List<String> aliases;
 
     /**
      * The plugin the command belongs to
@@ -56,16 +58,21 @@ public abstract class Command {
     private Predicate<CommandSender> executorPermission;
 
     /**
+     * Indicate {@link Command#init()} is called
+     */
+    private boolean initialize = false;
+
+    /**
      * Instance a <code>Command</code> Class with special name and aliases.
      * Never register it!
      *
      * @param name the name of the command
-     * @param ali the aliases of the command
+     * @param aliases the aliases of the command
      * @throws CommandLoadException if there is any exception thrown in the initializing process
      */
-    public Command(final @NotNull String name, final @NotNull List<String> ali) {
+    public Command(final @NotNull String name, final @NotNull String... aliases) {
         this.name = name;
-        this.ali = ali;
+        this.aliases = Lists.newArrayList(aliases);
         this.permission = MemberPermission.MEMBER;
         this.executorPermission = i -> true;
         try {
@@ -73,6 +80,14 @@ public abstract class Command {
         } catch (Exception e) {
             throw new CommandLoadException(this.getClass(),e);
         }
+        initialize = true;
+    }
+
+    /**
+     * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
+     * Never instance it! It will be instanced when bot bootstraps automatically.
+     */
+    protected Command() {
     }
 
     public void setExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
@@ -137,7 +152,7 @@ public abstract class Command {
      */
     public void unregister() {
         this.registered = false;
-        COMMANDS_MAP.remove(this);
+        COMMANDS_MAP.remove(this.getName());
     }
 
     @NotNull
@@ -147,7 +162,7 @@ public abstract class Command {
 
     @NotNull
     public List<String> getAliases() {
-        return ali;
+        return aliases;
     }
 
     /**

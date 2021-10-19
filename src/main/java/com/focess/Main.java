@@ -115,6 +115,7 @@ public class Main {
      * @param id the friend id
      * @return the Friend Mirai instance
      */
+    @Nullable
     public static Friend getFriend(long id) {
         return Main.getBot().getFriend(id);
     }
@@ -127,6 +128,7 @@ public class Main {
      * @param id the group id
      * @return the Group Mirai instance
      */
+    @Nullable
     public static Group getGroup(long id) {
         return Main.getBot().getGroup(id);
     }
@@ -461,10 +463,6 @@ public class Main {
         @Override
         public void disable() {
             Main.getLogger().debug("Disable MainPlugin.");
-            for (String key : properties.keySet())
-                getConfig().set(key, properties.get(key));
-            getConfig().save(getConfigFile());
-            Main.getLogger().debug("Save properties.");
             for (Plugin plugin : LoadCommand.getPlugins())
                 if (!plugin.equals(this))
                     try {
@@ -473,6 +471,10 @@ public class Main {
                         Main.getLogger().thr("Unload Target Plugin Exception",e);
                     }
             Main.getLogger().debug("Unload all loaded plugins without MainPlugin.");
+            for (String key : properties.keySet())
+                getConfig().set(key, properties.get(key));
+            getConfig().save(getConfigFile());
+            Main.getLogger().debug("Save properties.");
             if (friendMessageEventListener != null)
                 friendMessageEventListener.complete();
             if (groupMessageEventListener != null)

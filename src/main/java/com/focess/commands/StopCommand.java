@@ -11,7 +11,7 @@ public class StopCommand extends Command {
 
 
     public StopCommand() {
-        super("stop", Lists.newArrayList());
+        super("stop");
     }
 
     @Override

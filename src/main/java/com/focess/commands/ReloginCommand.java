@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 
 public class ReloginCommand extends Command {
     public ReloginCommand() {
-        super("relogin", Lists.newArrayList());
+        super("relogin");
     }
 
     @Override

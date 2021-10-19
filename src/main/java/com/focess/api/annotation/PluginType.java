@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 public @interface PluginType {
 
     /**
-     * Set the dependent plugins for this plugin
+     * Set the dependent plugins for the plugin
      *
      * @return the dependent plugins or {} if there is no dependent
      */

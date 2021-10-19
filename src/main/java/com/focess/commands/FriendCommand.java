@@ -13,7 +13,7 @@ import net.mamoe.mirai.message.code.MiraiCode;
 
 public class FriendCommand extends Command {
     public FriendCommand() {
-        super("friend", Lists.newArrayList());
+        super("friend");
     }
 
     @Override

@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 
 public class UnloadCommand extends Command {
     public UnloadCommand() {
-        super("unload", Lists.newArrayList());
+        super("unload");
     }
 
     @Override
@@ -26,23 +26,18 @@ public class UnloadCommand extends Command {
 
     @Override
     public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: unload [plugin-name]");
+        ioHandler.output("Use: unload <plugin>");
     }
 
     /**
      * Convert the String argument to Plugin argument
      */
-    public static class PluginDataConverter extends DataConverter<Plugin> {
+    public static class PluginDataConverter extends NullDataConverter<Plugin> {
 
         /**
          * Convert the String argument to Plugin argument
          */
         public static final PluginDataConverter PLUGIN_DATA_CONVERTER = new PluginDataConverter();
-
-        @Override
-        protected boolean accept(String arg) {
-            return Plugin.getPlugin(arg) != null;
-        }
 
         @Override
         public Plugin convert(String arg) {

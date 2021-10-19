@@ -15,9 +15,23 @@ import java.lang.annotation.Target;
 public @interface CommandType {
 
     /**
-     * Define what Plugin class it belongs to
+     * Set the plugin the command belongs to
      *
-     * @return the Plugin Class instance
+     * @return the plugin the command belongs to
      */
     Class<? extends Plugin> plugin();
+
+    /**
+     * Set the name of the command
+     *
+     * @return the name of the command
+     */
+    String name() default "";
+
+    /**
+     * Set the aliases of the command
+     *
+     * @return the aliases of the command
+     */
+    String[] aliases() default {};
 }

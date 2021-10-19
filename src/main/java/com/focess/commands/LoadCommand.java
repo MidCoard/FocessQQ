@@ -7,10 +7,10 @@ import com.focess.api.annotation.PluginType;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
-import com.focess.api.command.DataConverter;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.*;
 import com.focess.api.util.IOHandler;
+import com.focess.api.util.yaml.YamlConfiguration;
 import com.focess.commands.util.AnnotationHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +30,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.LockSupport;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -42,7 +42,7 @@ public class LoadCommand extends Command {
     private static final List<PluginClassLoader> LOADERS = Lists.newCopyOnWriteArrayList();
 
     public LoadCommand() {
-        super("load", Lists.newArrayList());
+        super("load");
     }
 
     /**
@@ -164,7 +164,7 @@ public class LoadCommand extends Command {
 
     @Override
     public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: load [plugin-path]");
+        ioHandler.output("Use: load <path>");
     }
 
     private static class PluginCoreClassLoader extends ClassLoader {
@@ -189,6 +189,27 @@ public class LoadCommand extends Command {
     }
 
     public static class PluginClassLoader extends URLClassLoader {
+        private static Field PLUGIN_NAME_FIELD,CONFIGURATION_FIELD,CONFIG_FIELD,COMMAND_NAME_FIELD,COMMAND_ALIASES_FIELD,INITIALIZE_FIELD;
+
+        static {
+            try {
+                PLUGIN_NAME_FIELD = Plugin.class.getDeclaredField("name");
+                PLUGIN_NAME_FIELD.setAccessible(true);
+                CONFIGURATION_FIELD = Plugin.class.getDeclaredField("configuration");
+                CONFIGURATION_FIELD.setAccessible(true);
+                CONFIG_FIELD = Plugin.class.getDeclaredField("config");
+                CONFIG_FIELD.setAccessible(true);
+                COMMAND_NAME_FIELD = Command.class.getDeclaredField("name");
+                COMMAND_NAME_FIELD.setAccessible(true);
+                COMMAND_ALIASES_FIELD = Command.class.getDeclaredField("aliases");
+                COMMAND_ALIASES_FIELD.setAccessible(true);
+                INITIALIZE_FIELD = Command.class.getDeclaredField("initialize");
+                INITIALIZE_FIELD.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }
+
         private static final Object LOCK = new Object();
         private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
         private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
@@ -211,7 +232,25 @@ public class LoadCommand extends Command {
             }
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
-                    classLoader.addPlugin((Plugin) c.newInstance());
+                    Plugin plugin = (Plugin) c.newInstance();
+                    if (!((PluginType) annotation).name().isEmpty()) {
+                        String name = ((PluginType) annotation).name();
+                        PLUGIN_NAME_FIELD.set(plugin,name);
+                        if (!plugin.getDefaultFolder().exists())
+                            plugin.getDefaultFolder().mkdirs();
+                        File config = new File(plugin.getDefaultFolder(), "config.yml");
+                        CONFIG_FIELD.set(plugin,config);
+                        if (!config.exists()) {
+                            try {
+                                config.createNewFile();
+                            } catch (IOException e) {
+                                Main.getLogger().thr("Create Config File Exception",e);
+                            }
+                        }
+                        YamlConfiguration configuration = YamlConfiguration.loadFile(plugin.getConfigFile());
+                        CONFIGURATION_FIELD.set(plugin,configuration);
+                    }
+                    classLoader.addPlugin(plugin);
                     return true;
                 } catch (Exception e) {
                     if (e instanceof PluginDuplicateException)
@@ -229,7 +268,22 @@ public class LoadCommand extends Command {
                         Plugin plugin = getPlugin(commandType.plugin());
                         if (plugin == null)
                             throw new IllegalCommandClassException(c);
-                        Command.register(plugin, (Command) c.newInstance());
+                        Command command = (Command) c.newInstance();
+                        if (!commandType.name().isEmpty()){
+                            COMMAND_NAME_FIELD.set(command,commandType.name());
+                            COMMAND_ALIASES_FIELD.set(command,Lists.newArrayList(commandType.aliases()));
+                            command.setPermission(MemberPermission.MEMBER);
+                            command.setExecutorPermission(i->true);
+                            if (!INITIALIZE_FIELD.getBoolean(command)) {
+                                try {
+                                    command.init();
+                                } catch (Exception e) {
+                                    throw new CommandLoadException((Class<? extends Command>) c, e);
+                                }
+                                INITIALIZE_FIELD.set(command,true);
+                            }
+                        }
+                        Command.register(plugin, command);
                         return true;
                     } catch (Exception e) {
                         if (e instanceof CommandDuplicateException)
