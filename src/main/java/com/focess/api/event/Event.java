@@ -8,6 +8,9 @@ import java.io.Serializable;
  */
 public abstract class Event implements Serializable {
 
+    /**
+     * Used to prevent submitting in the future Event Chain
+     */
     private boolean prevent = false;
 
     public void setPrevent(boolean prevent) {

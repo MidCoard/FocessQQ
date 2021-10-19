@@ -65,6 +65,14 @@ public abstract class Plugin {
     }
 
     /**
+     * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
+     * This method should not be called in any situation.
+     */
+    protected Plugin() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Get Plugin instance by the class instance
      *
      * @see LoadCommand#getPlugin(Class)

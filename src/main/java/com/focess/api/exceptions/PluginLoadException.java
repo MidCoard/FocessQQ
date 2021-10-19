@@ -2,9 +2,17 @@ package com.focess.api.exceptions;
 
 import com.focess.api.Plugin;
 
+/**
+ * Thrown to indicate there is any exception thrown in the initializing process
+ */
 public class PluginLoadException extends RuntimeException {
 
-    public PluginLoadException(Class<? extends Plugin> cls,Exception e) {
-        super("Something wrong in loading Plugin " + cls.getName() + ".",e);
+    /**
+     * Constructs a PluginLoadException
+     * @param c the class of the plugin
+     * @param e the exception
+     */
+    public PluginLoadException(Class<? extends Plugin> c,Exception e) {
+        super("Something wrong in loading Plugin " + c.getName() + ".",e);
     }
 }

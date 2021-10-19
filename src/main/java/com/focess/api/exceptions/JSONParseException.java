@@ -6,7 +6,7 @@ package com.focess.api.exceptions;
 public class JSONParseException extends RuntimeException{
 
     /**
-     * Constructs a new JSONParseException with the error parsed json.
+     * Constructs a new JSONParseException
      *
      * @param json the error parsed json
      */

@@ -14,19 +14,16 @@ public class ReloginCommand extends Command {
 
     @Override
     public void init() {
+        this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(0, (sender, dataCollection, ioHandler) -> {
-            if (sender.isConsole()) {
-                ioHandler.output("Relogining...");
-                Main.relogin();
-                return CommandResult.ALLOW;
-            }
-            return CommandResult.REFUSE;
+            ioHandler.output("Relogining...");
+            Main.relogin();
+            return CommandResult.ALLOW;
         });
     }
 
     @Override
-    public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        if (commandSender.isConsole())
-            ioHandler.output("Use: relogin");
+    public void usage(CommandSender sender, IOHandler ioHandler) {
+        ioHandler.output("Use: relogin");
     }
 }

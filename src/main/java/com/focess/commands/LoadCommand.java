@@ -7,6 +7,7 @@ import com.focess.api.annotation.PluginType;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
+import com.focess.api.command.DataConverter;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.*;
 import com.focess.api.util.IOHandler;
@@ -14,6 +15,7 @@ import com.focess.commands.util.AnnotationHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +29,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.LockSupport;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -71,28 +74,24 @@ public class LoadCommand extends Command {
      * @param plugin the plugin need to be enabled
      * @throws PluginLoaderException    if the classloader of the plugin is not {@link PluginClassLoader}
      * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
-     * @throws PluginLoadException      if there is any exception thrown in the initializing process
      */
     public static void enablePlugin(Plugin plugin) {
-        if (plugin.getClass().getClassLoader() instanceof PluginClassLoader || plugin.getClass() == Main.MainPlugin.class) {
-            try {
-                Main.getLogger().debug("Start Enable Plugin " + plugin.getName());
-                if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
-                    throw new PluginDuplicateException(plugin.getName());
-                plugin.enable();
-                Main.getLogger().debug("Enable Plugin.");
-                REGISTERED_PLUGINS.add(plugin);
-                CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
-                NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
-                Main.getLogger().debug("Add Plugin.");
-                Main.getLogger().debug("End Enable Plugin " + plugin.getName());
-            } catch (Exception e) {
-                if (e instanceof PluginDuplicateException)
-                    throw (PluginDuplicateException) e;
-                else throw new PluginLoadException(plugin.getClass(), e);
-
-            }
-        } else throw new PluginLoaderException(plugin.getName());
+        try {
+            Main.getLogger().debug("Start Enable Plugin " + plugin.getName());
+            if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
+                throw new PluginDuplicateException(plugin.getName());
+            plugin.enable();
+            Main.getLogger().debug("Enable Plugin.");
+            REGISTERED_PLUGINS.add(plugin);
+            CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
+            NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
+            Main.getLogger().debug("Add Plugin.");
+            Main.getLogger().debug("End Enable Plugin " + plugin.getName());
+        } catch (Exception e) {
+            if (e instanceof PluginDuplicateException)
+                throw (PluginDuplicateException) e;
+            throw new PluginLoadException(plugin.getClass(), e);
+        }
     }
 
     /**
@@ -142,33 +141,30 @@ public class LoadCommand extends Command {
 
     @Override
     public void init() {
+        this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, data, ioHandler) -> {
-            if (sender.isConsole()) {
-                String path = data.get();
-                File file = new File(path);
-                if (file.exists() && file.getName().endsWith(".jar")) {
-                    try {
-                        PluginClassLoader classLoader = new PluginClassLoader(file);
-                        if (classLoader.load())
-                            ioHandler.output("Load " + file.getName());
-                        else classLoader.close();
-                    } catch (IOException e) {
-                        Main.getLogger().thr("Load Plugin Exception", e);
-                        return CommandResult.REFUSE;
-                    }
-                    return CommandResult.ALLOW;
+            String path = data.get();
+            File file = new File(path);
+            if (file.exists() && file.getName().endsWith(".jar")) {
+                try {
+                    PluginClassLoader classLoader = new PluginClassLoader(file);
+                    if (classLoader.load())
+                        ioHandler.output("Load " + file.getName());
+                    else classLoader.close();
+                } catch (IOException e) {
+                    Main.getLogger().thr("Load Plugin Exception", e);
+                    return CommandResult.REFUSE;
                 }
-                ioHandler.output("File is not existed.");
-                return CommandResult.REFUSE;
+                return CommandResult.ALLOW;
             }
+            ioHandler.output("File is not existed.");
             return CommandResult.REFUSE;
         });
     }
 
     @Override
-    public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        if (commandSender.isConsole())
-            ioHandler.output("Use: load [plugin-path]");
+    public void usage(CommandSender sender, IOHandler ioHandler) {
+        ioHandler.output("Use: load [plugin-path]");
     }
 
     private static class PluginCoreClassLoader extends ClassLoader {
@@ -193,33 +189,36 @@ public class LoadCommand extends Command {
     }
 
     public static class PluginClassLoader extends URLClassLoader {
-
+        private static final Object LOCK = new Object();
         private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
-
-        private static final Set<File> AFTER_PLUGIN_FILES = Sets.newConcurrentHashSet();
         private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
         private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c, annotation, classLoader) -> {
             PluginType pluginType = (PluginType) annotation;
-            if (!pluginType.loadAfter().equals("") && getPlugin(pluginType.loadAfter()) == null) {
-                AFTER_PLUGINS_MAP.compute(pluginType.loadAfter(), (key, value) -> {
-                    if (value == null)
-                        value = Sets.newHashSet();
-                    value.add(classLoader.file);
-                    return value;
-                });
-                AFTER_PLUGIN_FILES.add(classLoader.file);
-                return false;
+            if (pluginType.loadAfter().length != 0) {
+                boolean flag = false;
+                for (String p : pluginType.loadAfter())
+                    if (getPlugin(p) == null) {
+                        AFTER_PLUGINS_MAP.compute(p, (key, value) -> {
+                            if (value == null)
+                                value = Sets.newHashSet();
+                            value.add(classLoader.file);
+                            return value;
+                        });
+                        flag = true;
+                    }
+                if (flag)
+                    return false;
             }
             if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
-                    Plugin plugin;
-                    if (!classLoader.addPlugin(plugin = (Plugin) c.newInstance()))
-                        throw new PluginDuplicateException(plugin.getName());
+                    classLoader.addPlugin((Plugin) c.newInstance());
                     return true;
                 } catch (Exception e) {
+                    if (e instanceof PluginDuplicateException)
+                        throw (PluginDuplicateException)e;
                     throw new PluginLoadException((Class<? extends Plugin>) c, e);
                 }
-            } else throw new IllegalPluginClassException();
+            } else throw new IllegalPluginClassException(c);
         };
 
         static {
@@ -229,13 +228,17 @@ public class LoadCommand extends Command {
                     try {
                         Plugin plugin = getPlugin(commandType.plugin());
                         if (plugin == null)
-                            throw new IllegalCommandClassException();
+                            throw new IllegalCommandClassException(c);
                         Command.register(plugin, (Command) c.newInstance());
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        throw new CommandLoadException((Class<? extends Command>) c);
+                        return true;
+                    } catch (Exception e) {
+                        if (e instanceof CommandDuplicateException)
+                            throw (CommandDuplicateException)e;
+                        else if (e instanceof CommandLoadException)
+                            throw (CommandLoadException)e;
+                        throw new CommandLoadException((Class<? extends Command>) c, e);
                     }
-                } else throw new IllegalCommandClassException();
-                return true;
+                } else throw new IllegalCommandClassException(c);
             });
         }
 
@@ -249,62 +252,59 @@ public class LoadCommand extends Command {
             LOADERS.add(this);
         }
 
-        private boolean addPlugin(@NotNull Plugin plugin) {
+        private void addPlugin(@NotNull Plugin plugin) {
             if (plugins.contains(plugin))
-                return false;
+                throw new PluginDuplicateException(plugin.getName());
             plugins.add(plugin);
-            return true;
         }
 
         public boolean load() {
-            Main.getLogger().debug("Start Load Plugin.");
-            try {
-                JarFile jarFile = new JarFile(file);
-                Enumeration<JarEntry> entries = jarFile.entries();
-                while (entries.hasMoreElements()) {
-                    JarEntry jarEntry = entries.nextElement();
-                    String name = jarEntry.getName();
-                    if (!name.endsWith(".class"))
-                        continue;
-                    this.loadedClasses.add(this.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
-                }
-                for (Class<?> c : loadedClasses)
-                    if (!analyseClass0(c)) {
-                        LOADERS.remove(this);
-                        return false;
+            synchronized (LOCK) {
+                Main.getLogger().debug("Start Load Plugin.");
+                try {
+                    JarFile jarFile = new JarFile(file);
+                    Enumeration<JarEntry> entries = jarFile.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry jarEntry = entries.nextElement();
+                        String name = jarEntry.getName();
+                        if (!name.endsWith(".class"))
+                            continue;
+                        this.loadedClasses.add(this.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
                     }
-                Main.getLogger().debug("Load And Analyse All Plugin Classes.");
-                for (Plugin plugin : plugins)
-                    enablePlugin(plugin);
-                Main.getLogger().debug("Enable All Plugins.");
-                for (Class<?> c : loadedClasses)
-                    analyseClass(c);
-                Main.getLogger().debug("Analyse All Non-Plugin Classes.");
-                for (Plugin plugin : plugins) {
-                    LOADER_MAP.put(plugin, this);
-                    for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
-                        if (AFTER_PLUGIN_FILES.contains(file)) {
+                    for (Class<?> c : loadedClasses)
+                        if (!analyseClass0(c)) {
+                            LOADERS.remove(this);
+                            return false;
+                        }
+                    Main.getLogger().debug("Load And Analyse All Plugin Classes.");
+                    for (Plugin plugin : plugins)
+                        enablePlugin(plugin);
+                    Main.getLogger().debug("Enable All Plugins.");
+                    for (Class<?> c : loadedClasses)
+                        analyseClass(c);
+                    Main.getLogger().debug("Analyse All Non-Plugin Classes.");
+                    for (Plugin plugin : plugins) {
+                        LOADER_MAP.put(plugin, this);
+                        for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
                             PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
-                            if (pluginClassLoader.load()) {
+                            if (pluginClassLoader.load())
                                 CommandSender.CONSOLE.getIOHandler().output("Load " + file.getName());
-                                AFTER_PLUGIN_FILES.remove(file);
-                            } else {
+                            else {
                                 LOADERS.remove(pluginClassLoader);
                                 pluginClassLoader.close();
                             }
                         }
+                        AFTER_PLUGINS_MAP.remove(plugin.getName());
                     }
-                    AFTER_PLUGINS_MAP.remove(plugin.getName());
-                    //todo add multi-depend
+                    Main.getLogger().debug("Load Plugins Depended On This.");
+                } catch (Exception e) {
+                    Main.getLogger().thr("Plugin Class Load Exception", e);
+                    LOADERS.remove(this);
+                    return false;
                 }
-                Main.getLogger().debug("Load Plugins Depended On This.");
-            } catch (Exception e) {
-                Main.getLogger().thr("Plugin Class Load Exception", e);
-                LOADERS.remove(this);
-                return false;
+                Main.getLogger().debug("End Load Plugin.");
+                return true;
             }
-            Main.getLogger().debug("End Load Plugin.");
-            return true;
         }
 
         private boolean analyseClass0(@NotNull Class<?> c) {

@@ -125,10 +125,10 @@ public class CommandSender {
     }
 
     /**
-     * Indicate whether this is an Author Mirai Friend Instance
+     * Indicate whether this is an Author Mirai Friend Instance or an Author Mirai Member Instance
      * @see CommandSender#isFriend()
      *
-     * @return true if this CommandSender presents a Mirai Friend instance and its friend id is equal to the id of the author, false otherwise
+     * @return true if this CommandSender presents its id is equal to the id of the author, false otherwise
      */
     public boolean isAuthor() {
         return this.isFriend ? this.friend.getId() == Main.getAuthorId() : isMember && this.member.getId() == Main.getAuthorId();

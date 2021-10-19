@@ -16,19 +16,16 @@ public class StopCommand extends Command {
 
     @Override
     public void init() {
+        this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(0, (sender, data, ioHandler) -> {
-            if (sender.isConsole()) {
-                ioHandler.output("Stopping...");
-                Main.exit();
-                return CommandResult.ALLOW;
-            }
-            return CommandResult.REFUSE;
+            ioHandler.output("Stopping...");
+            Main.exit();
+            return CommandResult.ALLOW;
         });
     }
 
     @Override
-    public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        if (commandSender.isConsole())
-            ioHandler.output("Use: stop");
+    public void usage(CommandSender sender, IOHandler ioHandler) {
+        ioHandler.output("Use: stop");
     }
 }

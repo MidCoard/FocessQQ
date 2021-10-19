@@ -18,16 +18,18 @@ public class ConsoleListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onConsoleInput(ConsoleInputEvent event) {
-        if (!QUESTS.isEmpty()) {
-            Pair<IOHandler,Long> element = QUESTS.poll();
-            while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 10 * 1000) {
-                element.getKey().input(null);
-                element = QUESTS.poll();
-            }
-            if (element == null)
+        synchronized (ConsoleListener.QUESTS) {
+            if (!QUESTS.isEmpty()) {
+                Pair<IOHandler, Long> element = QUESTS.poll();
+                while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 10 * 1000) {
+                    element.getKey().input(null);
+                    element = QUESTS.poll();
+                }
+                if (element == null)
+                    return;
+                element.getKey().input(event.getInput());
                 return;
-            element.getKey().input(event.getInput());
-            return;
+            }
         }
         try {
             Main.CommandLine.exec(event.getInput());

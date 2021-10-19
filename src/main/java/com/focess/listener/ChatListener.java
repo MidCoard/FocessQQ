@@ -28,31 +28,35 @@ public class ChatListener implements Listener {
      * @param flag true if you want to get the string value of this message, false if you want to get MiraiCode of this message
      */
     public static void registerInputListener(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
-        QUESTS.compute(commandSender, (k, v) -> {
-            if (v == null)
-                v = Queues.newConcurrentLinkedQueue();
-            v.offer(Pair.of(ioHandler, Pair.of(flag,System.currentTimeMillis())));
-            return v;
-        });
+        synchronized (QUESTS) {
+            QUESTS.compute(commandSender, (k, v) -> {
+                if (v == null)
+                    v = Queues.newConcurrentLinkedQueue();
+                v.offer(Pair.of(ioHandler, Pair.of(flag, System.currentTimeMillis())));
+                return v;
+            });
+        }
     }
 
     private static void updateInput(CommandSender sender, String content, String miraiContent, AtomicBoolean flag) {
-        QUESTS.compute(sender, (k, v) -> {
-            if (v != null && !v.isEmpty()) {
-                Pair<IOHandler,  Pair<Boolean,Long>> element = v.poll();
-                while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 10) {
-                    element.getKey().input(null);
-                    element = v.poll();
+        synchronized (QUESTS) {
+            QUESTS.compute(sender, (k, v) -> {
+                if (v != null && !v.isEmpty()) {
+                    Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
+                    while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 10) {
+                        element.getKey().input(null);
+                        element = v.poll();
+                    }
+                    if (element == null)
+                        return v;
+                    if (element.getValue().getKey())
+                        element.getKey().input(content);
+                    else element.getKey().input(miraiContent);
+                    flag.set(true);
                 }
-                if (element == null)
-                    return v;
-                if (element.getValue().getKey())
-                    element.getKey().input(content);
-                else element.getKey().input(miraiContent);
-                flag.set(true);
-            }
-            return v;
-        });
+                return v;
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

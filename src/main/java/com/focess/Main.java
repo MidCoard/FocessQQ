@@ -24,6 +24,7 @@ import kotlin.coroutines.Continuation;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Friend;
+import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.network.WrongPasswordException;
@@ -105,6 +106,30 @@ public class Main {
      */
     private static volatile boolean ready = false;
     private static boolean saved = false;
+
+    /**
+     * Get the Friend Mirai instance by its id
+     *
+     * @see Main#getBot()
+     * @see Bot#getFriend(long)
+     * @param id the friend id
+     * @return the Friend Mirai instance
+     */
+    public static Friend getFriend(long id) {
+        return Main.getBot().getFriend(id);
+    }
+
+    /**
+     * Get the Group Mirai instance by its id
+     *
+     * @see Main#getBot()
+     * @see Bot#getGroup(long)
+     * @param id the group id
+     * @return the Group Mirai instance
+     */
+    public static Group getGroup(long id) {
+        return Main.getBot().getGroup(id);
+    }
 
     private static final Thread CONSOLE_THREAD = new Thread(() -> {
         Main.getLogger().debug("Wait for Bot is ready.");
@@ -189,12 +214,16 @@ public class Main {
         Main.getLogger().debug("Setup default UncaughtExceptionHandler.");
 
         SCHEDULED_EXECUTOR_SERVICE.schedule(()->{
-            while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() -  ConsoleListener.QUESTS.peek().getValue())  > 60 * 10 * 1000 )
-                ConsoleListener.QUESTS.poll().getKey().input(null);
-            for (CommandSender sender : ChatListener.QUESTS.keySet()) {
-                Queue<Pair<IOHandler, Pair<Boolean,Long>>> queue = ChatListener.QUESTS.get(sender);
-                while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 10 * 1000)
-                    queue.poll().getKey().input(null);
+            synchronized (ConsoleListener.QUESTS) {
+                while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 10 * 1000)
+                    ConsoleListener.QUESTS.poll().getKey().input(null);
+            }
+            synchronized (ChatListener.QUESTS) {
+                for (CommandSender sender : ChatListener.QUESTS.keySet()) {
+                    Queue<Pair<IOHandler, Pair<Boolean, Long>>> queue = ChatListener.QUESTS.get(sender);
+                    while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 10 * 1000)
+                        queue.poll().getKey().input(null);
+                }
             }
         },1,TimeUnit.MINUTES);
 
@@ -292,7 +321,6 @@ public class Main {
         }
         if (event.isCancelled())
             return;
-        //todo need to be checked
         bot.close();
         login();
         Main.getLogger().debug("Relogin.");

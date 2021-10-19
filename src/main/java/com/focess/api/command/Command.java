@@ -2,6 +2,7 @@ package com.focess.api.command;
 
 import com.focess.api.Plugin;
 import com.focess.api.exceptions.CommandDuplicateException;
+import com.focess.api.exceptions.CommandLoadException;
 import com.focess.api.util.IOHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * Represent a Plugin class that can execute. Just like we use the terminal, we could use it to executing some commands. This is an important way to interact with Mirai QQ Bot.
@@ -49,17 +51,32 @@ public abstract class Command {
     private MemberPermission permission;
 
     /**
+     * The executor check predicate
+     */
+    private Predicate<CommandSender> executorPermission;
+
+    /**
      * Instance a <code>Command</code> Class with special name and aliases.
      * Never register it!
      *
      * @param name the name of the command
      * @param ali the aliases of the command
+     * @throws CommandLoadException if there is any exception thrown in the initializing process
      */
     public Command(final @NotNull String name, final @NotNull List<String> ali) {
         this.name = name;
         this.ali = ali;
         this.permission = MemberPermission.MEMBER;
-        this.init();
+        this.executorPermission = i -> true;
+        try {
+            this.init();
+        } catch (Exception e) {
+            throw new CommandLoadException(this.getClass(),e);
+        }
+    }
+
+    public void setExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
+        this.executorPermission = executorPermission;
     }
 
     /**
@@ -154,7 +171,7 @@ public abstract class Command {
      */
     @NotNull
     public final Executor addExecutor(final int count, final @NotNull CommandExecutor executor, final String... subCommands) {
-        Executor executor1 = new Executor(count, executor,subCommands);
+        Executor executor1 = new Executor(count, executor,this.executorPermission,subCommands);
         this.executors.add(executor1);
         return executor1;
     }
@@ -188,7 +205,7 @@ public abstract class Command {
                 break;
             }
         }
-        if (!flag || result == CommandResult.ARGS) {
+        if ((!flag && this.executorPermission.test(sender)) || result == CommandResult.ARGS) {
             this.usage(sender, ioHandler);
             return false;
         }
@@ -218,10 +235,10 @@ public abstract class Command {
     /**
      * Used to print help information when execute this command with wrong arguments or the executor returns {@link CommandResult#ARGS}
      *
-     * @param commandSender the executor which need to print help information
+     * @param sender the executor which need to print help information
      * @param ioHandler the receiver which need to print help information
      */
-    public abstract void usage(CommandSender commandSender, IOHandler ioHandler);
+    public abstract void usage(CommandSender sender, IOHandler ioHandler);
 
     /**
      * This class is used to help define the executor of certain command.
@@ -236,11 +253,13 @@ public abstract class Command {
         private MemberPermission permission = MemberPermission.MEMBER;
         private DataConverter<?>[] dataConverters;
         private boolean useDefaultConverter = true;
+        private Predicate<CommandSender> executorPermission;
 
-        private Executor(final int count,final CommandExecutor executor, final String... subCommands) {
+        private Executor(final int count,final CommandExecutor executor,final Predicate<CommandSender> executorPermission, final String... subCommands) {
             this.subCommands = subCommands;
             this.count = count;
             this.executor = executor;
+            this.executorPermission = executorPermission;
         }
 
         private boolean checkArgs(final String[] args) {
@@ -259,6 +278,8 @@ public abstract class Command {
         }
 
         private CommandResult execute(final CommandSender sender, final String[] args, IOHandler ioHandler) {
+            if (!this.executorPermission.test(sender))
+                return CommandResult.REFUSE;
             if (this.useDefaultConverter)
                 this.dataConverters = Collections.nCopies(args.length,DataConverter.DEFAULT_DATA_CONVERTER).toArray(new DataConverter[0]);
             else if (this.dataConverters.length < args.length) {
@@ -331,6 +352,43 @@ public abstract class Command {
         @NotNull
         public Executor setUseDefaultConverter(boolean flag) {
             this.useDefaultConverter = flag;
+            return this;
+        }
+
+        /**
+         * Set the executor permission check for this Executor
+         * When execute this Executor, it will check {@link Command#executorPermission} and the executorPermission
+         *
+         * @param executorPermission the executor permission check for this Executor
+         * @return the Executor self
+         */
+        @NotNull
+        public Executor setExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
+            this.executorPermission = this.executorPermission.and(executorPermission);
+            return this;
+        }
+
+        /**
+         * Removoe the executor permission check for this Executor
+         *
+         * @return the Executor self
+         */
+        @NotNull
+        public Executor removeExecutorPermission() {
+            this.executorPermission = i -> true;
+            return this;
+        }
+
+        /**
+         * Set the executor permission check for this Executor
+         * When execute this Executor, it will only check the executorPermission
+         *
+         * @param executorPermission the executor permission check for this Executor
+         * @return the Executor self
+         */
+        @NotNull
+        public Executor overrideExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
+            this.executorPermission = executorPermission;
             return this;
         }
     }

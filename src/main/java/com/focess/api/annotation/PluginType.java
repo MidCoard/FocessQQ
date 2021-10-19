@@ -13,10 +13,17 @@ import java.lang.annotation.Target;
 public @interface PluginType {
 
     /**
-     * Set the dependent plugin for this plugin
+     * Set the dependent plugins for this plugin
      *
-     * @return the dependent plugin or "" if there is no dependent
+     * @return the dependent plugins or {} if there is no dependent
      */
-    String loadAfter() default "";
+    String[] loadAfter() default {};
+
+    /**
+     * Set the name of this plugin
+     *
+     * @return the name of the plugin
+     */
+    String name() default "";
 
 }
