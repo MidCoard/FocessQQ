@@ -3,6 +3,10 @@
 /.idea/
 /cache/
 /logs/
+/lib/
+/libs/
+/plugins/
+MiraiQQ-2.0.jar
 MiraiQQ.iml
 device.json
 captcha.jpg
