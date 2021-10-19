@@ -3,10 +3,15 @@ package com.focess.listener;
 import com.focess.Main;
 import com.focess.api.annotation.EventHandler;
 import com.focess.api.command.CommandSender;
+import com.focess.api.event.EventManager;
 import com.focess.api.event.EventPriority;
 import com.focess.api.event.Listener;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
+import com.focess.api.event.message.ConsoleMessageEvent;
+import com.focess.api.event.message.FriendMessageEvent;
+import com.focess.api.event.message.GroupMessageEvent;
+import com.focess.api.exceptions.InputTimeoutException;
 import com.focess.api.util.IOHandler;
 import com.focess.util.Pair;
 import com.google.common.collect.Maps;
@@ -14,9 +19,13 @@ import com.google.common.collect.Queues;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
 
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean,Long>>>> QUESTS = Maps.newHashMap();
 
@@ -68,7 +77,26 @@ public class ChatListener implements Listener {
         AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
-            Main.CommandLine.exec(sender, event.getMessage().contentToString());
+            try {
+                Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
+                EXECUTOR.submit(()->{
+                    try {
+                        if (!ret.get()) {
+                            GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getMember(),event.getMessage(),event.getSource());
+                            try {
+                                EventManager.submit(groupMessageEvent);
+                            } catch (Exception e) {
+                                Main.getLogger().thr("Submit Group Message Exception", e);
+                            }
+                        }
+                    } catch (Exception e) {
+                        if (!(e instanceof InputTimeoutException))
+                            Main.getLogger().thr("Group Exec Command Exception",e);
+                    }
+                });
+            } catch (Exception e) {
+                Main.getLogger().thr("Group Exec Command Exception",e);
+            }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -80,6 +108,25 @@ public class ChatListener implements Listener {
         AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
-            Main.CommandLine.exec(sender, event.getMessage().contentToString());
+            try {
+                Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
+                EXECUTOR.submit(()->{
+                    try {
+                        if (!ret.get()) {
+                            FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getFriend(),event.getMessage());
+                            try {
+                                EventManager.submit(friendMessageEvent);
+                            } catch (Exception e) {
+                                Main.getLogger().thr("Submit Friend Message Exception", e);
+                            }
+                        }
+                    } catch (Exception e) {
+                        if (!(e instanceof InputTimeoutException))
+                            Main.getLogger().thr("Friend Exec Command Exception",e);
+                    }
+                });
+            } catch (Exception e) {
+                Main.getLogger().thr("Friend Exec Command Exception",e);
+            }
     }
 }

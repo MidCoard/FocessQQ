@@ -54,19 +54,19 @@ public class CombinedFuture implements Future<Boolean> {
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-       boolean ret = true;
+       boolean ret = false;
        for (Future<Boolean> future:futures)
-           if (!future.get())
-               ret = false;
+           if (future.get())
+               ret = true;
        return ret;
     }
 
     @Override
     public Boolean get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        boolean ret = true;
+        boolean ret = false;
         for (Future<Boolean> future:futures)
-            if (!future.get(timeout,unit))
-                ret = false;
+            if (future.get(timeout,unit))
+                ret = true;
         return ret;
     }
 }

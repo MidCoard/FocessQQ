@@ -1,8 +1,12 @@
 package com.focess.api.command;
 
+import com.focess.Main;
 import com.focess.api.Plugin;
+import com.focess.api.event.EventManager;
+import com.focess.api.event.command.CommandPrepostEvent;
 import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.exceptions.CommandLoadException;
+import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.LoadCommand;
 import com.google.common.collect.Lists;
@@ -186,7 +190,7 @@ public abstract class Command {
      */
     @NotNull
     public final Executor addExecutor(final int count, final @NotNull CommandExecutor executor, final String... subCommands) {
-        Executor executor1 = new Executor(count, executor,this.executorPermission,subCommands);
+        Executor executor1 = new Executor(count, executor,this.executorPermission,this,subCommands);
         this.executors.add(executor1);
         return executor1;
     }
@@ -208,7 +212,7 @@ public abstract class Command {
         final int amount = args.length;
         boolean flag = false;
         CommandResult result = CommandResult.NONE;
-        for (final Executor executor : this.executors) {
+        for (final Executor executor : this.executors)
             if (executor.checkCount(amount) && executor.checkArgs(args)) {
                 if (sender.hasPermission(executor.permission))
                     result = executor.execute(sender, Arrays.copyOfRange(args, executor.getSubCommandsSize(), args.length), ioHandler);
@@ -216,14 +220,12 @@ public abstract class Command {
                 for (CommandResult r : executor.results.keySet())
                     if ((r.getValue() & result.getValue()) != 0)
                         executor.results.get(r).execute(result);
+                if (result == CommandResult.NONE)
+                    continue;
                 flag = true;
-                break;
             }
-        }
-        if ((!flag && this.executorPermission.test(sender)) || result == CommandResult.ARGS) {
+        if ((!flag && this.executorPermission.test(sender)) || result == CommandResult.ARGS)
             this.usage(sender, ioHandler);
-            return false;
-        }
         return true;
     }
 
@@ -269,12 +271,14 @@ public abstract class Command {
         private DataConverter<?>[] dataConverters;
         private boolean useDefaultConverter = true;
         private Predicate<CommandSender> executorPermission;
+        private final Command command;
 
-        private Executor(final int count,final CommandExecutor executor,final Predicate<CommandSender> executorPermission, final String... subCommands) {
+        private Executor(final int count,final CommandExecutor executor,final Predicate<CommandSender> executorPermission,final Command command,final String... subCommands) {
             this.subCommands = subCommands;
             this.count = count;
             this.executor = executor;
             this.executorPermission = executorPermission;
+            this.command = command;
         }
 
         private boolean checkArgs(final String[] args) {
@@ -308,6 +312,14 @@ public abstract class Command {
                 if (!this.dataConverters[i].put(dataCollection, args[i]))
                     return CommandResult.ARGS;
             dataCollection.flip();
+            CommandPrepostEvent event = new CommandPrepostEvent(this,sender,dataCollection,ioHandler);
+            try {
+                EventManager.submit(event);
+            } catch (EventSubmitException e) {
+                Main.getLogger().thr("Submit Command Prepost Exception",e);
+            }
+            if (event.isCancelled())
+                return CommandResult.NONE;
             return this.executor.execute(sender, dataCollection, ioHandler);
         }
 

@@ -1,4 +1,4 @@
-package com.focess.api.event.chat;
+package com.focess.api.event.message;
 
 import com.focess.api.event.ListenerHandler;
 import net.mamoe.mirai.contact.Group;
@@ -7,28 +7,30 @@ import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.OnlineMessageSource;
 
 /**
- * Called when a member who chats in the group the bot is in
+ * Called when a member who chats in the group the bot is in (this does not execute any commands)
  */
-public class GroupChatEvent extends ChatEvent {
+public class GroupMessageEvent extends MessageEvent {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
+
     /**
      * The member who chats in the group the bot is in
      */
     private final Member member;
+
     /**
      * The source of the message
      */
     private final OnlineMessageSource.Incoming.FromGroup source;
 
     /**
-     * Constructs a GroupChatEvent
+     * Constructs a GroupMessageEvent
      *
      * @param member the one who chats in the group the bot is in
      * @param message the chat message
      * @param source the source of the message
      */
-    public GroupChatEvent(Member member, MessageChain message, OnlineMessageSource.Incoming.FromGroup source) {
+    public GroupMessageEvent(Member member, MessageChain message, OnlineMessageSource.Incoming.FromGroup source) {
         super(message);
         this.member = member;
         this.source = source;

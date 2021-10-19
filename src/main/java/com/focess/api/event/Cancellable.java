@@ -15,7 +15,7 @@ public interface Cancellable {
     /**
      * Set whether this event is cancelled or not
      *
-     * @param isCancelled whether this event is cancelled or not
+     * @param cancelled whether this event is cancelled or not
      */
-    void setCancelled(boolean isCancelled);
+    void setCancelled(boolean cancelled);
 }

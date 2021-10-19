@@ -4,11 +4,14 @@ import com.focess.api.Plugin;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
 import com.focess.api.event.*;
-import com.focess.api.event.BotReloginEvent;
+import com.focess.api.event.recall.GroupRecallEvent;
+import com.focess.api.event.server.BotReloginEvent;
+import com.focess.api.event.chat.ConsoleChatEvent;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
 import com.focess.api.event.request.FriendRequestEvent;
 import com.focess.api.event.request.GroupRequestEvent;
+import com.focess.api.event.server.ServerStartEvent;
 import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.util.IOHandler;
 import com.focess.commands.*;
@@ -141,9 +144,9 @@ public class Main {
         while (ready && SCANNER.hasNextLine()) {
             String input = SCANNER.nextLine();
             try {
-                EventManager.submit(new ConsoleInputEvent(input));
+                EventManager.submit(new ConsoleChatEvent(input));
             } catch (EventSubmitException e) {
-                Main.getLogger().thr("Submit Console Input Exception",e);
+                Main.getLogger().thr("Submit Console Chat Exception",e);
             }
         }
     });

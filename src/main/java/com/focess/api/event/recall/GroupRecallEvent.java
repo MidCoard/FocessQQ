@@ -1,5 +1,7 @@
-package com.focess.api.event;
+package com.focess.api.event.recall;
 
+import com.focess.api.event.Event;
+import com.focess.api.event.ListenerHandler;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.Member;
 import org.jetbrains.annotations.NotNull;
@@ -7,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Called when a Member recall a message in a Group
  */
-public class GroupRecallEvent extends Event{
+public class GroupRecallEvent extends Event {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 

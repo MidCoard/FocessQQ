@@ -1,4 +1,7 @@
-package com.focess.api.event;
+package com.focess.api.event.server;
+
+import com.focess.api.event.Event;
+import com.focess.api.event.ListenerHandler;
 
 /**
  * Called when MainPlugin is loaded completely
