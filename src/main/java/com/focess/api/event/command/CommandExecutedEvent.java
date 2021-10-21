@@ -1,16 +1,17 @@
 package com.focess.api.event.command;
 
 import com.focess.api.command.Command;
+import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
-import com.focess.api.event.Cancellable;
 import com.focess.api.event.Event;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.util.IOHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Called before command executing
+ * Called after command executed
  */
-public class CommandPrepostEvent extends Event implements Cancellable {
+public class CommandExecutedEvent extends Event {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 
@@ -22,7 +23,7 @@ public class CommandPrepostEvent extends Event implements Cancellable {
     /**
      * The args of this executor
      */
-    private final String[] args;
+    private final @NotNull String[] args;
 
     /**
      * The input and output handler
@@ -35,40 +36,39 @@ public class CommandPrepostEvent extends Event implements Cancellable {
     private final CommandSender sender;
 
     /**
-     * Indicate this event is cancelled
+     * The result
      */
-    private boolean cancelled;
+    private final CommandResult result;
 
     /**
-     * Constructs a CommandPrepostEvent
+     * Constructs a CommandExecutedEvent
      * @param executor the Executor
-     * @param sender the executor
-     * @param args the data of this executor
+     * @param args the args of the executor
      * @param ioHandler the input and output handler
+     * @param sender the executor
+     * @param result the result
      */
-    public CommandPrepostEvent(Command.Executor executor, CommandSender sender, String[] args, IOHandler ioHandler) {
+    public CommandExecutedEvent(Command.Executor executor, @NotNull String[] args, IOHandler ioHandler, CommandSender sender, CommandResult result) {
         this.executor = executor;
         this.args = args;
         this.ioHandler = ioHandler;
-        this.cancelled = false;
         this.sender = sender;
+        this.result = result;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return this.cancelled;
+    public CommandResult getResult() {
+        return result;
     }
 
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public CommandSender getSender() {
+        return sender;
     }
 
     public Command.Executor getExecutor() {
         return executor;
     }
 
-    public String[] getArgs() {
+    public @NotNull String[] getArgs() {
         return args;
     }
 

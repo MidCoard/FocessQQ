@@ -3,6 +3,7 @@ package com.focess.api.command;
 import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.event.EventManager;
+import com.focess.api.event.command.CommandExecutedEvent;
 import com.focess.api.event.command.CommandPrepostEvent;
 import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.exceptions.CommandLoadException;
@@ -220,6 +221,12 @@ public abstract class Command {
                         executor.results.get(r).execute(result);
                 if (result == CommandResult.NONE)
                     continue;
+                CommandExecutedEvent event = new CommandExecutedEvent(executor,args,ioHandler,sender,result);
+                try {
+                    EventManager.submit(event);
+                } catch (EventSubmitException e) {
+                    Main.getLogger().thr("Submit Command Executed Exception",e);
+                }
                 flag = true;
             }
         if ((!flag && this.executorPermission.test(sender)) || result == CommandResult.ARGS)
@@ -314,7 +321,7 @@ public abstract class Command {
                 if (!this.dataConverters[i].put(dataCollection, args[i]))
                     return CommandResult.ARGS;
             dataCollection.flip();
-            CommandPrepostEvent event = new CommandPrepostEvent(this,sender,dataCollection,ioHandler);
+            CommandPrepostEvent event = new CommandPrepostEvent(this,sender,args,ioHandler);
             try {
                 EventManager.submit(event);
             } catch (EventSubmitException e) {
