@@ -1,5 +1,6 @@
 package com.focess.api.event.chat;
 
+import com.focess.api.bot.Bot;
 import com.focess.api.event.ListenerHandler;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.message.data.MessageChain;
@@ -21,8 +22,8 @@ public class FriendChatEvent extends ChatEvent {
      * @param friend the friend who chats with bot
      * @param message the chat message
      */
-    public FriendChatEvent(Friend friend, MessageChain message) {
-        super(message);
+    public FriendChatEvent(Bot bot, Friend friend, MessageChain message) {
+        super(bot,message);
         this.friend = friend;
     }
 

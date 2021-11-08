@@ -1,4 +1,4 @@
-package com.focess.commands;
+package com.focess.core.commands;
 
 import com.focess.Main;
 import com.focess.api.command.Command;
@@ -6,25 +6,23 @@ import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
 import com.focess.api.util.IOHandler;
 
-public class StopCommand extends Command {
-
-
-    public StopCommand() {
-        super("stop");
+public class ReloginCommand extends Command {
+    public ReloginCommand() {
+        super("relogin");
     }
 
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(0, (sender, data, ioHandler) -> {
-            ioHandler.output("Stopping...");
-            Main.exit();
+        this.addExecutor(0, (sender, dataCollection, ioHandler) -> {
+            ioHandler.output("Relogining...");
+            Main.relogin();
             return CommandResult.ALLOW;
         });
     }
 
     @Override
     public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: stop");
+        ioHandler.output("Use: relogin");
     }
 }

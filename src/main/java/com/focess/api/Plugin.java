@@ -7,7 +7,7 @@ import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.PluginLoaderException;
 import com.focess.api.util.yaml.YamlConfiguration;
-import com.focess.commands.LoadCommand;
+import com.focess.core.commands.LoadCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

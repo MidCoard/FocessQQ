@@ -1,4 +1,4 @@
-package com.focess.commands.util;
+package com.focess.core.commands.util;
 
 public class ChatConstants {
 

@@ -3,7 +3,7 @@ package com.focess.api.command;
 import com.focess.Main;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.session.Session;
-import com.focess.listener.ChatListener;
+import com.focess.core.listener.ChatListener;
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;

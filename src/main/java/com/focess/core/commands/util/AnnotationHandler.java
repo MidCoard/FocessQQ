@@ -1,6 +1,6 @@
-package com.focess.commands.util;
+package com.focess.core.commands.util;
 
-import com.focess.commands.LoadCommand.PluginClassLoader;
+import com.focess.core.commands.LoadCommand.PluginClassLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;

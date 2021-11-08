@@ -1,7 +1,8 @@
 package com.focess.api.event.request;
 
-import com.focess.api.event.Event;
+import com.focess.api.bot.Bot;
 import com.focess.api.event.ListenerHandler;
+import com.focess.api.event.bot.BotEvent;
 import net.mamoe.mirai.contact.Group;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Called when a friend-request comes
  */
-public class FriendRequestEvent extends Event {
+public class FriendRequestEvent extends BotEvent {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 
@@ -44,7 +45,8 @@ public class FriendRequestEvent extends Event {
      * @param group the group of the stranger where the application comes from
      * @param message the message of the application
      */
-    public FriendRequestEvent(long id, String nick, Group group, String message) {
+    public FriendRequestEvent(Bot bot, long id, String nick, Group group, String message) {
+        super(bot);
         this.id = id;
         this.nick = nick;
         this.group = group;

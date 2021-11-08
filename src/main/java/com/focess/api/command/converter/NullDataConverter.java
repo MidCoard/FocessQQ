@@ -1,4 +1,6 @@
-package com.focess.api.command;
+package com.focess.api.command.converter;
+
+import com.focess.api.command.DataConverter;
 
 /**
  * Simplify the {@link DataConverter} class.

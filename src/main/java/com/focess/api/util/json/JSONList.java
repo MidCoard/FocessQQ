@@ -11,14 +11,14 @@ import java.util.List;
 /**
  * This class is used to define a JSON object as List.
  */
-public class ListJSON {
+public class JSONList {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<List<Object>> TYPE_REFERENCE =  new TypeReference<List<Object>>(){};
     private final List<?> values;
 
 
-    public ListJSON(String json) {
+    public JSONList(String json) {
         try {
             this.values = OBJECT_MAPPER.readValue(json,TYPE_REFERENCE);
         } catch (IOException e) {
@@ -26,7 +26,7 @@ public class ListJSON {
         }
     }
 
-    public ListJSON(List<?> values) {
+    public JSONList(List<?> values) {
         this.values = values;
     }
 

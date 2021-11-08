@@ -1,4 +1,4 @@
-package com.focess.util;
+package com.focess.api.util;
 
 import java.io.Serializable;
 
@@ -25,6 +25,15 @@ public class Pair<K, V> implements Serializable {
         this.value = value;
     }
 
+    /**
+     * Constructs a new Pair with static method
+     *
+     * @param key the first element
+     * @param value the second element
+     * @param <K> the first element type
+     * @param <V> the second element type
+     * @return the pair
+     */
     public static <K, V> Pair<K, V> of(K key, V value) {
         return new Pair<>(key, value);
     }

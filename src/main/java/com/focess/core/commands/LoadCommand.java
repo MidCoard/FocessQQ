@@ -1,4 +1,4 @@
-package com.focess.commands;
+package com.focess.core.commands;
 
 import com.focess.Main;
 import com.focess.api.Plugin;
@@ -11,7 +11,7 @@ import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.*;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.yaml.YamlConfiguration;
-import com.focess.commands.util.AnnotationHandler;
+import com.focess.core.commands.util.AnnotationHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

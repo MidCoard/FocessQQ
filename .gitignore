@@ -6,7 +6,9 @@
 /lib/
 /libs/
 /plugins/
-MiraiQQ-2.0.jar
+/docs/
+/devices/
 MiraiQQ.iml
+FocessQQ-2.0.jar
 device.json
 captcha.jpg

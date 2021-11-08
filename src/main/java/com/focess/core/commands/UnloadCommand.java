@@ -1,8 +1,9 @@
-package com.focess.commands;
+package com.focess.core.commands;
 
 import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.command.*;
+import com.focess.api.command.converter.PluginDataConverter;
 import com.focess.api.util.IOHandler;
 
 public class UnloadCommand extends Command {
@@ -28,24 +29,5 @@ public class UnloadCommand extends Command {
         ioHandler.output("Use: unload <plugin>");
     }
 
-    /**
-     * Convert the String argument to Plugin argument
-     */
-    public static class PluginDataConverter extends NullDataConverter<Plugin> {
 
-        /**
-         * Convert the String argument to Plugin argument
-         */
-        public static final PluginDataConverter PLUGIN_DATA_CONVERTER = new PluginDataConverter();
-
-        @Override
-        public Plugin convert(String arg) {
-            return Plugin.getPlugin(arg);
-        }
-
-        @Override
-        protected void connect(DataCollection dataCollection, Plugin arg) {
-            dataCollection.writePlugin(arg);
-        }
-    }
 }

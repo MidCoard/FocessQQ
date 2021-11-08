@@ -1,42 +1,32 @@
 package com.focess;
 
 import com.focess.api.Plugin;
+import com.focess.api.bot.Bot;
+import com.focess.api.bot.BotManager;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
-import com.focess.api.event.*;
-import com.focess.api.event.recall.GroupRecallEvent;
-import com.focess.api.event.server.BotReloginEvent;
+import com.focess.api.event.EventManager;
 import com.focess.api.event.chat.ConsoleChatEvent;
-import com.focess.api.event.chat.FriendChatEvent;
-import com.focess.api.event.chat.GroupChatEvent;
-import com.focess.api.event.request.FriendRequestEvent;
-import com.focess.api.event.request.GroupRequestEvent;
 import com.focess.api.event.server.ServerStartEvent;
+import com.focess.api.exceptions.BotLoginException;
 import com.focess.api.exceptions.EventSubmitException;
-import com.focess.api.util.IOHandler;
-import com.focess.commands.*;
-import com.focess.listener.ChatListener;
-import com.focess.listener.ConsoleListener;
+import com.focess.api.exceptions.PluginLoadException;
 import com.focess.api.util.CombinedFuture;
-import com.focess.util.Pair;
+import com.focess.api.util.IOHandler;
 import com.focess.api.util.logger.FocessLogger;
+import com.focess.core.bot.SimpleBotManager;
+import com.focess.core.commands.*;
+import com.focess.core.listener.ChatListener;
+import com.focess.core.listener.ConsoleListener;
+import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import kotlin.coroutines.Continuation;
-import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.event.Listener;
-import net.mamoe.mirai.event.events.*;
-import net.mamoe.mirai.network.WrongPasswordException;
-import net.mamoe.mirai.utils.BotConfiguration;
-import net.mamoe.mirai.utils.LoginSolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,6 +42,11 @@ public class Main {
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
 
     /**
+     * The Bot Manager
+     */
+    private static final BotManager BOT_MANAGER = new SimpleBotManager();
+
+    /**
      * The Focess Logger
      */
     private static final FocessLogger LOG = new FocessLogger();
@@ -60,24 +55,14 @@ public class Main {
      * The Author QQ number
      */
     private static final long AUTHOR_ID = 2624646185L;
-    private static final Scanner SCANNER = new Scanner(System.in);
 
-    /**
-     * The Mirai Bot Instance
-     */
-    private static Bot bot;
+    private static final Scanner SCANNER = new Scanner(System.in);
     private static MainPlugin MAIN_PLUGIN;
 
     /**
      * Indicate MainPlugin is running. True after MainPlugin is loaded.
-     * @see #isReady
      */
     private static boolean running = false;
-    private static Listener<GroupMessageEvent> groupMessageEventListener;
-    private static Listener<FriendMessageEvent> friendMessageEventListener;
-    private static Listener<MessageRecallEvent.GroupRecall> groupRecallEventListener;
-    private static Listener<NewFriendRequestEvent> newFriendRequestEventListener;
-    private static Listener<BotInvitedJoinGroupRequestEvent> botInvitedJoinGroupRequestEvent;
 
     private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
         @Override
@@ -92,22 +77,34 @@ public class Main {
         }
     };
 
+    private static final Thread CONSOLE_THREAD = new Thread(() -> {
+        Main.getLogger().debug("Bot is ready.");
+        Main.getLogger().debug("Start listening console input.");
+        while (SCANNER.hasNextLine()) {
+            String input = SCANNER.nextLine();
+            try {
+                EventManager.submit(new ConsoleChatEvent(input));
+            } catch (EventSubmitException e) {
+                Main.getLogger().thr("Submit Console Chat Exception",e);
+            }
+        }
+    });
+
     /**
      * The Mirai Bot user or we call it QQ number
      */
-    private static long user;
+    private static long username;
 
     /**
      * The Mirai Bot password
      */
     private static String password;
-    private static BotConfiguration configuration;
 
     /**
-     * Indicate Mirai Bot logins. True after Mirai Bot logins.
-     * @see #isRunning()
+     * The default Bot
      */
-    private static volatile boolean ready = false;
+    private static Bot bot;
+
     private static boolean saved = false;
 
     /**
@@ -136,27 +133,8 @@ public class Main {
         return Main.getBot().getGroup(id);
     }
 
-    private static final Thread CONSOLE_THREAD = new Thread(() -> {
-        Main.getLogger().debug("Wait for Bot is ready.");
-        while (!ready);
-        Main.getLogger().debug("Bot is ready.");
-        Main.getLogger().debug("Start listening console input.");
-        while (ready && SCANNER.hasNextLine()) {
-            String input = SCANNER.nextLine();
-            try {
-                EventManager.submit(new ConsoleChatEvent(input));
-            } catch (EventSubmitException e) {
-                Main.getLogger().thr("Submit Console Chat Exception",e);
-            }
-        }
-    });
-
     public static boolean isRunning() {
         return running;
-    }
-
-    public static boolean isReady() {
-        return ready;
     }
 
     @NotNull
@@ -169,12 +147,25 @@ public class Main {
         return bot;
     }
 
-    public static long getUser() {
-        return user;
+    public static long getUsername() {
+        return username;
     }
 
     public static long getAuthorId() {
         return AUTHOR_ID;
+    }
+
+    public static BotManager getBotManager() {
+        return BOT_MANAGER;
+    }
+
+    /**
+     * Get all the loaded plugins
+     *
+     * @return all the loaded plugins
+     */
+    public static List<Plugin> getPlugins() {
+        return LoadCommand.getPlugins();
     }
 
     /**
@@ -190,9 +181,10 @@ public class Main {
 
     private static void requestAccountInformation() {
         try {
-            IOHandler.getConsoleIoHandler().output("Please input your QQ user id: ");
+            IOHandler.getConsoleIoHandler().output("Please input your default QQ user id: ");
             String str = SCANNER.nextLine();
             if (str.equals("stop")) {
+                //won't happen
                 if (LoadCommand.getPlugin(MainPlugin.class) != null)
                     Main.exit();
                 else {
@@ -201,8 +193,8 @@ public class Main {
                     System.exit(0);
                 }
             }
-            user = Long.parseLong(str);
-            IOHandler.getConsoleIoHandler().output("Please input your QQ password: ");
+            username = Long.parseLong(str);
+            IOHandler.getConsoleIoHandler().output("Please input your default QQ password: ");
             password = SCANNER.nextLine();
         } catch (Exception e) {
             requestAccountInformation();
@@ -236,9 +228,9 @@ public class Main {
         Main.getLogger().debug("Start Console Thread.");
         if (args.length == 2) {
             try {
-                user = Long.parseLong(args[0]);
+                username = Long.parseLong(args[0]);
                 password = args[1];
-                Main.getLogger().debug("Use username and password as given.");
+                Main.getLogger().debug("Use Username and Password as Given.");
             } catch (Exception ignored) {
                 requestAccountInformation();
             }
@@ -247,88 +239,18 @@ public class Main {
             LoadCommand.enablePlugin(new MainPlugin());
             Main.getLogger().debug("Load MainPlugin.");
         } catch (Exception e) {
-            Main.getLogger().thr("Load MainPlugin Exception",e);
+            if (e instanceof PluginLoadException && e.getCause() != null && e.getCause() instanceof BotLoginException) {
+                Main.getLogger().fatal("Default Bot Login Failed, Server Stop.");
+            } else Main.getLogger().thr("Load MainPlugin Exception",e);
+            Main.exit();
         }
-    }
-
-    private static void login() {
-        bot = BotFactory.INSTANCE.newBot(user, password, configuration);
-        try {
-            bot.login();
-        } catch(Exception e) {
-            if (e instanceof WrongPasswordException) {
-                IOHandler.getConsoleIoHandler().output("Wrong username or password.");
-                requestAccountInformation();
-                login();
-            } else Main.getLogger().thr("Bot Login Exception",e);
-        }
-        ready = true;
-        groupMessageEventListener = bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-            GroupChatEvent e = new GroupChatEvent(event.getSender(), event.getMessage(),event.getSource());
-            try {
-                EventManager.submit(e);
-            } catch (EventSubmitException eventSubmitException) {
-                Main.getLogger().thr("Submit Group Message Exception",eventSubmitException);
-            }
-        });
-        friendMessageEventListener = bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-            FriendChatEvent e = new FriendChatEvent(event.getFriend(), event.getMessage());
-            try {
-                EventManager.submit(e);
-            } catch (EventSubmitException eventSubmitException) {
-                Main.getLogger().thr("Submit Friend Message Exception",eventSubmitException);
-            }
-        });
-        groupRecallEventListener = bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-            GroupRecallEvent e = new GroupRecallEvent(event.getAuthor(),event.getMessageIds(),event.getOperator());
-            try {
-                EventManager.submit(e);
-            } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Group Recall Exception",ex);
-            }
-        });
-        newFriendRequestEventListener = bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class,event ->{
-            FriendRequestEvent e = new FriendRequestEvent(event.getFromId(),event.getFromNick(),event.getFromGroup(),event.getMessage());
-            try {
-                EventManager.submit(e);
-            } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Friend Request Exception",ex);
-            }
-            if (e.getAccept() != null)
-                if (e.getAccept())
-                    event.accept();
-                else event.reject(e.isBlackList());
-        });
-        botInvitedJoinGroupRequestEvent = bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
-            GroupRequestEvent e = new GroupRequestEvent(event.getGroupId(),event.getGroupName(),event.getInvitor());
-            try {
-                EventManager.submit(e);
-            } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Group Request Exception",ex);
-            }
-            if (e.getAccept() != null)
-                if (e.getAccept())
-                    event.accept();
-                else event.ignore();
-        });
-        Main.getLogger().debug("Register message listeners.");
     }
 
     /**
-     * Relogin Bot using given username and password
+     * Relogin default Bot using given username and password
      */
     public static void relogin() {
-        BotReloginEvent event = new BotReloginEvent();
-        try {
-            EventManager.submit(event);
-        } catch (EventSubmitException e) {
-            Main.getLogger().thr("Submit Relogin Exception",e);
-        }
-        if (event.isCancelled())
-            return;
-        bot.close();
-        login();
-        Main.getLogger().debug("Relogin.");
+        bot.relogin();
     }
 
     /**
@@ -407,43 +329,8 @@ public class Main {
             Command.register(this, new FriendCommand());
             Command.register(this, new GroupCommand());
             Main.getLogger().debug("Register default commands.");
-            configuration = BotConfiguration.getDefault();
-            configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
-            configuration.fileBasedDeviceInfo();
-            configuration.setLoginSolver(new LoginSolver() {
-                @Nullable
-                @Override
-                public Object onSolvePicCaptcha(@NotNull Bot bot, byte[] bytes, @NotNull Continuation<? super String> continuation) {
-                    try {
-                        FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
-                        outputStream.write(bytes);
-                        outputStream.close();
-                    } catch (IOException e) {
-                        Main.getLogger().thr("CAPTCHA Picture Load Exception",e);
-                    }
-                    IOHandler.getConsoleIoHandler().output("Please input CAPTCHA: ");
-                    return SCANNER.nextLine();
-                }
-
-                @Nullable
-                @Override
-                public Object onSolveSliderCaptcha(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                    IOHandler.getConsoleIoHandler().output(s);
-                    SCANNER.nextLine();
-                    return null;
-                }
-
-                @Nullable
-                @Override
-                public Object onSolveUnsafeDeviceLoginVerify(@NotNull Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                    IOHandler.getConsoleIoHandler().output(s);
-                    SCANNER.nextLine();
-                    return null;
-                }
-            });
-            Main.getLogger().debug("Setup default Bot configuration.");
-            login();
-            Main.getLogger().debug("Login.");
+            bot = getBotManager().login(username,password);
+            Main.getLogger().debug("Login default bot.");
             File plugins = new File("plugins");
             if (plugins.exists())
                 for (File file : plugins.listFiles(file -> file.getName().endsWith(".jar")))
@@ -466,7 +353,7 @@ public class Main {
         @Override
         public void disable() {
             Main.getLogger().debug("Disable MainPlugin.");
-            for (Plugin plugin : LoadCommand.getPlugins())
+            for (Plugin plugin : Main.getPlugins())
                 if (!plugin.equals(this))
                     try {
                         LoadCommand.disablePlugin(plugin);
@@ -474,28 +361,18 @@ public class Main {
                         Main.getLogger().thr("Unload Target Plugin Exception",e);
                     }
             Main.getLogger().debug("Unload all loaded plugins without MainPlugin.");
+            SimpleBotManager.disableAllBotsAndExit();
+            Main.getLogger().debug("Close all logined bots.");
             for (String key : properties.keySet())
                 getConfig().set(key, properties.get(key));
             getConfig().save(getConfigFile());
             Main.getLogger().debug("Save properties.");
-            if (friendMessageEventListener != null)
-                friendMessageEventListener.complete();
-            if (groupMessageEventListener != null)
-                groupMessageEventListener.complete();
-            if (groupRecallEventListener != null)
-                groupRecallEventListener.complete();
-            if (newFriendRequestEventListener != null)
-                newFriendRequestEventListener.complete();
-            if (botInvitedJoinGroupRequestEvent != null)
-                botInvitedJoinGroupRequestEvent.complete();
-            Main.getLogger().debug("Complete all registered listeners.");
             if (!saved) {
                 Main.getLogger().debug("Save log file.");
                 saveLogFile();
                 saved = true;
-                ready = false;
-                running = false;
             }
+            running = false;
             EXECUTOR.shutdownNow();
             SCHEDULED_EXECUTOR_SERVICE.shutdownNow();
             System.exit(0);

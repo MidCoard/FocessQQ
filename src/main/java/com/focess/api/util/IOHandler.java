@@ -2,7 +2,7 @@ package com.focess.api.util;
 
 import com.focess.Main;
 import com.focess.api.exceptions.InputTimeoutException;
-import com.focess.listener.ConsoleListener;
+import com.focess.core.listener.ConsoleListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;

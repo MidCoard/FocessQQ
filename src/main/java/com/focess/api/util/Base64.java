@@ -2,6 +2,9 @@ package com.focess.api.util;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * This is a Base64 util class.
+ */
 public class Base64 {
 
     /**

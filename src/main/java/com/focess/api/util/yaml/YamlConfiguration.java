@@ -2,7 +2,7 @@ package com.focess.api.util.yaml;
 
 import com.focess.Main;
 import com.focess.api.util.SectionMap;
-import com.focess.commands.LoadCommand;
+import com.focess.core.commands.LoadCommand;
 import com.focess.api.util.Base64;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;

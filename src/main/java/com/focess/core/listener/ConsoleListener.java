@@ -1,4 +1,4 @@
-package com.focess.listener;
+package com.focess.core.listener;
 
 import com.focess.Main;
 import com.focess.api.annotation.EventHandler;
@@ -9,13 +9,11 @@ import com.focess.api.event.chat.ConsoleChatEvent;
 import com.focess.api.event.message.ConsoleMessageEvent;
 import com.focess.api.exceptions.InputTimeoutException;
 import com.focess.api.util.IOHandler;
-import com.focess.util.Pair;
+import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;
 
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class ConsoleListener implements Listener {
 
@@ -41,7 +39,7 @@ public class ConsoleListener implements Listener {
             Future<Boolean> ret = Main.CommandLine.exec(event.getMessage());
             EXECUTOR.submit(()->{
                 try {
-                    if (!ret.get()) {
+                    if (!ret.get(10, TimeUnit.MINUTES)) {
                         ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
                         try {
                             EventManager.submit(consoleMessageEvent);
@@ -50,7 +48,7 @@ public class ConsoleListener implements Listener {
                         }
                     }
                 } catch (Exception e) {
-                    if (!(e instanceof InputTimeoutException))
+                    if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
                         Main.getLogger().thr("Console Exec Command Exception",e);
                 }
             });

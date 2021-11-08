@@ -1,5 +1,6 @@
 package com.focess.api.event.message;
 
+import com.focess.api.bot.Bot;
 import com.focess.api.event.ListenerHandler;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.Member;
@@ -30,8 +31,8 @@ public class GroupMessageEvent extends MessageEvent {
      * @param message the chat message
      * @param source the source of the message
      */
-    public GroupMessageEvent(Member member, MessageChain message, OnlineMessageSource.Incoming.FromGroup source) {
-        super(message);
+    public GroupMessageEvent(Bot bot, Member member, MessageChain message, OnlineMessageSource.Incoming.FromGroup source) {
+        super(bot,message);
         this.member = member;
         this.source = source;
     }

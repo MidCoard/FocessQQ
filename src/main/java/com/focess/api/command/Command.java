@@ -67,7 +67,6 @@ public abstract class Command {
 
     /**
      * Instance a <code>Command</code> Class with special name and aliases.
-     * Never register it!
      *
      * @param name the name of the command
      * @param aliases the aliases of the command
@@ -88,7 +87,7 @@ public abstract class Command {
 
     /**
      * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
-     * Never instance it! It will be instanced when bot bootstraps automatically.
+     * Never instance it! It will be instanced when this class is loaded automatically.
      */
     protected Command() {
     }

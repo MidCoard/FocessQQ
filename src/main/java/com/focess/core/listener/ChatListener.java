@@ -1,4 +1,4 @@
-package com.focess.listener;
+package com.focess.core.listener;
 
 import com.focess.Main;
 import com.focess.api.annotation.EventHandler;
@@ -12,15 +12,13 @@ import com.focess.api.event.message.FriendMessageEvent;
 import com.focess.api.event.message.GroupMessageEvent;
 import com.focess.api.exceptions.InputTimeoutException;
 import com.focess.api.util.IOHandler;
-import com.focess.util.Pair;
+import com.focess.api.util.Pair;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
@@ -80,8 +78,8 @@ public class ChatListener implements Listener {
                 Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.submit(()->{
                     try {
-                        if (!ret.get()) {
-                            GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getMember(),event.getMessage(),event.getSource());
+                        if (!ret.get(10, TimeUnit.MINUTES)) {
+                            GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(),event.getMember(),event.getMessage(),event.getSource());
                             try {
                                 EventManager.submit(groupMessageEvent);
                             } catch (Exception e) {
@@ -89,7 +87,7 @@ public class ChatListener implements Listener {
                             }
                         }
                     } catch (Exception e) {
-                        if (!(e instanceof InputTimeoutException))
+                        if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
                             Main.getLogger().thr("Group Exec Command Exception",e);
                     }
                 });
@@ -111,8 +109,8 @@ public class ChatListener implements Listener {
                 Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.submit(()->{
                     try {
-                        if (!ret.get()) {
-                            FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getFriend(),event.getMessage());
+                        if (!ret.get(10,TimeUnit.MINUTES)) {
+                            FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage());
                             try {
                                 EventManager.submit(friendMessageEvent);
                             } catch (Exception e) {
@@ -120,7 +118,7 @@ public class ChatListener implements Listener {
                             }
                         }
                     } catch (Exception e) {
-                        if (!(e instanceof InputTimeoutException))
+                        if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
                             Main.getLogger().thr("Friend Exec Command Exception",e);
                     }
                 });

@@ -1,7 +1,7 @@
 package com.focess.api.util.logger;
 
 import com.focess.Main;
-import com.focess.commands.util.ChatConstants;
+import com.focess.core.commands.util.ChatConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

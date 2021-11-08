@@ -8,7 +8,6 @@ import com.focess.api.event.ListenerHandler;
  */
 public class ConsoleMessageEvent extends Event {
 
-
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 
     /**

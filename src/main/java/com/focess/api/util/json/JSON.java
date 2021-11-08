@@ -8,6 +8,7 @@ import com.focess.api.util.SectionMap;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +50,18 @@ public class JSON implements SectionMap {
         if (get(key) instanceof Map)
             return new JSONSection(this,get(key));
         else throw new IllegalStateException("This " + key + " is not a valid section.");
+    }
+
+    /**
+     * Get the list named key
+     *
+     * @param key the key of the list
+     * @return a list named key
+     */
+    public JSONList getList(String key) {
+        if (get(key) instanceof List)
+            return new JSONList(this.<List<?>>get(key));
+        else throw new IllegalStateException("This " + key + " is not a valid list.");
     }
 
     /**
