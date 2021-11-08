@@ -56,7 +56,6 @@ public class Main {
      */
     private static final long AUTHOR_ID = 2624646185L;
 
-    private static final Scanner SCANNER = new Scanner(System.in);
     private static MainPlugin MAIN_PLUGIN;
 
     /**
@@ -78,10 +77,10 @@ public class Main {
     };
 
     private static final Thread CONSOLE_THREAD = new Thread(() -> {
-        Main.getLogger().debug("Bot is ready.");
         Main.getLogger().debug("Start listening console input.");
-        while (SCANNER.hasNextLine()) {
-            String input = SCANNER.nextLine();
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine();
             try {
                 EventManager.submit(new ConsoleChatEvent(input));
             } catch (EventSubmitException e) {
@@ -93,7 +92,7 @@ public class Main {
     /**
      * The Mirai Bot user or we call it QQ number
      */
-    private static long username;
+    private static Long username;
 
     /**
      * The Mirai Bot password
@@ -182,7 +181,7 @@ public class Main {
     private static void requestAccountInformation() {
         try {
             IOHandler.getConsoleIoHandler().output("Please input your default QQ user id: ");
-            String str = SCANNER.nextLine();
+            String str = IOHandler.getConsoleIoHandler().input();
             if (str.equals("stop")) {
                 //won't happen
                 if (LoadCommand.getPlugin(MainPlugin.class) != null)
@@ -195,7 +194,7 @@ public class Main {
             }
             username = Long.parseLong(str);
             IOHandler.getConsoleIoHandler().output("Please input your default QQ password: ");
-            password = SCANNER.nextLine();
+            password = IOHandler.getConsoleIoHandler().input();
         } catch (Exception e) {
             requestAccountInformation();
         }
@@ -232,9 +231,8 @@ public class Main {
                 password = args[1];
                 Main.getLogger().debug("Use Username and Password as Given.");
             } catch (Exception ignored) {
-                requestAccountInformation();
             }
-        } else requestAccountInformation();
+        }
         try {
             LoadCommand.enablePlugin(new MainPlugin());
             Main.getLogger().debug("Load MainPlugin.");
@@ -329,6 +327,8 @@ public class Main {
             Command.register(this, new FriendCommand());
             Command.register(this, new GroupCommand());
             Main.getLogger().debug("Register default commands.");
+            if (username == null || password == null)
+                requestAccountInformation();
             bot = getBotManager().login(username,password);
             Main.getLogger().debug("Login default bot.");
             File plugins = new File("plugins");

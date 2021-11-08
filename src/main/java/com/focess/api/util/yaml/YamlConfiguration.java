@@ -1,6 +1,7 @@
 package com.focess.api.util.yaml;
 
 import com.focess.Main;
+import com.focess.api.exceptions.YamlLoadException;
 import com.focess.api.util.SectionMap;
 import com.focess.core.commands.LoadCommand;
 import com.focess.api.util.Base64;
@@ -89,7 +90,7 @@ public class YamlConfiguration implements SectionMap {
                     inputStream.close();
                     return t;
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new YamlLoadException(e);
                 }
             } else return (T) value;
         }

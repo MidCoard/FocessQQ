@@ -171,8 +171,7 @@ public class SimpleBotManager implements BotManager {
         for (Listener<?> listener : LISTENER_LIST)
             listener.complete();
         for (Bot bot : BOTS.values())
-            if (bot.isOnline())
-                bot.logout();
+            bot.logout();
     }
 
 
