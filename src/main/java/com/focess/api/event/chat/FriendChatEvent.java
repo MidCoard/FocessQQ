@@ -19,6 +19,7 @@ public class FriendChatEvent extends ChatEvent {
     /**
      * Constructs a FriendChatEvent
      *
+     * @param bot the bot
      * @param friend the friend who chats with bot
      * @param message the chat message
      */

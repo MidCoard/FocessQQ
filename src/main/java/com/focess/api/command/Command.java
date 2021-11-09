@@ -200,7 +200,7 @@ public abstract class Command {
      * @param sender the executor
      * @param args the arguments that command spilt by spaces
      * @param ioHandler the receiver
-     * @return a Executor that help to define the executor of this command
+     * @return an Executor that help to define the executor of this command
      */
     public final boolean execute(@NotNull final CommandSender sender, @NotNull final String[] args,@NotNull IOHandler ioHandler) {
         if (!this.isRegistered())
@@ -218,8 +218,6 @@ public abstract class Command {
                 for (CommandResult r : executor.results.keySet())
                     if ((r.getValue() & result.getValue()) != 0)
                         executor.results.get(r).execute(result);
-                if (result == CommandResult.NONE)
-                    continue;
                 CommandExecutedEvent event = new CommandExecutedEvent(executor,args,ioHandler,sender,result);
                 try {
                     EventManager.submit(event);
@@ -320,14 +318,6 @@ public abstract class Command {
                 if (!this.dataConverters[i].put(dataCollection, args[i]))
                     return CommandResult.ARGS;
             dataCollection.flip();
-            CommandPrepostEvent event = new CommandPrepostEvent(this,sender,args,ioHandler);
-            try {
-                EventManager.submit(event);
-            } catch (EventSubmitException e) {
-                Main.getLogger().thr("Submit Command Prepost Exception",e);
-            }
-            if (event.isCancelled())
-                return CommandResult.NONE;
             return this.executor.execute(sender, dataCollection, ioHandler);
         }
 
@@ -404,7 +394,7 @@ public abstract class Command {
         }
 
         /**
-         * Removoe the executor permission check for this Executor
+         * Remove the executor permission check for this Executor
          *
          * @return the Executor self
          */

@@ -25,6 +25,7 @@ public class GroupChatEvent extends ChatEvent {
     /**
      * Constructs a GroupChatEvent
      *
+     * @param bot the bot
      * @param member the one who chats in the group the bot is in
      * @param message the chat message
      * @param source the source of the message

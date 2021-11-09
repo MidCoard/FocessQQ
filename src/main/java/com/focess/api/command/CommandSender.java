@@ -1,6 +1,7 @@
 package com.focess.api.command;
 
 import com.focess.Main;
+import com.focess.api.bot.Bot;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.session.Session;
 import com.focess.core.listener.ChatListener;
@@ -28,6 +29,7 @@ public class CommandSender {
 
     private final Member member;
     private final Friend friend;
+    private final Bot bot;
     private final boolean isMember;
     private final boolean isFriend;
     private final MemberPermission permission;
@@ -35,6 +37,7 @@ public class CommandSender {
     private CommandSender() {
         this.member = null;
         this.friend = null;
+        this.bot = null;
         this.isFriend = false;
         this.isMember = false;
         this.permission = MemberPermission.OWNER;
@@ -48,6 +51,7 @@ public class CommandSender {
     public CommandSender(@NotNull Friend friend) {
         this.member = null;
         this.friend = friend;
+        this.bot = Main.getBotManager().getBot(friend.getBot().getId());
         this.isFriend = true;
         this.isMember = false;
         this.permission = MemberPermission.OWNER;
@@ -61,6 +65,7 @@ public class CommandSender {
     public CommandSender(@NotNull Member member) {
         this.member = member;
         this.friend = null;
+        this.bot = Main.getBotManager().getBot(member.getBot().getId());
         this.isMember = true;
         this.isFriend = false;
         this.permission = member.getPermission();
@@ -231,4 +236,12 @@ public class CommandSender {
         }
     }
 
+    /**
+     * Get the bot
+     *
+     * @return the bot
+     */
+    public Bot getBot() {
+        return bot;
+    }
 }

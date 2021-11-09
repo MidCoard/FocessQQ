@@ -78,6 +78,11 @@ public class SimpleBot implements Bot {
         return this.nativeBot.getAsFriend();
     }
 
+    @Override
+    public long getId() {
+        return this.nativeBot.getId();
+    }
+
     public long getUsername() {
         return username;
     }

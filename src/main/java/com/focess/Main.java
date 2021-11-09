@@ -7,18 +7,19 @@ import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.chat.ConsoleChatEvent;
+import com.focess.api.event.command.CommandPrepostEvent;
 import com.focess.api.event.server.ServerStartEvent;
 import com.focess.api.exceptions.BotLoginException;
 import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.exceptions.PluginLoadException;
 import com.focess.api.util.CombinedFuture;
 import com.focess.api.util.IOHandler;
+import com.focess.api.util.Pair;
 import com.focess.api.util.logger.FocessLogger;
 import com.focess.core.bot.SimpleBotManager;
 import com.focess.core.commands.*;
 import com.focess.core.listener.ChatListener;
 import com.focess.core.listener.ConsoleListener;
-import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -469,6 +470,14 @@ public class Main {
             CombinedFuture ret = new CombinedFuture();
             for (Command com : Command.getCommands())
                 if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
+                    CommandPrepostEvent event = new CommandPrepostEvent(sender,com,args,ioHandler);
+                    try {
+                        EventManager.submit(event);
+                    } catch (EventSubmitException e) {
+                        Main.getLogger().thr("Submit Command Prepost Exception",e);
+                    }
+                    if (event.isCancelled())
+                        continue;
                     flag = true;
                     ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
                 }

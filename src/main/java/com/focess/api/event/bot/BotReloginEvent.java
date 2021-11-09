@@ -18,6 +18,8 @@ public class BotReloginEvent extends BotEvent implements Cancellable {
 
     /**
      * Constructs a BotReloginEvent
+     *
+     * @param bot the bot
      */
     public BotReloginEvent(Bot bot) {
         super(bot);

@@ -21,6 +21,7 @@ public class ChatEvent extends BotEvent {
     /**
      * Constructs a ChatEvent
      *
+     * @param bot the bot
      * @param message the chat message
      */
     public ChatEvent(Bot bot, MessageChain message) {

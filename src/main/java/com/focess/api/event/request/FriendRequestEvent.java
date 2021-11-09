@@ -40,6 +40,7 @@ public class FriendRequestEvent extends BotEvent {
     /**
      * Constructs a FriendRequestEvent
      *
+     * @param bot the bot
      * @param id the id of the stranger
      * @param nick the nickname of the stranger
      * @param group the group of the stranger where the application comes from

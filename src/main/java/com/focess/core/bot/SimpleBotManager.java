@@ -4,6 +4,7 @@ import com.focess.Main;
 import com.focess.api.bot.Bot;
 import com.focess.api.bot.BotManager;
 import com.focess.api.event.EventManager;
+import com.focess.api.event.bot.FriendInputStatusEvent;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
 import com.focess.api.event.recall.GroupRecallEvent;
@@ -47,7 +48,7 @@ public class SimpleBotManager implements BotManager {
     public Bot login(long id, String password) {
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
-        configuration.fileBasedDeviceInfo("devices/" + id + "/device,json");
+        configuration.fileBasedDeviceInfo("devices/" + id + "/device.json");
         configuration.setCacheDir(new File("devices/" + id + "/cache"));
         configuration.setLoginSolver(new LoginSolver() {
             @Nullable
@@ -134,6 +135,14 @@ public class SimpleBotManager implements BotManager {
                 if (e.getAccept())
                     event.accept();
                 else event.ignore();
+        }));
+        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
+            FriendInputStatusEvent e = new FriendInputStatusEvent(b,event.getFriend(), event.getInputting());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                Main.getLogger().thr("Submit Friend Input Status Exception",ex);
+            }
         }));
         BOTS.put(id,b);
         return b;

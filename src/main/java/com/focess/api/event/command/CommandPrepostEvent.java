@@ -15,10 +15,9 @@ public class CommandPrepostEvent extends Event implements Cancellable {
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 
     /**
-     * The Executor
+     * The command
      */
-    private final Command.Executor executor;
-
+    private final Command command;
     /**
      * The args of this executor
      */
@@ -41,13 +40,13 @@ public class CommandPrepostEvent extends Event implements Cancellable {
 
     /**
      * Constructs a CommandPrepostEvent
-     * @param executor the Executor
      * @param sender the executor
+     * @param command the Command
      * @param args the data of this executor
      * @param ioHandler the input and output handler
      */
-    public CommandPrepostEvent(Command.Executor executor, CommandSender sender, String[] args, IOHandler ioHandler) {
-        this.executor = executor;
+    public CommandPrepostEvent(CommandSender sender, Command command, String[] args, IOHandler ioHandler) {
+        this.command = command;
         this.args = args;
         this.ioHandler = ioHandler;
         this.cancelled = false;
@@ -64,15 +63,19 @@ public class CommandPrepostEvent extends Event implements Cancellable {
         this.cancelled = cancelled;
     }
 
-    public Command.Executor getExecutor() {
-        return executor;
-    }
-
     public String[] getArgs() {
         return args;
     }
 
     public IOHandler getIoHandler() {
         return ioHandler;
+    }
+
+    public CommandSender getSender() {
+        return sender;
+    }
+
+    public Command getCommand() {
+        return command;
     }
 }

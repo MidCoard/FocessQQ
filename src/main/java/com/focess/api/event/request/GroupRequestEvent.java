@@ -31,6 +31,7 @@ public class GroupRequestEvent extends BotEvent {
     /**
      * Constructs a GroupRecallEvent
      *
+     * @param bot the bot
      * @param id the id of the group
      * @param name the name of the group
      * @param invitor the invitor of the request

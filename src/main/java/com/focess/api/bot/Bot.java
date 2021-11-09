@@ -95,4 +95,11 @@ public interface Bot {
      */
     @NotNull
     Friend getAsFriend();
+
+    /**
+     * Get the id of the bot
+     *
+     * @return the id of the bot
+     */
+    long getId();
 }

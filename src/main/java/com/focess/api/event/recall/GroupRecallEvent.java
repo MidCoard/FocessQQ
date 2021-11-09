@@ -30,6 +30,7 @@ public class GroupRecallEvent extends BotEvent {
     /**
      * Constructs a GroupRecallEvent
      *
+     * @param bot the bot
      * @param member the member who send the message
      * @param messageIds the message ids
      * @param operator the member who recalls the message
