@@ -16,5 +16,10 @@ public abstract class OptionType<T> {
         public boolean accept(String v) {
             return true;
         }
+
+        @Override
+        public String toString() {
+            return "DEFAULT_OPTION_TYPE";
+        }
     };
 }

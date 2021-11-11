@@ -9,4 +9,8 @@ public class IntegerOptionType extends ExceptionOptionType<Integer>{
         return Integer.parseInt(v);
     }
 
+    @Override
+    public String toString() {
+        return "INTEGER_OPTION_TYPE";
+    }
 }

@@ -20,6 +20,7 @@ public class Options {
                 for (OptionParserClassifier classifier : defaultClassifier)
                     options.add(classifier.createOption(temp.toArray(new String[0])));
                 defaultClassifier.clear();
+                temp.clear();
                 for (OptionParserClassifier classifier : classifiers)
                     if (arg.equals("--" + classifier.getName()))
                         defaultClassifier.add(classifier);
@@ -42,5 +43,10 @@ public class Options {
         return this.options.get(name);
     }
 
-
+    @Override
+    public String toString() {
+        return "Options{" +
+                "options=" + options +
+                '}';
+    }
 }

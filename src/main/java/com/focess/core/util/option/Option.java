@@ -36,4 +36,11 @@ public class Option {
         optionTypes.put(optionType,options);
         return t;
     }
+
+    @Override
+    public String toString() {
+        return "Option{" +
+                "optionTypes=" + optionTypes +
+                '}';
+    }
 }
