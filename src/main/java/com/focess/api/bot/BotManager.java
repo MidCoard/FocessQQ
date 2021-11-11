@@ -3,6 +3,8 @@ package com.focess.api.bot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.Future;
+
 /**
  * This class is used to manage all the bots.
  */
@@ -15,8 +17,18 @@ public interface BotManager {
      * @param password the password of the bot
      * @return the bot
      */
+    @NotNull Future<Bot> login(long id,String password);
+
+    /**
+     * Login and get the bot with id and password
+     * This is a blocking method
+     *
+     * @param id the id of the bot
+     * @param password the password of the bot
+     * @return the bot
+     */
     @NotNull
-    Bot login(long id,String password);
+    Bot loginDirectly(long id, String password);
 
     /**
      * Login the bot

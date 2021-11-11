@@ -108,10 +108,8 @@ public class ListenerHandler {
                             return;
                         Method method = i.getKey();
                         try {
-                            boolean flag = method.isAccessible();
                             method.setAccessible(true);
                             method.invoke(listener, event);
-                            method.setAccessible(flag);
                         } catch (Exception e) {
                             Main.getLogger().thr("Invoke Event Exception",e);
                         }

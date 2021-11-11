@@ -11,7 +11,9 @@ import com.focess.api.event.command.CommandPrepostEvent;
 import com.focess.api.event.server.ServerStartEvent;
 import com.focess.api.exceptions.BotLoginException;
 import com.focess.api.exceptions.EventSubmitException;
+import com.focess.api.exceptions.IllegalPortException;
 import com.focess.api.exceptions.PluginLoadException;
+import com.focess.api.net.*;
 import com.focess.api.util.CombinedFuture;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.Pair;
@@ -20,6 +22,13 @@ import com.focess.core.bot.SimpleBotManager;
 import com.focess.core.commands.*;
 import com.focess.core.listener.ChatListener;
 import com.focess.core.listener.ConsoleListener;
+import com.focess.core.net.*;
+import com.focess.core.util.option.Option;
+import com.focess.core.util.option.OptionParserClassifier;
+import com.focess.core.util.option.Options;
+import com.focess.core.util.option.optiontype.IntegerOptionType;
+import com.focess.core.util.option.optiontype.LongOptionType;
+import com.focess.core.util.option.optiontype.OptionType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -63,6 +72,24 @@ public class Main {
      * Indicate MainPlugin is running. True after MainPlugin is loaded.
      */
     private static boolean running = false;
+
+    /**
+     * The default socket
+     */
+    @Nullable
+    private static Socket socket;
+
+    /**
+     * The default server receiver
+     */
+    @Nullable
+    private static ServerReceiver serverReceiver;
+
+    /**
+     * The default client receiver
+     */
+    @Nullable
+    private static ClientReceiver clientReceiver;
 
     private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
         @Override
@@ -159,6 +186,21 @@ public class Main {
         return BOT_MANAGER;
     }
 
+    @Nullable
+    public static Socket getSocket() {
+        return socket;
+    }
+
+    @Nullable
+    public static ServerReceiver getServerReceiver() {
+        return serverReceiver;
+    }
+
+    @Nullable
+    public static ClientReceiver getClientReceiver() {
+        return clientReceiver;
+    }
+
     /**
      * Get all the loaded plugins
      *
@@ -226,12 +268,64 @@ public class Main {
 
         CONSOLE_THREAD.start();
         Main.getLogger().debug("Start Console Thread.");
-        if (args.length == 2) {
-            try {
-                username = Long.parseLong(args[0]);
-                password = args[1];
-                Main.getLogger().debug("Use Username and Password as Given.");
-            } catch (Exception ignored) {
+        Options options = Options.parse(args,
+                new OptionParserClassifier("user", LongOptionType.LONG_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE),
+                new OptionParserClassifier("server", IntegerOptionType.INTEGER_OPTION_TYPE),
+                new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
+                new OptionParserClassifier("sided"),
+                new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE));
+        Option option = options.get("user");
+        if (option != null) {
+            username = option.get(LongOptionType.LONG_OPTION_TYPE);
+            password = option.get(OptionType.DEFAULT_OPTION_TYPE);
+            Main.getLogger().debug("Use Username and Password as Given.");
+        }
+        Option sidedOption = options.get("sided");
+        option = options.get("server");
+        if (option != null) {
+            if (sidedOption == null)
+                try {
+                    FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                    focessSocket.registerReceiver(serverReceiver = new FocessReceiver(focessSocket));
+                    Main.socket = focessSocket;
+                    Main.getLogger().debug("Create Focess Socket Server.");
+                } catch (IllegalPortException e) {
+                    Main.getLogger().thr("Create Focess Socket Server Exception",e);
+                }
+            else {
+                try {
+                    FocessSidedSocket focessSidedSocket = new FocessSidedSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                    focessSidedSocket.registerReceiver(serverReceiver = new FocessSidedReceiver());
+                    Main.socket = focessSidedSocket;
+                    Main.getLogger().debug("Create Focess Sided Socket Server.");
+                } catch (IllegalPortException e) {
+                    Main.getLogger().thr("Create Focess Sided Socket Server Exception",e);
+                }
+            }
+        }
+        option = options.get("client");
+        if (option != null) {
+            if (sidedOption == null)
+                try {
+                    FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                    String localhost = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                    String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                    int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
+                    String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                    focessSocket.registerReceiver(clientReceiver = new FocessClientReceiver(focessSocket,localhost,host,port,name));
+                    Main.socket = focessSocket;
+                    Main.getLogger().debug("Create Focess Socket Client.");
+                } catch (IllegalPortException e) {
+                    Main.getLogger().thr("Create Focess Socket Client Exception",e);
+                }
+            else {
+                String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
+                String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host,port);
+                focessSidedClientSocket.registerReceiver(clientReceiver = new FocessSidedClientReceiver(focessSidedClientSocket,name));
+                Main.socket = focessSidedClientSocket;
+                Main.getLogger().debug("Create Focess Sided Socket Client.");
             }
         }
         try {
@@ -330,7 +424,7 @@ public class Main {
             Main.getLogger().debug("Register default commands.");
             if (username == null || password == null)
                 requestAccountInformation();
-            bot = getBotManager().login(username,password);
+            bot = getBotManager().loginDirectly(username,password);
             Main.getLogger().debug("Login default bot.");
             File plugins = new File("plugins");
             if (plugins.exists())
@@ -368,6 +462,9 @@ public class Main {
                 getConfig().set(key, properties.get(key));
             getConfig().save(getConfigFile());
             Main.getLogger().debug("Save properties.");
+            if (Main.getSocket() != null)
+                Main.getSocket().close();
+            Main.getLogger().debug("Close all default sockets");
             if (!saved) {
                 Main.getLogger().debug("Save log file.");
                 saveLogFile();
@@ -420,9 +517,8 @@ public class Main {
          */
         @NotNull
         public static Future<Boolean> exec(CommandSender sender, String command, IOHandler ioHandler) {
-            if (sender != CommandSender.CONSOLE)
-                IOHandler.getConsoleIoHandler().output(sender + " exec: " + command);
-            else Main.getLogger().consoleInput(command);
+            if (sender == CommandSender.CONSOLE)
+                Main.getLogger().consoleInput(command);
             List<String> args = Lists.newArrayList();
             StringBuilder stringBuilder = new StringBuilder();
             boolean stack = false;
@@ -462,10 +558,10 @@ public class Main {
                 return CompletableFuture.completedFuture(false);
             String name = args.get(0);
             args.remove(0);
-            return exec0(sender, name, args.toArray(new String[0]), ioHandler);
+            return exec0(sender, name, args.toArray(new String[0]), ioHandler,command);
         }
 
-        private static Future<Boolean> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler) {
+        private static Future<Boolean> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler,String rawCommand) {
             boolean flag = false;
             CombinedFuture ret = new CombinedFuture();
             for (Command com : Command.getCommands())
@@ -478,6 +574,8 @@ public class Main {
                     }
                     if (event.isCancelled())
                         continue;
+                    if (sender != CommandSender.CONSOLE)
+                        IOHandler.getConsoleIoHandler().output(sender + " exec: " + rawCommand);
                     flag = true;
                     ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
                 }

@@ -102,4 +102,11 @@ public interface Bot {
      * @return the id of the bot
      */
     long getId();
+
+    /**
+     * Indicate this is the default bot
+     *
+     * @return true if this is the default bot, false otherwise
+     */
+    boolean isDefaultBot();
 }

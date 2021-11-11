@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SimpleBot implements Bot {
 
@@ -83,11 +84,31 @@ public class SimpleBot implements Bot {
         return this.nativeBot.getId();
     }
 
+    @Override
+    public boolean isDefaultBot() {
+        return Main.getBot().equals(this);
+    }
+
     public long getUsername() {
         return username;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SimpleBot simpleBot = (SimpleBot) o;
+
+        return Objects.equals(nativeBot, simpleBot.nativeBot);
+    }
+
+    @Override
+    public int hashCode() {
+        return nativeBot != null ? nativeBot.hashCode() : 0;
     }
 }

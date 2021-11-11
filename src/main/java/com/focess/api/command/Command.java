@@ -4,7 +4,6 @@ import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.command.CommandExecutedEvent;
-import com.focess.api.event.command.CommandPrepostEvent;
 import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.exceptions.CommandLoadException;
 import com.focess.api.exceptions.EventSubmitException;
@@ -165,6 +164,10 @@ public abstract class Command {
     @NotNull
     public List<String> getAliases() {
         return aliases;
+    }
+
+    public Predicate<CommandSender> getExecutorPermission() {
+        return executorPermission;
     }
 
     /**

@@ -29,8 +29,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 public class SimpleBotManager implements BotManager {
+
+    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(2);
+
 
     private static final List<Listener<?>> LISTENER_LIST = Lists.newArrayList();
 
@@ -44,8 +48,12 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
-    @NotNull
-    public Bot login(long id, String password) {
+    public @NotNull Future<Bot> login(long id, String password) {
+        return EXECUTOR.submit(() -> loginDirectly(id,password));
+    }
+
+    @Override
+    public @NotNull Bot loginDirectly(long id, String password) {
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
         configuration.fileBasedDeviceInfo("devices/" + id + "/device.json");
@@ -144,6 +152,7 @@ public class SimpleBotManager implements BotManager {
                 Main.getLogger().thr("Submit Friend Input Status Exception",ex);
             }
         }));
+
         BOTS.put(id,b);
         return b;
     }
