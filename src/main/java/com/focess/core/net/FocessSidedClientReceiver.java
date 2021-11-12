@@ -98,6 +98,16 @@ public class FocessSidedClientReceiver implements ClientReceiver {
         return connected;
     }
 
+    @Override
+    public int getClientId() {
+        return this.id;
+    }
+
+    @Override
+    public String getClientToken() {
+        return this.token;
+    }
+
     public String getName() {
         return name;
     }

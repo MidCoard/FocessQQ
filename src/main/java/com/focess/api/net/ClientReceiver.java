@@ -49,4 +49,18 @@ public interface ClientReceiver extends Receiver {
      * @return true if the client has connected to a server, false otherwise
      */
     boolean isConnected();
+
+    /**
+     * Get the client id
+     *
+     * @return the client id
+     */
+    int getClientId();
+
+    /**
+     * Get the client token
+     *
+     * @return the client token
+     */
+    String getClientToken();
 }

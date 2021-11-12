@@ -244,7 +244,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        IOHandler.getConsoleIoHandler().output("MiraiQQ Bot Start!");
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
             Main.getLogger().thr("Uncaught Exception",e);
             Main.getLogger().fatal("Main Thread throws an uncaught exception. Force shutdown!");
@@ -269,12 +268,30 @@ public class Main {
         CONSOLE_THREAD.start();
         Main.getLogger().debug("Start Console Thread.");
         Options options = Options.parse(args,
+                new OptionParserClassifier("help"),
                 new OptionParserClassifier("user", LongOptionType.LONG_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("server", IntegerOptionType.INTEGER_OPTION_TYPE),
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("sided"),
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE));
-        Option option = options.get("user");
+        Option option = options.get("help");
+        if (option != null) {
+            Main.getLogger().info("--help");
+            Main.getLogger().info("--user <id> <password>");
+            Main.getLogger().info("--server <port>");
+            Main.getLogger().info("--client <localhost> <localport> <host> <port> <name>");
+            Main.getLogger().info("--client <host> <port> <name>");
+            Main.getLogger().info("--sided");
+            if (LoadCommand.getPlugin(MainPlugin.class) != null)
+                Main.exit();
+            else {
+                Main.getLogger().debug("Save log file.");
+                saveLogFile();
+                System.exit(0);
+            }
+        }
+        IOHandler.getConsoleIoHandler().output("MiraiQQ Bot Start!");
+        option = options.get("user");
         if (option != null) {
             username = option.get(LongOptionType.LONG_OPTION_TYPE);
             password = option.get(OptionType.DEFAULT_OPTION_TYPE);

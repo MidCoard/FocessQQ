@@ -91,6 +91,16 @@ public class FocessClientReceiver implements ClientReceiver {
     }
 
     @Override
+    public int getClientId() {
+        return this.id;
+    }
+
+    @Override
+    public String getClientToken() {
+        return this.token;
+    }
+
+    @Override
     public void sendPacket(Packet packet) {
         focessSocket.sendPacket(this.host,this.port,new ClientPackPacket(this.id,this.token,packet));
     }
