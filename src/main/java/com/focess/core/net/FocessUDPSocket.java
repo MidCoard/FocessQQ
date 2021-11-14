@@ -3,52 +3,53 @@ package com.focess.core.net;
 import com.focess.Main;
 import com.focess.api.annotation.PacketHandler;
 import com.focess.api.exceptions.IllegalPortException;
-import com.focess.api.net.Socket;
 import com.focess.api.net.PacketPreCodec;
 import com.focess.api.net.Receiver;
+import com.focess.api.net.Socket;
+import com.focess.api.net.packet.ConnectPacket;
 import com.focess.api.net.packet.Packet;
+import com.focess.api.net.packet.SidedConnectPacket;
 import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.ServerSocket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
 
-public class FocessSidedSocket implements Socket {
+public class FocessUDPSocket implements Socket {
 
     private final Map<Class<? extends Packet>, List<Pair<Receiver,Method>>> packetMethods = Maps.newHashMap();
     private final List<Receiver> receivers = Lists.newArrayList();
-    private final int localPort;
-    private final ServerSocket server;
+    private final DatagramSocket socket;
+    private final DatagramPacket packet;
     private final Thread thread;
 
-    public FocessSidedSocket(int localPort) throws IllegalPortException {
-        this.localPort = localPort;
+    public FocessUDPSocket(int port) throws IllegalPortException {
         try {
-            this.server = new ServerSocket(localPort);
-        } catch (IOException e) {
-            throw new IllegalPortException(localPort);
+            this.socket = new DatagramSocket(port);
+        } catch (SocketException e) {
+            throw new IllegalPortException(port);
         }
-        thread = new Thread(() -> {
-            Main.getLogger().debug("FocessSidedSocket (" + localPort + ") is Ready");
-            while (true)
+        this.packet = new DatagramPacket(new byte[1024*1024],1024*1024);
+        this.thread = new Thread(()->{
+            while (true) {
                 try {
-                    java.net.Socket socket = server.accept();
-                    InputStream inputStream = socket.getInputStream();
-                    byte[] buffer = new byte[1024];
+                    socket.receive(this.packet);
                     PacketPreCodec packetPreCodec = new PacketPreCodec();
-                    int length;
-                    while ((length = inputStream.read(buffer)) != -1)
-                        packetPreCodec.push(buffer, length);
+                    packetPreCodec.push(this.packet.getData(),this.packet.getOffset(),this.packet.getLength());
                     Packet packet = packetPreCodec.readPacket();
-                    OutputStream outputStream = socket.getOutputStream();
-                    if (packet != null)
+                    if (packet != null) {
+                        if (packet instanceof SidedConnectPacket) {
+                            String name = ((SidedConnectPacket) packet).getName();
+                            packet = new ConnectPacket(this.packet.getAddress().getHostName(),this.packet.getPort(),name);
+                        }
                         for (Pair<Receiver, Method> pair : packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
                             Method method = pair.getValue();
                             try {
@@ -57,33 +58,23 @@ public class FocessSidedSocket implements Socket {
                                 if (o != null) {
                                     PacketPreCodec handler = new PacketPreCodec();
                                     handler.writePacket((Packet)o);
-                                    outputStream.write(handler.getBytes());
-                                    outputStream.flush();
+                                    DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(),handler.getBytes().length,this.packet.getSocketAddress());
+                                    socket.send(sendPacket);
                                 }
                             } catch (Exception e) {
                                 Main.getLogger().thr("Invoke Packet Exception", e);
                             }
                         }
-                    socket.shutdownOutput();
+                    }
                 } catch (IOException e) {
-                    Main.getLogger().thr("FocessSidedSocket Exception",e);
-                    if (this.server.isClosed())
-                        return;
+                    Main.getLogger().thr("FocessUDPSocket Exception",e);
                 }
+            }
         });
-        thread.start();
+        this.thread.start();
     }
 
-    public void close() {
-        try {
-            this.server.close();
-        } catch (IOException ignored) {
-        }
-        this.thread.stop();
-        for (Receiver receiver : receivers)
-            receiver.close();
-    }
-
+    @Override
     public void registerReceiver(Receiver receiver) {
         receivers.add(receiver);
         for (Method method : receiver.getClass().getDeclaredMethods()) {
@@ -117,7 +108,23 @@ public class FocessSidedSocket implements Socket {
         return false;
     }
 
-    public int getLocalPort() {
-        return localPort;
+    @Override
+    public void close() {
+
+        this.socket.close();
+        this.thread.stop();
+        for (Receiver receiver: receivers)
+            receiver.close();
+    }
+
+    public void sendPacket(String host, int port, Packet packet) {
+        PacketPreCodec handler = new PacketPreCodec();
+        handler.writePacket(packet);
+        DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(),handler.getBytes().length,new InetSocketAddress(host,port));
+        try {
+            this.socket.send(sendPacket);
+        } catch (IOException e) {
+            Main.getLogger().thr("Send Packet Exception",e);
+        }
     }
 }

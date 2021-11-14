@@ -13,7 +13,9 @@ import com.focess.api.exceptions.BotLoginException;
 import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.exceptions.IllegalPortException;
 import com.focess.api.exceptions.PluginLoadException;
-import com.focess.api.net.*;
+import com.focess.api.net.ClientReceiver;
+import com.focess.api.net.ServerReceiver;
+import com.focess.api.net.Socket;
 import com.focess.api.util.CombinedFuture;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.Pair;
@@ -78,6 +80,18 @@ public class Main {
      */
     @Nullable
     private static Socket socket;
+
+    /**
+     * The default udp socket
+     */
+    @Nullable
+    private static Socket udpSocket;
+
+    /**
+     * The default udp server receiver
+     */
+    @Nullable
+    private static ServerReceiver udpServerReceiver;
 
     /**
      * The default server receiver
@@ -201,6 +215,14 @@ public class Main {
         return clientReceiver;
     }
 
+    public static @Nullable Socket getUdpSocket() {
+        return udpSocket;
+    }
+
+    public static @Nullable ServerReceiver getUdpServerReceiver() {
+        return udpServerReceiver;
+    }
+
     /**
      * Get all the loaded plugins
      *
@@ -273,7 +295,9 @@ public class Main {
                 new OptionParserClassifier("server", IntegerOptionType.INTEGER_OPTION_TYPE),
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("sided"),
-                new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE));
+                new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
+                new OptionParserClassifier("udp",IntegerOptionType.INTEGER_OPTION_TYPE)
+        );
         Option option = options.get("help");
         if (option != null) {
             Main.getLogger().info("--help");
@@ -281,6 +305,7 @@ public class Main {
             Main.getLogger().info("--server <port>");
             Main.getLogger().info("--client <localhost> <localport> <host> <port> <name>");
             Main.getLogger().info("--client <host> <port> <name>");
+            Main.getLogger().info("--udp <port>");
             Main.getLogger().info("--sided");
             if (LoadCommand.getPlugin(MainPlugin.class) != null)
                 Main.exit();
@@ -290,7 +315,7 @@ public class Main {
                 System.exit(0);
             }
         }
-        IOHandler.getConsoleIoHandler().output("MiraiQQ Bot Start!");
+        Main.getLogger().info("MiraiQQ Bot Start!");
         option = options.get("user");
         if (option != null) {
             username = option.get(LongOptionType.LONG_OPTION_TYPE);
@@ -301,11 +326,12 @@ public class Main {
         option = options.get("server");
         if (option != null) {
             if (sidedOption == null)
+
                 try {
                     FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
                     focessSocket.registerReceiver(serverReceiver = new FocessReceiver(focessSocket));
                     Main.socket = focessSocket;
-                    Main.getLogger().debug("Create Focess Socket Server.");
+                    Main.getLogger().info("Create Focess Socket Server.");
                 } catch (IllegalPortException e) {
                     Main.getLogger().thr("Create Focess Socket Server Exception",e);
                 }
@@ -314,7 +340,7 @@ public class Main {
                     FocessSidedSocket focessSidedSocket = new FocessSidedSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
                     focessSidedSocket.registerReceiver(serverReceiver = new FocessSidedReceiver());
                     Main.socket = focessSidedSocket;
-                    Main.getLogger().debug("Create Focess Sided Socket Server.");
+                    Main.getLogger().info("Create Focess Sided Socket Server.");
                 } catch (IllegalPortException e) {
                     Main.getLogger().thr("Create Focess Sided Socket Server Exception",e);
                 }
@@ -331,7 +357,7 @@ public class Main {
                     String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     focessSocket.registerReceiver(clientReceiver = new FocessClientReceiver(focessSocket,localhost,host,port,name));
                     Main.socket = focessSocket;
-                    Main.getLogger().debug("Create Focess Socket Client.");
+                    Main.getLogger().info("Create Focess Socket Client.");
                 } catch (IllegalPortException e) {
                     Main.getLogger().thr("Create Focess Socket Client Exception",e);
                 }
@@ -342,7 +368,18 @@ public class Main {
                 FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host,port);
                 focessSidedClientSocket.registerReceiver(clientReceiver = new FocessSidedClientReceiver(focessSidedClientSocket,name));
                 Main.socket = focessSidedClientSocket;
-                Main.getLogger().debug("Create Focess Sided Socket Client.");
+                Main.getLogger().info("Create Focess Sided Socket Client.");
+            }
+        }
+        option = options.get("udp");
+        if (option != null) {
+            try {
+                FocessUDPSocket focessUDPSocket = new FocessUDPSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                focessUDPSocket.registerReceiver(udpServerReceiver = new FocessUDPReceiver(focessUDPSocket));
+                udpSocket = focessUDPSocket;
+                Main.getLogger().info("Create Focess UDP Socket Client.");
+            } catch (IllegalPortException e) {
+                Main.getLogger().thr("Create Focess UDP Socket Client Exception",e);
             }
         }
         try {
@@ -481,6 +518,8 @@ public class Main {
             Main.getLogger().debug("Save properties.");
             if (Main.getSocket() != null)
                 Main.getSocket().close();
+            if (Main.getUdpSocket() != null)
+                Main.getUdpSocket().close();
             Main.getLogger().debug("Close all default sockets");
             if (!saved) {
                 Main.getLogger().debug("Save log file.");

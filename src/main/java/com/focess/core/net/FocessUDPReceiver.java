@@ -14,17 +14,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class FocessReceiver implements ServerReceiver {
+public class FocessUDPReceiver implements ServerReceiver {
 
     private final Map<Integer, ClientInfo> clientInfos = Maps.newConcurrentMap();
     private final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
-    private final Map<String, Map<Class<?>,List<PackHandler>>> packHandlers = Maps.newHashMap();
+    private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
+    private final FocessUDPSocket focessUDPSocket;
     private int defaultClientId = 0;
-    private final FocessSocket focessSocket;
     private final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
 
-    public FocessReceiver(FocessSocket focessSocket) {
-        this.focessSocket = focessSocket;
+    public FocessUDPReceiver(FocessUDPSocket focessUDPSocket) {
+        this.focessUDPSocket = focessUDPSocket;
         scheduledThreadPool.scheduleAtFixedRate(()->{
             for (ClientInfo clientInfo : clientInfos.values()) {
                 long time = lastHeart.getOrDefault(clientInfo.getId(),0L);
@@ -32,6 +32,19 @@ public class FocessReceiver implements ServerReceiver {
                     disconnect(clientInfo.getId());
             }
         },0,1, TimeUnit.SECONDS);
+    }
+
+    private void disconnect(int clientId) {
+        ClientInfo clientInfo = clientInfos.remove(clientId);
+        if (clientInfo != null)
+            focessUDPSocket.sendPacket(clientInfo.getHost(), clientInfo.getPort(),new DisconnectedPacket());
+    }
+
+    @Override
+    public void close() {
+        this.scheduledThreadPool.shutdownNow();
+        for (Integer id : clientInfos.keySet())
+            disconnect(id);
     }
 
     @PacketHandler
@@ -42,7 +55,7 @@ public class FocessReceiver implements ServerReceiver {
         ClientInfo clientInfo = new ClientInfo(packet.getHost(), packet.getPort(), defaultClientId++,packet.getName(),generateToken());
         lastHeart.put(clientInfo.getId(),System.currentTimeMillis());
         clientInfos.put(clientInfo.getId(),clientInfo);
-        focessSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(clientInfo.getId(),clientInfo.getToken()));
+        focessUDPSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(clientInfo.getId(),clientInfo.getToken()));
     }
 
     @PacketHandler
@@ -58,8 +71,8 @@ public class FocessReceiver implements ServerReceiver {
     public void onHeart(HeartPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
             ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000> packet.getTime())
-                lastHeart.put(clientInfo.getId(),packet.getTime());
+            if (clientInfo.getToken().equals(packet.getToken()))
+                lastHeart.put(clientInfo.getId(),System.currentTimeMillis());
         }
     }
 
@@ -73,10 +86,26 @@ public class FocessReceiver implements ServerReceiver {
         }
     }
 
-    private void disconnect(int clientId) {
-        ClientInfo clientInfo = clientInfos.remove(clientId);
-        if (clientInfo != null)
-            focessSocket.sendPacket(clientInfo.getHost(), clientInfo.getPort(),new DisconnectedPacket());
+    @Override
+    public void sendPacket(String client, Packet packet) {
+        for (ClientInfo clientInfo : this.clientInfos.values())
+            if (clientInfo.getName().equals(client))
+                this.focessUDPSocket.sendPacket(clientInfo.getHost(),clientInfo.getPort(),new ServerPackPacket(packet));
+    }
+
+    @Override
+    public <T extends Packet> void registerPackHandler(String name, Class<T> c, PackHandler<T> packHandler) {
+        packHandlers.compute(name,(k, v)->{
+            if (v == null)
+                v = Maps.newHashMap();
+            v.compute(c,(k1,v1)->{
+                if (v1 == null)
+                    v1 = Lists.newArrayList();
+                v1.add(packHandler);
+                return v1;
+            });
+            return v;
+        });
     }
 
     private static String generateToken() {
@@ -85,7 +114,7 @@ public class FocessReceiver implements ServerReceiver {
         for (int i = 0;i<64;i++) {
             switch (random.nextInt(3)) {
                 case 0:
-                    stringBuilder.append((char)('0' + random.nextInt(10)));
+                    stringBuilder.append((char) ('0' + random.nextInt(10)));
                     break;
                 case 1:
                     stringBuilder.append((char)('a' + random.nextInt(26)));
@@ -98,39 +127,11 @@ public class FocessReceiver implements ServerReceiver {
         return stringBuilder.toString();
     }
 
-    public <T extends Packet> void registerPackHandler(String name,Class<T> c, PackHandler<T> packHandler){
-        packHandlers.compute(name,(k, v)->{
-            if (v == null)
-                v = Maps.newHashMap();
-            v.compute(c,(k1,v1)->{
-               if (v1 == null)
-                   v1 = Lists.newArrayList();
-               v1.add(packHandler);
-               return v1;
-            });
-            return v;
-        });
-    }
-
     @Override
     public boolean isConnected(String client) {
         for (Integer id : clientInfos.keySet())
             if (clientInfos.get(id).getName().equals(client))
                 return true;
         return false;
-    }
-
-    @Override
-    public void sendPacket(String client, Packet packet) {
-        for (ClientInfo clientInfo : clientInfos.values())
-            if (clientInfo.getName().equals(client))
-                this.focessSocket.sendPacket(clientInfo.getHost(),clientInfo.getPort(),new ServerPackPacket(packet));
-    }
-
-    @Override
-    public void close() {
-        this.scheduledThreadPool.shutdownNow();
-        for (Integer id : clientInfos.keySet())
-            disconnect(id);
     }
 }

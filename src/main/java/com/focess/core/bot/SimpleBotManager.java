@@ -69,14 +69,14 @@ public class SimpleBotManager implements BotManager {
                 } catch (IOException e) {
                     Main.getLogger().thr("CAPTCHA Picture Load Exception",e);
                 }
-                IOHandler.getConsoleIoHandler().output("Please input CAPTCHA for " + bot.getId() + ": ");
+                Main.getLogger().info("Please input CAPTCHA for " + bot.getId() + ": ");
                 return IOHandler.getConsoleIoHandler().input();
             }
 
             @Nullable
             @Override
             public Object onSolveSliderCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                IOHandler.getConsoleIoHandler().output(s);
+                Main.getLogger().info(s);
                 IOHandler.getConsoleIoHandler().input();
                 return null;
             }
@@ -84,7 +84,7 @@ public class SimpleBotManager implements BotManager {
             @Nullable
             @Override
             public Object onSolveUnsafeDeviceLoginVerify(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
-                IOHandler.getConsoleIoHandler().output(s);
+                Main.getLogger().info(s);
                 IOHandler.getConsoleIoHandler().input();
                 return null;
             }

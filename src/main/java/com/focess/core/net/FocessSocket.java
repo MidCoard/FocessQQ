@@ -57,6 +57,7 @@ public class FocessSocket implements Socket {
                             }
                         }
                 } catch (IOException e) {
+                    Main.getLogger().thr("FocessSocket Exception",e);
                     if (this.server.isClosed())
                         return;
                 }
@@ -115,7 +116,7 @@ public class FocessSocket implements Socket {
                 outputStream.close();
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                Main.getLogger().thr("Send Packet Exception",e);
                 return false;
             }
         return false;

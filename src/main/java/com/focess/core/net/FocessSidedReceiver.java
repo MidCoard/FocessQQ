@@ -141,5 +141,15 @@ public class FocessSidedReceiver implements ServerReceiver {
     @Override
     public void close() {
         this.scheduledThreadPool.shutdownNow();
+        for (Integer id : clientInfos.keySet())
+            disconnect(id);
+    }
+
+    @Override
+    public boolean isConnected(String client) {
+        for (Integer id : clientInfos.keySet())
+            if (clientInfos.get(id).getName().equals(client))
+                return true;
+        return false;
     }
 }

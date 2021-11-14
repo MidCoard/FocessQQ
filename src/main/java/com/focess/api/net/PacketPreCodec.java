@@ -34,17 +34,6 @@ public class PacketPreCodec {
     private int pointer = 0;
 
     /**
-     * Push the data to the precodec
-     *
-     * @param buffer the data
-     * @param length the length of the data
-     */
-    public void push(byte[] buffer, int length) {
-        for (int i = 0; i < length; i++)
-            data.add(buffer[i]);
-    }
-
-    /**
      * Read a integer
      * @return the integer read from precodec
      */
@@ -241,5 +230,29 @@ public class PacketPreCodec {
      */
     public static <T extends Packet> void registerPacketCodec(int packetId, PacketCodec<T> packetCodec) {
         PACKET_CODECS.put(packetId, packetCodec);
+    }
+
+    /**
+     * Push the data to the precodec
+     *
+     * @param buffer the data
+     * @param offset the offset of the data
+     * @param length the length of the data
+     * @see #push(byte[], int)
+     */
+    public void push(byte[] buffer, int offset, int length) {
+        for (int i = offset; i < length; i++)
+            data.add(buffer[i]);
+    }
+
+    /**
+     * Push the data to the precodec
+     *
+     * @param buffer the data
+     * @param length the length of the data
+     * @see #push(byte[], int, int)
+     */
+    public void push(byte[] buffer, int length) {
+        this.push(buffer,0,length);
     }
 }

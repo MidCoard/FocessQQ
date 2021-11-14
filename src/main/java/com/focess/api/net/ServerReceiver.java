@@ -25,4 +25,12 @@ public interface ServerReceiver extends Receiver{
      */
     <T extends Packet> void registerPackHandler(String client,Class<T> c,PackHandler<T> packHandler);
 
+    /**
+     * Indicate the client is connected to server
+     *
+     * @param client the client name
+     * @return true if the client is connected to server, false otherwise
+     */
+    boolean isConnected(String client);
+
 }
