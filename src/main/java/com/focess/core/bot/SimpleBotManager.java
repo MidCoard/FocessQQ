@@ -96,16 +96,16 @@ public class SimpleBotManager implements BotManager {
             }
         });
         net.mamoe.mirai.Bot bot = BotFactory.INSTANCE.newBot(id, password, configuration);
+        try {
+            bot.login();
+        } catch(Exception e) {
+            throw new BotLoginException(id);
+        }
         Bot b = new SimpleBot(id,password, bot);
         try {
             EventManager.submit(new BotLoginEvent(b));
         } catch (EventSubmitException e) {
             Main.getLogger().thr("Submit Bot Login Exception",e);
-        }
-        try {
-            bot.login();
-        } catch(Exception e) {
-            throw new BotLoginException(id);
         }
         LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
             GroupChatEvent e = new GroupChatEvent(b,event.getSender(), event.getMessage(),event.getSource());

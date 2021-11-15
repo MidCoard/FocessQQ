@@ -110,7 +110,6 @@ public class FocessUDPSocket implements Socket {
 
     @Override
     public void close() {
-
         this.socket.close();
         this.thread.stop();
         for (Receiver receiver: receivers)
