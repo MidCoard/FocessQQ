@@ -4,9 +4,13 @@ import com.focess.Main;
 import com.focess.api.bot.Bot;
 import com.focess.api.bot.BotManager;
 import com.focess.api.event.EventManager;
+import com.focess.api.event.bot.BotLoginEvent;
+import com.focess.api.event.bot.BotLogoutEvent;
+import com.focess.api.event.bot.BotReloginEvent;
 import com.focess.api.event.bot.FriendInputStatusEvent;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
+import com.focess.api.event.recall.FriendRecallEvent;
 import com.focess.api.event.recall.GroupRecallEvent;
 import com.focess.api.event.request.FriendRequestEvent;
 import com.focess.api.event.request.GroupRequestEvent;
@@ -29,7 +33,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class SimpleBotManager implements BotManager {
 
@@ -90,12 +96,17 @@ public class SimpleBotManager implements BotManager {
             }
         });
         net.mamoe.mirai.Bot bot = BotFactory.INSTANCE.newBot(id, password, configuration);
+        Bot b = new SimpleBot(id,password, bot);
+        try {
+            EventManager.submit(new BotLoginEvent(b));
+        } catch (EventSubmitException e) {
+            Main.getLogger().thr("Submit Bot Login Exception",e);
+        }
         try {
             bot.login();
         } catch(Exception e) {
             throw new BotLoginException(id);
         }
-        Bot b = new SimpleBot(id,password, bot);
         LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
             GroupChatEvent e = new GroupChatEvent(b,event.getSender(), event.getMessage(),event.getSource());
             try {
@@ -105,7 +116,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-            FriendChatEvent e = new FriendChatEvent(b,event.getFriend(), event.getMessage());
+            FriendChatEvent e = new FriendChatEvent(b,event.getFriend(), event.getMessage(),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
@@ -118,6 +129,14 @@ public class SimpleBotManager implements BotManager {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
                 Main.getLogger().thr("Submit Group Recall Exception",ex);
+            }
+        }));
+        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
+            FriendRecallEvent e = new FriendRecallEvent(b,event.getAuthor(),event.getMessageIds());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                Main.getLogger().thr("Submit Friend Recall Exception",ex);
             }
         }));
         LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
@@ -152,7 +171,6 @@ public class SimpleBotManager implements BotManager {
                 Main.getLogger().thr("Submit Friend Input Status Exception",ex);
             }
         }));
-
         BOTS.put(id,b);
         return b;
     }
@@ -161,6 +179,11 @@ public class SimpleBotManager implements BotManager {
     public boolean login(Bot bot) {
         if (!bot.isOnline()) {
             bot.getNativeBot().login();
+            try {
+                EventManager.submit(new BotLoginEvent(bot));
+            } catch (EventSubmitException e) {
+                Main.getLogger().thr("Submit Bot Login Exception",e);
+            }
             return true;
         }
         return false;
@@ -172,6 +195,11 @@ public class SimpleBotManager implements BotManager {
         if (!bot.isOnline())
             return false;
         bot.getNativeBot().close();
+        try {
+            EventManager.submit(new BotLogoutEvent(bot));
+        } catch (EventSubmitException e) {
+            Main.getLogger().thr("Submit Bot Logout Exception",e);
+        }
         return true;
     }
 
@@ -182,7 +210,13 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public boolean relogin(@NotNull Bot bot) {
-        return this.login(bot) & this.logout(bot);
+        boolean ret = this.login(bot) & this.logout(bot);
+        try {
+            EventManager.submit(new BotReloginEvent(bot));
+        } catch (EventSubmitException e) {
+            Main.getLogger().thr("Submit Bot Relogin Exception",e);
+        }
+        return ret;
     }
 
     public static void disableAllBotsAndExit() {

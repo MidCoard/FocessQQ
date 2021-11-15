@@ -1,20 +1,14 @@
 package com.focess.api.event.bot;
 
 import com.focess.api.bot.Bot;
-import com.focess.api.event.Cancellable;
 import com.focess.api.event.ListenerHandler;
 
 /**
- * Called when bot is relogined
+ * Called when bot relogin
  */
-public class BotReloginEvent extends BotEvent implements Cancellable {
+public class BotReloginEvent extends BotEvent {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
-
-    /**
-     * Indicate this event is cancelled
-     */
-    private boolean cancelled;
 
     /**
      * Constructs a BotReloginEvent
@@ -23,16 +17,5 @@ public class BotReloginEvent extends BotEvent implements Cancellable {
      */
     public BotReloginEvent(Bot bot) {
         super(bot);
-        this.cancelled = false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 }

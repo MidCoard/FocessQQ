@@ -233,6 +233,28 @@ public class Main {
     }
 
     /**
+     * Get the plugin by its name
+     *
+     * @param name the plugin name
+     * @return the plugin
+     */
+    @Nullable
+    public static Plugin getPlugin(String name) {
+        return LoadCommand.getPlugin(name);
+    }
+
+    /**
+     * Get the plugin by its class
+     *
+     * @param cls the plugin class
+     * @return the plugin
+     */
+    @Nullable
+    public static Plugin getPlugin(Class<? extends Plugin> cls) {
+        return LoadCommand.getPlugin(cls);
+    }
+
+    /**
      *
      * get Author as a Friend
      *
