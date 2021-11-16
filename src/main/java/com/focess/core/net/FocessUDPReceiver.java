@@ -1,11 +1,13 @@
 package com.focess.core.net;
 
 import com.focess.api.annotation.PacketHandler;
+import com.focess.api.net.Client;
 import com.focess.api.net.PackHandler;
 import com.focess.api.net.ServerReceiver;
 import com.focess.api.net.packet.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FocessUDPReceiver implements ServerReceiver {
 
-    private final Map<Integer, ClientInfo> clientInfos = Maps.newConcurrentMap();
+    private final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
     private final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
     private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
     private final FocessUDPSocket focessUDPSocket;
@@ -26,18 +28,18 @@ public class FocessUDPReceiver implements ServerReceiver {
     public FocessUDPReceiver(FocessUDPSocket focessUDPSocket) {
         this.focessUDPSocket = focessUDPSocket;
         scheduledThreadPool.scheduleAtFixedRate(()->{
-            for (ClientInfo clientInfo : clientInfos.values()) {
-                long time = lastHeart.getOrDefault(clientInfo.getId(),0L);
+            for (SimpleClient simpleClient : clientInfos.values()) {
+                long time = lastHeart.getOrDefault(simpleClient.getId(),0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
-                    disconnect(clientInfo.getId());
+                    disconnect(simpleClient.getId());
             }
         },0,1, TimeUnit.SECONDS);
     }
 
     private void disconnect(int clientId) {
-        ClientInfo clientInfo = clientInfos.remove(clientId);
-        if (clientInfo != null)
-            focessUDPSocket.sendPacket(clientInfo.getHost(), clientInfo.getPort(),new DisconnectedPacket());
+        SimpleClient simpleClient = clientInfos.remove(clientId);
+        if (simpleClient != null)
+            focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new DisconnectedPacket());
     }
 
     @Override
@@ -49,20 +51,20 @@ public class FocessUDPReceiver implements ServerReceiver {
 
     @PacketHandler
     public void onConnect(ConnectPacket packet) {
-        for (ClientInfo clientInfo : clientInfos.values())
-            if (clientInfo.getName().equals(packet.getName()))
+        for (SimpleClient simpleClient : clientInfos.values())
+            if (simpleClient.getName().equals(packet.getName()))
                 return;
-        ClientInfo clientInfo = new ClientInfo(packet.getHost(), packet.getPort(), defaultClientId++,packet.getName(),generateToken());
-        lastHeart.put(clientInfo.getId(),System.currentTimeMillis());
-        clientInfos.put(clientInfo.getId(),clientInfo);
-        focessUDPSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(clientInfo.getId(),clientInfo.getToken()));
+        SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), defaultClientId++,packet.getName(),generateToken());
+        lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+        clientInfos.put(simpleClient.getId(), simpleClient);
+        focessUDPSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
     }
 
     @PacketHandler
     public void onDisconnect(DisconnectPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()))
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken()))
                 disconnect(packet.getClientId());
         }
     }
@@ -70,27 +72,27 @@ public class FocessUDPReceiver implements ServerReceiver {
     @PacketHandler
     public void onHeart(HeartPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()))
-                lastHeart.put(clientInfo.getId(),System.currentTimeMillis());
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken()))
+                lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
         }
     }
 
     @PacketHandler
     public void onClientPacket(ClientPackPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()))
-                for (PackHandler packHandler : packHandlers.getOrDefault(clientInfo.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken()))
+                for (PackHandler packHandler : packHandlers.getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
                     packHandler.handle(packet.getPacket());
         }
     }
 
     @Override
     public void sendPacket(String client, Packet packet) {
-        for (ClientInfo clientInfo : this.clientInfos.values())
-            if (clientInfo.getName().equals(client))
-                this.focessUDPSocket.sendPacket(clientInfo.getHost(),clientInfo.getPort(),new ServerPackPacket(packet));
+        for (SimpleClient simpleClient : this.clientInfos.values())
+            if (simpleClient.getName().equals(client))
+                this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new ServerPackPacket(packet));
     }
 
     @Override
@@ -133,5 +135,13 @@ public class FocessUDPReceiver implements ServerReceiver {
             if (clientInfos.get(id).getName().equals(client))
                 return true;
         return false;
+    }
+
+    @Override
+    public @Nullable Client getClient(String name) {
+        for (SimpleClient simpleClient : clientInfos.values())
+            if (simpleClient.getName().equals(name))
+                return simpleClient;
+        return null;
     }
 }

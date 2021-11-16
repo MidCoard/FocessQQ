@@ -1,12 +1,14 @@
 package com.focess.core.net;
 
 import com.focess.api.annotation.PacketHandler;
+import com.focess.api.net.Client;
 import com.focess.api.net.PackHandler;
 import com.focess.api.net.ServerReceiver;
 import com.focess.api.net.packet.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FocessSidedReceiver implements ServerReceiver {
 
-    private final Map<Integer, ClientInfo> clientInfos = Maps.newConcurrentMap();
+    private final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
     private final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
     private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
     private final Map<String, Queue<Packet>> packets = Maps.newConcurrentMap();
@@ -27,30 +29,30 @@ public class FocessSidedReceiver implements ServerReceiver {
 
     public FocessSidedReceiver() {
         scheduledThreadPool.scheduleAtFixedRate(()->{
-            for (ClientInfo clientInfo : clientInfos.values()) {
-                long time = lastHeart.getOrDefault(clientInfo.getId(),0L);
+            for (SimpleClient simpleClient : clientInfos.values()) {
+                long time = lastHeart.getOrDefault(simpleClient.getId(),0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
-                    disconnect(clientInfo.getId());
+                    disconnect(simpleClient.getId());
             }
         },0,1, TimeUnit.SECONDS);
     }
 
     @PacketHandler
     public ConnectedPacket onConnect(SidedConnectPacket packet) {
-        for (ClientInfo clientInfo : clientInfos.values())
-            if (clientInfo.getName().equals(packet.getName()))
+        for (SimpleClient simpleClient : clientInfos.values())
+            if (simpleClient.getName().equals(packet.getName()))
                 return null;
-        ClientInfo clientInfo = new ClientInfo(defaultClientId++,packet.getName(),generateToken());
-        lastHeart.put(clientInfo.getId(),System.currentTimeMillis());
-        clientInfos.put(clientInfo.getId(),clientInfo);
-        return new ConnectedPacket(clientInfo.getId(),clientInfo.getToken());
+        SimpleClient simpleClient = new SimpleClient(defaultClientId++,packet.getName(),generateToken());
+        lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+        clientInfos.put(simpleClient.getId(), simpleClient);
+        return new ConnectedPacket(simpleClient.getId(), simpleClient.getToken());
     }
 
     @PacketHandler
     public DisconnectedPacket onDisconnect(DisconnectPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()))
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken()))
                 return disconnect(packet.getClientId());
         }
         return null;
@@ -59,10 +61,10 @@ public class FocessSidedReceiver implements ServerReceiver {
     @PacketHandler
     public Packet onHeart(HeartPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000 > packet.getTime()) {
-                lastHeart.put(clientInfo.getId(), packet.getTime());
-                return packets.getOrDefault(clientInfo.getName(), Queues.newConcurrentLinkedQueue()).poll();
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000 > packet.getTime()) {
+                lastHeart.put(simpleClient.getId(), packet.getTime());
+                return packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
             }
         }
         return null;
@@ -71,11 +73,11 @@ public class FocessSidedReceiver implements ServerReceiver {
     @PacketHandler
     public Packet onClientPacket(ClientPackPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken())) {
-                for (PackHandler packHandler : packHandlers.getOrDefault(clientInfo.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken())) {
+                for (PackHandler packHandler : packHandlers.getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
                     packHandler.handle(packet.getPacket());
-                return packets.getOrDefault(clientInfo.getName(), Queues.newConcurrentLinkedQueue()).poll();
+                return packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
             }
         }
         return null;
@@ -84,9 +86,9 @@ public class FocessSidedReceiver implements ServerReceiver {
     @PacketHandler
     public Packet onWait(WaitPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
-            ClientInfo clientInfo = clientInfos.get(packet.getClientId());
-            if (clientInfo.getToken().equals(packet.getToken()))
-                return packets.getOrDefault(clientInfo.getName(), Queues.newConcurrentLinkedQueue()).poll();
+            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+            if (simpleClient.getToken().equals(packet.getToken()))
+                return packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
         }
         return null;
     }
@@ -151,5 +153,13 @@ public class FocessSidedReceiver implements ServerReceiver {
             if (clientInfos.get(id).getName().equals(client))
                 return true;
         return false;
+    }
+
+    @Override
+    public @Nullable Client getClient(String name) {
+        for (SimpleClient simpleClient : clientInfos.values())
+            if (simpleClient.getName().equals(name))
+                return simpleClient;
+        return null;
     }
 }

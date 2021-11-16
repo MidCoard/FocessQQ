@@ -157,7 +157,7 @@ public class PacketPreCodec {
     public short readShort() {
         short r = 0;
         for (int i = 0; i < 2; i++)
-            r += Byte.toUnsignedInt(data.get(pointer++)) << (i * 8);
+            r += (short) Byte.toUnsignedInt(data.get(pointer++)) << (i * 8);
         return r;
     }
 

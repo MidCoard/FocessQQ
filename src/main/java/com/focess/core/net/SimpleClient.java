@@ -1,6 +1,8 @@
 package com.focess.core.net;
 
-public class ClientInfo {
+import com.focess.api.net.Client;
+
+public class SimpleClient implements Client {
 
     private final String host;
     private final int port;
@@ -8,7 +10,7 @@ public class ClientInfo {
     private final String name;
     private final String token;
 
-    public ClientInfo(String host, int port, int id, String name, String token) {
+    public SimpleClient(String host, int port, int id, String name, String token) {
         this.host = host;
         this.port = port;
         this.id = id;
@@ -16,7 +18,7 @@ public class ClientInfo {
         this.token = token;
     }
 
-    public ClientInfo(int id, String name, String token) {
+    public SimpleClient(int id, String name, String token) {
         this.host = null;
         this.port = -1;
         this.id = id;

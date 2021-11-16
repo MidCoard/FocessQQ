@@ -1,6 +1,7 @@
 package com.focess.api.net;
 
 import com.focess.api.net.packet.Packet;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The socket receiver for server.
@@ -32,5 +33,8 @@ public interface ServerReceiver extends Receiver{
      * @return true if the client is connected to server, false otherwise
      */
     boolean isConnected(String client);
+
+    @Nullable
+    Client getClient(String name);
 
 }

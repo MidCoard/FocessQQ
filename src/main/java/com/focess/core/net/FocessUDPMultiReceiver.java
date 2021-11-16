@@ -3,11 +3,10 @@ package com.focess.core.net;
 import com.focess.api.annotation.PacketHandler;
 import com.focess.api.net.Client;
 import com.focess.api.net.PackHandler;
-import com.focess.api.net.ServerReceiver;
+import com.focess.api.net.ServerMultiReceiver;
 import com.focess.api.net.packet.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -16,17 +15,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class FocessReceiver implements ServerReceiver {
+public class FocessUDPMultiReceiver implements ServerMultiReceiver {
 
     private final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
     private final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
-    private final Map<String, Map<Class<?>,List<PackHandler>>> packHandlers = Maps.newHashMap();
+    private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
+    private final FocessUDPSocket focessUDPSocket;
     private int defaultClientId = 0;
-    private final FocessSocket focessSocket;
     private final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
 
-    public FocessReceiver(FocessSocket focessSocket) {
-        this.focessSocket = focessSocket;
+    public FocessUDPMultiReceiver(FocessUDPSocket focessUDPSocket) {
+        this.focessUDPSocket = focessUDPSocket;
         scheduledThreadPool.scheduleAtFixedRate(()->{
             for (SimpleClient simpleClient : clientInfos.values()) {
                 long time = lastHeart.getOrDefault(simpleClient.getId(),0L);
@@ -36,15 +35,25 @@ public class FocessReceiver implements ServerReceiver {
         },0,1, TimeUnit.SECONDS);
     }
 
+    private void disconnect(int clientId) {
+        SimpleClient simpleClient = clientInfos.remove(clientId);
+        if (simpleClient != null)
+            focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new DisconnectedPacket());
+    }
+
+    @Override
+    public void close() {
+        this.scheduledThreadPool.shutdownNow();
+        for (Integer id : clientInfos.keySet())
+            disconnect(id);
+    }
+
     @PacketHandler
     public void onConnect(ConnectPacket packet) {
-        for (SimpleClient simpleClient : clientInfos.values())
-            if (simpleClient.getName().equals(packet.getName()))
-                return;
         SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), defaultClientId++,packet.getName(),generateToken());
         lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
         clientInfos.put(simpleClient.getId(), simpleClient);
-        focessSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
+        focessUDPSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
     }
 
     @PacketHandler
@@ -60,8 +69,8 @@ public class FocessReceiver implements ServerReceiver {
     public void onHeart(HeartPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
             SimpleClient simpleClient = clientInfos.get(packet.getClientId());
-            if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000> packet.getTime())
-                lastHeart.put(simpleClient.getId(),packet.getTime());
+            if (simpleClient.getToken().equals(packet.getToken()))
+                lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
         }
     }
 
@@ -75,10 +84,28 @@ public class FocessReceiver implements ServerReceiver {
         }
     }
 
-    private void disconnect(int clientId) {
-        SimpleClient simpleClient = clientInfos.remove(clientId);
-        if (simpleClient != null)
-            focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new DisconnectedPacket());
+    @Override
+    public void sendPacket(String client, Packet packet) {
+        for (SimpleClient simpleClient : this.clientInfos.values())
+            if (simpleClient.getName().equals(client))
+                this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new ServerPackPacket(packet));
+    }
+
+
+
+    @Override
+    public <T extends Packet> void registerPackHandler(String name, Class<T> c, PackHandler<T> packHandler) {
+        packHandlers.compute(name,(k, v)->{
+            if (v == null)
+                v = Maps.newHashMap();
+            v.compute(c,(k1,v1)->{
+                if (v1 == null)
+                    v1 = Lists.newArrayList();
+                v1.add(packHandler);
+                return v1;
+            });
+            return v;
+        });
     }
 
     private static String generateToken() {
@@ -87,7 +114,7 @@ public class FocessReceiver implements ServerReceiver {
         for (int i = 0;i<64;i++) {
             switch (random.nextInt(3)) {
                 case 0:
-                    stringBuilder.append((char)('0' + random.nextInt(10)));
+                    stringBuilder.append((char) ('0' + random.nextInt(10)));
                     break;
                 case 1:
                     stringBuilder.append((char)('a' + random.nextInt(26)));
@@ -100,20 +127,6 @@ public class FocessReceiver implements ServerReceiver {
         return stringBuilder.toString();
     }
 
-    public <T extends Packet> void registerPackHandler(String name,Class<T> c, PackHandler<T> packHandler){
-        packHandlers.compute(name,(k, v)->{
-            if (v == null)
-                v = Maps.newHashMap();
-            v.compute(c,(k1,v1)->{
-               if (v1 == null)
-                   v1 = Lists.newArrayList();
-               v1.add(packHandler);
-               return v1;
-            });
-            return v;
-        });
-    }
-
     @Override
     public boolean isConnected(String client) {
         for (Integer id : clientInfos.keySet())
@@ -123,24 +136,20 @@ public class FocessReceiver implements ServerReceiver {
     }
 
     @Override
-    public @Nullable Client getClient(String name) {
-        for (SimpleClient simpleClient : clientInfos.values())
-            if (simpleClient.getName().equals(name))
-                return simpleClient;
-        return null;
+    public void sendPacket(int id, Packet packet) {
+        SimpleClient simpleClient = this.clientInfos.get(id);
+        if (simpleClient != null)
+            this.focessUDPSocket.sendPacket(simpleClient.getHost(),simpleClient.getPort(),packet);
     }
 
     @Override
-    public void sendPacket(String client, Packet packet) {
-        for (SimpleClient simpleClient : clientInfos.values())
-            if (simpleClient.getName().equals(client))
-                this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new ServerPackPacket(packet));
+    public List<Client> getClients(String name) {
+        List<Client> ret = Lists.newArrayList();
+        for (SimpleClient client : this.clientInfos.values())
+            if (client.getName().equals(name))
+                ret.add(client);
+        return ret;
     }
 
-    @Override
-    public void close() {
-        this.scheduledThreadPool.shutdownNow();
-        for (Integer id : clientInfos.keySet())
-            disconnect(id);
-    }
+
 }
