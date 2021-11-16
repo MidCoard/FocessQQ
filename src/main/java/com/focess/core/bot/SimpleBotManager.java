@@ -10,6 +10,7 @@ import com.focess.api.event.bot.BotReloginEvent;
 import com.focess.api.event.bot.FriendInputStatusEvent;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
+import com.focess.api.event.chat.StrangerChatEvent;
 import com.focess.api.event.recall.FriendRecallEvent;
 import com.focess.api.event.recall.GroupRecallEvent;
 import com.focess.api.event.request.FriendRequestEvent;
@@ -40,7 +41,6 @@ import java.util.concurrent.ScheduledExecutorService;
 public class SimpleBotManager implements BotManager {
 
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(2);
-
 
     private static final List<Listener<?>> LISTENER_LIST = Lists.newArrayList();
 
@@ -169,6 +169,14 @@ public class SimpleBotManager implements BotManager {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
                 Main.getLogger().thr("Submit Friend Input Status Exception",ex);
+            }
+        }));
+        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
+            StrangerChatEvent e = new StrangerChatEvent(b,event.getMessage(),event.getSender(),event.getSource());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                Main.getLogger().thr("Submit Stranger Message Exception",ex);
             }
         }));
         BOTS.put(id,b);

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Represent an packet receiver method. It means this method mush own one argument whose class is an implemented Packet.
+ * Represent a packet receiver method. It means this method mush own one argument whose class is an implemented Packet.
  */
 @Target(value = ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

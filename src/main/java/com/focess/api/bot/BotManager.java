@@ -33,14 +33,14 @@ public interface BotManager {
     /**
      * Login the bot
      *
-     * @param bot the bot need to login
+     * @param bot the bot need to log in
      * @return true if the bot is not online, false otherwise
      */
     boolean login(Bot bot);
 
     /**
      * Logout the bot
-     * @param bot the bot need to logout
+     * @param bot the bot need to log out
      * @return true if the bot is online, false otherwise
      */
     boolean logout(@NotNull Bot bot);

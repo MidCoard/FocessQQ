@@ -237,12 +237,14 @@ public class LoadCommand extends Command {
                         String name = ((PluginType) annotation).name();
                         PLUGIN_NAME_FIELD.set(plugin,name);
                         if (!plugin.getDefaultFolder().exists())
-                            plugin.getDefaultFolder().mkdirs();
+                            if (!plugin.getDefaultFolder().mkdirs())
+                                Main.getLogger().debug("Create Default Folder Failed");
                         File config = new File(plugin.getDefaultFolder(), "config.yml");
                         CONFIG_FIELD.set(plugin,config);
                         if (!config.exists()) {
                             try {
-                                config.createNewFile();
+                                if (!config.createNewFile())
+                                    Main.getLogger().debug("Create Default Config File Failed");
                             } catch (IOException e) {
                                 Main.getLogger().thr("Create Config File Exception",e);
                             }

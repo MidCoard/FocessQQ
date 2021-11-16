@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
+import net.mamoe.mirai.contact.Stranger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,17 +30,21 @@ public class CommandSender {
 
     private final Member member;
     private final Friend friend;
+    private final Stranger stranger;
     private final Bot bot;
     private final boolean isMember;
     private final boolean isFriend;
     private final MemberPermission permission;
+    private final boolean isStranger;
 
     private CommandSender() {
         this.member = null;
         this.friend = null;
+        this.stranger = null;
         this.bot = null;
         this.isFriend = false;
         this.isMember = false;
+        this.isStranger = false;
         this.permission = MemberPermission.OWNER;
     }
 
@@ -50,10 +55,12 @@ public class CommandSender {
      */
     public CommandSender(@NotNull Friend friend) {
         this.member = null;
+        this.stranger = null;
         this.friend = friend;
         this.bot = Main.getBotManager().getBot(friend.getBot().getId());
         this.isFriend = true;
         this.isMember = false;
+        this.isStranger = false;
         this.permission = MemberPermission.OWNER;
     }
 
@@ -64,11 +71,29 @@ public class CommandSender {
      */
     public CommandSender(@NotNull Member member) {
         this.member = member;
+        this.stranger = null;
         this.friend = null;
         this.bot = Main.getBotManager().getBot(member.getBot().getId());
         this.isMember = true;
         this.isFriend = false;
+        this.isStranger = false;
         this.permission = member.getPermission();
+    }
+
+    /**
+     * Present Stranger
+     *
+     * @param stranger The Mirai Stranger Instance
+     */
+    public CommandSender(@NotNull Stranger stranger) {
+        this.member = null;
+        this.friend = null;
+        this.stranger = stranger;
+        this.bot = Main.getBotManager().getBot(this.stranger.getBot().getId());
+        this.isMember = false;
+        this.isFriend = false;
+        this.isStranger = true;
+        this.permission = MemberPermission.OWNER;
     }
 
     /**
@@ -131,7 +156,6 @@ public class CommandSender {
 
     /**
      * Indicate whether this is an Author Mirai Friend Instance or an Author Mirai Member Instance
-     * @see CommandSender#isFriend()
      *
      * @return true if this CommandSender presents its id is equal to the id of the author, false otherwise
      */
@@ -174,7 +198,7 @@ public class CommandSender {
     }
 
     /**
-     * indicate whether it is CONSOLE
+     * Indicate whether it is CONSOLE
      *
      * @return true if it is {@link CommandSender#CONSOLE}, false otherwise
      */
@@ -243,5 +267,14 @@ public class CommandSender {
      */
     public Bot getBot() {
         return bot;
+    }
+
+    /**
+     * Indicate whether this is a Mirai Stranger instance
+     *
+     * @return true if this CommandSender presents a Mirai Stranger instance, false otherwise
+     */
+    public boolean isStranger() {
+        return isStranger;
     }
 }

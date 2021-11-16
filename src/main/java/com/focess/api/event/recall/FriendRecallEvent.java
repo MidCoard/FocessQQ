@@ -5,6 +5,9 @@ import com.focess.api.event.ListenerHandler;
 import com.focess.api.event.bot.BotEvent;
 import net.mamoe.mirai.contact.Friend;
 
+/**
+ * Called when a Friend recall a message
+ */
 public class FriendRecallEvent extends BotEvent {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();

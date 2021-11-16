@@ -34,6 +34,12 @@ public interface ServerReceiver extends Receiver{
      */
     boolean isConnected(String client);
 
+    /**
+     * Get the client by given name
+     *
+     * @param name the client name
+     * @return the client
+     */
     @Nullable
     Client getClient(String name);
 

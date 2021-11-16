@@ -8,8 +8,11 @@ import com.focess.api.event.EventPriority;
 import com.focess.api.event.Listener;
 import com.focess.api.event.chat.FriendChatEvent;
 import com.focess.api.event.chat.GroupChatEvent;
+import com.focess.api.event.chat.StrangerChatEvent;
 import com.focess.api.event.message.FriendMessageEvent;
 import com.focess.api.event.message.GroupMessageEvent;
+import com.focess.api.event.message.StrangerMessageEvent;
+import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.exceptions.InputTimeoutException;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.Pair;
@@ -62,6 +65,19 @@ public class ChatListener implements Listener {
                 }
                 return v;
             });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onStrangerChat(StrangerChatEvent event) {
+        Main.getLogger().debug(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
+        Main.getLogger().debug("MessageChain: ");
+        event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
+        StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());
+        try {
+            EventManager.submit(strangerMessageEvent);
+        } catch (EventSubmitException e) {
+            Main.getLogger().thr("Submit Stranger Message Exception",e);
         }
     }
 

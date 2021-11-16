@@ -70,7 +70,7 @@ public class SimpleBot implements Bot {
 
     @Override
     public boolean isOnline() {
-        return false;
+        return this.nativeBot.isOnline();
     }
 
     @Override

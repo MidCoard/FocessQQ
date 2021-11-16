@@ -6,13 +6,11 @@ import com.focess.core.util.option.Options;
 import com.focess.core.util.option.optiontype.IntegerOptionType;
 import com.focess.core.util.option.optiontype.LongOptionType;
 import com.focess.core.util.option.optiontype.OptionType;
-import lombok.SneakyThrows;
 
 import java.util.Arrays;
 
 public class Test {
 
-    @SneakyThrows
     public static void main(String[] args) {
         System.out.println(Arrays.toString(args));
         Options options = Options.parse(args,

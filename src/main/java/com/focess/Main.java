@@ -14,6 +14,7 @@ import com.focess.api.exceptions.EventSubmitException;
 import com.focess.api.exceptions.IllegalPortException;
 import com.focess.api.exceptions.PluginLoadException;
 import com.focess.api.net.ClientReceiver;
+import com.focess.api.net.ServerMultiReceiver;
 import com.focess.api.net.ServerReceiver;
 import com.focess.api.net.Socket;
 import com.focess.api.util.CombinedFuture;
@@ -104,6 +105,12 @@ public class Main {
      */
     @Nullable
     private static ClientReceiver clientReceiver;
+
+    /**
+     * The default server multi receiver
+     */
+    @Nullable
+    private static ServerMultiReceiver udpServerMultiReceiver;
 
     private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
         @Override
@@ -223,6 +230,11 @@ public class Main {
         return udpServerReceiver;
     }
 
+    @Nullable
+    public static ServerMultiReceiver getUdpServerMultiReceiver() {
+        return udpServerMultiReceiver;
+    }
+
     /**
      * Get all the loaded plugins
      *
@@ -318,7 +330,8 @@ public class Main {
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("sided"),
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
-                new OptionParserClassifier("udp",IntegerOptionType.INTEGER_OPTION_TYPE)
+                new OptionParserClassifier("udp",IntegerOptionType.INTEGER_OPTION_TYPE),
+                new OptionParserClassifier("multi")
         );
         Option option = options.get("help");
         if (option != null) {
@@ -329,6 +342,7 @@ public class Main {
             Main.getLogger().info("--client <host> <port> <name>");
             Main.getLogger().info("--udp <port>");
             Main.getLogger().info("--sided");
+            Main.getLogger().info("--multi");
             if (LoadCommand.getPlugin(MainPlugin.class) != null)
                 Main.exit();
             else {
@@ -345,6 +359,7 @@ public class Main {
             Main.getLogger().debug("Use Username and Password as Given.");
         }
         Option sidedOption = options.get("sided");
+        Option multiOption = options.get("multi");
         option = options.get("server");
         if (option != null) {
             if (sidedOption == null)
@@ -397,7 +412,10 @@ public class Main {
         if (option != null) {
             try {
                 FocessUDPSocket focessUDPSocket = new FocessUDPSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-                focessUDPSocket.registerReceiver(udpServerReceiver = new FocessUDPReceiver(focessUDPSocket));
+                if (multiOption == null)
+                    focessUDPSocket.registerReceiver(udpServerReceiver = new FocessUDPReceiver(focessUDPSocket));
+                else
+                    focessUDPSocket.registerReceiver(udpServerMultiReceiver = new FocessUDPMultiReceiver(focessUDPSocket));
                 udpSocket = focessUDPSocket;
                 Main.getLogger().info("Create Focess UDP Socket Client.");
             } catch (IllegalPortException e) {
@@ -450,7 +468,8 @@ public class Main {
                 inputStream.close();
                 gzipOutputStream.finish();
                 gzipOutputStream.close();
-                target.delete();
+                if (!target.delete())
+                    Main.getLogger().fatal("Temp Log File Delete Failed");
             }
         } catch (IOException e) {
             Main.getLogger().thr("Save Log Exception",e);
