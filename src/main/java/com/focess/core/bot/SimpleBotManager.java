@@ -234,6 +234,8 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public Bot remove(long id) {
+        if (Main.getBot().getId() == id)
+            return null;
         return BOTS.remove(id);
     }
 
