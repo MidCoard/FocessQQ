@@ -434,13 +434,6 @@ public class Main {
     }
 
     /**
-     * Relogin default Bot using given username and password
-     */
-    public static void relogin() {
-        bot.relogin();
-    }
-
-    /**
      * Exit Bot
      */
     public static void exit() {
@@ -513,9 +506,9 @@ public class Main {
             Command.register(this, new LoadCommand());
             Command.register(this, new UnloadCommand());
             Command.register(this, new StopCommand());
-            Command.register(this, new ReloginCommand());
             Command.register(this, new FriendCommand());
             Command.register(this, new GroupCommand());
+            Command.register(this,new BotCommand());
             Main.getLogger().debug("Register default commands.");
             if (username == null || password == null)
                 requestAccountInformation();

@@ -1,6 +1,7 @@
 package com.focess.core.commands;
 
 import com.focess.Main;
+import com.focess.api.bot.Bot;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
@@ -19,19 +20,29 @@ public class GroupCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(0, (sender, dataCollection, ioHandler) -> {
+        this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
+            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            if (bot == null) {
+                ioHandler.output("未找到机器人");
+                return CommandResult.REFUSE;
+            }
             StringBuilder stringBuilder = new StringBuilder("群列表: ");
-            for (Group group : Main.getBot().getGroups())
+            for (Group group : bot.getGroups())
                 stringBuilder.append(group.getName()).append("(").append(group.getId()).append("),");
             ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             return CommandResult.ALLOW;
-        }, "list");
-        this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
+        }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
+        this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
+            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            if (bot == null) {
+                ioHandler.output("未找到机器人");
+                return CommandResult.REFUSE;
+            }
             long id = dataCollection.getLong();
             try {
                 ioHandler.output("请输入一条消息");
                 String message = ioHandler.input();
-                Group group = Main.getGroup(id);
+                Group group = bot.getGroup(id);
                 if (group == null) {
                     ioHandler.output("未找到该群");
                     return CommandResult.REFUSE;
@@ -42,11 +53,11 @@ public class GroupCommand extends Command {
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;
-        },"send").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
+        },"send").setDataConverters(DataConverter.LONG_DATA_CONVERTER,DataConverter.LONG_DATA_CONVERTER);
     }
 
     @Override
     public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: group list\n" + "Use: group send <group>");
+        ioHandler.output("Use: group list <username>\n" + "Use: group send <username> <group>");
     }
 }

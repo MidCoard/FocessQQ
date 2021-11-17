@@ -3,6 +3,7 @@ package com.focess.api.bot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -61,4 +62,18 @@ public interface BotManager {
      * @return true if the bot is online, false otherwise
      */
     boolean relogin(@NotNull Bot bot);
+
+    /**
+     * Get the list of bots
+     *
+     * @return the list of bots
+     */
+    List<Bot> getBots();
+
+    /**
+     * Remove the bot
+     * @param id the bot id
+     * @return the previous bot
+     */
+    Bot remove(long id);
 }

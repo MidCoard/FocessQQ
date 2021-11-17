@@ -227,6 +227,16 @@ public class SimpleBotManager implements BotManager {
         return ret;
     }
 
+    @Override
+    public List<Bot> getBots() {
+        return Lists.newArrayList(BOTS.values());
+    }
+
+    @Override
+    public Bot remove(long id) {
+        return BOTS.remove(id);
+    }
+
     public static void disableAllBotsAndExit() {
         for (Listener<?> listener : LISTENER_LIST)
             listener.complete();
