@@ -1,4 +1,4 @@
-package com.focess.core.util.option.optiontype;
+package com.focess.core.util.option.type;
 
 public class IntegerOptionType extends ExceptionOptionType<Integer>{
 

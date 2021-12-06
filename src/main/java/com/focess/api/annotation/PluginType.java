@@ -26,4 +26,18 @@ public @interface PluginType {
      */
     String name() default "";
 
+    /**
+     * Set the author of this plugin
+     *
+     * @return the author of the plugin
+     */
+    String author() default "MidCoard";
+
+    /**
+     * Set the version of this plugin
+     *
+     * @return the version of the plugin
+     */
+    String version() default "1.0.0";
+
 }

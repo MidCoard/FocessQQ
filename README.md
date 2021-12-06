@@ -1,9 +1,9 @@
 # FocessQQ - 轻量级QQ机器人框架
-这是一个基于mirai框架的机器人框架，是一个面向开发者的框架。
+这是一个基于mirai的机器人框架，是一个面向开发者的框架。
 
 ## 开发
 
-开发文档移步本项目Wiki
+开发文档移步本项目[Wiki](https://github.com/MIdCoard/MiraiQQ/wiki)
 
 ## 注意事项
 

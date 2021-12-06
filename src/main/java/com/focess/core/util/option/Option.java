@@ -1,6 +1,6 @@
 package com.focess.core.util.option;
 
-import com.focess.core.util.option.optiontype.OptionType;
+import com.focess.core.util.option.type.OptionType;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 

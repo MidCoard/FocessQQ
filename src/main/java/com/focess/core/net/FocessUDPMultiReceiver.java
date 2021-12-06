@@ -30,7 +30,7 @@ public class FocessUDPMultiReceiver implements ServerMultiReceiver {
             for (SimpleClient simpleClient : clientInfos.values()) {
                 long time = lastHeart.getOrDefault(simpleClient.getId(),0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
-                    disconnect(simpleClient.getId());
+                    clientInfos.remove(simpleClient.getId());
             }
         },0,1, TimeUnit.SECONDS);
     }

@@ -52,7 +52,7 @@ public abstract class Command {
     /**
      * The MiraiPermission of the command
      */
-    private MemberPermission permission;
+    private CommandPermission permission;
 
     /**
      * The executor check predicate
@@ -74,7 +74,7 @@ public abstract class Command {
     public Command(final @NotNull String name, final @NotNull String... aliases) {
         this.name = name;
         this.aliases = Lists.newArrayList(aliases);
-        this.permission = MemberPermission.MEMBER;
+        this.permission = CommandPermission.MEMBER;
         this.executorPermission = i -> true;
         try {
             this.init();
@@ -235,7 +235,7 @@ public abstract class Command {
     }
 
     @NotNull
-    public MemberPermission getPermission() {
+    public CommandPermission getPermission() {
         return this.permission;
     }
 
@@ -244,8 +244,9 @@ public abstract class Command {
      *
      * @param permission the target permission the command need
      */
+    @Deprecated
     public final void setPermission(@NotNull MemberPermission permission) {
-        this.permission = permission;
+        this.permission = CommandPermission.toCommandPermission(permission);
     }
 
     /**
@@ -264,6 +265,15 @@ public abstract class Command {
 
     public boolean isInitialize() {
         return initialize;
+    }
+
+    /**
+     * Set the default permission
+     *
+     * @param permission the target permission the command need
+     */
+    public void setPermission(CommandPermission permission) {
+        this.permission = permission;
     }
 
     /**

@@ -21,6 +21,11 @@ public class GroupCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
+
+//            if (sender.isMember()) {
+//                Member member = sender.getMember();
+//                member.sendMessage("");
+//            }
             Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
             if (bot == null) {
                 ioHandler.output("未找到机器人");

@@ -26,6 +26,7 @@ public interface BotManager {
      *
      * @param id the id of the bot
      * @param password the password of the bot
+     * @throws com.focess.api.exceptions.BotLoginException if the bot login failed
      * @return the bot
      */
     @NotNull

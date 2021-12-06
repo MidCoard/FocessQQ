@@ -10,8 +10,9 @@ import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.MemberPermission;
 import net.mamoe.mirai.contact.Stranger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +35,7 @@ public class CommandSender {
     private final Bot bot;
     private final boolean isMember;
     private final boolean isFriend;
-    private final MemberPermission permission;
+    private final CommandPermission permission;
     private final boolean isStranger;
 
     private CommandSender() {
@@ -45,7 +46,7 @@ public class CommandSender {
         this.isFriend = false;
         this.isMember = false;
         this.isStranger = false;
-        this.permission = MemberPermission.OWNER;
+        this.permission = CommandPermission.OWNER;
     }
 
     /**
@@ -53,7 +54,7 @@ public class CommandSender {
      *
      * @param friend the Mirai Friend instance
      */
-    public CommandSender(@NotNull Friend friend) {
+    public CommandSender(@NonNull Friend friend) {
         this.member = null;
         this.stranger = null;
         this.friend = friend;
@@ -61,7 +62,7 @@ public class CommandSender {
         this.isFriend = true;
         this.isMember = false;
         this.isStranger = false;
-        this.permission = MemberPermission.OWNER;
+        this.permission = CommandPermission.OWNER;
     }
 
     /**
@@ -69,7 +70,7 @@ public class CommandSender {
      *
      * @param member The Mirai Member Instance
      */
-    public CommandSender(@NotNull Member member) {
+    public CommandSender(@NonNull Member member) {
         this.member = member;
         this.stranger = null;
         this.friend = null;
@@ -77,7 +78,7 @@ public class CommandSender {
         this.isMember = true;
         this.isFriend = false;
         this.isStranger = false;
-        this.permission = member.getPermission();
+        this.permission = CommandPermission.toCommandPermission(member.getPermission());
     }
 
     /**
@@ -85,7 +86,7 @@ public class CommandSender {
      *
      * @param stranger The Mirai Stranger Instance
      */
-    public CommandSender(@NotNull Stranger stranger) {
+    public CommandSender(@NonNull Stranger stranger) {
         this.member = null;
         this.friend = null;
         this.stranger = stranger;
@@ -93,7 +94,7 @@ public class CommandSender {
         this.isMember = false;
         this.isFriend = false;
         this.isStranger = true;
-        this.permission = MemberPermission.OWNER;
+        this.permission = CommandPermission.OWNER;
     }
 
     /**
@@ -121,6 +122,7 @@ public class CommandSender {
      * @param permission the compared permission
      * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
      */
+    @Deprecated
     public boolean hasPermission(MemberPermission permission) {
         if (isAuthor())
             return true;
@@ -128,12 +130,24 @@ public class CommandSender {
             case MEMBER:
                 return true;
             case ADMINISTRATOR:
-                return this.getPermission() == MemberPermission.ADMINISTRATOR || this.getPermission() == MemberPermission.OWNER;
+                return this.getPermission().permission == MemberPermission.ADMINISTRATOR || this.getPermission().permission == MemberPermission.OWNER;
             case OWNER:
-                return this.getPermission() == MemberPermission.OWNER;
+                return this.getPermission().permission == MemberPermission.OWNER;
         }
         return false;
     }
+    /**
+     * Indicate whether this CommandSender owns the permission
+     *
+     * @param permission the compared permission
+     * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
+     */
+    public boolean hasPermission(CommandPermission permission) {
+        if (isAuthor())
+            return true;
+        return this.permission.hasPermission(permission);
+    }
+
 
     /**
      * Get the Mirai Member instance, or null if this CommandSender does not present a Mirai Member instance.
@@ -150,6 +164,7 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents a Mirai Member instance, false otherwise
      */
+    @EnsuresNonNullIf( expression = "getMember()",result = true)
     public boolean isMember() {
         return isMember;
     }
@@ -164,11 +179,11 @@ public class CommandSender {
     }
 
     /**
-     * Get Mirai Permission
-     * @return Mirai Permission of this sender
+     * Get permission
+     * @return permission of this sender
      */
-    @NotNull
-    public MemberPermission getPermission() {
+    @NonNull
+    public CommandPermission getPermission() {
         return permission;
     }
 

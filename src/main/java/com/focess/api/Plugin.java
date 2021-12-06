@@ -6,6 +6,7 @@ import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.PluginLoaderException;
+import com.focess.api.util.version.Version;
 import com.focess.api.util.yaml.YamlConfiguration;
 import com.focess.core.commands.LoadCommand;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,15 @@ import java.util.Objects;
 public abstract class Plugin {
 
     private static final String path = Plugin.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+    /**
+     * The plugin author
+     */
+    private String author;
+
+    /**
+     * The plugin version
+     */
+    private Version version;
 
     /**
      * The plugin name
@@ -47,12 +57,16 @@ public abstract class Plugin {
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
      * @param name the plugin name
+     * @param author the plugin author
+     * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link LoadCommand.PluginClassLoader}
      */
-    public Plugin(String name) {
+    public Plugin(String name, String author, Version version) {
         if (!(this.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
             throw new PluginLoaderException(name);
         this.name = name;
+        this.author = author;
+        this.version = version;
         if (!getDefaultFolder().exists())
             getDefaultFolder().mkdirs();
         config = new File(getDefaultFolder(), "config.yml");
@@ -168,5 +182,13 @@ public abstract class Plugin {
                 }
             }
         }
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public Version getVersion() {
+        return version;
     }
 }

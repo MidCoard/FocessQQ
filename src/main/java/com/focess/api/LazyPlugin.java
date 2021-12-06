@@ -1,6 +1,8 @@
 package com.focess.api;
 
 
+import com.focess.api.util.version.Version;
+
 /**
  * This is lazy version of the plugin.
  * Do not need to implement {@link Plugin#enable()} and {@link Plugin#disable()}
@@ -15,8 +17,8 @@ public abstract class LazyPlugin extends Plugin{
      * @param name the plugin name
      * @throws com.focess.api.exceptions.PluginLoaderException if the classloader of the plugin is not {@link com.focess.core.commands.LoadCommand.PluginClassLoader}
      */
-    public LazyPlugin(String name) {
-        super(name);
+    public LazyPlugin(String name, String author, Version version) {
+        super(name,author, version);
     }
 
     /**

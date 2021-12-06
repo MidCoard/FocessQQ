@@ -1,6 +1,6 @@
 package com.focess.core.util.option;
 
-import com.focess.core.util.option.optiontype.OptionType;
+import com.focess.core.util.option.type.OptionType;
 
 public class OptionParserClassifier {
 

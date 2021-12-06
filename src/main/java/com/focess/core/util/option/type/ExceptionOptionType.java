@@ -1,4 +1,4 @@
-package com.focess.core.util.option.optiontype;
+package com.focess.core.util.option.type;
 
 
 public abstract class ExceptionOptionType<T> extends OptionType<T> {

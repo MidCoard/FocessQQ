@@ -21,6 +21,7 @@ import com.focess.api.util.CombinedFuture;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.Pair;
 import com.focess.api.util.logger.FocessLogger;
+import com.focess.api.util.version.Version;
 import com.focess.core.bot.SimpleBotManager;
 import com.focess.core.commands.*;
 import com.focess.core.listener.ChatListener;
@@ -29,9 +30,9 @@ import com.focess.core.net.*;
 import com.focess.core.util.option.Option;
 import com.focess.core.util.option.OptionParserClassifier;
 import com.focess.core.util.option.Options;
-import com.focess.core.util.option.optiontype.IntegerOptionType;
-import com.focess.core.util.option.optiontype.LongOptionType;
-import com.focess.core.util.option.optiontype.OptionType;
+import com.focess.core.util.option.type.IntegerOptionType;
+import com.focess.core.util.option.type.LongOptionType;
+import com.focess.core.util.option.type.OptionType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -50,6 +51,16 @@ import java.util.concurrent.*;
 import java.util.zip.GZIPOutputStream;
 
 public class Main {
+
+    /**
+     * Stable version of Focess
+     */
+    private static final Version STABLE = new Version(3,0,1);
+
+    /**
+     * Nightly version of Focess
+     */
+    private static final Version NIGHTLY = new Version(3,0,1,"1001");
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
@@ -233,6 +244,14 @@ public class Main {
     @Nullable
     public static ServerMultiReceiver getUdpServerMultiReceiver() {
         return udpServerMultiReceiver;
+    }
+
+    public static Version getNightly() {
+        return NIGHTLY;
+    }
+
+    public static Version getStable() {
+        return STABLE;
     }
 
     /**
@@ -480,7 +499,7 @@ public class Main {
         private static Map<String, Object> properties;
 
         public MainPlugin() {
-            super("MainPlugin");
+            super("MainPlugin","MidCoard",Version.DEFAULT_VERSION);
             if (running) {
                 Main.getLogger().fatal("Run more that one MainPlugin. Force shutdown!");
                 Main.exit();

@@ -5,17 +5,20 @@ import com.focess.api.Plugin;
 import com.focess.api.annotation.CommandType;
 import com.focess.api.annotation.PluginType;
 import com.focess.api.command.Command;
+import com.focess.api.command.CommandPermission;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
+import com.focess.api.event.EventManager;
 import com.focess.api.event.ListenerHandler;
+import com.focess.api.event.plugin.PluginLoadEvent;
 import com.focess.api.exceptions.*;
 import com.focess.api.util.IOHandler;
+import com.focess.api.util.version.Version;
 import com.focess.api.util.yaml.YamlConfiguration;
 import com.focess.core.commands.util.AnnotationHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -189,12 +192,16 @@ public class LoadCommand extends Command {
     }
 
     public static class PluginClassLoader extends URLClassLoader {
-        private static Field PLUGIN_NAME_FIELD,CONFIGURATION_FIELD,CONFIG_FIELD,COMMAND_NAME_FIELD,COMMAND_ALIASES_FIELD,INITIALIZE_FIELD;
+        private static Field PLUGIN_NAME_FIELD,PLUGIN_VERSION_FIELD,PLUGIN_AUTHOR_FIELD,CONFIGURATION_FIELD,CONFIG_FIELD,COMMAND_NAME_FIELD,COMMAND_ALIASES_FIELD,INITIALIZE_FIELD;
 
         static {
             try {
                 PLUGIN_NAME_FIELD = Plugin.class.getDeclaredField("name");
                 PLUGIN_NAME_FIELD.setAccessible(true);
+                PLUGIN_VERSION_FIELD = Plugin.class.getDeclaredField("version");
+                PLUGIN_VERSION_FIELD.setAccessible(true);
+                PLUGIN_AUTHOR_FIELD = Plugin.class.getDeclaredField("author");
+                PLUGIN_AUTHOR_FIELD.setAccessible(true);
                 CONFIGURATION_FIELD = Plugin.class.getDeclaredField("configuration");
                 CONFIGURATION_FIELD.setAccessible(true);
                 CONFIG_FIELD = Plugin.class.getDeclaredField("config");
@@ -236,6 +243,8 @@ public class LoadCommand extends Command {
                     if (!((PluginType) annotation).name().isEmpty()) {
                         String name = ((PluginType) annotation).name();
                         PLUGIN_NAME_FIELD.set(plugin,name);
+                        PLUGIN_AUTHOR_FIELD.set(plugin,((PluginType) annotation).author());
+                        PLUGIN_VERSION_FIELD.set(plugin,new Version(((PluginType) annotation).version()));
                         if (!plugin.getDefaultFolder().exists())
                             if (!plugin.getDefaultFolder().mkdirs())
                                 Main.getLogger().debug("Create Default Folder Failed");
@@ -274,7 +283,7 @@ public class LoadCommand extends Command {
                         if (!commandType.name().isEmpty()){
                             COMMAND_NAME_FIELD.set(command,commandType.name());
                             COMMAND_ALIASES_FIELD.set(command,Lists.newArrayList(commandType.aliases()));
-                            command.setPermission(MemberPermission.MEMBER);
+                            command.setPermission(CommandPermission.MEMBER);
                             command.setExecutorPermission(i->true);
                             if (!INITIALIZE_FIELD.getBoolean(command)) {
                                 try {
@@ -351,6 +360,12 @@ public class LoadCommand extends Command {
                             }
                         }
                         AFTER_PLUGINS_MAP.remove(plugin.getName());
+                        PluginLoadEvent pluginLoadEvent = new PluginLoadEvent(plugin);
+                        try {
+                            EventManager.submit(pluginLoadEvent);
+                        } catch (EventSubmitException e) {
+                            Main.getLogger().thr("Submit Plugin Load Exception",e);
+                        }
                     }
                     Main.getLogger().debug("Load Plugins Depended On This.");
                 } catch (Exception e) {
