@@ -42,7 +42,7 @@ public class YamlConfiguration implements SectionMap {
             reader.close();
             return yamlConfiguration;
         } catch (IOException e) {
-            Main.getLogger().thr("Load Config File Exception",e);
+            Main.getLogger().thr("Load File Exception",e);
         }
         return null;
     }
@@ -77,6 +77,8 @@ public class YamlConfiguration implements SectionMap {
     @Override
     public <T> T get(String key) {
         Object value = SectionMap.super.get(key);
+        if (value == null)
+            return null;
         if (value.getClass().isPrimitive() || value.getClass().equals(Double.class) || value.getClass().equals(Float.class) || value.getClass().equals(Short.class) || value.getClass().equals(Character.class) || value.getClass().equals(Long.class) || value.getClass().equals(Integer.class) || value.getClass().equals(Boolean.class) || value.getClass().equals(Byte.class))
             return (T) value;
         else {
@@ -110,7 +112,7 @@ public class YamlConfiguration implements SectionMap {
         try {
             YAML.dump(this.values, new FileWriter(file));
         } catch (IOException e) {
-            Main.getLogger().thr("Save Config File Exception",e);
+            Main.getLogger().thr("Save File Exception",e);
         }
     }
 

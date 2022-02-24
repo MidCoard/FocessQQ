@@ -280,6 +280,7 @@ public class CommandSender {
      *
      * @return the bot
      */
+    @Nullable
     public Bot getBot() {
         return bot;
     }

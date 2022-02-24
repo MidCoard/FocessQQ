@@ -4,13 +4,11 @@ import com.focess.Main;
 import com.focess.api.Plugin;
 import com.focess.api.annotation.CommandType;
 import com.focess.api.annotation.PluginType;
-import com.focess.api.command.Command;
-import com.focess.api.command.CommandPermission;
-import com.focess.api.command.CommandResult;
-import com.focess.api.command.CommandSender;
+import com.focess.api.command.*;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.event.plugin.PluginLoadEvent;
+import com.focess.api.event.plugin.PluginUnloadEvent;
 import com.focess.api.exceptions.*;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.version.Version;
@@ -102,10 +100,12 @@ public class LoadCommand extends Command {
      *
      * @param plugin the plugin need to be disabled
      */
-    public static void disablePlugin(Plugin plugin) {
+    public static File disablePlugin(Plugin plugin) {
         Main.getLogger().debug("Start Disable Plugin " + plugin.getName());
         ListenerHandler.unregisterPlugin(plugin);
         Main.getLogger().debug("Unregister Event Listener.");
+        DataCollection.unregisterBuffers(plugin);
+        Main.getLogger().debug("Unregister DataConverter.");
         Command.unregister(plugin);
         Main.getLogger().debug("Unregister Command.");
         try {
@@ -118,16 +118,27 @@ public class LoadCommand extends Command {
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
         NAME_PLUGIN_MAP.remove(plugin.getName());
         Main.getLogger().debug("Remove Plugin.");
+        File ret = null;
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
                 PluginClassLoader loader = LOADER_MAP.remove(plugin);
-                if (loader != null)
+                LOADERS.remove(loader);
+                if (loader != null) {
+                    ret = loader.file;
                     loader.close();
+                }
             } catch (IOException e) {
                 Main.getLogger().thr("Remove Plugin Loader Exception", e);
             }
         Main.getLogger().debug("Remove Plugin Loader.");
         Main.getLogger().debug("End Disable Plugin " + plugin.getName());
+        PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
+        try {
+            EventManager.submit(pluginUnloadEvent);
+        } catch (EventSubmitException e) {
+            Main.getLogger().thr("Submit Plugin Unload Exception",e);
+        }
+        return ret;
     }
 
     /**
@@ -140,6 +151,25 @@ public class LoadCommand extends Command {
     @Nullable
     public static Plugin getPlugin(String name) {
         return NAME_PLUGIN_MAP.get(name);
+    }
+
+    public static boolean reloadPlugin(Plugin plugin) {
+        if (plugin == Main.getMainPlugin())
+            return false;
+        File pluginFile = disablePlugin(plugin);
+        PluginClassLoader classLoader;
+        try {
+            classLoader = new PluginClassLoader(pluginFile);
+            if (classLoader.load())
+                return true;
+            else {
+                classLoader.close();
+                return false;
+            }
+        } catch (Exception e) {
+            Main.getLogger().thr("Plugin Reload Exception", e);
+            return false;
+        }
     }
 
     @Override
@@ -191,8 +221,31 @@ public class LoadCommand extends Command {
         }
     }
 
+    /**
+     * Get the plugin of the loaded class
+     *
+     * @param clazz the class
+     * @return the target plugin, @null if the class is loaded by default classloader
+     */
+    @Nullable
+    public static Plugin getClassLoadedBy(Class<?> clazz) {
+        if (clazz.getClassLoader() instanceof PluginClassLoader)
+            for (PluginClassLoader pluginClassLoader : LOADERS)
+                if (pluginClassLoader.loadedClasses.contains(clazz))
+                    return pluginClassLoader.plugins.stream().findAny().get();
+        return null;
+    }
+
+
     public static class PluginClassLoader extends URLClassLoader {
-        private static Field PLUGIN_NAME_FIELD,PLUGIN_VERSION_FIELD,PLUGIN_AUTHOR_FIELD,CONFIGURATION_FIELD,CONFIG_FIELD,COMMAND_NAME_FIELD,COMMAND_ALIASES_FIELD,INITIALIZE_FIELD;
+        private static Field PLUGIN_NAME_FIELD,
+                PLUGIN_VERSION_FIELD,
+                PLUGIN_AUTHOR_FIELD,
+                CONFIGURATION_FIELD,
+                CONFIG_FIELD,
+                COMMAND_NAME_FIELD,
+                COMMAND_ALIASES_FIELD,
+                INITIALIZE_FIELD;
 
         static {
             try {
@@ -348,6 +401,10 @@ public class LoadCommand extends Command {
                     for (Class<?> c : loadedClasses)
                         analyseClass(c);
                     Main.getLogger().debug("Analyse All Non-Plugin Classes.");
+                    if (plugins.size() == 0) {
+                        Main.getLogger().debug("No Plugin Found.");
+                        return false;
+                    }
                     for (Plugin plugin : plugins) {
                         LOADER_MAP.put(plugin, this);
                         for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
@@ -370,6 +427,11 @@ public class LoadCommand extends Command {
                     Main.getLogger().debug("Load Plugins Depended On This.");
                 } catch (Exception e) {
                     Main.getLogger().thr("Plugin Class Load Exception", e);
+                    for (Plugin plugin : plugins) {
+                        Command.unregister(plugin);
+                        DataCollection.unregisterBuffers(plugin);
+                        LOADER_MAP.remove(plugin);
+                    }
                     LOADERS.remove(this);
                     return false;
                 }
@@ -429,5 +491,9 @@ public class LoadCommand extends Command {
             }
             throw new ClassNotFoundException(desc.getName());
         }
+    }
+
+    public static Class<?> forName(String name) throws ClassNotFoundException {
+        return DEFAULT_CLASS_LOADER.loadClass(name, false);
     }
 }

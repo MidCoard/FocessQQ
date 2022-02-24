@@ -1,9 +1,13 @@
 package com.focess.api.util;
 
 import com.focess.Main;
+import com.focess.api.Plugin;
 import com.focess.api.exceptions.InputTimeoutException;
+import com.focess.core.commands.LoadCommand;
 import com.focess.core.listener.ConsoleListener;
 import org.jetbrains.annotations.Nullable;
+import sun.reflect.CallerSensitive;
+import sun.reflect.Reflection;
 
 import java.util.Arrays;
 
@@ -50,6 +54,19 @@ public abstract class IOHandler {
      * @param output output String
      */
     public abstract void output(String output);
+
+    /**
+     * Used to output formatted language key
+     *
+     * @param key the language key
+     */
+    @CallerSensitive
+    public void outputLang(String key,Object... objects) {
+        Plugin plugin = LoadCommand.getClassLoadedBy(Reflection.getCallerClass());
+        if (plugin == null)
+            output(String.format(Main.getLangConfig().get(key), objects));
+        else output(String.format(plugin.getLangConfig().get(key), objects));
+    }
 
     /**
      * Used to get input String

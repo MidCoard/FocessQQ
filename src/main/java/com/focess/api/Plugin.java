@@ -6,10 +6,15 @@ import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.PluginLoaderException;
+import com.focess.api.plugin.PluginDescription;
+import com.focess.api.util.config.DefaultConfig;
+import com.focess.api.util.config.LangConfig;
 import com.focess.api.util.version.Version;
 import com.focess.api.util.yaml.YamlConfiguration;
 import com.focess.core.commands.LoadCommand;
+import com.focess.core.util.MethodCaller;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,12 +48,29 @@ public abstract class Plugin {
     /**
      * The plugin configuration stored in YAML
      */
+    @Deprecated
     private YamlConfiguration configuration;
 
     /**
      * The plugin configuration file
      */
+    @Deprecated
     private File config;
+
+    /**
+     * The plugin language config
+     */
+    private LangConfig langConfig;
+
+    /**
+     * The plugin default config
+     */
+    private DefaultConfig defaultConfig;
+
+    /**
+     * The plugin description
+     */
+    private PluginDescription pluginDescription;
 
     private boolean initialized;
 
@@ -77,7 +99,9 @@ public abstract class Plugin {
                 Main.getLogger().thr("Create Config File Exception",e);
             }
         }
-        configuration = YamlConfiguration.loadFile(getConfigFile());
+        configuration = YamlConfiguration.loadFile(config);
+        defaultConfig = new DefaultConfig(config);
+        langConfig = new LangConfig(new File(getDefaultFolder(),"lang.yml"));
     }
 
     /**
@@ -109,6 +133,11 @@ public abstract class Plugin {
      */
     public static Plugin getPlugin(String name) {
         return LoadCommand.getPlugin(name);
+    }
+
+    @Nullable
+    public static Plugin thisPlugin() {
+        return LoadCommand.getClassLoadedBy(MethodCaller.getCallerClass());
     }
 
     @NotNull
@@ -190,5 +219,17 @@ public abstract class Plugin {
 
     public Version getVersion() {
         return version;
+    }
+
+    public LangConfig getLangConfig() {
+        return langConfig;
+    }
+
+    public DefaultConfig getDefaultConfig() {
+        return defaultConfig;
+    }
+
+    public PluginDescription getPluginDescription() {
+        return pluginDescription;
     }
 }

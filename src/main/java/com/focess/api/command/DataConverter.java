@@ -1,11 +1,49 @@
 package com.focess.api.command;
 
+import java.util.function.Predicate;
+
 /**
  * This class used to convert String data to target T type data.
  *
  * @param <T> target type
  */
 public abstract class DataConverter<T> {
+
+    /**
+     * It is a Predicate used to predicate a String is an Integer
+     */
+    public static final Predicate<String> INTEGER_PREDICATE = i -> {
+        try {
+            Integer.parseInt(i);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    };
+
+    /**
+     * It is a Predicate used to predicate a String is a Double
+     */
+    public static final Predicate<String> DOUBLE_PREDICATE = i -> {
+        try {
+            Double.parseDouble(i);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    };
+
+    /**
+     * It is a Predicate used to predicate a String is a Long
+     */
+    public static final Predicate<String> LONG_PREDICATE = i -> {
+        try {
+            Long.parseLong(i);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    };
 
     /**
      * Never convert it! Put them into DataCollection with their original values.
@@ -34,7 +72,7 @@ public abstract class DataConverter<T> {
     public static final DataConverter<Integer> INTEGER_DATA_CONVERTER = new DataConverter<Integer>() {
         @Override
         protected boolean accept(String arg) {
-            return TabCompleter.INTEGER_PREDICATE.test(arg);
+            return INTEGER_PREDICATE.test(arg);
         }
 
         @Override
@@ -54,7 +92,7 @@ public abstract class DataConverter<T> {
     public static final DataConverter<Long> LONG_DATA_CONVERTER = new DataConverter<Long>() {
         @Override
         protected boolean accept(String arg) {
-            return TabCompleter.LONG_PREDICATE.test(arg);
+            return LONG_PREDICATE.test(arg);
         }
 
         @Override
@@ -74,7 +112,7 @@ public abstract class DataConverter<T> {
     public static final DataConverter<Double> DOUBLE_DATA_CONVERTER = new DataConverter<Double>() {
         @Override
         protected boolean accept(String s) {
-            return TabCompleter.DOUBLE_PREDICATE.test(s);
+            return DOUBLE_PREDICATE.test(s);
         }
 
         @Override

@@ -1,11 +1,18 @@
 package com.focess.api.command;
 
 import com.focess.api.Plugin;
+import com.focess.api.command.data.BooleanBuffer;
+import com.focess.api.command.data.DataBuffer;
+import com.focess.api.command.data.PluginBuffer;
 import com.focess.api.command.data.StringBuffer;
-import com.focess.api.command.data.*;
+import com.focess.api.util.Pair;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import java.nio.*;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,7 +20,7 @@ import java.util.Map;
  */
 public class DataCollection {
 
-    private static final Map<Class<?>, BufferGetter> registeredBuffers = Maps.newHashMap();
+    private static final Map<Plugin, List<Pair<Class<?>, BufferGetter>>> registeredBuffers = Maps.newConcurrentMap();
     private final IntBuffer intBuffer;
     private final DoubleBuffer doubleBuffer;
     private final BooleanBuffer booleanBuffer;
@@ -34,19 +41,35 @@ public class DataCollection {
         this.booleanBuffer = BooleanBuffer.allocate(size);
         this.longBuffer = LongBuffer.allocate(size);
         this.pluginBuffer = PluginBuffer.allocate(size);
-        for (Class<?> c : registeredBuffers.keySet())
-            buffers.put(c, registeredBuffers.get(c).newBuffer(size));
+        for (Plugin plugin : registeredBuffers.keySet())
+            for (Pair<Class<?>,BufferGetter> pair : registeredBuffers.get(plugin))
+                buffers.put(pair.getKey(), pair.getValue().newBuffer(size));
     }
 
     /**
-     * Register the getter of the buffer
+     * Register the getter of the buffer by plugin
      *
+     * @param plugin the plugin
      * @param c the class type of the buffer's elements.
      * @param bufferGetter the getter of the buffer
      */
-    public static void registerBuffer(Class<?> c, BufferGetter bufferGetter) {
-        registeredBuffers.put(c, bufferGetter);
+    public static void registerBuffer(Plugin plugin,Class<?> c, BufferGetter bufferGetter) {
+        registeredBuffers.compute(plugin, (k, v) -> {
+            if (v == null)
+                v = Lists.newArrayList();
+            v.add(Pair.of(c, bufferGetter));
+            return v;
+        });
     }
+
+    /**
+     * Unregister the getter of the buffers by plugin
+     * @param plugin the plugin
+     */
+    public static void unregisterBuffers(Plugin plugin) {
+        registeredBuffers.remove(plugin);
+    }
+
 
     /**
      * Flip all the buffers. Make them all readable.

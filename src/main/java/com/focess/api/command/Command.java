@@ -286,7 +286,7 @@ public abstract class Command {
         private final String[] subCommands;
         private final Map<CommandResult, CommandResultExecutor> results = Maps.newHashMap();
         private final CommandExecutor executor;
-        private MemberPermission permission = MemberPermission.MEMBER;
+        private CommandPermission permission = CommandPermission.MEMBER;
         private DataConverter<?>[] dataConverters;
         private boolean useDefaultConverter = true;
         private Predicate<CommandSender> executorPermission;
@@ -346,10 +346,25 @@ public abstract class Command {
          * @return the Executor itself
          */
         @NotNull
+        @Deprecated
         public Executor setPermission(@NotNull MemberPermission permission) {
+            this.permission = CommandPermission.toCommandPermission(permission);
+            return this;
+        }
+
+        /**
+         * Set the executor Mirai Permission
+         * (Only if the CommandSender has the command that this executor belongs to and this executor's permissions, this executor runs)
+         *
+         * @param permission the executor Mirai Permission
+         * @return the Executor itself
+         */
+        @NotNull
+        public Executor setPermission(@NotNull CommandPermission permission) {
             this.permission = permission;
             return this;
         }
+
 
         /**
          * Set the executor of the special CommandResult after executing this Executor

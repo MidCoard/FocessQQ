@@ -20,12 +20,14 @@ import com.focess.api.net.Socket;
 import com.focess.api.util.CombinedFuture;
 import com.focess.api.util.IOHandler;
 import com.focess.api.util.Pair;
+import com.focess.api.util.config.LangConfig;
 import com.focess.api.util.logger.FocessLogger;
 import com.focess.api.util.version.Version;
 import com.focess.core.bot.SimpleBotManager;
 import com.focess.core.commands.*;
 import com.focess.core.listener.ChatListener;
 import com.focess.core.listener.ConsoleListener;
+import com.focess.core.listener.PluginListener;
 import com.focess.core.net.*;
 import com.focess.core.util.option.Option;
 import com.focess.core.util.option.OptionParserClassifier;
@@ -53,14 +55,9 @@ import java.util.zip.GZIPOutputStream;
 public class Main {
 
     /**
-     * Stable version of Focess
+     * Version of Focess
      */
-    private static final Version STABLE = new Version(3,0,1);
-
-    /**
-     * Nightly version of Focess
-     */
-    private static final Version NIGHTLY = new Version(3,0,1,"1001");
+    private static final Version VERSION = new Version(3,0,2,"1001");
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
@@ -80,6 +77,9 @@ public class Main {
      */
     private static final long AUTHOR_ID = 2624646185L;
 
+    /**
+     * The Main Plugin Instance
+     */
     private static MainPlugin MAIN_PLUGIN;
 
     /**
@@ -246,12 +246,12 @@ public class Main {
         return udpServerMultiReceiver;
     }
 
-    public static Version getNightly() {
-        return NIGHTLY;
+    public static Version getVersion() {
+        return VERSION;
     }
 
-    public static Version getStable() {
-        return STABLE;
+    public static Plugin getMainPlugin() {
+        return MAIN_PLUGIN;
     }
 
     /**
@@ -382,7 +382,6 @@ public class Main {
         option = options.get("server");
         if (option != null) {
             if (sidedOption == null)
-
                 try {
                     FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
                     focessSocket.registerReceiver(serverReceiver = new FocessReceiver(focessSocket));
@@ -488,6 +487,10 @@ public class Main {
         }
     }
 
+    public static LangConfig getLangConfig() {
+        return MAIN_PLUGIN.getLangConfig();
+    }
+
     /**
      *
      * The MainPlugin Plugin is a core plugin in Bot. It will initialize all default settings and make the Bot login.
@@ -517,6 +520,7 @@ public class Main {
             running = true;
             this.registerListener(new ConsoleListener());
             this.registerListener(new ChatListener());
+            this.registerListener(new PluginListener());
             Main.getLogger().debug("Register default listeners.");
             properties = getConfig().getValues();
             if (properties == null)
@@ -528,6 +532,7 @@ public class Main {
             Command.register(this, new FriendCommand());
             Command.register(this, new GroupCommand());
             Command.register(this,new BotCommand());
+            Command.register(this,new ReloadCommand());
             Main.getLogger().debug("Register default commands.");
             if (username == null || password == null)
                 requestAccountInformation();
