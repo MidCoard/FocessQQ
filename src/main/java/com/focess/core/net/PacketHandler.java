@@ -1,4 +1,4 @@
-package com.focess.api.annotation;
+package com.focess.core.net;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

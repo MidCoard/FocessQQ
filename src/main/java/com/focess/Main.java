@@ -534,8 +534,10 @@ public class Main {
             Command.register(this, new StopCommand());
             Command.register(this, new FriendCommand());
             Command.register(this, new GroupCommand());
-            Command.register(this,new BotCommand());
-            Command.register(this,new ReloadCommand());
+            Command.register(this, new BotCommand());
+            Command.register(this, new ReloadCommand());
+            Command.register(this, new CommandCommand());
+            Command.register(this, new PluginCommand());
             Main.getLogger().debug("Register default commands.");
             if (username == null || password == null)
                 requestAccountInformation();

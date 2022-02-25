@@ -133,6 +133,7 @@ public abstract class Command {
      * @throws com.focess.api.exceptions.CommandDuplicateException if the command name already exists in the registered commands
      */
     public static void register(@NotNull Plugin plugin, @NotNull final Command command) {
+        //todo if no name throw CommandLoadException
         if (COMMANDS_MAP.containsKey(command.getName()))
             throw new CommandDuplicateException(command.getName());
         command.registered = true;

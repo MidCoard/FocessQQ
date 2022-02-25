@@ -1,10 +1,8 @@
 package com.focess.api.command;
 
-import com.focess.api.plugin.Plugin;
-import com.focess.api.command.data.BooleanBuffer;
-import com.focess.api.command.data.DataBuffer;
-import com.focess.api.command.data.PluginBuffer;
+import com.focess.api.command.data.*;
 import com.focess.api.command.data.StringBuffer;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -27,6 +25,7 @@ public class DataCollection {
     private final LongBuffer longBuffer;
     private final StringBuffer defaultBuffer;
     private final PluginBuffer pluginBuffer;
+    private final CommandBuffer commandBuffer;
     private final Map<Class<?>, DataBuffer> buffers = Maps.newHashMap();
 
     /**
@@ -35,12 +34,14 @@ public class DataCollection {
      * @param size the arguments size
      */
     public DataCollection(int size) {
+        //todo fix memory unused!
         this.defaultBuffer = StringBuffer.allocate(size);
         this.intBuffer = IntBuffer.allocate(size);
         this.doubleBuffer = DoubleBuffer.allocate(size);
         this.booleanBuffer = BooleanBuffer.allocate(size);
         this.longBuffer = LongBuffer.allocate(size);
         this.pluginBuffer = PluginBuffer.allocate(size);
+        this.commandBuffer = CommandBuffer.allocate(size);
         for (Plugin plugin : PLUGIN_BUFFER_MAP.keySet())
             for (Pair<Class<?>,BufferGetter> pair : PLUGIN_BUFFER_MAP.get(plugin))
                 buffers.put(pair.getKey(), pair.getValue().newBuffer(size));
@@ -81,13 +82,14 @@ public class DataCollection {
     /**
      * Flip all the buffers. Make them all readable.
      */
-    public void flip() {
+    void flip() {
         this.defaultBuffer.flip();
         this.intBuffer.flip();
         this.doubleBuffer.flip();
         this.booleanBuffer.flip();
         this.longBuffer.flip();
         this.pluginBuffer.flip();
+        this.commandBuffer.flip();
         for (Class<?> c : buffers.keySet())
             buffers.get(c).flip();
     }
@@ -198,6 +200,22 @@ public class DataCollection {
      */
     public Plugin getPlugin() {
         return this.pluginBuffer.get();
+    }
+
+    /**
+     * Get Command argument in order
+     * @return the Command argument in order
+     */
+    public Command getCommand() {
+        return this.commandBuffer.get();
+    }
+
+    /**
+     * Write a Command argument
+     * @param command Command argument
+     */
+    public void writeCommand(Command command) {
+        this.commandBuffer.put(command);
     }
 
     /**

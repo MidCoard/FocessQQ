@@ -1,6 +1,5 @@
 package com.focess.core.net;
 
-import com.focess.api.annotation.PacketHandler;
 import com.focess.api.net.Client;
 import com.focess.api.net.PackHandler;
 import com.focess.api.net.ServerMultiReceiver;

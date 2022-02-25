@@ -59,6 +59,6 @@ public class ReloadCommand extends Command {
 
     @Override
     public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: reload <path>");
+        ioHandler.output("Use: reload <plugin>");
     }
 }

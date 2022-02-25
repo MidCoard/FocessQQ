@@ -1,7 +1,6 @@
 package com.focess.core.net;
 
 import com.focess.Main;
-import com.focess.api.annotation.PacketHandler;
 import com.focess.api.net.Socket;
 import com.focess.api.net.PacketPreCodec;
 import com.focess.api.net.Receiver;
