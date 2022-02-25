@@ -2,6 +2,7 @@ package com.focess.api.plugin;
 
 
 import com.focess.api.util.version.Version;
+import com.focess.core.plugin.PluginClassLoader;
 
 /**
  * This is lazy version of the plugin.
@@ -15,7 +16,7 @@ public abstract class LazyPlugin extends Plugin{
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
      * @param name the plugin name
-     * @throws com.focess.api.exceptions.PluginLoaderException if the classloader of the plugin is not {@link com.focess.core.commands.LoadCommand.PluginClassLoader}
+     * @throws com.focess.api.exceptions.PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
     public LazyPlugin(String name, String author, Version version) {
         super(name,author, version);

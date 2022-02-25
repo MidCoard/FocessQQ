@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class DataCollection {
 
-    private static final Map<Plugin, List<Pair<Class<?>, BufferGetter>>> registeredBuffers = Maps.newConcurrentMap();
+    private static final Map<Plugin, List<Pair<Class<?>, BufferGetter>>> PLUGIN_BUFFER_MAP = Maps.newConcurrentMap();
     private final IntBuffer intBuffer;
     private final DoubleBuffer doubleBuffer;
     private final BooleanBuffer booleanBuffer;
@@ -41,8 +41,8 @@ public class DataCollection {
         this.booleanBuffer = BooleanBuffer.allocate(size);
         this.longBuffer = LongBuffer.allocate(size);
         this.pluginBuffer = PluginBuffer.allocate(size);
-        for (Plugin plugin : registeredBuffers.keySet())
-            for (Pair<Class<?>,BufferGetter> pair : registeredBuffers.get(plugin))
+        for (Plugin plugin : PLUGIN_BUFFER_MAP.keySet())
+            for (Pair<Class<?>,BufferGetter> pair : PLUGIN_BUFFER_MAP.get(plugin))
                 buffers.put(pair.getKey(), pair.getValue().newBuffer(size));
     }
 
@@ -53,8 +53,8 @@ public class DataCollection {
      * @param c the class type of the buffer's elements.
      * @param bufferGetter the getter of the buffer
      */
-    public static void registerBuffer(Plugin plugin,Class<?> c, BufferGetter bufferGetter) {
-        registeredBuffers.compute(plugin, (k, v) -> {
+    public static void register(Plugin plugin, Class<?> c, BufferGetter bufferGetter) {
+        PLUGIN_BUFFER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
             v.add(Pair.of(c, bufferGetter));
@@ -66,8 +66,15 @@ public class DataCollection {
      * Unregister the getter of the buffers by plugin
      * @param plugin the plugin
      */
-    public static void unregisterBuffers(Plugin plugin) {
-        registeredBuffers.remove(plugin);
+    public static void unregister(Plugin plugin) {
+        PLUGIN_BUFFER_MAP.remove(plugin);
+    }
+
+    /**
+     * Unregister all the getter of the buffers
+     */
+    public static void unregisterAll() {
+        PLUGIN_BUFFER_MAP.clear();
     }
 
 

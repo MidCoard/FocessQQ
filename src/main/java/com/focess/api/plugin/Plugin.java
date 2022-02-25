@@ -209,7 +209,7 @@ public abstract class Plugin {
      * @param listener the listener need to be registered
      */
     public void registerListener(Listener listener) {
-        ListenerHandler.addListener(this, listener);
+        ListenerHandler.register(this, listener);
         for (Method method : listener.getClass().getDeclaredMethods()) {
             EventHandler handler;
             if ((handler = method.getAnnotation(EventHandler.class)) != null) {
@@ -222,7 +222,7 @@ public abstract class Plugin {
                             field.setAccessible(true);
                             ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
                             field.setAccessible(flag);
-                            listenerHandler.registerListener(listener, method, handler);
+                            listenerHandler.register(listener, method, handler);
                         } catch (Exception ignored) {
                         }
                     }

@@ -252,9 +252,9 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public static File disablePlugin(Plugin plugin) {
         Main.getLogger().debug("Start Disable Plugin " + plugin.getName());
-        ListenerHandler.unregisterPlugin(plugin);
+        ListenerHandler.unregister(plugin);
         Main.getLogger().debug("Unregister Event Listener.");
-        DataCollection.unregisterBuffers(plugin);
+        DataCollection.unregister(plugin);
         Main.getLogger().debug("Unregister DataConverter.");
         Command.unregister(plugin);
         Main.getLogger().debug("Unregister Command.");
@@ -403,7 +403,7 @@ public class PluginClassLoader extends URLClassLoader {
             } catch (Exception e) {
                 Main.getLogger().thr("Plugin Class Load Exception", e);
                 Command.unregister(plugin);
-                DataCollection.unregisterBuffers(plugin);
+                DataCollection.unregister(plugin);
                 LOADER_MAP.remove(plugin);
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;

@@ -1,7 +1,6 @@
 package com.focess.core.plugin;
 
 import com.focess.api.plugin.Plugin;
-import com.focess.core.commands.LoadCommand;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +8,7 @@ import java.util.List;
 
 public class PluginCoreClassLoader extends ClassLoader {
 
-    public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(LoadCommand.class.getClassLoader());
+    public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(PluginCoreClassLoader.class.getClassLoader());
     public static final List<PluginClassLoader> LOADERS = Lists.newCopyOnWriteArrayList();
 
     public PluginCoreClassLoader(ClassLoader parent) {

@@ -1,5 +1,7 @@
 package com.focess;
 
+import com.focess.api.command.DataCollection;
+import com.focess.api.event.ListenerHandler;
 import com.focess.api.plugin.Plugin;
 import com.focess.api.bot.Bot;
 import com.focess.api.bot.BotManager;
@@ -568,6 +570,9 @@ public class Main {
                     } catch (Exception e) {
                         Main.getLogger().thr("Unload Target Plugin Exception",e);
                     }
+            Command.unregisterAll();
+            ListenerHandler.unregisterAll();
+            DataCollection.unregisterAll();
             Main.getLogger().debug("Unload all loaded plugins without MainPlugin.");
             SimpleBotManager.disableAllBotsAndExit();
             Main.getLogger().debug("Close all logined bots.");

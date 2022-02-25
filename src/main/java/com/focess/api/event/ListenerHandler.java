@@ -31,12 +31,12 @@ public class ListenerHandler {
      *
      * @param plugin the plugin which need to unregister all its listeners
      */
-    public static void unregisterPlugin(Plugin plugin) {
+    public static void unregister(Plugin plugin) {
         List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
         for (ListenerHandler handler : LISTENER_HANDLER_LIST)
             for (Listener listener : listeners) {
                 LISTENER_PLUGIN_MAP.remove(listener);
-                handler.unregisterListener(listener);
+                handler.unregister(listener);
             }
         PLUGIN_LISTENER_MAP.remove(plugin);
     }
@@ -47,7 +47,7 @@ public class ListenerHandler {
      * @param plugin the plugin
      * @param listener the listener
      */
-    public static void addListener(Plugin plugin, Listener listener) {
+    public static void register(Plugin plugin, Listener listener) {
         PLUGIN_LISTENER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
@@ -62,9 +62,27 @@ public class ListenerHandler {
      *
      * @param listener the listener need to be unregistered
      */
-    public void unregisterListener(Listener listener) {
+    public void unregister(Listener listener) {
         listeners.remove(listener);
     }
+
+    /**
+     * Unregister all listeners
+     *
+     */
+    public static void unregisterAll() {
+        for (Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
+            List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
+            for (ListenerHandler handler : LISTENER_HANDLER_LIST)
+                for (Listener listener : listeners) {
+                    LISTENER_PLUGIN_MAP.remove(listener);
+                    handler.unregister(listener);
+                }
+        }
+        PLUGIN_LISTENER_MAP.clear();
+    }
+
+
 
     /**
      * Register the listener
@@ -74,7 +92,7 @@ public class ListenerHandler {
      * @param handler the event handler
      * @param <T> the event type
      */
-    public <T extends Event> void registerListener(Listener listener, Method method, EventHandler handler) {
+    public <T extends Event> void register(Listener listener, Method method, EventHandler handler) {
         listeners.compute(listener, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
