@@ -69,7 +69,8 @@ public class ListenerHandler {
      * Unregister all listeners
      *
      */
-    public static void unregisterAll() {
+    public static boolean unregisterAll() {
+        boolean ret = !PLUGIN_LISTENER_MAP.isEmpty();
         for (Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
             List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
             for (ListenerHandler handler : LISTENER_HANDLER_LIST)
@@ -79,6 +80,7 @@ public class ListenerHandler {
                 }
         }
         PLUGIN_LISTENER_MAP.clear();
+        return ret;
     }
 
 

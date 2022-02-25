@@ -572,9 +572,12 @@ public class Main {
                     } catch (Exception e) {
                         Main.getLogger().thr("Unload Target Plugin Exception",e);
                     }
-            Command.unregisterAll();
-            ListenerHandler.unregisterAll();
-            DataCollection.unregisterAll();
+            if (Command.unregisterAll())
+                Main.getLogger().debug("Commands are not empty.");
+            if (ListenerHandler.unregisterAll())
+                Main.getLogger().debug("Listeners are not empty");
+            if (DataCollection.unregisterAll())
+                Main.getLogger().debug("Buffers are not empty.");
             Main.getLogger().debug("Unload all loaded plugins without MainPlugin.");
             SimpleBotManager.disableAllBotsAndExit();
             Main.getLogger().debug("Close all logined bots.");

@@ -74,8 +74,10 @@ public class DataCollection {
     /**
      * Unregister all the getter of the buffers
      */
-    public static void unregisterAll() {
+    public static boolean unregisterAll() {
+        boolean ret = !PLUGIN_BUFFER_MAP.isEmpty();
         PLUGIN_BUFFER_MAP.clear();
+        return ret;
     }
 
 

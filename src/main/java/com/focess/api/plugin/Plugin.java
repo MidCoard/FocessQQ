@@ -1,8 +1,10 @@
 package com.focess.api.plugin;
 
 import com.focess.Main;
-import com.focess.api.event.EventHandler;
+import com.focess.api.command.Command;
+import com.focess.api.command.DataCollection;
 import com.focess.api.event.Event;
+import com.focess.api.event.EventHandler;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.PluginLoaderException;
@@ -229,6 +231,24 @@ public abstract class Plugin {
                 }
             }
         }
+    }
+
+    /**
+     * Register the command
+     * @param command the command need to be registered
+     */
+    public void registerCommand(Command command) {
+        Command.register(this,command);
+    }
+
+    /**
+     * Register the getter of the buffer
+     *
+     * @param c the class type of the buffer's elements.
+     * @param bufferGetter the getter of the buffer
+     */
+    public void registerBuffer(Class<?> c, DataCollection.BufferGetter bufferGetter) {
+        DataCollection.register(this,c,bufferGetter);
     }
 
     public String getAuthor() {

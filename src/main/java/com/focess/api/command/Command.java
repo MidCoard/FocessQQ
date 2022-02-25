@@ -110,9 +110,11 @@ public abstract class Command {
     /**
      * Unregister all commands
      */
-    public static void unregisterAll() {
+    public static boolean unregisterAll() {
+        boolean ret = !COMMANDS_MAP.isEmpty();
         for (Command command : COMMANDS_MAP.values())
             command.unregister();
+        return ret;
     }
 
     /**
