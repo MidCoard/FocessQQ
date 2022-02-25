@@ -1,12 +1,13 @@
 package com.focess.core.commands;
 
 import com.focess.Main;
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandResult;
 import com.focess.api.command.CommandSender;
 import com.focess.api.command.converter.PluginDataConverter;
 import com.focess.api.util.IOHandler;
+import com.focess.core.plugin.PluginClassLoader;
 
 public class UnloadCommand extends Command {
     public UnloadCommand() {
@@ -22,12 +23,12 @@ public class UnloadCommand extends Command {
                 ioHandler.output("Can't unload the Main Plugin, if you want to stop the server use stop command.");
                 return CommandResult.REFUSE;
             }
-            if (!(plugin.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader)) {
+            if (!(plugin.getClass().getClassLoader() instanceof PluginClassLoader)) {
                 ioHandler.output("Plugin " + plugin.getName() + " is not loaded from PluginClassLoader");
                 return CommandResult.REFUSE;
             }
             ioHandler.output("Unload " + plugin.getName());
-            LoadCommand.disablePlugin(plugin);
+            PluginClassLoader.disablePlugin(plugin);
             return CommandResult.ALLOW;
         }).setDataConverters(PluginDataConverter.PLUGIN_DATA_CONVERTER);
     }

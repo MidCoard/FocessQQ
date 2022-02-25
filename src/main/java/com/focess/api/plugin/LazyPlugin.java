@@ -1,4 +1,4 @@
-package com.focess.api;
+package com.focess.api.plugin;
 
 
 import com.focess.api.util.version.Version;

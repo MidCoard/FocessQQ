@@ -1,6 +1,6 @@
 package com.focess.api.exceptions;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 
 /**
  * Thrown to indicate none-MainPlugin plugin is not loaded by PluginClassLoader

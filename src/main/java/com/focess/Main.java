@@ -1,6 +1,6 @@
 package com.focess;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.bot.Bot;
 import com.focess.api.bot.BotManager;
 import com.focess.api.command.Command;
@@ -29,6 +29,7 @@ import com.focess.core.listener.ChatListener;
 import com.focess.core.listener.ConsoleListener;
 import com.focess.core.listener.PluginListener;
 import com.focess.core.net.*;
+import com.focess.core.plugin.PluginClassLoader;
 import com.focess.core.util.option.Option;
 import com.focess.core.util.option.OptionParserClassifier;
 import com.focess.core.util.option.Options;
@@ -57,7 +58,7 @@ public class Main {
     /**
      * Version of Focess
      */
-    private static final Version VERSION = new Version(3,0,2,"1001");
+    private static final Version VERSION = new Version(3,0,3,"1001");
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
@@ -131,7 +132,7 @@ public class Main {
                 Main.getLogger().debug("Save log file.");
                 saveLogFile();
                 saved = true;
-                LoadCommand.disablePlugin(MAIN_PLUGIN);
+                PluginClassLoader.disablePlugin(MAIN_PLUGIN);
             }
         }
     };
@@ -260,7 +261,7 @@ public class Main {
      * @return all the loaded plugins
      */
     public static List<Plugin> getPlugins() {
-        return LoadCommand.getPlugins();
+        return PluginClassLoader.getPlugins();
     }
 
     /**
@@ -271,7 +272,7 @@ public class Main {
      */
     @Nullable
     public static Plugin getPlugin(String name) {
-        return LoadCommand.getPlugin(name);
+        return PluginClassLoader.getPlugin(name);
     }
 
     /**
@@ -282,7 +283,7 @@ public class Main {
      */
     @Nullable
     public static Plugin getPlugin(Class<? extends Plugin> cls) {
-        return LoadCommand.getPlugin(cls);
+        return PluginClassLoader.getPlugin(cls);
     }
 
     /**
@@ -302,7 +303,7 @@ public class Main {
             String str = IOHandler.getConsoleIoHandler().input();
             if (str.equals("stop")) {
                 //won't happen
-                if (LoadCommand.getPlugin(MainPlugin.class) != null)
+                if (PluginClassLoader.getPlugin(MainPlugin.class) != null)
                     Main.exit();
                 else {
                     Main.getLogger().debug("Save log file.");
@@ -362,7 +363,7 @@ public class Main {
             Main.getLogger().info("--udp <port>");
             Main.getLogger().info("--sided");
             Main.getLogger().info("--multi");
-            if (LoadCommand.getPlugin(MainPlugin.class) != null)
+            if (PluginClassLoader.getPlugin(MainPlugin.class) != null)
                 Main.exit();
             else {
                 Main.getLogger().debug("Save log file.");
@@ -441,7 +442,7 @@ public class Main {
             }
         }
         try {
-            LoadCommand.enablePlugin(new MainPlugin());
+            PluginClassLoader.enablePlugin(new MainPlugin());
             Main.getLogger().debug("Load MainPlugin.");
         } catch (Exception e) {
             if (e instanceof PluginLoadException && e.getCause() != null && e.getCause() instanceof BotLoginException) {
@@ -460,7 +461,7 @@ public class Main {
             Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
             System.exit(0);
         }, 5, TimeUnit.SECONDS);
-        LoadCommand.disablePlugin(MAIN_PLUGIN);
+        PluginClassLoader.disablePlugin(MAIN_PLUGIN);
     }
 
     private static void saveLogFile() {
@@ -563,7 +564,7 @@ public class Main {
             for (Plugin plugin : Main.getPlugins())
                 if (!plugin.equals(this))
                     try {
-                        LoadCommand.disablePlugin(plugin);
+                        PluginClassLoader.disablePlugin(plugin);
                     } catch (Exception e) {
                         Main.getLogger().thr("Unload Target Plugin Exception",e);
                     }

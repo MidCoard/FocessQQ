@@ -1,4 +1,4 @@
-package com.focess.api;
+package com.focess.api.plugin;
 
 import com.focess.Main;
 import com.focess.api.annotation.EventHandler;
@@ -6,21 +6,23 @@ import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.exceptions.PluginLoaderException;
-import com.focess.api.plugin.PluginDescription;
 import com.focess.api.util.config.DefaultConfig;
 import com.focess.api.util.config.LangConfig;
 import com.focess.api.util.version.Version;
 import com.focess.api.util.yaml.YamlConfiguration;
-import com.focess.core.commands.LoadCommand;
+import com.focess.core.plugin.PluginClassLoader;
+import com.focess.core.plugin.PluginCoreClassLoader;
 import com.focess.core.util.MethodCaller;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
 import java.util.Objects;
 
 /**
@@ -72,8 +74,6 @@ public abstract class Plugin {
      */
     private PluginDescription pluginDescription;
 
-    private boolean initialized;
-
     /**
      * Initialize a Plugin instance by its name.
      * Never instance it! It will be instanced when bot bootstraps automatically.
@@ -81,27 +81,45 @@ public abstract class Plugin {
      * @param name the plugin name
      * @param author the plugin author
      * @param version the plugin version
-     * @throws PluginLoaderException if the classloader of the plugin is not {@link LoadCommand.PluginClassLoader}
+     * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
     public Plugin(String name, String author, Version version) {
-        if (!(this.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
+        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
             throw new PluginLoaderException(name);
         this.name = name;
         this.author = author;
         this.version = version;
         if (!getDefaultFolder().exists())
-            getDefaultFolder().mkdirs();
+            if (!getDefaultFolder().mkdirs())
+                Main.getLogger().debug("Create Default Folder Failed");
         config = new File(getDefaultFolder(), "config.yml");
         if (!config.exists()) {
             try {
-                config.createNewFile();
+                InputStream configResource = loadResource("config.yml");
+                if (configResource != null) {
+                    Files.copy(configResource, config.toPath());
+                    configResource.close();
+                } else if (!config.createNewFile())
+                    Main.getLogger().debug("Create Default Config File Failed");
             } catch (IOException e) {
                 Main.getLogger().thr("Create Config File Exception",e);
             }
         }
         configuration = YamlConfiguration.loadFile(config);
         defaultConfig = new DefaultConfig(config);
-        langConfig = new LangConfig(new File(getDefaultFolder(),"lang.yml"));
+        File lang = new File(getDefaultFolder(), "lang.yml");
+        if (!lang.exists()) {
+            try {
+                InputStream configResource = loadResource("config.yml");
+                if (configResource != null) {
+                    Files.copy(configResource, config.toPath());
+                    configResource.close();
+                }
+            } catch (IOException e) {
+                Main.getLogger().thr("Create Lang File Exception",e);
+            }
+        }
+        langConfig = new LangConfig(lang);
     }
 
     /**
@@ -109,35 +127,35 @@ public abstract class Plugin {
      * Never instance it! It will be instanced when bot bootstraps automatically.
      */
     protected Plugin() {
-        if (!(this.getClass().getClassLoader() instanceof LoadCommand.PluginClassLoader))
+        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader))
             throw new PluginLoaderException(this.getClass());
     }
 
     /**
      * Get Plugin instance by the class instance
      *
-     * @see LoadCommand#getPlugin(Class)
+     * @see PluginClassLoader#getPlugin(Class)
      * @param plugin the class instance of the plugin
      * @return the plugin instance
      */
     public static Plugin getPlugin(Class<? extends Plugin> plugin) {
-        return LoadCommand.getPlugin(plugin);
+        return PluginClassLoader.getPlugin(plugin);
     }
 
     /**
      * Get Plugin instance by the name
      *
-     * @see LoadCommand#getPlugin(String)
+     * @see PluginClassLoader#getPlugin(String)
      * @param name the name of the plugin
      * @return the plugin instance
      */
     public static Plugin getPlugin(String name) {
-        return LoadCommand.getPlugin(name);
+        return PluginClassLoader.getPlugin(name);
     }
 
     @Nullable
     public static Plugin thisPlugin() {
-        return LoadCommand.getClassLoadedBy(MethodCaller.getCallerClass());
+        return PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
     }
 
     @NotNull
@@ -231,5 +249,9 @@ public abstract class Plugin {
 
     public PluginDescription getPluginDescription() {
         return pluginDescription;
+    }
+
+    public InputStream loadResource(String path) {
+        return this.getClass().getClassLoader().getResourceAsStream(path);
     }
 }

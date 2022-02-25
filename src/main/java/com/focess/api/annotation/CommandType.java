@@ -1,6 +1,6 @@
 package com.focess.api.annotation;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

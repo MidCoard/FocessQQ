@@ -1,7 +1,7 @@
 package com.focess.api.event;
 
 import com.focess.Main;
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.annotation.EventHandler;
 import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;

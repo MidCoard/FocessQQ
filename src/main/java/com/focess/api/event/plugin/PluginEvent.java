@@ -1,6 +1,6 @@
 package com.focess.api.event.plugin;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.event.Event;
 import com.focess.api.event.ListenerHandler;
 

@@ -1,6 +1,6 @@
 package com.focess.api.command;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.command.data.BooleanBuffer;
 import com.focess.api.command.data.DataBuffer;
 import com.focess.api.command.data.PluginBuffer;

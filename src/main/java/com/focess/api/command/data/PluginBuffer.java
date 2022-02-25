@@ -1,6 +1,6 @@
 package com.focess.api.command.data;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 
 /**
  * Represent a buffer of Plugin.

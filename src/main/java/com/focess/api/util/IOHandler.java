@@ -1,10 +1,10 @@
 package com.focess.api.util;
 
 import com.focess.Main;
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.exceptions.InputTimeoutException;
-import com.focess.core.commands.LoadCommand;
 import com.focess.core.listener.ConsoleListener;
+import com.focess.core.plugin.PluginCoreClassLoader;
 import org.jetbrains.annotations.Nullable;
 import sun.reflect.CallerSensitive;
 import sun.reflect.Reflection;
@@ -62,7 +62,7 @@ public abstract class IOHandler {
      */
     @CallerSensitive
     public void outputLang(String key,Object... objects) {
-        Plugin plugin = LoadCommand.getClassLoadedBy(Reflection.getCallerClass());
+        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(Reflection.getCallerClass());
         if (plugin == null)
             output(String.format(Main.getLangConfig().get(key), objects));
         else output(String.format(plugin.getLangConfig().get(key), objects));

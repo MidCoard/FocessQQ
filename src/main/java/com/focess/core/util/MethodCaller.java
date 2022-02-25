@@ -1,6 +1,6 @@
 package com.focess.core.util;
 
-import com.focess.core.commands.LoadCommand;
+import com.focess.core.plugin.PluginCoreClassLoader;
 
 public class MethodCaller {
 
@@ -9,7 +9,7 @@ public class MethodCaller {
         if (stackTraceElements.length < 4)
             return null;
         try {
-            return LoadCommand.forName(stackTraceElements[3].getClassName());
+            return PluginCoreClassLoader.forName(stackTraceElements[3].getClassName());
         } catch (ClassNotFoundException e) {
             return null;
         }

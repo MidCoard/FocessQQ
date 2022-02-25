@@ -1,7 +1,7 @@
 package com.focess.api.command;
 
 import com.focess.Main;
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.command.CommandExecutedEvent;
 import com.focess.api.exceptions.CommandDuplicateException;

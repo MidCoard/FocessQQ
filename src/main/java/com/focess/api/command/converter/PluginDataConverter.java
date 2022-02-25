@@ -1,6 +1,6 @@
 package com.focess.api.command.converter;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.command.DataCollection;
 
 /**

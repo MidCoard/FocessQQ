@@ -1,6 +1,6 @@
 package com.focess.api.exceptions;
 
-import com.focess.api.Plugin;
+import com.focess.api.plugin.Plugin;
 
 /**
  * Thrown to indicate there is any exception thrown in the initializing process
