@@ -1,4 +1,4 @@
-package com.focess.api.annotation;
+package com.focess.api.command;
 
 import com.focess.api.plugin.Plugin;
 

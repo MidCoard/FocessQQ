@@ -1,7 +1,7 @@
 package com.focess.api.plugin;
 
 import com.focess.Main;
-import com.focess.api.annotation.EventHandler;
+import com.focess.api.event.EventHandler;
 import com.focess.api.event.Event;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
@@ -27,7 +27,7 @@ import java.util.Objects;
 
 /**
  * Represent a Plugin class that can be load, enable and disable. Also, provide plenty of API for the plugin to get better with this framework.
- * You should declare {@link com.focess.api.annotation.PluginType} to this class.
+ * You should declare {@link PluginType} to this class.
  */
 public abstract class Plugin {
 
@@ -123,7 +123,7 @@ public abstract class Plugin {
     }
 
     /**
-     * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
+     * Provide a constructor to help {@link PluginType} design.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      */
     protected Plugin() {

@@ -2,8 +2,8 @@ package com.focess.core.plugin;
 
 import com.focess.Main;
 import com.focess.api.plugin.Plugin;
-import com.focess.api.annotation.CommandType;
-import com.focess.api.annotation.PluginType;
+import com.focess.api.command.CommandType;
+import com.focess.api.plugin.PluginType;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandPermission;
 import com.focess.api.command.CommandSender;

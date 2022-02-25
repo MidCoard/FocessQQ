@@ -1,6 +1,4 @@
-package com.focess.api.annotation;
-
-import com.focess.api.event.EventPriority;
+package com.focess.api.event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

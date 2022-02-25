@@ -23,7 +23,7 @@ public abstract class LazyPlugin extends Plugin{
     }
 
     /**
-     * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
+     * Provide a constructor to help {@link PluginType} design.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      */
     public LazyPlugin(){

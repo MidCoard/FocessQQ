@@ -1,7 +1,7 @@
 package com.focess.core.listener;
 
 import com.focess.Main;
-import com.focess.api.annotation.EventHandler;
+import com.focess.api.event.EventHandler;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.EventPriority;
 import com.focess.api.event.Listener;

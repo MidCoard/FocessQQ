@@ -7,6 +7,7 @@ import com.focess.api.event.command.CommandExecutedEvent;
 import com.focess.api.exceptions.CommandDuplicateException;
 import com.focess.api.exceptions.CommandLoadException;
 import com.focess.api.exceptions.EventSubmitException;
+import com.focess.api.plugin.PluginType;
 import com.focess.api.util.IOHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -21,7 +22,7 @@ import java.util.function.Predicate;
 
 /**
  * Represent a Plugin class that can execute. Just like we use the terminal, we could use it to executing some commands. This is an important way to interact with Mirai QQ Bot.
- * You should declare {@link com.focess.api.annotation.CommandType} to this class ,or you should register it with your plugin manually.
+ * You should declare {@link CommandType} to this class ,or you should register it with your plugin manually.
  */
 public abstract class Command {
 
@@ -85,7 +86,7 @@ public abstract class Command {
     }
 
     /**
-     * Provide a constructor to help {@link com.focess.api.annotation.PluginType} design.
+     * Provide a constructor to help {@link PluginType} design.
      * Never instance it! It will be instanced when this class is loaded automatically.
      */
     protected Command() {
