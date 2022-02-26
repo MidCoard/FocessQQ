@@ -20,14 +20,14 @@ public class UnloadCommand extends Command {
         this.addExecutor(1, (sender, data, ioHandler) -> {
             Plugin plugin = data.getPlugin();
             if (plugin == Main.getMainPlugin()) {
-                ioHandler.output("Can't unload the Main Plugin, if you want to stop the server use stop command.");
+                ioHandler.outputLang("unload-command-unload-main-plugin");
                 return CommandResult.REFUSE;
             }
             if (!(plugin.getClass().getClassLoader() instanceof PluginClassLoader)) {
-                ioHandler.output("Plugin " + plugin.getName() + " is not loaded from PluginClassLoader");
+                ioHandler.outputLang("unload-command-plugin-loader-error", plugin.getName());
                 return CommandResult.REFUSE;
             }
-            ioHandler.output("Unload " + plugin.getName());
+            ioHandler.outputLang("unload-command-unload", plugin.getName());
             PluginClassLoader.disablePlugin(plugin);
             return CommandResult.ALLOW;
         }).setDataConverters(PluginDataConverter.PLUGIN_DATA_CONVERTER);

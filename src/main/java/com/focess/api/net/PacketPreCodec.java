@@ -199,7 +199,7 @@ public class PacketPreCodec {
         PacketCodec<? extends Packet> packetCodec = PACKET_CODECS.get(packetId);
         if (packetCodec != null)
             return packetCodec.readPacket(this);
-        Main.getLogger().debug("Unknown Packet Id: " + packetId);
+        Main.getLogger().debugLang("unknown-packet", packetId);
         return null;
     }
 
@@ -217,7 +217,7 @@ public class PacketPreCodec {
             this.writeInt(packetId);
             packetCodec.writePacket(packet, this);
             return true;
-        } else Main.getLogger().debug("Unknown Packet Id: " + packetId);
+        } else Main.getLogger().debugLang("unknown-packet", packetId);
         return false;
     }
 

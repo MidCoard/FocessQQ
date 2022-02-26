@@ -21,40 +21,39 @@ public class GroupCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
-
-//            if (sender.isMember()) {
-//                Member member = sender.getMember();
-//                member.sendMessage("");
-//            }
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("未找到机器人");
+                ioHandler.outputLang("group-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
-            StringBuilder stringBuilder = new StringBuilder("群列表: ");
-            for (Group group : bot.getGroups())
-                stringBuilder.append(group.getName()).append("(").append(group.getId()).append("),");
-            ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
+            if (!bot.getGroups().isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder(Main.getLangConfig().get("group-command-list"));
+                for (Group group : bot.getGroups())
+                    stringBuilder.append(group.getName()).append("(").append(group.getId()).append("),");
+                ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
+            } else ioHandler.outputLang("group-command-no-group");
             return CommandResult.ALLOW;
         }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("未找到机器人");
+                ioHandler.outputLang("group-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
-            long id = dataCollection.getLong();
+            long groupId = dataCollection.getLong();
             try {
-                ioHandler.output("请输入一条消息");
+                ioHandler.outputLang("group-command-input-one-message");
                 String message = ioHandler.input();
-                Group group = bot.getGroup(id);
+                Group group = bot.getGroup(groupId);
                 if (group == null) {
-                    ioHandler.output("未找到该群");
+                    ioHandler.outputLang("group-command-group-not-found", groupId);
                     return CommandResult.REFUSE;
                 }
                 group.sendMessage(MiraiCode.deserializeMiraiCode(message));
             } catch (InputTimeoutException exception) {
-                ioHandler.output("输入超时");
+                ioHandler.outputLang("group-command-input-timeout");
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;

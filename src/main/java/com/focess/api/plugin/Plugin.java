@@ -7,6 +7,7 @@ import com.focess.api.event.Event;
 import com.focess.api.event.EventHandler;
 import com.focess.api.event.Listener;
 import com.focess.api.event.ListenerHandler;
+import com.focess.api.exceptions.PluginDuplicateException;
 import com.focess.api.exceptions.PluginLoaderException;
 import com.focess.api.util.config.DefaultConfig;
 import com.focess.api.util.config.LangConfig;
@@ -88,12 +89,17 @@ public abstract class Plugin {
     public Plugin(String name, String author, Version version) {
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
             throw new PluginLoaderException(name);
+        if (Plugin.getPlugin(this.getClass()) != null)
+            throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
+        this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
+        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
+            throw new IllegalStateException("Cannot new a plugin at runtime");
         this.name = name;
         this.author = author;
         this.version = version;
         if (!getDefaultFolder().exists())
             if (!getDefaultFolder().mkdirs())
-                Main.getLogger().debug("Create Default Folder Failed");
+                Main.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
         config = new File(getDefaultFolder(), "config.yml");
         if (!config.exists()) {
             try {
@@ -102,26 +108,14 @@ public abstract class Plugin {
                     Files.copy(configResource, config.toPath());
                     configResource.close();
                 } else if (!config.createNewFile())
-                    Main.getLogger().debug("Create Default Config File Failed");
+                    Main.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
             } catch (IOException e) {
-                Main.getLogger().thr("Create Config File Exception",e);
+                Main.getLogger().thrLang("exception-create-config-file",e);
             }
         }
         configuration = YamlConfiguration.loadFile(config);
         defaultConfig = new DefaultConfig(config);
-        File lang = new File(getDefaultFolder(), "lang.yml");
-        if (!lang.exists()) {
-            try {
-                InputStream configResource = loadResource("config.yml");
-                if (configResource != null) {
-                    Files.copy(configResource, config.toPath());
-                    configResource.close();
-                }
-            } catch (IOException e) {
-                Main.getLogger().thr("Create Lang File Exception",e);
-            }
-        }
-        langConfig = new LangConfig(lang);
+        langConfig = new LangConfig(loadResource("lang.yml"));
     }
 
     /**
@@ -129,8 +123,32 @@ public abstract class Plugin {
      * Never instance it! It will be instanced when bot bootstraps automatically.
      */
     protected Plugin() {
-        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader))
-            throw new PluginLoaderException(this.getClass());
+        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
+            throw new PluginLoaderException(name);
+        if (Plugin.getPlugin(this.getClass()) != null)
+            throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
+        this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
+        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
+            throw new IllegalStateException("Cannot new a plugin at runtime");
+        if (!getDefaultFolder().exists())
+            if (!getDefaultFolder().mkdirs())
+                Main.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
+        config = new File(getDefaultFolder(), "config.yml");
+        if (!config.exists()) {
+            try {
+                InputStream configResource = loadResource("config.yml");
+                if (configResource != null) {
+                    Files.copy(configResource, config.toPath());
+                    configResource.close();
+                } else if (!config.createNewFile())
+                    Main.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
+            } catch (IOException e) {
+                Main.getLogger().thrLang("exception-create-config-file",e);
+            }
+        }
+        configuration = YamlConfiguration.loadFile(config);
+        defaultConfig = new DefaultConfig(config);
+        langConfig = new LangConfig(loadResource("lang.yml"));
     }
 
     /**

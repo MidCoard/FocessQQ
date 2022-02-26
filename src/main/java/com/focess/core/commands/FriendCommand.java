@@ -20,35 +20,37 @@ public class FriendCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("未找到机器人");
+                ioHandler.outputLang("friend-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
-            StringBuilder stringBuilder = new StringBuilder("朋友列表: ");
+            StringBuilder stringBuilder = new StringBuilder(Main.getLangConfig().get("friend-command-list"));
             for (Friend friend : bot.getFriends())
                 stringBuilder.append(friend.getNick()).append("(").append(friend.getId()).append("),");
             ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             return CommandResult.ALLOW;
         }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("未找到机器人");
+                ioHandler.outputLang("friend-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
-            long id = dataCollection.getLong();
+            long friendId = dataCollection.getLong();
             try {
-                ioHandler.output("请输入一条消息");
+                ioHandler.outputLang("friend-command-input-one-message");
                 String message = ioHandler.input();
-                Friend friend = bot.getFriend(id);
+                Friend friend = bot.getFriend(friendId);
                 if (friend == null) {
-                    ioHandler.output("未找到该朋友");
+                    ioHandler.outputLang("friend-command-friend-not-found");
                     return CommandResult.REFUSE;
                 }
                 friend.sendMessage(MiraiCode.deserializeMiraiCode(message));
             } catch (InputTimeoutException exception) {
-                ioHandler.output("输入超时");
+                ioHandler.outputLang("friend-command-input-timeout");
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;

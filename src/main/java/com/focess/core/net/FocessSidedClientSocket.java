@@ -61,7 +61,7 @@ public class FocessSidedClientSocket implements Socket {
                             method.setAccessible(true);
                             method.invoke(pair.getKey(), p);
                         } catch (Exception e) {
-                            Main.getLogger().thr("Invoke Packet Exception", e);
+                            Main.getLogger().thrLang("exception-handle-packet", e);
                         }
                     }
                 return true;

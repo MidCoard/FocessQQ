@@ -42,13 +42,13 @@ public class SimpleBotManager implements BotManager {
 
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(2);
 
-    private static final List<Listener<?>> LISTENER_LIST = Lists.newArrayList();
+    private static final Map<Bot,List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 
     private static final Map<Long,Bot> BOTS = Maps.newHashMap();
 
     public SimpleBotManager() {
         if (Main.getBotManager() != null) {
-            Main.getLogger().fatal("Run more that one BotManager. Force shutdown!");
+            Main.getLogger().fatalLang("fatal-simple-bot-manager-already-exist");
             Main.exit();
         }
     }
@@ -73,9 +73,9 @@ public class SimpleBotManager implements BotManager {
                     outputStream.write(bytes);
                     outputStream.close();
                 } catch (IOException e) {
-                    Main.getLogger().thr("CAPTCHA Picture Load Exception",e);
+                    Main.getLogger().thrLang("exception-load-captcha-picture",e);
                 }
-                Main.getLogger().info("Please input CAPTCHA for " + bot.getId() + ": ");
+                Main.getLogger().infoLang("input-captcha-code");
                 return IOHandler.getConsoleIoHandler().input();
             }
 
@@ -105,80 +105,82 @@ public class SimpleBotManager implements BotManager {
         try {
             EventManager.submit(new BotLoginEvent(b));
         } catch (EventSubmitException e) {
-            Main.getLogger().thr("Submit Bot Login Exception",e);
+            Main.getLogger().thrLang("exception-submit-bot-login-event",e);
         }
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
+        List<Listener<?>> listeners = Lists.newArrayList();
+        listeners.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
             GroupChatEvent e = new GroupChatEvent(b,event.getSender(), event.getMessage(),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
-                Main.getLogger().thr("Submit Group Message Exception",eventSubmitException);
+                Main.getLogger().thrLang("exception-submit-group-chat-event",eventSubmitException);
             }
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
+        listeners.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
             FriendChatEvent e = new FriendChatEvent(b,event.getFriend(), event.getMessage(),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
-                Main.getLogger().thr("Submit Friend Message Exception",eventSubmitException);
+                Main.getLogger().thrLang("exception-submit-friend-chat-event",eventSubmitException);
             }
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
+        listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
             GroupRecallEvent e = new GroupRecallEvent(b,event.getAuthor(),event.getMessageIds(),event.getOperator());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Group Recall Exception",ex);
+                Main.getLogger().thrLang("exception-submit-group-recall-event",ex);
             }
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
+        listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
             FriendRecallEvent e = new FriendRecallEvent(b,event.getAuthor(),event.getMessageIds());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Friend Recall Exception",ex);
+                Main.getLogger().thrLang("exception-submit-friend-recall-event",ex);
             }
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
+        listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
             FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),event.getFromGroup(),event.getMessage());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Friend Request Exception",ex);
+                Main.getLogger().thrLang("exception-submit-friend-request-event",ex);
             }
             if (e.getAccept() != null)
                 if (e.getAccept())
                     event.accept();
                 else event.reject(e.isBlackList());
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
+        listeners.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
             GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),event.getInvitor());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Group Request Exception",ex);
+                Main.getLogger().thrLang("exception-submit-group-request-event",ex);
             }
             if (e.getAccept() != null)
                 if (e.getAccept())
                     event.accept();
                 else event.ignore();
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
+        listeners.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
             FriendInputStatusEvent e = new FriendInputStatusEvent(b,event.getFriend(), event.getInputting());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Friend Input Status Exception",ex);
+                Main.getLogger().thrLang("exception-submit-friend-input-status-event",ex);
             }
         }));
-        LISTENER_LIST.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
+        listeners.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
             StrangerChatEvent e = new StrangerChatEvent(b,event.getMessage(),event.getSender(),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
-                Main.getLogger().thr("Submit Stranger Message Exception",ex);
+                Main.getLogger().thrLang("exception-submit-stranger-chat-event",ex);
             }
         }));
+        BOT_LISTENER_MAP.put(b,listeners);
         BOTS.put(id,b);
         return b;
     }
@@ -190,7 +192,7 @@ public class SimpleBotManager implements BotManager {
             try {
                 EventManager.submit(new BotLoginEvent(bot));
             } catch (EventSubmitException e) {
-                Main.getLogger().thr("Submit Bot Login Exception",e);
+                Main.getLogger().thrLang("exception-submit-bot-login-event",e);
             }
             return true;
         }
@@ -206,7 +208,7 @@ public class SimpleBotManager implements BotManager {
         try {
             EventManager.submit(new BotLogoutEvent(bot));
         } catch (EventSubmitException e) {
-            Main.getLogger().thr("Submit Bot Logout Exception",e);
+            Main.getLogger().thrLang("exception-submit-bot-logout-event",e);
         }
         return true;
     }
@@ -222,7 +224,7 @@ public class SimpleBotManager implements BotManager {
         try {
             EventManager.submit(new BotReloginEvent(bot));
         } catch (EventSubmitException e) {
-            Main.getLogger().thr("Submit Bot Relogin Exception",e);
+            Main.getLogger().thrLang("exception-submit-bot-relogin-event",e);
         }
         return ret;
     }
@@ -236,14 +238,25 @@ public class SimpleBotManager implements BotManager {
     public Bot remove(long id) {
         if (Main.getBot().getId() == id)
             return null;
-        return BOTS.remove(id);
+        Bot b = BOTS.remove(id);
+        if (b != null)
+            b.logout();
+        for (Listener<?> listener : BOT_LISTENER_MAP.getOrDefault(b,Lists.newArrayList()))
+            listener.complete();
+        BOT_LISTENER_MAP.remove(b);
+        return b;
     }
 
-    public static void disableAllBotsAndExit() {
-        for (Listener<?> listener : LISTENER_LIST)
+    public static void removeAll() {
+        for (Long id : BOTS.keySet())
+            Main.getBotManager().remove(id);
+        //remove default bot
+        Bot b = BOTS.remove(Main.getBot().getId());
+        if (b != null)
+            b.logout();
+        for (Listener<?> listener : BOT_LISTENER_MAP.getOrDefault(b,Lists.newArrayList()))
             listener.complete();
-        for (Bot bot : BOTS.values())
-            bot.logout();
+        BOT_LISTENER_MAP.remove(b);
     }
 
 

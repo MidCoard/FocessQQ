@@ -17,10 +17,12 @@ public class PluginCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(0,(sender,data,ioHandler)->{
-            StringBuilder stringBuilder = new StringBuilder("The following plugins are: ");
-            for (Plugin plugin: Main.getPlugins())
-                stringBuilder.append(' ').append(plugin.getName());
-            ioHandler.output(stringBuilder.toString());
+            if (Main.getPlugins().size() != 0) {
+                StringBuilder stringBuilder = new StringBuilder(Main.getLangConfig().get("plugin-command-list"));
+                for (Plugin plugin : Main.getPlugins())
+                    stringBuilder.append(' ').append(plugin.getName());
+                ioHandler.output(stringBuilder.toString());
+            } else ioHandler.outputLang("plugin-command-no-plugin");
             return CommandResult.ALLOW;
         },"list");
     }

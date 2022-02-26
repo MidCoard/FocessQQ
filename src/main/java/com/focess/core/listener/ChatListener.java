@@ -71,20 +71,20 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onStrangerChat(StrangerChatEvent event) {
         Main.getLogger().debug(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
-        Main.getLogger().debug("MessageChain: ");
+        Main.getLogger().debugLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
         StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());
         try {
             EventManager.submit(strangerMessageEvent);
         } catch (EventSubmitException e) {
-            Main.getLogger().thr("Submit Stranger Message Exception",e);
+            Main.getLogger().thrLang("exception-submit-stranger-message-event",e);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGroupChat(GroupChatEvent event) {
         Main.getLogger().debug(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-        Main.getLogger().debug("MessageChain: ");
+        Main.getLogger().debugLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
         CommandSender sender = new CommandSender(event.getMember());
         AtomicBoolean flag = new AtomicBoolean(false);
@@ -99,23 +99,23 @@ public class ChatListener implements Listener {
                             try {
                                 EventManager.submit(groupMessageEvent);
                             } catch (Exception e) {
-                                Main.getLogger().thr("Submit Group Message Exception", e);
+                                Main.getLogger().thrLang("exception-submit-group-message-event", e);
                             }
                         }
                     } catch (Exception e) {
                         if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
-                            Main.getLogger().thr("Group Exec Command Exception",e);
+                            Main.getLogger().thrLang("exception-exec-group-command",e);
                     }
                 });
             } catch (Exception e) {
-                Main.getLogger().thr("Group Exec Command Exception",e);
+                Main.getLogger().thrLang("exception-exec-group-command",e);
             }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFriendChat(FriendChatEvent event){
         Main.getLogger().debug(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-        Main.getLogger().debug("MessageChain: ");
+        Main.getLogger().debugLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
         CommandSender sender = new CommandSender(event.getFriend());
         AtomicBoolean flag = new AtomicBoolean(false);
@@ -130,16 +130,16 @@ public class ChatListener implements Listener {
                             try {
                                 EventManager.submit(friendMessageEvent);
                             } catch (Exception e) {
-                                Main.getLogger().thr("Submit Friend Message Exception", e);
+                                Main.getLogger().thrLang("exception-submit-friend-message-event", e);
                             }
                         }
                     } catch (Exception e) {
                         if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
-                            Main.getLogger().thr("Friend Exec Command Exception",e);
+                            Main.getLogger().thrLang("exception-exec-friend-command",e);
                     }
                 });
             } catch (Exception e) {
-                Main.getLogger().thr("Friend Exec Command Exception",e);
+                Main.getLogger().thrLang("exception-exec-friend-command",e);
             }
     }
 }

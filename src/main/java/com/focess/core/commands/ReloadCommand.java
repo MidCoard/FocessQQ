@@ -18,6 +18,7 @@ public class ReloadCommand extends Command {
     }
 
     public static boolean reloadPlugin(Plugin plugin) {
+        Main.getLogger().debugLang("start-reload-plugin", plugin.getName());
         if (plugin == Main.getMainPlugin())
             return false;
         File pluginFile = PluginClassLoader.disablePlugin(plugin);
@@ -31,7 +32,7 @@ public class ReloadCommand extends Command {
                 return false;
             }
         } catch (Exception e) {
-            Main.getLogger().thr("Plugin Reload Exception", e);
+            Main.getLogger().thrLang("exception-reload-plugin", e);
             return false;
         }
     }
@@ -42,17 +43,16 @@ public class ReloadCommand extends Command {
         this.addExecutor(1, (sender, data, ioHandler) -> {
             Plugin plugin = data.getPlugin();
             if (plugin == Main.getMainPlugin()) {
-                ioHandler.output("Can't reload the Main Plugin, if you want to stop the server use stop command.");
+                ioHandler.outputLang("reload-command-reload-main-plugin");
                 return CommandResult.REFUSE;
             }
             if (!(plugin.getClass().getClassLoader() instanceof PluginClassLoader)) {
-                ioHandler.output("Plugin " + plugin.getName() + " is not loaded from PluginClassLoader");
+                ioHandler.outputLang("reload-command-plugin-loader-error", plugin.getName());
                 return CommandResult.REFUSE;
             }
-            ioHandler.output("Reload " + plugin.getName());
-            if (reloadPlugin(plugin)) {
-                ioHandler.output("Reload " + plugin.getName() + " success");
-            } else ioHandler.output("Reload " + plugin.getName() + " failed");
+            if (reloadPlugin(plugin))
+                ioHandler.outputLang("reload-command-reload-plugin-succeed", plugin.getName());
+            else ioHandler.outputLang("reload-command-reload-plugin-failed", plugin.getName());
             return CommandResult.ALLOW;
         }).setDataConverters(PluginDataConverter.PLUGIN_DATA_CONVERTER);
     }

@@ -1,25 +1,17 @@
 package com.focess.core.plugin;
 
 import com.focess.Main;
-import com.focess.api.plugin.Plugin;
-import com.focess.api.command.CommandType;
-import com.focess.api.plugin.PluginType;
-import com.focess.api.command.Command;
-import com.focess.api.command.CommandPermission;
-import com.focess.api.command.CommandSender;
-import com.focess.api.command.DataCollection;
+import com.focess.api.command.*;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.event.plugin.PluginLoadEvent;
 import com.focess.api.event.plugin.PluginUnloadEvent;
 import com.focess.api.exceptions.*;
+import com.focess.api.plugin.Plugin;
 import com.focess.api.plugin.PluginDescription;
-import com.focess.api.util.config.DefaultConfig;
-import com.focess.api.util.config.LangConfig;
+import com.focess.api.plugin.PluginType;
 import com.focess.api.util.version.Version;
 import com.focess.api.util.yaml.YamlConfiguration;
-import com.focess.core.commands.util.AnnotationHandler;
-import com.focess.core.commands.util.ResourceHandler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -28,14 +20,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -44,18 +34,12 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class PluginClassLoader extends URLClassLoader {
-    public static final Map<Plugin, PluginClassLoader> LOADER_MAP = Maps.newConcurrentMap();
     public static final Map<Class<? extends Plugin>, Plugin> CLASS_PLUGIN_MAP = Maps.newHashMap();
     public static final Map<String, Plugin> NAME_PLUGIN_MAP = Maps.newHashMap();
     public static final List<Plugin> REGISTERED_PLUGINS = Lists.newCopyOnWriteArrayList();
     private static Field PLUGIN_NAME_FIELD,
             PLUGIN_VERSION_FIELD,
             PLUGIN_AUTHOR_FIELD,
-            PLUGIN_CONFIGURATION_FIELD,
-            PLUGIN_CONFIG_FIELD,
-            PLUGIN_LANG_CONFIG_FIELD,
-            PLUGIN_DEFAULT_CONFIG_FIELD,
-            PLUGIN_DESCRIPTION_FIELD,
             COMMAND_NAME_FIELD,
             COMMAND_ALIASES_FIELD,
             COMMAND_INITIALIZE_FIELD;
@@ -68,16 +52,6 @@ public class PluginClassLoader extends URLClassLoader {
             PLUGIN_VERSION_FIELD.setAccessible(true);
             PLUGIN_AUTHOR_FIELD = Plugin.class.getDeclaredField("author");
             PLUGIN_AUTHOR_FIELD.setAccessible(true);
-            PLUGIN_CONFIGURATION_FIELD = Plugin.class.getDeclaredField("configuration");
-            PLUGIN_CONFIGURATION_FIELD.setAccessible(true);
-            PLUGIN_CONFIG_FIELD = Plugin.class.getDeclaredField("config");
-            PLUGIN_CONFIG_FIELD.setAccessible(true);
-            PLUGIN_LANG_CONFIG_FIELD = Plugin.class.getDeclaredField("langConfig");
-            PLUGIN_LANG_CONFIG_FIELD.setAccessible(true);
-            PLUGIN_DEFAULT_CONFIG_FIELD = Plugin.class.getDeclaredField("defaultConfig");
-            PLUGIN_DEFAULT_CONFIG_FIELD.setAccessible(true);
-            PLUGIN_DESCRIPTION_FIELD = Plugin.class.getDeclaredField("pluginDescription");
-            PLUGIN_DESCRIPTION_FIELD.setAccessible(true);
             COMMAND_NAME_FIELD = Command.class.getDeclaredField("name");
             COMMAND_NAME_FIELD.setAccessible(true);
             COMMAND_ALIASES_FIELD = Command.class.getDeclaredField("aliases");
@@ -120,40 +94,6 @@ public class PluginClassLoader extends URLClassLoader {
                     PLUGIN_NAME_FIELD.set(plugin,name);
                     PLUGIN_AUTHOR_FIELD.set(plugin,((PluginType) annotation).author());
                     PLUGIN_VERSION_FIELD.set(plugin,new Version(((PluginType) annotation).version()));
-                    if (!plugin.getDefaultFolder().exists())
-                        if (!plugin.getDefaultFolder().mkdirs())
-                            Main.getLogger().debug("Create Default Folder Failed");
-                    File config = new File(plugin.getDefaultFolder(), "config.yml");
-                    PLUGIN_CONFIG_FIELD.set(plugin,config);
-                    if (!config.exists()) {
-                        try {
-                            InputStream configResource = plugin.loadResource("config.yml");
-                            if (configResource != null) {
-                                Files.copy(configResource, config.toPath());
-                                configResource.close();
-                            } else if (!config.createNewFile())
-                                Main.getLogger().debug("Create Default Config File Failed");
-                        } catch (IOException e) {
-                            Main.getLogger().thr("Create Config File Exception",e);
-                        }
-                    }
-                    YamlConfiguration configuration = YamlConfiguration.loadFile(plugin.getConfigFile());
-                    PLUGIN_CONFIGURATION_FIELD.set(plugin,configuration);
-                    PLUGIN_DEFAULT_CONFIG_FIELD.set(plugin,new DefaultConfig(config));
-                    File lang = new File(plugin.getDefaultFolder(), "lang.yml");
-                    if (!lang.exists()) {
-                        try {
-                            InputStream configResource = plugin.loadResource("config.yml");
-                            if (configResource != null) {
-                                Files.copy(configResource, config.toPath());
-                                configResource.close();
-                            }
-                        } catch (IOException e) {
-                            Main.getLogger().thr("Create Lang File Exception",e);
-                        }
-                    }
-                    PLUGIN_LANG_CONFIG_FIELD.set(plugin,new LangConfig(config));
-                    PLUGIN_DESCRIPTION_FIELD.set(plugin,classLoader.getPluginDescription());
                 }
                 classLoader.plugin = plugin;
                 return true;
@@ -175,7 +115,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     pluginClassLoader.loadedClasses.add(pluginClassLoader.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
                 } catch (ClassNotFoundException e) {
-                    Main.getLogger().thr("Load Class Exception",e);
+                    Main.getLogger().thrLang("exception-load-class",e);
                 }
         });
 
@@ -195,8 +135,6 @@ public class PluginClassLoader extends URLClassLoader {
                     if (!commandType.name().isEmpty()){
                         COMMAND_NAME_FIELD.set(command,commandType.name());
                         COMMAND_ALIASES_FIELD.set(command,Lists.newArrayList(commandType.aliases()));
-                        command.setPermission(CommandPermission.MEMBER);
-                        command.setExecutorPermission(i->true);
                         if (!COMMAND_INITIALIZE_FIELD.getBoolean(command)) {
                             try {
                                 command.init();
@@ -228,16 +166,15 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public static void enablePlugin(Plugin plugin) {
         try {
-            Main.getLogger().debug("Start Enable Plugin " + plugin.getName());
+            Main.getLogger().debugLang("start-enable-plugin",plugin.getName());
             if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
                 throw new PluginDuplicateException(plugin.getName());
+            // no try-catch because it should be noticed by the Plugin User
             plugin.enable();
-            Main.getLogger().debug("Enable Plugin.");
             REGISTERED_PLUGINS.add(plugin);
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
             NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
-            Main.getLogger().debug("Add Plugin.");
-            Main.getLogger().debug("End Enable Plugin " + plugin.getName());
+            Main.getLogger().debugLang("end-enable-plugin",plugin.getName());
         } catch (Exception e) {
             if (e instanceof PluginDuplicateException)
                 throw (PluginDuplicateException) e;
@@ -251,42 +188,41 @@ public class PluginClassLoader extends URLClassLoader {
      * @param plugin the plugin need to be disabled
      */
     public static File disablePlugin(Plugin plugin) {
-        Main.getLogger().debug("Start Disable Plugin " + plugin.getName());
+        Main.getLogger().debugLang("start-disable-plugin",plugin.getName());
         ListenerHandler.unregister(plugin);
-        Main.getLogger().debug("Unregister Event Listener.");
+        Main.getLogger().debugLang("unregister-listeners");
         DataCollection.unregister(plugin);
-        Main.getLogger().debug("Unregister DataConverter.");
+        Main.getLogger().debugLang("unregister-buffers");
         Command.unregister(plugin);
-        Main.getLogger().debug("Unregister Command.");
+        Main.getLogger().debugLang("unregister-commands");
+        // try-catch because it should take over the process
         try {
             plugin.disable();
         } catch (Exception e) {
-            Main.getLogger().thr("Disable Plugin Exception", e);
+            Main.getLogger().thrLang("exception-plugin-disable", e);
         }
-        Main.getLogger().debug("Disable Plugin.");
         REGISTERED_PLUGINS.remove(plugin);
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
         NAME_PLUGIN_MAP.remove(plugin.getName());
-        Main.getLogger().debug("Remove Plugin.");
         File ret = null;
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
-                PluginClassLoader loader = LOADER_MAP.remove(plugin);
+                PluginClassLoader loader = (PluginClassLoader) plugin.getClass().getClassLoader();
                 PluginCoreClassLoader.LOADERS.remove(loader);
                 if (loader != null) {
                     ret = loader.getFile();
                     loader.close();
                 }
             } catch (IOException e) {
-                Main.getLogger().thr("Remove Plugin Loader Exception", e);
+                Main.getLogger().thrLang("exception-remove-plugin-loader", e);
             }
-        Main.getLogger().debug("Remove Plugin Loader.");
-        Main.getLogger().debug("End Disable Plugin " + plugin.getName());
+        Main.getLogger().debugLang("remove-plugin-loader");
+        Main.getLogger().debugLang("end-disable-plugin",plugin.getName());
         PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
         try {
             EventManager.submit(pluginUnloadEvent);
         } catch (EventSubmitException e) {
-            Main.getLogger().thr("Submit Plugin Unload Exception",e);
+            Main.getLogger().thrLang("exception-submit-plugin-unload-event",e);
         }
         return ret;
     }
@@ -352,7 +288,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     public boolean load() {
         synchronized (LOCK) {
-            Main.getLogger().debug("Start Load Plugin.");
+            Main.getLogger().debugLang("start-load-plugin", file.getName());
             try {
                 JarFile jarFile = new JarFile(file);
                 Enumeration<JarEntry> entries = jarFile.entries();
@@ -362,7 +298,9 @@ public class PluginClassLoader extends URLClassLoader {
                     for (ResourceHandler resourceHandler : RESOURCE_HANDLERS)
                         resourceHandler.handle(name,jarFile.getInputStream(jarEntry),this);
                 }
+                Main.getLogger().debugLang("load-plugin-classes", loadedClasses.size());
                 if (this.pluginDescription == null) {
+                    Main.getLogger().debugLang("plugin-description-not-found");
                     PluginCoreClassLoader.LOADERS.remove(this);
                     return false;
                 }
@@ -378,37 +316,39 @@ public class PluginClassLoader extends URLClassLoader {
                     return false;
                 }
                 enablePlugin(plugin);
+                Main.getLogger().debugLang("load-plugin-class");
+
                 for (Class<?> c : loadedClasses)
                     analyseClass(c);
+                Main.getLogger().debugLang("load-command-class");
 
-                LOADER_MAP.put(plugin, this);
-
+                Main.getLogger().debugLang("load-depend-plugin");
                 for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
                     PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
                     if (pluginClassLoader.load())
-                        CommandSender.CONSOLE.getIOHandler().output("Load " + file.getName());
+                        Main.getLogger().infoLang("load-depend-plugin-succeed", pluginClassLoader.getPlugin().getName());
                     else {
-                        PluginCoreClassLoader.LOADERS.remove(pluginClassLoader);
+                        Main.getLogger().infoLang("load-depend-plugin-failed", file.getName());
                         pluginClassLoader.close();
                     }
                 }
                 AFTER_PLUGINS_MAP.remove(plugin.getName());
+
                 PluginLoadEvent pluginLoadEvent = new PluginLoadEvent(plugin);
                 try {
                     EventManager.submit(pluginLoadEvent);
                 } catch (EventSubmitException e) {
-                    Main.getLogger().thr("Submit Plugin Load Exception",e);
+                    Main.getLogger().thrLang("exception-submit-plugin-load-event",e);
                 }
-                Main.getLogger().debug("Load Plugins Depended On This.");
             } catch (Exception e) {
-                Main.getLogger().thr("Plugin Class Load Exception", e);
-                Command.unregister(plugin);
+                Main.getLogger().thrLang("exception-load-plugin-file", e);
+                ListenerHandler.unregister(plugin);
                 DataCollection.unregister(plugin);
-                LOADER_MAP.remove(plugin);
+                Command.unregister(plugin);
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;
             }
-            Main.getLogger().debug("End Load Plugin.");
+            Main.getLogger().debugLang("end-load-plugin", file.getName());
             return true;
         }
     }

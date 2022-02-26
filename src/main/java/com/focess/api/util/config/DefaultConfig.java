@@ -17,4 +17,9 @@ public class DefaultConfig extends Config {
     public <T> T get(String key) {
         return super.get(key);
     }
+
+    @Override
+    public void save() {
+        super.save();
+    }
 }

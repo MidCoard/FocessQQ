@@ -26,15 +26,18 @@ public class LoadCommand extends Command {
                 try {
                     PluginClassLoader classLoader = new PluginClassLoader(file);
                     if (classLoader.load())
-                        ioHandler.output("Load " + file.getName());
-                    else classLoader.close();
+                        ioHandler.outputLang("load-command-load-succeed", classLoader.getPlugin().getName());
+                    else {
+                        ioHandler.outputLang("load-command-load-failed", file.getName());
+                        classLoader.close();
+                    }
                 } catch (IOException e) {
-                    Main.getLogger().thr("Load Plugin Exception", e);
+                    Main.getLogger().thrLang("exception-load-plugin", e);
                     return CommandResult.REFUSE;
                 }
                 return CommandResult.ALLOW;
             }
-            ioHandler.output("File is not existed.");
+            ioHandler.outputLang("load-command-file-not-exist", path);
             return CommandResult.REFUSE;
         });
     }

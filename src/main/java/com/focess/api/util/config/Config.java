@@ -1,19 +1,23 @@
 package com.focess.api.util.config;
 
 import com.focess.api.util.yaml.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
 public abstract class Config {
 
+    @Nullable
     private final File file;
-    private final YamlConfiguration yaml;
 
-    public Config(File file) {
+    protected YamlConfiguration yaml;
+
+    protected Config(@Nullable File file) {
         this.file = file;
-        this.yaml = this.file.exists() ? YamlConfiguration.loadFile(file) : new YamlConfiguration(null);
+        this.yaml = this.file != null && this.file.exists() ? YamlConfiguration.loadFile(file) : new YamlConfiguration(null);
     }
 
+    @Nullable
     public File getFile() {
         return file;
     }

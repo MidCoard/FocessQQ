@@ -35,7 +35,7 @@ public class FocessSidedSocket implements Socket {
             throw new IllegalPortException(localPort);
         }
         thread = new Thread(() -> {
-            Main.getLogger().debug("FocessSidedSocket (" + localPort + ") is Ready");
+            Main.getLogger().debugLang("start-focess-sided-socket",localPort);
             while (true)
                 try {
                     java.net.Socket socket = server.accept();
@@ -60,12 +60,12 @@ public class FocessSidedSocket implements Socket {
                                     outputStream.flush();
                                 }
                             } catch (Exception e) {
-                                Main.getLogger().thr("Invoke Packet Exception", e);
+                                Main.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                     socket.shutdownOutput();
                 } catch (IOException e) {
-                    Main.getLogger().thr("FocessSidedSocket Exception",e);
+                    Main.getLogger().thrLang("exception-focess-sided-socket",e);
                     if (this.server.isClosed())
                         return;
                 }

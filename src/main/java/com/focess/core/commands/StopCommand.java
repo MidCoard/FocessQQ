@@ -17,7 +17,7 @@ public class StopCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(0, (sender, data, ioHandler) -> {
-            ioHandler.output("Stopping...");
+            ioHandler.outputLang("stop-command-stop");
             Main.exit();
             return CommandResult.ALLOW;
         });

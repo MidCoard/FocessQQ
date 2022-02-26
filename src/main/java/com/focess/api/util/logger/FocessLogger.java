@@ -1,7 +1,10 @@
 package com.focess.api.util.logger;
 
 import com.focess.Main;
+import com.focess.api.plugin.Plugin;
 import com.focess.core.commands.util.ChatConstants;
+import com.focess.core.plugin.PluginCoreClassLoader;
+import com.focess.core.util.MethodCaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,19 @@ public class FocessLogger {
     }
 
     /**
+     * Log a message with INFO level
+     *
+     * @param key the language key
+     * @param objects the objects need to replace
+     */
+    public void infoLang(String key,Object... objects) {
+        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        if (plugin == null)
+            info(String.format(Main.getLangConfig().get(key), objects));
+        else info(String.format(plugin.getLangConfig().get(key), objects));
+    }
+
+    /**
      * Log a message inputted by console with DEBUG level
      *
      * @param message the message need to reshow
@@ -54,6 +70,19 @@ public class FocessLogger {
         LOG.error(message,e);
     }
 
+    /**
+     * Log a message and a throwable (or exception) with ERROR level
+     * @param key the language key
+     * @param e a throwable (or exception) with this message
+     * @param objects the objects need to replace
+     */
+    public void thrLang(String key,Throwable e,Object... objects) {
+        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        if (plugin == null)
+            thr(String.format(Main.getLangConfig().get(key), objects),e);
+        else thr(String.format(plugin.getLangConfig().get(key), objects),e);
+    }
+
 
     /**
      * Log a message with ERROR level
@@ -64,12 +93,38 @@ public class FocessLogger {
 
 
     /**
+     * Log a message with ERROR level
+     *
+     * @param key the language key
+     * @param objects the objects need to replace
+     */
+    public void fatalLang(String key,Object... objects) {
+        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        if (plugin == null)
+            fatal(String.format(Main.getLangConfig().get(key), objects));
+        else fatal(String.format(plugin.getLangConfig().get(key), objects));
+    }
+
+    /**
      * Log a message with DEBUG level
      *
      * @param message the message need to debug
      */
     public void debug(String message) {
         LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
+    }
+
+    /**
+     * Log a message with DEBUG level
+     *
+     * @param key the language key
+     * @param objects the objects need to replace
+     */
+    public void debugLang(String key,Object... objects) {
+        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        if (plugin == null)
+            debug(String.format(Main.getLangConfig().get(key), objects));
+        else debug(String.format(plugin.getLangConfig().get(key), objects));
     }
 
     /**

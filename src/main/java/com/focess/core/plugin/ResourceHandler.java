@@ -1,6 +1,5 @@
-package com.focess.core.commands.util;
+package com.focess.core.plugin;
 
-import com.focess.core.plugin.PluginClassLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;

@@ -42,7 +42,7 @@ public class YamlConfiguration implements SectionMap {
             reader.close();
             return yamlConfiguration;
         } catch (IOException e) {
-            Main.getLogger().thr("Load File Exception",e);
+            Main.getLogger().thrLang("exception-load-file",e);
         }
         return null;
     }
@@ -116,7 +116,7 @@ public class YamlConfiguration implements SectionMap {
         try {
             YAML.dump(this.values, new FileWriter(file));
         } catch (IOException e) {
-            Main.getLogger().thr("Save File Exception",e);
+            Main.getLogger().thrLang("exception-save-file",e);
         }
     }
 

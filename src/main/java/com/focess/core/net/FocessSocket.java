@@ -33,7 +33,7 @@ public class FocessSocket implements Socket {
             throw new IllegalPortException(localPort);
         }
         thread = new Thread(() -> {
-            Main.getLogger().debug("FocessSocket (" + localPort + ") is Ready");
+            Main.getLogger().debugLang("start-focess-socket",localPort);
             while (true)
                 try {
                     java.net.Socket socket = server.accept();
@@ -52,11 +52,11 @@ public class FocessSocket implements Socket {
                                 method.setAccessible(true);
                                 method.invoke(pair.getKey(), packet);
                             } catch (Exception e) {
-                                Main.getLogger().thr("Invoke Packet Exception", e);
+                                Main.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                 } catch (IOException e) {
-                    Main.getLogger().thr("FocessSocket Exception",e);
+                    Main.getLogger().thrLang("exception-focess-socket",e);
                     if (this.server.isClosed())
                         return;
                 }
@@ -115,7 +115,7 @@ public class FocessSocket implements Socket {
                 outputStream.close();
                 return true;
             } catch (IOException e) {
-                Main.getLogger().thr("Send Packet Exception",e);
+                Main.getLogger().thrLang("exception-send-packet",e);
                 return false;
             }
         return false;

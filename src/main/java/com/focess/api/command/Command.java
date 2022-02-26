@@ -90,6 +90,8 @@ public abstract class Command {
      * Never instance it! It will be instanced when this class is loaded automatically.
      */
     protected Command() {
+        this.permission = CommandPermission.MEMBER;
+        this.executorPermission = i -> true;
     }
 
     public void setExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
@@ -135,7 +137,8 @@ public abstract class Command {
      * @throws com.focess.api.exceptions.CommandDuplicateException if the command name already exists in the registered commands
      */
     public static void register(@NotNull Plugin plugin, @NotNull final Command command) {
-        //todo if no name throw CommandLoadException
+        if (command.name == null)
+            throw new IllegalStateException("CommandType dose not contain name or the constructor does not super name");
         if (COMMANDS_MAP.containsKey(command.getName()))
             throw new CommandDuplicateException(command.getName());
         command.registered = true;
@@ -229,7 +232,7 @@ public abstract class Command {
                 try {
                     EventManager.submit(event);
                 } catch (EventSubmitException e) {
-                    Main.getLogger().thr("Submit Command Executed Exception",e);
+                    Main.getLogger().thrLang("exception-submit-command-executed-event",e);
                 }
                 flag = true;
             }

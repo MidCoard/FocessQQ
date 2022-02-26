@@ -44,16 +44,16 @@ public class ConsoleListener implements Listener {
                         try {
                             EventManager.submit(consoleMessageEvent);
                         } catch (Exception e) {
-                            Main.getLogger().thr("Submit Console Message Exception", e);
+                            Main.getLogger().thrLang("exception-submit-console-message-event", e);
                         }
                     }
                 } catch (Exception e) {
                     if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
-                        Main.getLogger().thr("Console Exec Command Exception",e);
+                        Main.getLogger().thrLang("exception-exec-console-command",e);
                 }
             });
         } catch (Exception e) {
-            Main.getLogger().thr("Console Exec Command Exception", e);
+            Main.getLogger().thrLang("exception-exec-console-command",e);
         }
     }
 

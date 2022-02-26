@@ -130,7 +130,7 @@ public class ListenerHandler {
                             method.setAccessible(true);
                             method.invoke(listener, event);
                         } catch (Exception e) {
-                            Main.getLogger().thr("Invoke Event Exception",e);
+                            Main.getLogger().thrLang("exception-handle-event",e);
                         }
                     }
             );

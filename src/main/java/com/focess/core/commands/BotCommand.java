@@ -26,59 +26,66 @@ public class BotCommand extends Command {
                 stringBuilder.append(bot.getId()).append(',');
             }
             if (!flag)
-                ioHandler.output("There is no bots");
-            else
-                ioHandler.output(stringBuilder.substring(0,stringBuilder.length() - 1));
+                ioHandler.outputLang("bot-command-no-bot");
+            else {
+
+                ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
+            }
             return CommandResult.ALLOW;
         },"list");
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("Bot id does not exist");
+                ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
             }
             bot.login();
-            ioHandler.output("Bot log in successfully");
+            ioHandler.outputLang("bot-command-login-succeed",bot.getId());
             return CommandResult.ALLOW;
         },"login").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("Bot id does not exist");
+                ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
             }
             bot.logout();
-            ioHandler.output("Bot log out successfully");
+            ioHandler.outputLang("bot-command-logout-succeed",bot.getId());
             return CommandResult.ALLOW;
         },"logout").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
-                ioHandler.output("Bot id does not exist");
+                ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
             }
             bot.relogin();
-            ioHandler.output("Bot relogin successfully");
+            ioHandler.outputLang("bot-command-relogin-succeed",bot.getId());
             return CommandResult.ALLOW;
         },"relogin").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
-            Bot bot = Main.getBotManager().getBot(dataCollection.getLong());
+            long id = dataCollection.getLong();
+            Bot bot = Main.getBotManager().getBot(id);
             if (bot == null) {
                 try {
-                    Main.getBotManager().login(dataCollection.getLong(), dataCollection.get());
+                    Main.getBotManager().login(id, dataCollection.get());
                 } catch (BotLoginException e) {
-                    ioHandler.output("Bot log in failed");
+                    ioHandler.outputLang("bot-command-login-failed",id);
                     return CommandResult.REFUSE;
                 }
-                ioHandler.output("Bot log in successfully");
+                ioHandler.outputLang("bot-command-login-succeed",id);
                 return CommandResult.ALLOW;
             }
-            ioHandler.output("Bot does exist");
+            ioHandler.outputLang("bot-command-bot-exist",id);
             return CommandResult.REFUSE;
         },"login").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
-            Main.getBotManager().remove(dataCollection.getLong());
-            ioHandler.output("Remove successfully");
+            long id = dataCollection.getLong();
+            Main.getBotManager().remove(id);
+            ioHandler.outputLang("bot-command-remove-succeed",id);
             return CommandResult.ALLOW;
         },"remove").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
     }

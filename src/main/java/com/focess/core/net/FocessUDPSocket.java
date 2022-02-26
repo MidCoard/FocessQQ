@@ -38,6 +38,7 @@ public class FocessUDPSocket implements Socket {
         }
         this.packet = new DatagramPacket(new byte[1024*1024],1024*1024);
         this.thread = new Thread(()->{
+            Main.getLogger().debugLang("start-focess-udp-socket",port);
             while (true) {
                 try {
                     socket.receive(this.packet);
@@ -61,12 +62,12 @@ public class FocessUDPSocket implements Socket {
                                     socket.send(sendPacket);
                                 }
                             } catch (Exception e) {
-                                Main.getLogger().thr("Invoke Packet Exception", e);
+                                Main.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                     }
                 } catch (IOException e) {
-                    Main.getLogger().thr("FocessUDPSocket Exception",e);
+                    Main.getLogger().thrLang("exception-focess-udp-socket",e);
                 }
             }
         });
@@ -122,7 +123,7 @@ public class FocessUDPSocket implements Socket {
         try {
             this.socket.send(sendPacket);
         } catch (IOException e) {
-            Main.getLogger().thr("Send Packet Exception",e);
+            Main.getLogger().thrLang("exception-send-packet",e);
         }
     }
 }
