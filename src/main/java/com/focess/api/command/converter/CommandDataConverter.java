@@ -25,4 +25,9 @@ public class CommandDataConverter extends NullDataConverter<Command> {
     protected void connect(DataCollection dataCollection, Command command) {
         dataCollection.writeCommand(command);
     }
+
+    @Override
+    protected Class<Command> getTargetClass() {
+        return Command.class;
+    }
 }

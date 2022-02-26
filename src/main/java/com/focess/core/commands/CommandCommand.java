@@ -28,8 +28,9 @@ public class CommandCommand extends Command {
         },"list");
         this.addExecutor(1,(sender,data,ioHandler) ->{
             Command command = data.getCommand();
-            if (command.getPlugin().equals(Main.getMainPlugin())) {
+            if (command.getPlugin() == Main.getMainPlugin()) {
                 ioHandler.outputLang("command-command-unload-main-plugin-command", command.getName());
+                return CommandResult.REFUSE;
             }
             command.unregister();
             ioHandler.outputLang("command-command-unload",command.getName());

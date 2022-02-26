@@ -113,9 +113,12 @@ public abstract class Command {
      * Unregister all commands
      */
     public static boolean unregisterAll() {
-        boolean ret = !COMMANDS_MAP.isEmpty();
-        for (Command command : COMMANDS_MAP.values())
+        boolean ret = false;
+        for (Command command : COMMANDS_MAP.values()) {
+            if (command.getPlugin() != Main.getMainPlugin())
+                ret = true;
             command.unregister();
+        }
         return ret;
     }
 
@@ -333,7 +336,7 @@ public abstract class Command {
                     dataConverters.add(DataConverter.DEFAULT_DATA_CONVERTER);
                 this.dataConverters = dataConverters.toArray(new DataConverter[0]);
             }
-            DataCollection dataCollection = new DataCollection(args.length);
+            DataCollection dataCollection = new DataCollection(this.dataConverters);
             for (int i = 0; i < args.length; i++)
                 if (!this.dataConverters[i].put(dataCollection, args[i]))
                     return CommandResult.ARGS;

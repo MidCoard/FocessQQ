@@ -70,14 +70,11 @@ public class ListenerHandler {
      *
      */
     public static boolean unregisterAll() {
-        boolean ret = !PLUGIN_LISTENER_MAP.isEmpty();
+        boolean ret = false;
         for (Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
-            List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
-            for (ListenerHandler handler : LISTENER_HANDLER_LIST)
-                for (Listener listener : listeners) {
-                    LISTENER_PLUGIN_MAP.remove(listener);
-                    handler.unregister(listener);
-                }
+            if (plugin != Main.getMainPlugin())
+                ret = true;
+            unregister(plugin);
         }
         PLUGIN_LISTENER_MAP.clear();
         return ret;

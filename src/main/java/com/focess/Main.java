@@ -5,6 +5,11 @@ import com.focess.api.bot.BotManager;
 import com.focess.api.command.Command;
 import com.focess.api.command.CommandSender;
 import com.focess.api.command.DataCollection;
+import com.focess.api.command.DataConverter;
+import com.focess.api.command.converter.CommandDataConverter;
+import com.focess.api.command.converter.PluginDataConverter;
+import com.focess.api.command.data.*;
+import com.focess.api.command.data.StringBuffer;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.event.chat.ConsoleChatEvent;
@@ -538,25 +543,33 @@ public class Main {
             this.registerListener(new ConsoleListener());
             this.registerListener(new ChatListener());
             this.registerListener(new PluginListener());
+            Main.getLogger().debugLang("register-default-listeners");
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {
                 requestAccountInformation();
                 Main.getLogger().debugLang("request-account-information");
             }
-            Main.getLogger().debugLang("register-default-listeners");
+            this.registerBuffer(DataConverter.DEFAULT_DATA_CONVERTER, StringBuffer::allocate);
+            this.registerBuffer(DataConverter.INTEGER_DATA_CONVERTER, IntBuffer::allocate);
+            this.registerBuffer(PluginDataConverter.PLUGIN_DATA_CONVERTER, PluginBuffer::allocate);
+            this.registerBuffer(CommandDataConverter.COMMAND_DATA_CONVERTER, CommandBuffer::allocate);
+            this.registerBuffer(DataConverter.LONG_DATA_CONVERTER, LongBuffer::allocate);
+            this.registerBuffer(DataConverter.DOUBLE_DATA_CONVERTER, DoubleBuffer::allocate);
+            this.registerBuffer(DataConverter.BOOLEAN_DATA_CONVERTER, BooleanBuffer::allocate);
+            Main.getLogger().debugLang("register-default-data-converters");
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
             Main.getLogger().debugLang("load-default-properties");
-            Command.register(this, new LoadCommand());
-            Command.register(this, new UnloadCommand());
-            Command.register(this, new StopCommand());
-            Command.register(this, new FriendCommand());
-            Command.register(this, new GroupCommand());
-            Command.register(this, new BotCommand());
-            Command.register(this, new ReloadCommand());
-            Command.register(this, new CommandCommand());
-            Command.register(this, new PluginCommand());
+            this.registerCommand(new LoadCommand());
+            this.registerCommand(new UnloadCommand());
+            this.registerCommand(new StopCommand());
+            this.registerCommand(new FriendCommand());
+            this.registerCommand(new GroupCommand());
+            this.registerCommand(new BotCommand());
+            this.registerCommand(new ReloadCommand());
+            this.registerCommand(new CommandCommand());
+            this.registerCommand(new PluginCommand());
             Main.getLogger().debugLang("register-default-commands");
             bot = getBotManager().loginDirectly(username,password);
             Main.getLogger().debugLang("login-default-bot");

@@ -1,15 +1,11 @@
 package com.focess.api.command;
 
-import com.focess.api.command.data.*;
-import com.focess.api.command.data.StringBuffer;
+import com.focess.Main;
+import com.focess.api.command.data.DataBuffer;
 import com.focess.api.plugin.Plugin;
-import com.focess.api.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import java.util.List;
 import java.util.Map;
 
@@ -18,49 +14,43 @@ import java.util.Map;
  */
 public class DataCollection {
 
-    private static final Map<Plugin, List<Pair<Class<?>, BufferGetter>>> PLUGIN_BUFFER_MAP = Maps.newConcurrentMap();
-    private final IntBuffer intBuffer;
-    private final DoubleBuffer doubleBuffer;
-    private final BooleanBuffer booleanBuffer;
-    private final LongBuffer longBuffer;
-    private final StringBuffer defaultBuffer;
-    private final PluginBuffer pluginBuffer;
-    private final CommandBuffer commandBuffer;
+    private static final Map<Plugin,List<DataConverter<?>>> PLUGIN_DATA_CONVERTER_MAP = Maps.newConcurrentMap();
+    private static final Map<DataConverter<?>,BufferGetter> DATA_CONVERTER_BUFFER_MAP = Maps.newConcurrentMap();
     private final Map<Class<?>, DataBuffer> buffers = Maps.newHashMap();
 
     /**
      * Initialize the DataCollection with fixed size.
      *
-     * @param size the arguments size
+     * @param dataConverters the data converters
      */
-    public DataCollection(int size) {
-        //todo fix memory unused!
-        this.defaultBuffer = StringBuffer.allocate(size);
-        this.intBuffer = IntBuffer.allocate(size);
-        this.doubleBuffer = DoubleBuffer.allocate(size);
-        this.booleanBuffer = BooleanBuffer.allocate(size);
-        this.longBuffer = LongBuffer.allocate(size);
-        this.pluginBuffer = PluginBuffer.allocate(size);
-        this.commandBuffer = CommandBuffer.allocate(size);
-        for (Plugin plugin : PLUGIN_BUFFER_MAP.keySet())
-            for (Pair<Class<?>,BufferGetter> pair : PLUGIN_BUFFER_MAP.get(plugin))
-                buffers.put(pair.getKey(), pair.getValue().newBuffer(size));
+    public DataCollection(DataConverter<?>[] dataConverters) {
+        Map<DataConverter<?>,Integer> map = Maps.newHashMap();
+        for (DataConverter<?> dataConverter : dataConverters)
+            map.compute(dataConverter, (k, v) -> {
+              if (v == null)
+                  v = 0;
+              v++;
+              return v;
+            });
+        for (DataConverter<?> dataConverter : map.keySet())
+            buffers.put(dataConverter.getTargetClass(), DATA_CONVERTER_BUFFER_MAP.get(dataConverter).newBuffer(map.get(dataConverter)));
     }
 
     /**
-     * Register the getter of the buffer by plugin
+     * Register the getter of the buffer
      *
      * @param plugin the plugin
-     * @param c the class type of the buffer's elements.
+     * @param dataConverter the buffer data converter
      * @param bufferGetter the getter of the buffer
      */
-    public static void register(Plugin plugin, Class<?> c, BufferGetter bufferGetter) {
-        PLUGIN_BUFFER_MAP.compute(plugin, (k, v) -> {
-            if (v == null)
-                v = Lists.newArrayList();
-            v.add(Pair.of(c, bufferGetter));
-            return v;
+    public static void register(Plugin plugin, DataConverter<?> dataConverter,BufferGetter bufferGetter) {
+        PLUGIN_DATA_CONVERTER_MAP.compute(plugin, (k, v) -> {
+           if (v == null)
+               v = Lists.newArrayList();
+           v.add(dataConverter);
+           return v;
         });
+        DATA_CONVERTER_BUFFER_MAP.put(dataConverter,bufferGetter);
     }
 
     /**
@@ -68,15 +58,22 @@ public class DataCollection {
      * @param plugin the plugin
      */
     public static void unregister(Plugin plugin) {
-        PLUGIN_BUFFER_MAP.remove(plugin);
+        for (DataConverter<?> dataConverter : PLUGIN_DATA_CONVERTER_MAP.getOrDefault(plugin, Lists.newArrayList()))
+            DATA_CONVERTER_BUFFER_MAP.remove(dataConverter);
+        PLUGIN_DATA_CONVERTER_MAP.remove(plugin);
     }
 
     /**
      * Unregister all the getter of the buffers
      */
     public static boolean unregisterAll() {
-        boolean ret = !PLUGIN_BUFFER_MAP.isEmpty();
-        PLUGIN_BUFFER_MAP.clear();
+        boolean ret = false;
+        for (Plugin plugin : PLUGIN_DATA_CONVERTER_MAP.keySet()) {
+            if (plugin != Main.getMainPlugin())
+                ret = true;
+            unregister(plugin);
+        }
+        PLUGIN_DATA_CONVERTER_MAP.clear();
         return ret;
     }
 
@@ -85,13 +82,6 @@ public class DataCollection {
      * Flip all the buffers. Make them all readable.
      */
     void flip() {
-        this.defaultBuffer.flip();
-        this.intBuffer.flip();
-        this.doubleBuffer.flip();
-        this.booleanBuffer.flip();
-        this.longBuffer.flip();
-        this.pluginBuffer.flip();
-        this.commandBuffer.flip();
         for (Class<?> c : buffers.keySet())
             buffers.get(c).flip();
     }
@@ -102,7 +92,7 @@ public class DataCollection {
      * @param s String argument
      */
     void write(String s) {
-        defaultBuffer.put(s);
+        this.write(String.class, s);
     }
 
     /**
@@ -111,7 +101,7 @@ public class DataCollection {
      * @param i int argument
      */
     void writeInt(int i) {
-        intBuffer.put(i);
+        this.write(Integer.class, i);
     }
 
     /**
@@ -120,7 +110,7 @@ public class DataCollection {
      * @param d double argument
      */
     void writeDouble(double d) {
-        doubleBuffer.put(d);
+        this.write(Double.class, d);
     }
 
     /**
@@ -129,7 +119,7 @@ public class DataCollection {
      * @param b boolean argument
      */
     void writeBoolean(boolean b) {
-        booleanBuffer.put(b);
+        this.write(Boolean.class, b);
     }
 
     /**
@@ -138,7 +128,7 @@ public class DataCollection {
      * @param l long argument
      */
     void writeLong(long l) {
-        longBuffer.put(l);
+        this.write(Long.class, l);
     }
 
     /**
@@ -147,7 +137,7 @@ public class DataCollection {
      * @return the String argument in order
      */
     public String get() {
-        return defaultBuffer.get();
+        return this.get(String.class);
     }
 
     /**
@@ -156,7 +146,7 @@ public class DataCollection {
      * @return the int argument in order
      */
     public int getInt() {
-        return intBuffer.get();
+        return this.get(Integer.class);
     }
 
     /**
@@ -165,7 +155,7 @@ public class DataCollection {
      * @return the double argument in order
      */
     public double getDouble() {
-        return doubleBuffer.get();
+        return this.get(Double.class);
     }
 
     /**
@@ -174,7 +164,7 @@ public class DataCollection {
      * @return the boolean argument in order
      */
     public boolean getBoolean() {
-        return booleanBuffer.get();
+        return this.get(Boolean.class);
     }
 
     /**
@@ -183,7 +173,7 @@ public class DataCollection {
      * @return the long argument in order
      */
     public long getLong() {
-        return longBuffer.get();
+        return this.get(Long.class);
     }
 
     /**
@@ -192,7 +182,7 @@ public class DataCollection {
      * @param p Plugin argument
      */
     public void writePlugin(Plugin p) {
-        this.pluginBuffer.put(p);
+        this.write(Plugin.class, p);
     }
 
     /**
@@ -201,7 +191,7 @@ public class DataCollection {
      * @return the Plugin argument in order
      */
     public Plugin getPlugin() {
-        return this.pluginBuffer.get();
+        return this.get(Plugin.class);
     }
 
     /**
@@ -209,7 +199,7 @@ public class DataCollection {
      * @return the Command argument in order
      */
     public Command getCommand() {
-        return this.commandBuffer.get();
+        return this.get(Command.class);
     }
 
     /**
@@ -217,7 +207,7 @@ public class DataCollection {
      * @param command Command argument
      */
     public void writeCommand(Command command) {
-        this.commandBuffer.put(command);
+        this.write(Command.class, command);
     }
 
     /**

@@ -63,6 +63,11 @@ public abstract class DataConverter<T> {
         protected void connect(DataCollection dataCollection, String arg) {
             dataCollection.write(arg);
         }
+
+        @Override
+        protected Class<String> getTargetClass() {
+            return String.class;
+        }
     };
 
 
@@ -84,6 +89,11 @@ public abstract class DataConverter<T> {
         protected void connect(DataCollection dataCollection, Integer arg) {
             dataCollection.writeInt(arg);
         }
+
+        @Override
+        protected Class<Integer> getTargetClass() {
+            return Integer.class;
+        }
     };
 
     /**
@@ -104,6 +114,11 @@ public abstract class DataConverter<T> {
         protected void connect(DataCollection dataCollection, Long arg) {
             dataCollection.writeLong(arg);
         }
+
+        @Override
+        protected Class<Long> getTargetClass() {
+            return Long.class;
+        }
     };
 
     /**
@@ -123,6 +138,36 @@ public abstract class DataConverter<T> {
         @Override
         protected void connect(DataCollection dataCollection, Double arg) {
             dataCollection.writeDouble(arg);
+        }
+
+        @Override
+        protected Class<Double> getTargetClass() {
+            return Double.class;
+        }
+    };
+
+    /**
+     * Convert the String argument to Boolean argument
+     */
+    public static final DataConverter<Boolean> BOOLEAN_DATA_CONVERTER = new DataConverter<Boolean>() {
+        @Override
+        protected boolean accept(String arg) {
+            return arg.equalsIgnoreCase("true") || arg.equalsIgnoreCase("false");
+        }
+
+        @Override
+        public Boolean convert(String arg) {
+            return Boolean.parseBoolean(arg);
+        }
+
+        @Override
+        protected void connect(DataCollection dataCollection, Boolean arg) {
+            dataCollection.writeBoolean(arg);
+        }
+
+        @Override
+        protected Class<Boolean> getTargetClass() {
+            return Boolean.class;
         }
     };
 
@@ -157,4 +202,6 @@ public abstract class DataConverter<T> {
      * @param arg the target argument
      */
     protected abstract void connect(DataCollection dataCollection, T arg);
+
+    protected abstract Class<T> getTargetClass();
 }

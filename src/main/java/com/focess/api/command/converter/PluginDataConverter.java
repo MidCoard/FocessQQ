@@ -22,4 +22,9 @@ public class PluginDataConverter extends NullDataConverter<Plugin> {
     protected void connect(DataCollection dataCollection, Plugin arg) {
         dataCollection.writePlugin(arg);
     }
+
+    @Override
+    protected Class<Plugin> getTargetClass() {
+        return Plugin.class;
+    }
 }

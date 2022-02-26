@@ -3,6 +3,7 @@ package com.focess.api.plugin;
 import com.focess.Main;
 import com.focess.api.command.Command;
 import com.focess.api.command.DataCollection;
+import com.focess.api.command.DataConverter;
 import com.focess.api.event.Event;
 import com.focess.api.event.EventHandler;
 import com.focess.api.event.Listener;
@@ -241,11 +242,11 @@ public abstract class Plugin {
     /**
      * Register the getter of the buffer
      *
-     * @param c the class type of the buffer's elements.
+     * @param dataConverter the buffer data converter
      * @param bufferGetter the getter of the buffer
      */
-    public void registerBuffer(Class<?> c, DataCollection.BufferGetter bufferGetter) {
-        DataCollection.register(this,c,bufferGetter);
+    public void registerBuffer(DataConverter<?> dataConverter, DataCollection.BufferGetter bufferGetter) {
+        DataCollection.register(this,dataConverter,bufferGetter);
     }
 
     public String getAuthor() {

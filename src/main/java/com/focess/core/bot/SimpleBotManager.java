@@ -44,7 +44,7 @@ public class SimpleBotManager implements BotManager {
 
     private static final Map<Bot,List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 
-    private static final Map<Long,Bot> BOTS = Maps.newHashMap();
+    private static final Map<Long,Bot> BOTS = Maps.newConcurrentMap();
 
     public SimpleBotManager() {
         if (Main.getBotManager() != null) {

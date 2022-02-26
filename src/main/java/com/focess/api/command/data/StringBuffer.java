@@ -13,7 +13,7 @@ public class StringBuffer extends DataBuffer<String> {
     private final CharBuffer[] charBuffers;
     private int pos = 0;
 
-    public StringBuffer(int size) {
+    private StringBuffer(int size) {
         this.intBuffer = IntBuffer.allocate(size);
         this.charBuffers = new CharBuffer[size];
     }
