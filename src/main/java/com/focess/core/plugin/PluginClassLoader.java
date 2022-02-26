@@ -1,7 +1,9 @@
 package com.focess.core.plugin;
 
 import com.focess.Main;
-import com.focess.api.command.*;
+import com.focess.api.command.Command;
+import com.focess.api.command.CommandType;
+import com.focess.api.command.DataCollection;
 import com.focess.api.event.EventManager;
 import com.focess.api.event.ListenerHandler;
 import com.focess.api.event.plugin.PluginLoadEvent;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,6 +46,7 @@ public class PluginClassLoader extends URLClassLoader {
             COMMAND_NAME_FIELD,
             COMMAND_ALIASES_FIELD,
             COMMAND_INITIALIZE_FIELD;
+    private static Method PLUGIN_INIT_METHOD;
 
     static {
         try {
@@ -58,8 +62,10 @@ public class PluginClassLoader extends URLClassLoader {
             COMMAND_ALIASES_FIELD.setAccessible(true);
             COMMAND_INITIALIZE_FIELD = Command.class.getDeclaredField("initialize");
             COMMAND_INITIALIZE_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
+            PLUGIN_INIT_METHOD.setAccessible(true);
+        } catch (Exception e) {
+            Main.getLogger().thrLang("exception-init-classloader", e);
         }
     }
 
@@ -71,9 +77,9 @@ public class PluginClassLoader extends URLClassLoader {
 
     private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c, annotation, classLoader) -> {
         PluginType pluginType = (PluginType) annotation;
-        if (pluginType.loadAfter().length != 0) {
+        if (pluginType.depend().length != 0) {
             boolean flag = false;
-            for (String p : pluginType.loadAfter())
+            for (String p : pluginType.depend())
                 if (Plugin.getPlugin(p) == null) {
                     AFTER_PLUGINS_MAP.compute(p, (key, value) -> {
                         if (value == null)
@@ -84,7 +90,7 @@ public class PluginClassLoader extends URLClassLoader {
                     flag = true;
                 }
             if (flag)
-                return false;
+                throw new IllegalStateException("Plugin depends on other plugins, but not all of them are loaded.");
         }
         if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
             try {
@@ -95,6 +101,7 @@ public class PluginClassLoader extends URLClassLoader {
                     PLUGIN_AUTHOR_FIELD.set(plugin,((PluginType) annotation).author());
                     PLUGIN_VERSION_FIELD.set(plugin,new Version(((PluginType) annotation).version()));
                 }
+                PLUGIN_INIT_METHOD.invoke(plugin);
                 classLoader.plugin = plugin;
                 return true;
             } catch (Exception e) {
@@ -341,10 +348,14 @@ public class PluginClassLoader extends URLClassLoader {
                     Main.getLogger().thrLang("exception-submit-plugin-load-event",e);
                 }
             } catch (Exception e) {
-                Main.getLogger().thrLang("exception-load-plugin-file", e);
-                ListenerHandler.unregister(plugin);
-                DataCollection.unregister(plugin);
-                Command.unregister(plugin);
+                if (e instanceof IllegalStateException)
+                    Main.getLogger().debugLang("plugin-depend-on-other-plugin");
+                if (plugin != null) {
+                    Main.getLogger().thrLang("exception-load-plugin-file", e);
+                    ListenerHandler.unregister(plugin);
+                    DataCollection.unregister(plugin);
+                    Command.unregister(plugin);
+                }
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;
             }

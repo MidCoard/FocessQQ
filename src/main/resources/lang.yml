@@ -54,6 +54,7 @@ exception-focess-sided-socket: Focess sided socket exception
 exception-send-packet: Send packet exception
 exception-focess-socket: Focess socket exception
 exception-focess-udp-socket: Focess udp socket exception
+exception-init-classloader: Init classloader exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
@@ -147,3 +148,4 @@ create-default-folder-failed: Failed to create default folder %s
 create-config-file-failed: Failed to create config file %s
 unknown-packet: Unknown packet %d
 message-chain: "Message chain:"
+plugin-depend-on-other-plugin: Plugin depends on other plugins

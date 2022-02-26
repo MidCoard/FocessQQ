@@ -119,7 +119,7 @@ public class Main {
     /**
      * The lang config
      */
-    private static final LangConfig LANG_CONFIG = new LangConfig(Main.class.getResourceAsStream("lang.yml"));
+    private static final LangConfig LANG_CONFIG = new LangConfig(Main.class.getResourceAsStream("/lang.yml"));
 
     /**
      * The default client receiver
@@ -328,7 +328,11 @@ public class Main {
             Main.getLogger().fatalLang("fatal-uncaught-exception");
             Main.exit();
         });
-        Main.getLogger().debugLang("setup-uncaught-exception-handler");
+        try {
+            Main.getLogger().debugLang("setup-uncaught-exception-handler");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         SCHEDULED_EXECUTOR_SERVICE.schedule(()->{
             synchronized (ConsoleListener.QUESTS) {
@@ -531,13 +535,14 @@ public class Main {
         public void enable() {
             Main.getLogger().debugLang("start-enable-main-plugin");
             running = true;
+            this.registerListener(new ConsoleListener());
+            this.registerListener(new ChatListener());
+            this.registerListener(new PluginListener());
+            // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {
                 requestAccountInformation();
                 Main.getLogger().debugLang("request-account-information");
             }
-            this.registerListener(new ConsoleListener());
-            this.registerListener(new ChatListener());
-            this.registerListener(new PluginListener());
             Main.getLogger().debugLang("register-default-listeners");
             properties = getConfig().getValues();
             if (properties == null)

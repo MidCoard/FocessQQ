@@ -87,47 +87,26 @@ public abstract class Plugin {
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
     public Plugin(String name, String author, Version version) {
-        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
-            throw new PluginLoaderException(name);
-        if (Plugin.getPlugin(this.getClass()) != null)
-            throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
-        this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
-        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
-            throw new IllegalStateException("Cannot new a plugin at runtime");
         this.name = name;
         this.author = author;
         this.version = version;
-        if (!getDefaultFolder().exists())
-            if (!getDefaultFolder().mkdirs())
-                Main.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
-        config = new File(getDefaultFolder(), "config.yml");
-        if (!config.exists()) {
-            try {
-                InputStream configResource = loadResource("config.yml");
-                if (configResource != null) {
-                    Files.copy(configResource, config.toPath());
-                    configResource.close();
-                } else if (!config.createNewFile())
-                    Main.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
-            } catch (IOException e) {
-                Main.getLogger().thrLang("exception-create-config-file",e);
-            }
-        }
-        configuration = YamlConfiguration.loadFile(config);
-        defaultConfig = new DefaultConfig(config);
-        langConfig = new LangConfig(loadResource("lang.yml"));
+        this.init();
     }
 
     /**
      * Provide a constructor to help {@link PluginType} design.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      */
-    protected Plugin() {
+    protected Plugin() {}
+
+    private void init() {
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
             throw new PluginLoaderException(name);
         if (Plugin.getPlugin(this.getClass()) != null)
             throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
-        this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
+        if (this.getClass() != Main.MainPlugin.class)
+            this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
+        else this.pluginDescription = new PluginDescription();
         if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
             throw new IllegalStateException("Cannot new a plugin at runtime");
         if (!getDefaultFolder().exists())

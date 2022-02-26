@@ -17,7 +17,7 @@ public @interface PluginType {
      *
      * @return the dependent plugins or {} if there is no dependent
      */
-    String[] loadAfter() default {};
+    String[] depend() default {};
 
     /**
      * Set the name of this plugin

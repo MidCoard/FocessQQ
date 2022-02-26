@@ -17,7 +17,8 @@ public class LangConfig extends Config {
     }
 
     @Override
-    public <T> T get(String key) {
-        return super.get(key);
+    public String get(String key) {
+        String ret = super.get(key);
+        return ret != null ? ret : "";
     }
 }
