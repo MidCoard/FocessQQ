@@ -66,7 +66,7 @@ public class Main {
     /**
      * Version of Focess
      */
-    private static final Version VERSION = new Version(3,0,3,"1001");
+    private static final Version VERSION = new Version(4,0,0,"1000");
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);

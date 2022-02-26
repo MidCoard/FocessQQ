@@ -6,7 +6,7 @@
 
     <groupId>com.focess</groupId>
     <artifactId>FocessQQ</artifactId>
-    <version>3.0</version>
+    <version>4.0.0.1000</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
