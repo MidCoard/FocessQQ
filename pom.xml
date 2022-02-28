@@ -137,7 +137,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                com.focess.Main
+                                top.focess.qq.Main
                             </mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                             <addClasspath>true</addClasspath>

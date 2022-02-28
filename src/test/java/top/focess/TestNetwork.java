@@ -1,10 +1,10 @@
 package top.focess;
 
-import com.focess.api.util.Pair;
-import com.focess.api.util.json.JSON;
-import com.focess.api.util.network.HttpResponse;
-import com.focess.api.util.network.NetworkHandler;
-import com.focess.core.util.MethodCaller;
+import top.focess.qq.api.util.Pair;
+import top.focess.qq.api.util.json.JSON;
+import top.focess.qq.api.util.network.HttpResponse;
+import top.focess.qq.api.util.network.NetworkHandler;
+import top.focess.qq.core.util.MethodCaller;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.math3.random.ISAACRandom;
