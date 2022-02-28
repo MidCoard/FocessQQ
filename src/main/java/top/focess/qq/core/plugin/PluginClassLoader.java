@@ -8,7 +8,6 @@ import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
-import com.focess.api.exceptions.*;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginDescription;
 import top.focess.qq.api.plugin.PluginType;

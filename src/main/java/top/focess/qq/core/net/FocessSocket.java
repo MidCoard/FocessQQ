@@ -2,7 +2,6 @@ package top.focess.qq.core.net;
 
 import top.focess.qq.Main;
 import top.focess.qq.api.exceptions.IllegalPortException;
-import com.focess.api.net.*;
 import top.focess.qq.api.net.*;
 import top.focess.qq.api.net.packet.Packet;
 import top.focess.qq.api.util.Pair;

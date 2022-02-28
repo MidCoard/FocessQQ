@@ -1,7 +1,6 @@
 package top.focess.qq.api.net;
 
 import top.focess.qq.Main;
-import com.focess.api.net.packet.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;

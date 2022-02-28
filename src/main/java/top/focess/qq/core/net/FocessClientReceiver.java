@@ -2,7 +2,6 @@ package top.focess.qq.core.net;
 
 import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PackHandler;
-import com.focess.api.net.packet.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import top.focess.qq.api.net.packet.*;
