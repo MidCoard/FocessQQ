@@ -556,7 +556,7 @@ public class Main {
             this.registerBuffer(DataConverter.LONG_DATA_CONVERTER, LongBuffer::allocate);
             this.registerBuffer(DataConverter.DOUBLE_DATA_CONVERTER, DoubleBuffer::allocate);
             this.registerBuffer(DataConverter.BOOLEAN_DATA_CONVERTER, BooleanBuffer::allocate);
-            Main.getLogger().debugLang("register-default-data-converters");
+            Main.getLogger().debugLang("register-default-buffers");
             properties = getConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
@@ -605,12 +605,17 @@ public class Main {
             Main.getLogger().debugLang("unload-all-plugins-except-main-plugin");
             if (Command.unregisterAll())
                 Main.getLogger().debugLang("commands-not-empty");
+            Main.getLogger().debugLang("unregister-all-commands");
             if (ListenerHandler.unregisterAll())
                 Main.getLogger().debugLang("listeners-not-empty");
+            Main.getLogger().debugLang("unregister-all-listeners");
             if (DataCollection.unregisterAll())
                 Main.getLogger().debugLang("buffers-not-empty");
-            SimpleBotManager.removeAll();
-            Main.getLogger().debugLang("remove-all-bots");
+            Main.getLogger().debugLang("unregister-all-buffers");
+            if (bot != null) {
+                SimpleBotManager.removeAll();
+                Main.getLogger().debugLang("remove-all-bots");
+            }
             for (String key : properties.keySet())
                 getDefaultConfig().set(key, properties.get(key));
             getDefaultConfig().save();

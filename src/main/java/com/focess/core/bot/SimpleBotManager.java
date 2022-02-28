@@ -95,8 +95,9 @@ public class SimpleBotManager implements BotManager {
                 return null;
             }
         });
-        net.mamoe.mirai.Bot bot = BotFactory.INSTANCE.newBot(id, password, configuration);
+        net.mamoe.mirai.Bot bot;
         try {
+            bot = BotFactory.INSTANCE.newBot(id, password, configuration);
             bot.login();
         } catch(Exception e) {
             throw new BotLoginException(id);

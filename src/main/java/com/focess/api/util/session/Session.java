@@ -40,4 +40,9 @@ public class Session implements SectionMap {
             return new SessionSection(this,get(key));
         else throw new IllegalStateException("This " + key + " is not a valid section.");
     }
+
+    @Override
+    public String toString() {
+        return values.toString();
+    }
 }

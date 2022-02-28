@@ -149,4 +149,7 @@ create-config-file-failed: Failed to create config file %s
 unknown-packet: Unknown packet %d
 message-chain: "Message chain:"
 plugin-depend-on-other-plugin: Plugin depends on other plugins
-register-default-data-converters: Register default data converters
+register-default-buffers: Register default buffers
+unregister-default-buffers: Unregister default buffers
+unregister-default-listeners: Unregister default listeners
+unregister-default-commands: Unregister default commands

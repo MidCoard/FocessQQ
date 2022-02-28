@@ -77,4 +77,8 @@ public class JSON implements SectionMap {
         }
     }
 
+    @Override
+    public String toString() {
+        return values.toString();
+    }
 }

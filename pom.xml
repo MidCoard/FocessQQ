@@ -11,8 +11,8 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/MidCoard/MiraiQQ</url>
+            <name>GitHub MidCoard Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/midcoard/miraiqq</url>
         </repository>
     </distributionManagement>
 

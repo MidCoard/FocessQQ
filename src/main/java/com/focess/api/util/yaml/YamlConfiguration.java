@@ -126,4 +126,9 @@ public class YamlConfiguration implements SectionMap {
             return new YamlConfigurationSection(this, get(key));
         else throw new IllegalStateException("This " + key + " is not a valid section.");
     }
+
+    @Override
+    public String toString() {
+        return values.toString();
+    }
 }
