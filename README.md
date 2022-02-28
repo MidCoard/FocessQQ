@@ -3,6 +3,15 @@
 
 ## 开发
 
+Maven 项目地址：
+```xml
+<dependency>
+  <groupId>top.focess</groupId>
+  <artifactId>focess-qq</artifactId>
+  <version>4.0.0.1000</version>
+</dependency>
+```
+
 开发文档移步本项目[Wiki](https://github.com/MIdCoard/MiraiQQ/wiki)
 
 ## 注意事项

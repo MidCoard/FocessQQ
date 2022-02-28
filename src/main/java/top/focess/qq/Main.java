@@ -79,7 +79,7 @@ public class Main {
     /**
      * The Focess Logger
      */
-    private static final FocessLogger LOG = new FocessLogger();
+    private static final FocessLogger LOGGER = new FocessLogger();
 
     /**
      * The Author QQ number
@@ -212,7 +212,7 @@ public class Main {
 
     @NotNull
     public static FocessLogger getLogger() {
-        return LOG;
+        return LOGGER;
     }
 
     @NotNull

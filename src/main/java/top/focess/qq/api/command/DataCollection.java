@@ -65,6 +65,8 @@ public class DataCollection {
 
     /**
      * Unregister all the getter of the buffers
+     *
+     * @return true if there are some getter of the buffers not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {
         boolean ret = false;

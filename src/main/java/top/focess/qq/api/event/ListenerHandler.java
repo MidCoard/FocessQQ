@@ -68,6 +68,7 @@ public class ListenerHandler {
     /**
      * Unregister all listeners
      *
+     * @return true if there are some listeners not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {
         boolean ret = false;

@@ -111,6 +111,8 @@ public abstract class Command {
 
     /**
      * Unregister all commands
+     *
+     * @return true if there are some commands not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {
         boolean ret = false;

@@ -17,6 +17,8 @@ public abstract class LazyPlugin extends Plugin{
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
      * @param name the plugin name
+     * @param author the plugin author
+     * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
     public LazyPlugin(String name, String author, Version version) {

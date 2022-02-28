@@ -193,6 +193,7 @@ public class PluginClassLoader extends URLClassLoader {
      * Used to disable plugin
      *
      * @param plugin the plugin need to be disabled
+     * @return the plugin jar file, or null if the plugin is MainPlugin
      */
     public static File disablePlugin(Plugin plugin) {
         Main.getLogger().debugLang("start-disable-plugin",plugin.getName());
