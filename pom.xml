@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.focess</groupId>
-    <artifactId>FocessQQ</artifactId>
+    <artifactId>focess-qq</artifactId>
     <version>4.0.0.1000</version>
 
     <distributionManagement>
