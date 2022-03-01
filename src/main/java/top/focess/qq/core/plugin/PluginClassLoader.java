@@ -11,6 +11,7 @@ import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginDescription;
 import top.focess.qq.api.plugin.PluginType;
+import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
 import com.google.common.collect.Lists;
@@ -177,7 +178,7 @@ public class PluginClassLoader extends URLClassLoader {
             if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
                 throw new PluginDuplicateException(plugin.getName());
             // no try-catch because it should be noticed by the Plugin User
-            plugin.enable();
+            plugin.onEnable();
             REGISTERED_PLUGINS.add(plugin);
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
             NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
@@ -203,9 +204,11 @@ public class PluginClassLoader extends URLClassLoader {
         Main.getLogger().debugLang("unregister-buffers");
         Command.unregister(plugin);
         Main.getLogger().debugLang("unregister-commands");
+        Schedulers.close(plugin);
+        Main.getLogger().debugLang("close-schedulers");
         // try-catch because it should take over the process
         try {
-            plugin.disable();
+            plugin.onDisable();
         } catch (Exception e) {
             Main.getLogger().thrLang("exception-plugin-disable", e);
         }

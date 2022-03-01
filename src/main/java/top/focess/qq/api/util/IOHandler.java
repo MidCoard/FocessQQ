@@ -58,6 +58,7 @@ public abstract class IOHandler {
      * Used to output formatted language key
      *
      * @param key the language key
+     * @param objects the objects need to replace
      */
     public void outputLang(String key,Object... objects) {
         Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());

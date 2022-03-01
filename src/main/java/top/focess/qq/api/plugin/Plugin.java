@@ -79,6 +79,11 @@ public abstract class Plugin {
     private PluginDescription pluginDescription;
 
     /**
+     * Whether the plugin is enabled or not
+     */
+    private boolean isEnabled;
+
+    /**
      * Initialize a Plugin instance by its name.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
@@ -108,7 +113,7 @@ public abstract class Plugin {
         if (this.getClass() != Main.MainPlugin.class)
             this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
         else this.pluginDescription = new PluginDescription();
-        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
+        if (!this.getClass().getName().equals(this.pluginDescription.getMain()) && this.getClass() != Main.MainPlugin.class)
             throw new IllegalStateException("Cannot new a plugin at runtime");
         if (!getDefaultFolder().exists())
             if (!getDefaultFolder().mkdirs())
@@ -172,6 +177,16 @@ public abstract class Plugin {
      * Used to save some data of the plugin
      */
     public abstract void disable();
+
+    public final void onEnable() {
+        this.isEnabled = true;
+        this.enable();
+    }
+
+    public final void onDisable() {
+        this.disable();
+        this.isEnabled = false;
+    }
 
     @NotNull
     public File getDefaultFolder() {
@@ -271,5 +286,9 @@ public abstract class Plugin {
 
     public InputStream loadResource(String path) {
         return this.getClass().getClassLoader().getResourceAsStream(path);
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
     }
 }

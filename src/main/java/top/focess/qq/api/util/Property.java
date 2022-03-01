@@ -7,6 +7,8 @@ import top.focess.qq.Main;
  */
 public class Property {
 
+    private Property(){}
+
     /**
      * Indicate whether it has the key or not
      *

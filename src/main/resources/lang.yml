@@ -55,10 +55,13 @@ exception-send-packet: Send packet exception
 exception-focess-socket: Focess socket exception
 exception-focess-udp-socket: Focess udp socket exception
 exception-init-classloader: Init classloader exception
+exception-focess-scheduler: Focess scheduler exception
+exception-thread-pool-scheduler: Thread pool scheduler exception
+exception-thread-pool-scheduler-thread: Thread pool scheduler thread exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
-start-main: Hi, this is MiraiQQ Framework!
+start-main: Hi, this is MiraiQQ Framework@%s!
 start-enable-plugin: Enable plugin %s
 start-disable-plugin: Disable plugin %s
 start-load-plugin: Start loading file %s
@@ -153,3 +156,5 @@ register-default-buffers: Register default buffers
 unregister-default-buffers: Unregister default buffers
 unregister-default-listeners: Unregister default listeners
 unregister-default-commands: Unregister default commands
+close-schedulers: Close schedulers
+schedulers-not-empty: Schedulers are not empty

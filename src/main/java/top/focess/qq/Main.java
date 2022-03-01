@@ -31,6 +31,8 @@ import top.focess.qq.api.net.ServerMultiReceiver;
 import top.focess.qq.api.net.ServerReceiver;
 import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.api.schedule.Scheduler;
+import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.CombinedFuture;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
@@ -57,6 +59,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.zip.GZIPOutputStream;
@@ -66,10 +69,21 @@ public class Main {
     /**
      * Version of Focess
      */
-    private static final Version VERSION = new Version(4,0,0,"1001");
+    private static final Version VERSION;
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
-    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
+    static {
+        Version version;
+        Properties properties = new Properties();
+        try {
+            properties.load(Main.class.getResourceAsStream("/default.properties"));
+            version = new Version(properties.getProperty("version"));
+        } catch (Exception e) {
+            version = new Version("build");
+        }
+
+        VERSION = version;
+    }
+
 
     /**
      * The Bot Manager
@@ -89,7 +103,11 @@ public class Main {
     /**
      * The Main Plugin Instance
      */
-    private static MainPlugin mainPlugin;
+    private static final MainPlugin MAIN_PLUGIN = new MainPlugin();
+
+
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(MAIN_PLUGIN,10);
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN);
 
     /**
      * Indicate MainPlugin is running. True after MainPlugin is loaded.
@@ -146,7 +164,7 @@ public class Main {
                 Main.getLogger().debugLang("save-log");
                 saveLogFile();
                 saved = true;
-                PluginClassLoader.disablePlugin(mainPlugin);
+                PluginClassLoader.disablePlugin(MAIN_PLUGIN);
             }
         }
     };
@@ -265,7 +283,7 @@ public class Main {
     }
 
     public static Plugin getMainPlugin() {
-        return mainPlugin;
+        return MAIN_PLUGIN;
     }
 
     /**
@@ -338,8 +356,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        SCHEDULED_EXECUTOR_SERVICE.schedule(()->{
+        SCHEDULER.runTimer(()->{
             synchronized (ConsoleListener.QUESTS) {
                 while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 10 * 1000)
                     ConsoleListener.QUESTS.poll().getKey().input(null);
@@ -351,7 +368,7 @@ public class Main {
                         queue.poll().getKey().input(null);
                 }
             }
-        },1,TimeUnit.MINUTES);
+        }, Duration.ZERO,Duration.ofMinutes(1));
 
         CONSOLE_INPUT_THREAD.start();
         Main.getLogger().debugLang("start-console-input-thread");
@@ -378,9 +395,9 @@ public class Main {
             Main.getLogger().info("--multi");
             saveLogFile();
             Main.getLogger().debugLang("save-log");
-            System.exit(0);
+            return;
         }
-        Main.getLogger().infoLang("start-main");
+        Main.getLogger().infoLang("start-main",Main.getVersion());
         option = options.get("user");
         if (option != null) {
             username = option.get(LongOptionType.LONG_OPTION_TYPE);
@@ -455,7 +472,7 @@ public class Main {
             }
         }
         try {
-            PluginClassLoader.enablePlugin(new MainPlugin());
+            PluginClassLoader.enablePlugin(MAIN_PLUGIN);
             Main.getLogger().debugLang("load-main-plugin");
         } catch (Exception e) {
             if (e instanceof PluginLoadException && e.getCause() != null && e.getCause() instanceof BotLoginException) {
@@ -469,13 +486,13 @@ public class Main {
      * Exit Bot
      */
     public static void exit() {
-        SCHEDULED_EXECUTOR_SERVICE.schedule(() -> {
+        SCHEDULER.run(() -> {
             Main.getLogger().fatalLang("fatal-exit-failed");
             Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
             System.exit(0);
-        }, 5, TimeUnit.SECONDS);
-        if (mainPlugin != null)
-            PluginClassLoader.disablePlugin(mainPlugin);
+        }, Duration.ofSeconds(5) );
+        if (MAIN_PLUGIN.isEnabled())
+            PluginClassLoader.disablePlugin(MAIN_PLUGIN);
     }
 
     private static void saveLogFile() {
@@ -517,12 +534,11 @@ public class Main {
         private static Map<String, Object> properties;
 
         public MainPlugin() {
-            super("MainPlugin","MidCoard",Version.DEFAULT_VERSION);
+            super("MainPlugin","MidCoard",Main.getVersion());
             if (running) {
                 Main.getLogger().fatalLang("fatal-main-plugin-already-running");
                 Main.exit();
             }
-            mainPlugin = this;
             try {
                 Field field = Plugin.class.getDeclaredField("langConfig");
                 field.setAccessible(true);
@@ -611,6 +627,8 @@ public class Main {
             Main.getLogger().debugLang("unregister-all-listeners");
             if (DataCollection.unregisterAll())
                 Main.getLogger().debugLang("buffers-not-empty");
+            if (Schedulers.closeAll())
+                Main.getLogger().debugLang("schedulers-not-empty");;
             Main.getLogger().debugLang("unregister-all-buffers");
             if (bot != null) {
                 SimpleBotManager.removeAll();
@@ -630,8 +648,6 @@ public class Main {
                 saveLogFile();
                 saved = true;
             }
-            EXECUTOR.shutdownNow();
-            SCHEDULED_EXECUTOR_SERVICE.shutdownNow();
             running = false;
             System.exit(0);
         }
