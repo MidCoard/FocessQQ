@@ -53,6 +53,8 @@ Maven 依赖
 
 开发文档移步本项目[Wiki](https://github.com/MIdCoard/MiraiQQ/wiki)
 
+示例插件 [FocessQQ-SendPlugin](https://github.com/MidCoard/FocessQQ-SendPlugin)
+
 ## 许可证
 本项目使用 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) 许可证
 
