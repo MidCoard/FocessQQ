@@ -5,15 +5,13 @@ import top.focess.qq.Main;
 import top.focess.qq.api.exceptions.SchedulerClosedException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
-public class ThreadPoolScheduler implements Scheduler {
-    private final Plugin plugin;
+public class ThreadPoolScheduler extends AScheduler {
 
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
 
@@ -24,7 +22,7 @@ public class ThreadPoolScheduler implements Scheduler {
     private int currentThread = 0;
 
     public ThreadPoolScheduler(Plugin plugin, int poolSize) {
-        this.plugin = plugin;
+        super(plugin);
         this.threads = new ThreadPoolSchedulerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
             threads[i] = new ThreadPoolSchedulerThread(this.getName() + "-" + i);
@@ -82,16 +80,17 @@ public class ThreadPoolScheduler implements Scheduler {
     }
 
     @Override
-    public Plugin getPlugin() {
-        return this.plugin;
-    }
-
-    @Override
     public void close() {
+        super.close();
         this.shouldStop = true;
         cancelAll();
         for (ThreadPoolSchedulerThread thread : this.threads)
             thread.close();
+    }
+
+    @Override
+    public boolean isClosed() {
+        return this.shouldStop;
     }
 
     private class SchedulerThread extends Thread {

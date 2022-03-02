@@ -83,4 +83,11 @@ public interface Scheduler {
      * Close this scheduler
      */
     void close();
+
+    /**
+     * Indicate whether this scheduler is closed or not
+     *
+     * @return true if this scheduler is closed, false otherwise
+     */
+    boolean isClosed();
 }

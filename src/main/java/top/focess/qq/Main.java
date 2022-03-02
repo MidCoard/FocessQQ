@@ -98,7 +98,13 @@ public class Main {
     /**
      * The Author QQ number
      */
+    @Deprecated
     private static final long AUTHOR_ID = 2624646185L;
+
+    /**
+     * The administrator QQ number
+     */
+    private static long administratorId = 0;
 
     /**
      * The Main Plugin Instance
@@ -242,6 +248,11 @@ public class Main {
         return username;
     }
 
+    public static long getAdministratorId() {
+        return administratorId;
+    }
+
+    @Deprecated
     public static long getAuthorId() {
         return AUTHOR_ID;
     }
@@ -323,9 +334,20 @@ public class Main {
      *
      * @return Author as a Friend
      */
+    @Deprecated
     @NotNull
     public static Friend getAuthor() {
         return getBot().getFriendOrFail(getAuthorId());
+    }
+
+    /**
+     * Get Administrator as a Friend
+     *
+     * @return the Administrator as a Friend
+     */
+    @Nullable
+    public static Friend getAdministrator() {
+        return getBot().getFriend(getAdministratorId());
     }
 
     private static void requestAccountInformation() {
@@ -387,6 +409,7 @@ public class Main {
         if (option != null) {
             Main.getLogger().info("--help");
             Main.getLogger().info("--user <id> <password>");
+            Main.getLogger().info("--admin <id>");
             Main.getLogger().info("--server <port>");
             Main.getLogger().info("--client <localhost> <localport> <host> <port> <name>");
             Main.getLogger().info("--client <host> <port> <name>");
@@ -404,6 +427,8 @@ public class Main {
             password = option.get(OptionType.DEFAULT_OPTION_TYPE);
             Main.getLogger().debugLang("use-given-account");
         }
+        option = options.get("admin");
+        option.get(LongOptionType.LONG_OPTION_TYPE);
         Option sidedOption = options.get("sided");
         Option multiOption = options.get("multi");
         option = options.get("server");

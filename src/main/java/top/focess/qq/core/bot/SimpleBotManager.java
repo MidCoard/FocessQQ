@@ -1,5 +1,15 @@
 package top.focess.qq.core.bot;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import kotlin.coroutines.Continuation;
+import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.event.Listener;
+import net.mamoe.mirai.event.events.*;
+import net.mamoe.mirai.utils.BotConfiguration;
+import net.mamoe.mirai.utils.LoginSolver;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.Main;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotManager;
@@ -17,30 +27,20 @@ import top.focess.qq.api.event.request.FriendRequestEvent;
 import top.focess.qq.api.event.request.GroupRequestEvent;
 import top.focess.qq.api.exceptions.BotLoginException;
 import top.focess.qq.api.exceptions.EventSubmitException;
+import top.focess.qq.api.schedule.Scheduler;
+import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import kotlin.coroutines.Continuation;
-import net.mamoe.mirai.BotFactory;
-import net.mamoe.mirai.event.Listener;
-import net.mamoe.mirai.event.events.*;
-import net.mamoe.mirai.utils.BotConfiguration;
-import net.mamoe.mirai.utils.LoginSolver;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class SimpleBotManager implements BotManager {
 
-    private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(2);
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(Main.getMainPlugin());
 
     private static final Map<Bot,List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 
@@ -55,7 +55,7 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public @NotNull Future<Bot> login(long id, String password) {
-        return EXECUTOR.submit(() -> loginDirectly(id,password));
+        return SCHEDULER.submit(() -> loginDirectly(id,password));
     }
 
     @Override

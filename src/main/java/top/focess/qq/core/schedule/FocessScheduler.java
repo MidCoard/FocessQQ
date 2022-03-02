@@ -6,23 +6,20 @@ import top.focess.qq.Main;
 import top.focess.qq.api.exceptions.SchedulerClosedException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
-public class FocessScheduler implements Scheduler {
-
-    private final Plugin plugin;
+public class FocessScheduler extends AScheduler {
 
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
 
     private boolean shouldStop = false;
 
     public FocessScheduler(@NotNull Plugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
         new SchedulerThread(this.getName()).start();
     }
 
@@ -71,18 +68,19 @@ public class FocessScheduler implements Scheduler {
 
     @Override
     public String getName() {
-        return this.plugin.getName() + "-FocessScheduler";
-    }
-
-    @Override
-    public Plugin getPlugin() {
-        return this.plugin;
+        return this.getPlugin().getName() + "-FocessScheduler";
     }
 
     @Override
     public void close() {
+        super.close();
         shouldStop = true;
         this.cancelAll();
+    }
+
+    @Override
+    public boolean isClosed() {
+        return shouldStop;
     }
 
     private class SchedulerThread extends Thread {

@@ -9,6 +9,8 @@ import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.message.ConsoleMessageEvent;
 import top.focess.qq.api.exceptions.InputTimeoutException;
+import top.focess.qq.api.schedule.Scheduler;
+import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
 import com.google.common.collect.Lists;
@@ -18,7 +20,7 @@ import java.util.concurrent.*;
 
 public class ConsoleListener implements Listener {
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(Main.getMainPlugin(),10);
     public static final Queue<Pair<IOHandler,Long>> QUESTS = Lists.newLinkedList();
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -38,7 +40,7 @@ public class ConsoleListener implements Listener {
         }
         try {
             Future<Boolean> ret = Main.CommandLine.exec(event.getMessage());
-            EXECUTOR.submit(()->{
+            EXECUTOR.run(()->{
                 try {
                     if (!ret.get(10, TimeUnit.MINUTES)) {
                         ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());

@@ -1,18 +1,19 @@
 package top.focess.qq.core.net;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import top.focess.qq.Main;
 import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.ServerMultiReceiver;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import top.focess.qq.api.net.packet.*;
+import top.focess.qq.api.schedule.Scheduler;
+import top.focess.qq.api.schedule.Schedulers;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class FocessUDPMultiReceiver implements ServerMultiReceiver {
 
@@ -21,17 +22,17 @@ public class FocessUDPMultiReceiver implements ServerMultiReceiver {
     private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
     private final FocessUDPSocket focessUDPSocket;
     private int defaultClientId = 0;
-    private final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(Main.getMainPlugin());
 
     public FocessUDPMultiReceiver(FocessUDPSocket focessUDPSocket) {
         this.focessUDPSocket = focessUDPSocket;
-        scheduledThreadPool.scheduleAtFixedRate(()->{
+        scheduler.runTimer(()->{
             for (SimpleClient simpleClient : clientInfos.values()) {
                 long time = lastHeart.getOrDefault(simpleClient.getId(),0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
                     clientInfos.remove(simpleClient.getId());
             }
-        },0,1, TimeUnit.SECONDS);
+        }, Duration.ZERO,Duration.ofSeconds(1));
     }
 
     private void disconnect(int clientId) {
@@ -42,7 +43,7 @@ public class FocessUDPMultiReceiver implements ServerMultiReceiver {
 
     @Override
     public void close() {
-        this.scheduledThreadPool.shutdownNow();
+        scheduler.close();
         for (Integer id : clientInfos.keySet())
             disconnect(id);
     }

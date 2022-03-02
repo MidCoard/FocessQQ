@@ -14,6 +14,8 @@ import top.focess.qq.api.event.message.GroupMessageEvent;
 import top.focess.qq.api.event.message.StrangerMessageEvent;
 import top.focess.qq.api.exceptions.EventSubmitException;
 import top.focess.qq.api.exceptions.InputTimeoutException;
+import top.focess.qq.api.schedule.Scheduler;
+import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
 import com.google.common.collect.Maps;
@@ -25,7 +27,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(Main.getMainPlugin(),10);
 
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean,Long>>>> QUESTS = Maps.newHashMap();
 
@@ -92,7 +94,7 @@ public class ChatListener implements Listener {
         if (!flag.get())
             try {
                 Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
-                EXECUTOR.submit(()->{
+                EXECUTOR.run(()->{
                     try {
                         if (!ret.get(10, TimeUnit.MINUTES)) {
                             GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(),event.getMember(),event.getMessage(),event.getSource());
@@ -123,7 +125,7 @@ public class ChatListener implements Listener {
         if (!flag.get())
             try {
                 Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
-                EXECUTOR.submit(()->{
+                EXECUTOR.run(()->{
                     try {
                         if (!ret.get(10,TimeUnit.MINUTES)) {
                             FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage());

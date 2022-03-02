@@ -124,7 +124,7 @@ public class CommandSender {
      */
     @Deprecated
     public boolean hasPermission(MemberPermission permission) {
-        if (isAuthor())
+        if (isAdministrator())
             return true;
         switch (permission) {
             case MEMBER:
@@ -143,7 +143,7 @@ public class CommandSender {
      * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
      */
     public boolean hasPermission(CommandPermission permission) {
-        if (isAuthor())
+        if (isAdministrator())
             return true;
         return this.permission.hasPermission(permission);
     }
@@ -174,8 +174,18 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents its id is equal to the id of the author, false otherwise
      */
+    @Deprecated
     public boolean isAuthor() {
         return this.isFriend ? this.friend.getId() == Main.getAuthorId() : isMember && this.member.getId() == Main.getAuthorId();
+    }
+
+    /**
+     * Indicate whether this is an Administrator
+     *
+     * @return true if this CommandSender presents its id is equal to the id of the Administrator, false otherwise
+     */
+    public boolean isAdministrator() {
+        return this.isFriend ? this.friend.getId() == Main.getAdministratorId() : isMember && this.member.getId() == Main.getAdministratorId();
     }
 
     /**
