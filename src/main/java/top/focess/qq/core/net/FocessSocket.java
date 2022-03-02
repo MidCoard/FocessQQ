@@ -126,7 +126,6 @@ public class FocessSocket implements Socket {
             this.server.close();
         } catch (IOException ignored) {
         }
-        this.thread.stop();
         for (Receiver receiver : receivers)
             receiver.close();
     }
