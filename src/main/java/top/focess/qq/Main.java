@@ -503,6 +503,7 @@ public class Main {
         } catch (Exception e) {
             if (e instanceof PluginLoadException && e.getCause() != null && e.getCause() instanceof BotLoginException) {
                 Main.getLogger().fatalLang("fatal-default-bot-login-failed",getUsername());
+                Main.getLogger().thrLang("exception-default-bot-login-failed",e.getCause());
             } else Main.getLogger().thrLang("exception-load-main-plugin",e);
             Main.exit();
         }

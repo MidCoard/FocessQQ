@@ -1,6 +1,5 @@
 package top.focess.qq.core.schedule;
 
-import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.exceptions.TaskNotFinishedException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
@@ -9,7 +8,6 @@ import top.focess.qq.api.schedule.Scheduler;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 public class FocessCallback<V> implements Callback<V>, ITask {
 
@@ -94,10 +92,5 @@ public class FocessCallback<V> implements Callback<V>, ITask {
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
         return this.nativeTask.cancel(mayInterruptIfRunning);
-    }
-
-    @Override
-    public V get(long timeout, @NotNull TimeUnit unit){
-        return null;
     }
 }

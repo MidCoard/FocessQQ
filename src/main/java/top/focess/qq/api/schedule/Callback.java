@@ -1,5 +1,7 @@
 package top.focess.qq.api.schedule;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -57,7 +59,8 @@ public interface Callback<V> extends Task, Future<V> {
      * @return not supported
      */
     @Override
-    default V get(long timeout, TimeUnit unit){
-        throw new UnsupportedOperationException();
+    default V get(long timeout, @NotNull TimeUnit unit){
+        //todo implement it!
+        return this.get();
     }
 }

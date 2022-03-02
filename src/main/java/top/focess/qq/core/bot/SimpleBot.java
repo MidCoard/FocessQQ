@@ -24,7 +24,8 @@ public class SimpleBot implements Bot {
     }
 
     @Override
-    public net.mamoe.mirai.@NotNull Bot getNativeBot() {
+    @NotNull
+    public net.mamoe.mirai.Bot getNativeBot() {
         return this.nativeBot;
     }
 

@@ -62,8 +62,12 @@ public class SimpleBotManager implements BotManager {
     public @NotNull Bot loginDirectly(long id, String password) {
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
+        File cache = new File("devices/" + id + "/cache");
+        if (!cache.exists())
+            if(!cache.mkdirs())
+                throw new BotLoginException(id,Main.getLangConfig().get("fatal-create-cache-dir-failed"));
         configuration.fileBasedDeviceInfo("devices/" + id + "/device.json");
-        configuration.setCacheDir(new File("devices/" + id + "/cache"));
+        configuration.setCacheDir(cache);
         configuration.setLoginSolver(new LoginSolver() {
             @Nullable
             @Override
@@ -100,7 +104,7 @@ public class SimpleBotManager implements BotManager {
             bot = BotFactory.INSTANCE.newBot(id, password, configuration);
             bot.login();
         } catch(Exception e) {
-            throw new BotLoginException(id);
+            throw new BotLoginException(id,e);
         }
         Bot b = new SimpleBot(id,password, bot);
         try {

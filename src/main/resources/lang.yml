@@ -5,6 +5,7 @@ fatal-exit-failed: Main Thread waits for more than 5 sec before shutdown. Force 
 fatal-save-data: Main Thread shuts down without saving Data. Try to save data now!
 fatal-main-plugin-already-running: Main Plugin is already running. Force shutdown!
 fatal-simple-bot-manager-already-exist: SimpleBotManager already exists. Force shutdown!
+fatal-create-cache-dir-failed: Failed to create cache directory %s.
 exception-uncaught-exception: Uncaught exception
 exception-submit-console-chat-event: Submit console input event exception
 exception-submit-plugin-unload-event: Submit plugin unload event exception
@@ -58,6 +59,7 @@ exception-init-classloader: Init classloader exception
 exception-focess-scheduler: Focess scheduler exception
 exception-thread-pool-scheduler: Thread pool scheduler exception
 exception-thread-pool-scheduler-thread: Thread pool scheduler thread exception
+exception-default-bot-login-failed: Default bot login failed exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
