@@ -2,7 +2,7 @@ package top.focess.qq.core.schedule;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 
@@ -58,7 +58,7 @@ public abstract class AScheduler implements Scheduler {
     public static boolean closeAll() {
         boolean ret = false;
         for (Plugin plugin : PLUGIN_SCHEDULER_MAP.keySet()) {
-            if (plugin != Main.getMainPlugin())
+            if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
             close(plugin);
         }

@@ -1,6 +1,6 @@
 package top.focess.qq.core.bot;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import com.google.common.collect.Lists;
 import net.mamoe.mirai.contact.Friend;
@@ -31,17 +31,17 @@ public class SimpleBot implements Bot {
 
     @Override
     public boolean relogin() {
-        return Main.getBotManager().relogin(this);
+        return FocessQQ.getBotManager().relogin(this);
     }
 
     @Override
     public boolean login() {
-        return Main.getBotManager().login(this);
+        return FocessQQ.getBotManager().login(this);
     }
 
     @Override
     public boolean logout() {
-        return Main.getBotManager().logout(this);
+        return FocessQQ.getBotManager().logout(this);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class SimpleBot implements Bot {
 
     @Override
     public boolean isDefaultBot() {
-        return Main.getBot().equals(this);
+        return FocessQQ.getBot().equals(this);
     }
 
     public long getUsername() {

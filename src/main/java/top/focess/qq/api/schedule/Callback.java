@@ -59,8 +59,5 @@ public interface Callback<V> extends Task, Future<V> {
      * @return not supported
      */
     @Override
-    default V get(long timeout, @NotNull TimeUnit unit){
-        //todo implement it!
-        return this.get();
-    }
+    V get(long timeout, @NotNull TimeUnit unit);
 }

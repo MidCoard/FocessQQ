@@ -1,6 +1,6 @@
 package top.focess;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
@@ -20,7 +20,7 @@ public class TestScheduler {
                 return new NetworkHandler().request("https://www.baidu.com", NetworkHandler.RequestType.GET).getResponse();
             }
         };
-        Scheduler scheduler = Schedulers.newThreadPoolScheduler(new Main.MainPlugin(),3);
+        Scheduler scheduler = Schedulers.newThreadPoolScheduler(new FocessQQ.MainPlugin(),3);
         Callback<String> callback = scheduler.submit(callable);
         System.out.println(callback.waitCall());
         scheduler.run(()->{

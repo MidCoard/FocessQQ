@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
@@ -21,7 +21,7 @@ public class BotCommand extends Command {
         this.addExecutor(0,(sender, dataCollection, ioHandler) -> {
             boolean flag = false;
             StringBuilder stringBuilder = new StringBuilder();
-            for (Bot bot : Main.getBotManager().getBots()) {
+            for (Bot bot : FocessQQ.getBotManager().getBots()) {
                 flag = true;
                 stringBuilder.append(bot.getId()).append(',');
             }
@@ -35,7 +35,7 @@ public class BotCommand extends Command {
         },"list");
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
@@ -46,7 +46,7 @@ public class BotCommand extends Command {
         },"login").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
@@ -57,7 +57,7 @@ public class BotCommand extends Command {
         },"logout").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
@@ -68,10 +68,10 @@ public class BotCommand extends Command {
         },"relogin").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 try {
-                    Main.getBotManager().login(id, dataCollection.get());
+                    FocessQQ.getBotManager().login(id, dataCollection.get());
                 } catch (BotLoginException e) {
                     ioHandler.outputLang("bot-command-login-failed",id);
                     return CommandResult.REFUSE;
@@ -84,7 +84,7 @@ public class BotCommand extends Command {
         },"login").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(1,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Main.getBotManager().remove(id);
+            FocessQQ.getBotManager().remove(id);
             ioHandler.outputLang("bot-command-remove-succeed",id);
             return CommandResult.ALLOW;
         },"remove").setDataConverters(DataConverter.LONG_DATA_CONVERTER);

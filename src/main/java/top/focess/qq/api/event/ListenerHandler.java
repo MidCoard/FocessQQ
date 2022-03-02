@@ -1,6 +1,6 @@
 package top.focess.qq.api.event;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.Pair;
 import com.google.common.collect.Lists;
@@ -73,7 +73,7 @@ public class ListenerHandler {
     public static boolean unregisterAll() {
         boolean ret = false;
         for (Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
-            if (plugin != Main.getMainPlugin())
+            if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
             unregister(plugin);
         }
@@ -128,7 +128,7 @@ public class ListenerHandler {
                             method.setAccessible(true);
                             method.invoke(listener, event);
                         } catch (Exception e) {
-                            Main.getLogger().thrLang("exception-handle-event",e);
+                            FocessQQ.getLogger().thrLang("exception-handle-event",e);
                         }
                     }
             );

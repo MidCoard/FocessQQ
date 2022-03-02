@@ -1,6 +1,6 @@
 package top.focess.qq.core.schedule;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 
 public class ThreadPoolSchedulerThread extends Thread{
 
@@ -26,7 +26,7 @@ public class ThreadPoolSchedulerThread extends Thread{
                     this.task.run();
                     this.isAvailable = true;
                 } catch (Exception e) {
-                    Main.getLogger().thrLang("exception-thread-pool-scheduler-thread",e);
+                    FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread",e);
                 }
             }
         }

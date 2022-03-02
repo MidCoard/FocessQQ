@@ -1,6 +1,6 @@
 package top.focess.qq.api.net;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;
@@ -199,7 +199,7 @@ public class PacketPreCodec {
         PacketCodec<? extends Packet> packetCodec = PACKET_CODECS.get(packetId);
         if (packetCodec != null)
             return packetCodec.readPacket(this);
-        Main.getLogger().debugLang("unknown-packet", packetId);
+        FocessQQ.getLogger().debugLang("unknown-packet", packetId);
         return null;
     }
 
@@ -217,7 +217,7 @@ public class PacketPreCodec {
             this.writeInt(packetId);
             packetCodec.writePacket(packet, this);
             return true;
-        } else Main.getLogger().debugLang("unknown-packet", packetId);
+        } else FocessQQ.getLogger().debugLang("unknown-packet", packetId);
         return false;
     }
 

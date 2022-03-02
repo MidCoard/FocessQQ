@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
@@ -18,8 +18,8 @@ public class ReloadCommand extends Command {
     }
 
     public static boolean reloadPlugin(Plugin plugin) {
-        Main.getLogger().debugLang("start-reload-plugin", plugin.getName());
-        if (plugin == Main.getMainPlugin())
+        FocessQQ.getLogger().debugLang("start-reload-plugin", plugin.getName());
+        if (plugin == FocessQQ.getMainPlugin())
             return false;
         File pluginFile = PluginClassLoader.disablePlugin(plugin);
         PluginClassLoader classLoader;
@@ -32,7 +32,7 @@ public class ReloadCommand extends Command {
                 return false;
             }
         } catch (Exception e) {
-            Main.getLogger().thrLang("exception-reload-plugin", e);
+            FocessQQ.getLogger().thrLang("exception-reload-plugin", e);
             return false;
         }
     }
@@ -42,7 +42,7 @@ public class ReloadCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, data, ioHandler) -> {
             Plugin plugin = data.getPlugin();
-            if (plugin == Main.getMainPlugin()) {
+            if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("reload-command-reload-main-plugin");
                 return CommandResult.REFUSE;
             }

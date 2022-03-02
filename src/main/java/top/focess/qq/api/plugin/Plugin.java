@@ -1,6 +1,6 @@
 package top.focess.qq.api.plugin;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.DataCollection;
 import top.focess.qq.api.command.DataConverter;
@@ -106,18 +106,18 @@ public abstract class Plugin {
     protected Plugin() {}
 
     private void init() {
-        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != Main.MainPlugin.class)
+        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(name);
         if (Plugin.getPlugin(this.getClass()) != null)
             throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
-        if (this.getClass() != Main.MainPlugin.class)
+        if (this.getClass() != FocessQQ.MainPlugin.class)
             this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
         else this.pluginDescription = new PluginDescription();
-        if (!this.getClass().getName().equals(this.pluginDescription.getMain()) && this.getClass() != Main.MainPlugin.class)
+        if (!this.getClass().getName().equals(this.pluginDescription.getMain()) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new IllegalStateException("Cannot new a plugin at runtime");
         if (!getDefaultFolder().exists())
             if (!getDefaultFolder().mkdirs())
-                Main.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
+                FocessQQ.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
         config = new File(getDefaultFolder(), "config.yml");
         if (!config.exists()) {
             try {
@@ -126,9 +126,9 @@ public abstract class Plugin {
                     Files.copy(configResource, config.toPath());
                     configResource.close();
                 } else if (!config.createNewFile())
-                    Main.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
+                    FocessQQ.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
             } catch (IOException e) {
-                Main.getLogger().thrLang("exception-create-config-file",e);
+                FocessQQ.getLogger().thrLang("exception-create-config-file",e);
             }
         }
         configuration = YamlConfiguration.loadFile(config);

@@ -1,6 +1,6 @@
 package top.focess.qq.core.net;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PackHandler;
 import com.google.common.collect.Lists;
@@ -25,7 +25,7 @@ public class FocessSidedClientReceiver implements ClientReceiver {
     private int id;
     private volatile boolean connected = false;
     private final Map<Class<?>, List<PackHandler>> packHandlers = Maps.newHashMap();
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(Main.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
     private final Queue<Packet> packets = Queues.newConcurrentLinkedQueue();
 
     public FocessSidedClientReceiver(FocessSidedClientSocket focessSidedClientSocket, String name) {

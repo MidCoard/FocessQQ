@@ -1,6 +1,6 @@
 package top.focess.qq.core.net;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.IllegalPortException;
 import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.net.PacketPreCodec;
@@ -35,7 +35,7 @@ public class FocessSidedSocket implements Socket {
             throw new IllegalPortException(localPort);
         }
         thread = new Thread(() -> {
-            Main.getLogger().debugLang("start-focess-sided-socket",localPort);
+            FocessQQ.getLogger().debugLang("start-focess-sided-socket",localPort);
             while (!server.isClosed())
                 try {
                     java.net.Socket socket = server.accept();
@@ -60,12 +60,12 @@ public class FocessSidedSocket implements Socket {
                                     outputStream.flush();
                                 }
                             } catch (Exception e) {
-                                Main.getLogger().thrLang("exception-handle-packet", e);
+                                FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                     socket.shutdownOutput();
                 } catch (IOException e) {
-                    Main.getLogger().thrLang("exception-focess-sided-socket",e);
+                    FocessQQ.getLogger().thrLang("exception-focess-sided-socket",e);
                     if (this.server.isClosed())
                         return;
                 }

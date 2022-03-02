@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
@@ -32,7 +32,7 @@ public class LoadCommand extends Command {
                         classLoader.close();
                     }
                 } catch (IOException e) {
-                    Main.getLogger().thrLang("exception-load-plugin", e);
+                    FocessQQ.getLogger().thrLang("exception-load-plugin", e);
                     return CommandResult.REFUSE;
                 }
                 return CommandResult.ALLOW;

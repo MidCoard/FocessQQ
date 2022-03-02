@@ -1,6 +1,6 @@
 package top.focess.qq.api.util.yaml;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.YamlLoadException;
 import top.focess.qq.api.util.Base64;
 import top.focess.qq.api.util.SectionMap;
@@ -42,7 +42,7 @@ public class YamlConfiguration implements SectionMap {
             reader.close();
             return yamlConfiguration;
         } catch (IOException e) {
-            Main.getLogger().thrLang("exception-load-file",e);
+            FocessQQ.getLogger().thrLang("exception-load-file",e);
         }
         return null;
     }
@@ -116,7 +116,7 @@ public class YamlConfiguration implements SectionMap {
         try {
             YAML.dump(this.values, new FileWriter(file));
         } catch (IOException e) {
-            Main.getLogger().thrLang("exception-save-file",e);
+            FocessQQ.getLogger().thrLang("exception-save-file",e);
         }
     }
 

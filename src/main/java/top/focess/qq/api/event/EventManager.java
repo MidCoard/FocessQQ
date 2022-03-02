@@ -1,6 +1,6 @@
 package top.focess.qq.api.event;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.EventSubmitException;
 import com.google.common.collect.Maps;
 
@@ -71,7 +71,7 @@ public class EventManager {
         try {
             submitOnce(cls,event);
         } catch (EventSubmitException e) {
-            Main.getLogger().trace("Try Submit Failed",e);
+            FocessQQ.getLogger().trace("Try Submit Failed",e);
         }
     }
 

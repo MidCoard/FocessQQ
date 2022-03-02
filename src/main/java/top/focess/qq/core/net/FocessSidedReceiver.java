@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.jetbrains.annotations.Nullable;
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.ServerReceiver;
@@ -25,7 +25,7 @@ public class FocessSidedReceiver implements ServerReceiver {
     private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
     private final Map<String, Queue<Packet>> packets = Maps.newConcurrentMap();
     private int defaultClientId = 0;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(Main.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
 
     public FocessSidedReceiver() {
         scheduler.runTimer(()->{

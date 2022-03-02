@@ -1,6 +1,6 @@
 package top.focess.qq.core.plugin;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandType;
 import top.focess.qq.api.command.DataCollection;
@@ -66,7 +66,7 @@ public class PluginClassLoader extends URLClassLoader {
             PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
             PLUGIN_INIT_METHOD.setAccessible(true);
         } catch (Exception e) {
-            Main.getLogger().thrLang("exception-init-classloader", e);
+            FocessQQ.getLogger().thrLang("exception-init-classloader", e);
         }
     }
 
@@ -123,7 +123,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     pluginClassLoader.loadedClasses.add(pluginClassLoader.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
                 } catch (ClassNotFoundException e) {
-                    Main.getLogger().thrLang("exception-load-class",e);
+                    FocessQQ.getLogger().thrLang("exception-load-class",e);
                 }
         });
 
@@ -174,7 +174,7 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public static void enablePlugin(Plugin plugin) {
         try {
-            Main.getLogger().debugLang("start-enable-plugin",plugin.getName());
+            FocessQQ.getLogger().debugLang("start-enable-plugin",plugin.getName());
             if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
                 throw new PluginDuplicateException(plugin.getName());
             // no try-catch because it should be noticed by the Plugin User
@@ -182,7 +182,7 @@ public class PluginClassLoader extends URLClassLoader {
             REGISTERED_PLUGINS.add(plugin);
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
             NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
-            Main.getLogger().debugLang("end-enable-plugin",plugin.getName());
+            FocessQQ.getLogger().debugLang("end-enable-plugin",plugin.getName());
         } catch (Exception e) {
             if (e instanceof PluginDuplicateException)
                 throw (PluginDuplicateException) e;
@@ -197,20 +197,20 @@ public class PluginClassLoader extends URLClassLoader {
      * @return the plugin jar file, or null if the plugin is MainPlugin
      */
     public static File disablePlugin(Plugin plugin) {
-        Main.getLogger().debugLang("start-disable-plugin",plugin.getName());
+        FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
         ListenerHandler.unregister(plugin);
-        Main.getLogger().debugLang("unregister-listeners");
+        FocessQQ.getLogger().debugLang("unregister-listeners");
         DataCollection.unregister(plugin);
-        Main.getLogger().debugLang("unregister-buffers");
+        FocessQQ.getLogger().debugLang("unregister-buffers");
         Command.unregister(plugin);
-        Main.getLogger().debugLang("unregister-commands");
+        FocessQQ.getLogger().debugLang("unregister-commands");
         Schedulers.close(plugin);
-        Main.getLogger().debugLang("close-schedulers");
+        FocessQQ.getLogger().debugLang("close-schedulers");
         // try-catch because it should take over the process
         try {
             plugin.onDisable();
         } catch (Exception e) {
-            Main.getLogger().thrLang("exception-plugin-disable", e);
+            FocessQQ.getLogger().thrLang("exception-plugin-disable", e);
         }
         REGISTERED_PLUGINS.remove(plugin);
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
@@ -225,15 +225,15 @@ public class PluginClassLoader extends URLClassLoader {
                     loader.close();
                 }
             } catch (IOException e) {
-                Main.getLogger().thrLang("exception-remove-plugin-loader", e);
+                FocessQQ.getLogger().thrLang("exception-remove-plugin-loader", e);
             }
-        Main.getLogger().debugLang("remove-plugin-loader");
-        Main.getLogger().debugLang("end-disable-plugin",plugin.getName());
+        FocessQQ.getLogger().debugLang("remove-plugin-loader");
+        FocessQQ.getLogger().debugLang("end-disable-plugin",plugin.getName());
         PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
         try {
             EventManager.submit(pluginUnloadEvent);
         } catch (EventSubmitException e) {
-            Main.getLogger().thrLang("exception-submit-plugin-unload-event",e);
+            FocessQQ.getLogger().thrLang("exception-submit-plugin-unload-event",e);
         }
         return ret;
     }
@@ -299,7 +299,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     public boolean load() {
         synchronized (LOCK) {
-            Main.getLogger().debugLang("start-load-plugin", file.getName());
+            FocessQQ.getLogger().debugLang("start-load-plugin", file.getName());
             try {
                 JarFile jarFile = new JarFile(file);
                 Enumeration<JarEntry> entries = jarFile.entries();
@@ -309,9 +309,9 @@ public class PluginClassLoader extends URLClassLoader {
                     for (ResourceHandler resourceHandler : RESOURCE_HANDLERS)
                         resourceHandler.handle(name,jarFile.getInputStream(jarEntry),this);
                 }
-                Main.getLogger().debugLang("load-plugin-classes", loadedClasses.size());
+                FocessQQ.getLogger().debugLang("load-plugin-classes", loadedClasses.size());
                 if (this.pluginDescription == null) {
-                    Main.getLogger().debugLang("plugin-description-not-found");
+                    FocessQQ.getLogger().debugLang("plugin-description-not-found");
                     PluginCoreClassLoader.LOADERS.remove(this);
                     return false;
                 }
@@ -327,19 +327,19 @@ public class PluginClassLoader extends URLClassLoader {
                     return false;
                 }
                 enablePlugin(plugin);
-                Main.getLogger().debugLang("load-plugin-class");
+                FocessQQ.getLogger().debugLang("load-plugin-class");
 
                 for (Class<?> c : loadedClasses)
                     analyseClass(c);
-                Main.getLogger().debugLang("load-command-class");
+                FocessQQ.getLogger().debugLang("load-command-class");
 
-                Main.getLogger().debugLang("load-depend-plugin");
+                FocessQQ.getLogger().debugLang("load-depend-plugin");
                 for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
                     PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
                     if (pluginClassLoader.load())
-                        Main.getLogger().infoLang("load-depend-plugin-succeed", pluginClassLoader.getPlugin().getName());
+                        FocessQQ.getLogger().infoLang("load-depend-plugin-succeed", pluginClassLoader.getPlugin().getName());
                     else {
-                        Main.getLogger().infoLang("load-depend-plugin-failed", file.getName());
+                        FocessQQ.getLogger().infoLang("load-depend-plugin-failed", file.getName());
                         pluginClassLoader.close();
                     }
                 }
@@ -349,13 +349,13 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     EventManager.submit(pluginLoadEvent);
                 } catch (EventSubmitException e) {
-                    Main.getLogger().thrLang("exception-submit-plugin-load-event",e);
+                    FocessQQ.getLogger().thrLang("exception-submit-plugin-load-event",e);
                 }
             } catch (Exception e) {
                 if (e instanceof IllegalStateException)
-                    Main.getLogger().debugLang("plugin-depend-on-other-plugin");
+                    FocessQQ.getLogger().debugLang("plugin-depend-on-other-plugin");
                 if (plugin != null) {
-                    Main.getLogger().thrLang("exception-load-plugin-file", e);
+                    FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                     ListenerHandler.unregister(plugin);
                     DataCollection.unregister(plugin);
                     Command.unregister(plugin);
@@ -363,7 +363,7 @@ public class PluginClassLoader extends URLClassLoader {
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;
             }
-            Main.getLogger().debugLang("end-load-plugin", file.getName());
+            FocessQQ.getLogger().debugLang("end-load-plugin", file.getName());
             return true;
         }
     }

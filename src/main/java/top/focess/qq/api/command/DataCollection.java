@@ -1,6 +1,6 @@
 package top.focess.qq.api.command;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.data.DataBuffer;
 import top.focess.qq.api.plugin.Plugin;
 import com.google.common.collect.Lists;
@@ -71,7 +71,7 @@ public class DataCollection {
     public static boolean unregisterAll() {
         boolean ret = false;
         for (Plugin plugin : PLUGIN_DATA_CONVERTER_MAP.keySet()) {
-            if (plugin != Main.getMainPlugin())
+            if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
             unregister(plugin);
         }

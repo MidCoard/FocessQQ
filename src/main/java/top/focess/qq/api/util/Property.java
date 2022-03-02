@@ -1,6 +1,6 @@
 package top.focess.qq.api.util;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 
 /**
  * Store some default properties of this framework.
@@ -16,7 +16,7 @@ public class Property {
      * @return true if it has the key, false otherwise
      */
     public static boolean hasKey(String key) {
-        return Main.MainPlugin.getProperties().containsKey(key);
+        return FocessQQ.MainPlugin.getProperties().containsKey(key);
     }
 
     /**
@@ -26,7 +26,7 @@ public class Property {
      * @param value the MiraiQQ framework properties' value
      */
     public static void put(String key, Object value) {
-        Main.MainPlugin.getProperties().put(key, value);
+        FocessQQ.MainPlugin.getProperties().put(key, value);
     }
 
     /**
@@ -38,7 +38,7 @@ public class Property {
      * @return the desired value
      */
     public static <T> T get(String key) {
-        return (T) Main.MainPlugin.getProperties().get(key);
+        return (T) FocessQQ.MainPlugin.getProperties().get(key);
     }
 
     /**
@@ -47,6 +47,6 @@ public class Property {
      * @param key the MiraiQQ framework properties' key
      */
     public static void remove(String key) {
-        Main.MainPlugin.getProperties().remove(key);
+        FocessQQ.MainPlugin.getProperties().remove(key);
     }
 }

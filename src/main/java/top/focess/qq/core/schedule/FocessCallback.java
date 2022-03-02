@@ -1,15 +1,22 @@
 package top.focess.qq.core.schedule;
 
+import org.jetbrains.annotations.NotNull;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.TaskNotFinishedException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
+import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 
 public class FocessCallback<V> implements Callback<V>, ITask {
+
+    private final static Scheduler DEFAULT_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
 
     private final Callable<V> callback;
     private final Scheduler scheduler;
@@ -27,9 +34,16 @@ public class FocessCallback<V> implements Callback<V>, ITask {
 
     @Override
     public V call() {
+        if (this.isCancelled())
+            throw new CancellationException();
         if (!this.isFinished)
             throw new TaskNotFinishedException(this);
         return value;
+    }
+
+    @Override
+    public V get(long timeout, @NotNull TimeUnit unit) {
+        return DEFAULT_SCHEDULER.submit(this::get,Duration.ofMillis(unit.toMillis(timeout))).get();
     }
 
     @Override

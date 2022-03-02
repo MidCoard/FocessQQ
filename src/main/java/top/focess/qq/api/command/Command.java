@@ -1,6 +1,6 @@
 package top.focess.qq.api.command;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.command.CommandExecutedEvent;
@@ -117,7 +117,7 @@ public abstract class Command {
     public static boolean unregisterAll() {
         boolean ret = false;
         for (Command command : COMMANDS_MAP.values()) {
-            if (command.getPlugin() != Main.getMainPlugin())
+            if (command.getPlugin() != FocessQQ.getMainPlugin())
                 ret = true;
             command.unregister();
         }
@@ -210,7 +210,7 @@ public abstract class Command {
 
     /**
      * Execute the command with special arguments
-     * @see Main.CommandLine#exec(CommandSender, String, IOHandler)
+     * @see FocessQQ.CommandLine#exec(CommandSender, String, IOHandler)
      *
      * @param sender the executor
      * @param args the arguments that command spilt by spaces
@@ -237,7 +237,7 @@ public abstract class Command {
                 try {
                     EventManager.submit(event);
                 } catch (EventSubmitException e) {
-                    Main.getLogger().thrLang("exception-submit-command-executed-event",e);
+                    FocessQQ.getLogger().thrLang("exception-submit-command-executed-event",e);
                 }
                 flag = true;
             }

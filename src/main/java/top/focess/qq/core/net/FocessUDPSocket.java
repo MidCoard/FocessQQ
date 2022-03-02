@@ -1,6 +1,6 @@
 package top.focess.qq.core.net;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.IllegalPortException;
 import top.focess.qq.api.net.PacketPreCodec;
 import top.focess.qq.api.net.Receiver;
@@ -38,7 +38,7 @@ public class FocessUDPSocket implements Socket {
         }
         this.packet = new DatagramPacket(new byte[1024*1024],1024*1024);
         this.thread = new Thread(()->{
-            Main.getLogger().debugLang("start-focess-udp-socket",port);
+            FocessQQ.getLogger().debugLang("start-focess-udp-socket",port);
             while (!socket.isClosed()) {
                 try {
                     socket.receive(this.packet);
@@ -62,12 +62,12 @@ public class FocessUDPSocket implements Socket {
                                     socket.send(sendPacket);
                                 }
                             } catch (Exception e) {
-                                Main.getLogger().thrLang("exception-handle-packet", e);
+                                FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                     }
                 } catch (IOException e) {
-                    Main.getLogger().thrLang("exception-focess-udp-socket",e);
+                    FocessQQ.getLogger().thrLang("exception-focess-udp-socket",e);
                 }
             }
         });
@@ -122,7 +122,7 @@ public class FocessUDPSocket implements Socket {
         try {
             this.socket.send(sendPacket);
         } catch (IOException e) {
-            Main.getLogger().thrLang("exception-send-packet",e);
+            FocessQQ.getLogger().thrLang("exception-send-packet",e);
         }
     }
 }

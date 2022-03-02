@@ -1,6 +1,6 @@
 package top.focess.qq.api.util.logger;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.commands.util.ChatConstants;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
@@ -21,7 +21,7 @@ public class FocessLogger {
      * Initialize a logger for this framework.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
-     * @see Main#getLogger()
+     * @see FocessQQ#getLogger()
      */
     public FocessLogger() {
         if (FOCESS_LOG != null)
@@ -47,7 +47,7 @@ public class FocessLogger {
     public void infoLang(String key,Object... objects) {
         Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin == null)
-            info(String.format(Main.getLangConfig().get(key), objects));
+            info(String.format(FocessQQ.getLangConfig().get(key), objects));
         else info(String.format(plugin.getLangConfig().get(key), objects));
     }
 
@@ -79,7 +79,7 @@ public class FocessLogger {
     public void thrLang(String key,Throwable e,Object... objects) {
         Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin == null)
-            thr(String.format(Main.getLangConfig().get(key), objects),e);
+            thr(String.format(FocessQQ.getLangConfig().get(key), objects),e);
         else thr(String.format(plugin.getLangConfig().get(key), objects),e);
     }
 
@@ -101,7 +101,7 @@ public class FocessLogger {
     public void fatalLang(String key,Object... objects) {
         Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin == null)
-            fatal(String.format(Main.getLangConfig().get(key), objects));
+            fatal(String.format(FocessQQ.getLangConfig().get(key), objects));
         else fatal(String.format(plugin.getLangConfig().get(key), objects));
     }
 
@@ -123,7 +123,7 @@ public class FocessLogger {
     public void debugLang(String key,Object... objects) {
         Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin == null)
-            debug(String.format(Main.getLangConfig().get(key), objects));
+            debug(String.format(FocessQQ.getLangConfig().get(key), objects));
         else debug(String.format(plugin.getLangConfig().get(key), objects));
     }
 

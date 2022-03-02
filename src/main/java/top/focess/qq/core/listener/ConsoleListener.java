@@ -1,6 +1,6 @@
 package top.focess.qq.core.listener;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventPriority;
@@ -20,7 +20,7 @@ import java.util.concurrent.*;
 
 public class ConsoleListener implements Listener {
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(Main.getMainPlugin(),10);
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
     public static final Queue<Pair<IOHandler,Long>> QUESTS = Lists.newLinkedList();
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -39,7 +39,7 @@ public class ConsoleListener implements Listener {
             }
         }
         try {
-            Future<Boolean> ret = Main.CommandLine.exec(event.getMessage());
+            Future<Boolean> ret = FocessQQ.CommandLine.exec(event.getMessage());
             EXECUTOR.run(()->{
                 try {
                     if (!ret.get(10, TimeUnit.MINUTES)) {
@@ -47,16 +47,16 @@ public class ConsoleListener implements Listener {
                         try {
                             EventManager.submit(consoleMessageEvent);
                         } catch (Exception e) {
-                            Main.getLogger().thrLang("exception-submit-console-message-event", e);
+                            FocessQQ.getLogger().thrLang("exception-submit-console-message-event", e);
                         }
                     }
                 } catch (Exception e) {
                     if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
-                        Main.getLogger().thrLang("exception-exec-console-command",e);
+                        FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
                 }
             });
         } catch (Exception e) {
-            Main.getLogger().thrLang("exception-exec-console-command",e);
+            FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
         }
     }
 

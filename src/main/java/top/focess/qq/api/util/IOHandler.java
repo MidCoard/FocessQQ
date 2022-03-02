@@ -1,6 +1,6 @@
 package top.focess.qq.api.util;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.InputTimeoutException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.listener.ConsoleListener;
@@ -24,7 +24,7 @@ public abstract class IOHandler {
         @Override
         public void output(String output) {
             String[] messages = output.split("\n");
-            Arrays.stream(messages).forEachOrdered(Main.getLogger()::info);
+            Arrays.stream(messages).forEachOrdered(FocessQQ.getLogger()::info);
         }
 
         @Override
@@ -63,7 +63,7 @@ public abstract class IOHandler {
     public void outputLang(String key,Object... objects) {
         Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin == null)
-            output(String.format(Main.getLangConfig().get(key), objects));
+            output(String.format(FocessQQ.getLangConfig().get(key), objects));
         else output(String.format(plugin.getLangConfig().get(key), objects));
     }
 

@@ -1,6 +1,6 @@
 package top.focess.qq.core.net;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.net.PacketPreCodec;
 import top.focess.qq.api.net.Receiver;
@@ -61,7 +61,7 @@ public class FocessSidedClientSocket implements Socket {
                             method.setAccessible(true);
                             method.invoke(pair.getKey(), p);
                         } catch (Exception e) {
-                            Main.getLogger().thrLang("exception-handle-packet", e);
+                            FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                         }
                     }
                 return true;

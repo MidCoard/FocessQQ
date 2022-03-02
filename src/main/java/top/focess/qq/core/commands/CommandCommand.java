@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
@@ -19,7 +19,7 @@ public class CommandCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(0,(sender,data,ioHandler)->{
             if (Command.getCommands().size() != 0 ) {
-                StringBuilder stringBuilder = new StringBuilder(Main.getLangConfig().get("command-command-list"));
+                StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("command-command-list"));
                 for (Command command : Command.getCommands())
                     stringBuilder.append(' ').append(command.getName());
                 ioHandler.output(stringBuilder.toString());
@@ -28,7 +28,7 @@ public class CommandCommand extends Command {
         },"list");
         this.addExecutor(1,(sender,data,ioHandler) ->{
             Command command = data.getCommand();
-            if (command.getPlugin() == Main.getMainPlugin()) {
+            if (command.getPlugin() == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("command-command-unload-main-plugin-command", command.getName());
                 return CommandResult.REFUSE;
             }

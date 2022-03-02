@@ -64,7 +64,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.zip.GZIPOutputStream;
 
-public class Main {
+public class FocessQQ {
 
     /**
      * Version of Focess
@@ -75,7 +75,7 @@ public class Main {
         Version version;
         Properties properties = new Properties();
         try {
-            properties.load(Main.class.getResourceAsStream("/default.properties"));
+            properties.load(FocessQQ.class.getResourceAsStream("/default.properties"));
             version = new Version(properties.getProperty("version"));
         } catch (Exception e) {
             version = new Version("build");
@@ -147,7 +147,7 @@ public class Main {
     /**
      * The lang config
      */
-    private static final LangConfig LANG_CONFIG = new LangConfig(Main.class.getResourceAsStream("/lang.yml"));
+    private static final LangConfig LANG_CONFIG = new LangConfig(FocessQQ.class.getResourceAsStream("/lang.yml"));
 
     /**
      * The default client receiver
@@ -165,8 +165,8 @@ public class Main {
         @Override
         public void run() {
             if (running) {
-                Main.getLogger().fatalLang("fatal-save-data");
-                Main.getLogger().debugLang("save-log");
+                FocessQQ.getLogger().fatalLang("fatal-save-data");
+                FocessQQ.getLogger().debugLang("save-log");
                 saveLogFile();
                 saved = true;
                 PluginClassLoader.disablePlugin(MAIN_PLUGIN);
@@ -181,7 +181,7 @@ public class Main {
             try {
                 EventManager.submit(new ConsoleChatEvent(input));
             } catch (EventSubmitException e) {
-                Main.getLogger().thrLang("exception-submit-console-chat-event",e);
+                FocessQQ.getLogger().thrLang("exception-submit-console-chat-event",e);
             }
         }
     });
@@ -206,27 +206,27 @@ public class Main {
     /**
      * Get the Friend Mirai instance by its id
      *
-     * @see Main#getBot()
+     * @see FocessQQ#getBot()
      * @see Bot#getFriend(long)
      * @param id the friend id
      * @return the Friend Mirai instance
      */
     @Nullable
     public static Friend getFriend(long id) {
-        return Main.getBot().getFriend(id);
+        return FocessQQ.getBot().getFriend(id);
     }
 
     /**
      * Get the Group Mirai instance by its id
      *
-     * @see Main#getBot()
+     * @see FocessQQ#getBot()
      * @see Bot#getGroup(long)
      * @param id the group id
      * @return the Group Mirai instance
      */
     @Nullable
     public static Group getGroup(long id) {
-        return Main.getBot().getGroup(id);
+        return FocessQQ.getBot().getGroup(id);
     }
 
     public static boolean isRunning() {
@@ -354,7 +354,7 @@ public class Main {
             IOHandler.getConsoleIoHandler().outputLang("input-account-username");
             String str = IOHandler.getConsoleIoHandler().input();
             if (str.equals("stop")) {
-                Main.getLogger().debugLang("save-log");
+                FocessQQ.getLogger().debugLang("save-log");
                 saveLogFile();
                 System.exit(0);
             }
@@ -368,12 +368,12 @@ public class Main {
 
     public static void main(String[] args) {
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
-            Main.getLogger().thrLang("exception-uncaught-exception",e);
-            Main.getLogger().fatalLang("fatal-uncaught-exception");
-            Main.exit();
+            FocessQQ.getLogger().thrLang("exception-uncaught-exception",e);
+            FocessQQ.getLogger().fatalLang("fatal-uncaught-exception");
+            FocessQQ.exit();
         });
         try {
-            Main.getLogger().debugLang("setup-uncaught-exception-handler");
+            FocessQQ.getLogger().debugLang("setup-uncaught-exception-handler");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -392,7 +392,7 @@ public class Main {
         }, Duration.ZERO,Duration.ofMinutes(1));
 
         CONSOLE_INPUT_THREAD.start();
-        Main.getLogger().debugLang("start-console-input-thread");
+        FocessQQ.getLogger().debugLang("start-console-input-thread");
 
         Options options = Options.parse(args,
                 new OptionParserClassifier("help"),
@@ -406,25 +406,25 @@ public class Main {
         );
         Option option = options.get("help");
         if (option != null) {
-            Main.getLogger().info("--help");
-            Main.getLogger().info("--user <id> <password>");
-            Main.getLogger().info("--admin <id>");
-            Main.getLogger().info("--server <port>");
-            Main.getLogger().info("--client <localhost> <localport> <host> <port> <name>");
-            Main.getLogger().info("--client <host> <port> <name>");
-            Main.getLogger().info("--udp <port>");
-            Main.getLogger().info("--sided");
-            Main.getLogger().info("--multi");
+            FocessQQ.getLogger().info("--help");
+            FocessQQ.getLogger().info("--user <id> <password>");
+            FocessQQ.getLogger().info("--admin <id>");
+            FocessQQ.getLogger().info("--server <port>");
+            FocessQQ.getLogger().info("--client <localhost> <localport> <host> <port> <name>");
+            FocessQQ.getLogger().info("--client <host> <port> <name>");
+            FocessQQ.getLogger().info("--udp <port>");
+            FocessQQ.getLogger().info("--sided");
+            FocessQQ.getLogger().info("--multi");
             saveLogFile();
-            Main.getLogger().debugLang("save-log");
+            FocessQQ.getLogger().debugLang("save-log");
             return;
         }
-        Main.getLogger().infoLang("start-main",Main.getVersion());
+        FocessQQ.getLogger().infoLang("start-main", FocessQQ.getVersion());
         option = options.get("user");
         if (option != null) {
             username = option.get(LongOptionType.LONG_OPTION_TYPE);
             password = option.get(OptionType.DEFAULT_OPTION_TYPE);
-            Main.getLogger().debugLang("use-given-account");
+            FocessQQ.getLogger().debugLang("use-given-account");
         }
         option = options.get("admin");
         if (option != null) {
@@ -438,19 +438,19 @@ public class Main {
                 try {
                     FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
                     focessSocket.registerReceiver(serverReceiver = new FocessReceiver(focessSocket));
-                    Main.socket = focessSocket;
-                    Main.getLogger().infoLang("create-focess-socket-server");
+                    FocessQQ.socket = focessSocket;
+                    FocessQQ.getLogger().infoLang("create-focess-socket-server");
                 } catch (Exception e) {
-                    Main.getLogger().thrLang("exception-create-focess-socket-server",e);
+                    FocessQQ.getLogger().thrLang("exception-create-focess-socket-server",e);
                 }
             else {
                 try {
                     FocessSidedSocket focessSidedSocket = new FocessSidedSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
                     focessSidedSocket.registerReceiver(serverReceiver = new FocessSidedReceiver());
-                    Main.socket = focessSidedSocket;
-                    Main.getLogger().infoLang("create-focess-sided-socket-server");
+                    FocessQQ.socket = focessSidedSocket;
+                    FocessQQ.getLogger().infoLang("create-focess-sided-socket-server");
                 } catch (Exception e) {
-                    Main.getLogger().thrLang("exception-create-focess-sided-socket-server",e);
+                    FocessQQ.getLogger().thrLang("exception-create-focess-sided-socket-server",e);
                 }
             }
         }
@@ -464,10 +464,10 @@ public class Main {
                     int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     focessSocket.registerReceiver(clientReceiver = new FocessClientReceiver(focessSocket,localhost,host,port,name));
-                    Main.socket = focessSocket;
-                    Main.getLogger().infoLang("create-focess-socket-client");
+                    FocessQQ.socket = focessSocket;
+                    FocessQQ.getLogger().infoLang("create-focess-socket-client");
                 } catch (Exception e) {
-                    Main.getLogger().thrLang("exception-create-focess-socket-client",e);
+                    FocessQQ.getLogger().thrLang("exception-create-focess-socket-client",e);
                 }
             else {
                 try {
@@ -476,10 +476,10 @@ public class Main {
                     String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host, port);
                     focessSidedClientSocket.registerReceiver(clientReceiver = new FocessSidedClientReceiver(focessSidedClientSocket, name));
-                    Main.socket = focessSidedClientSocket;
-                    Main.getLogger().infoLang("create-focess-sided-socket-client");
+                    FocessQQ.socket = focessSidedClientSocket;
+                    FocessQQ.getLogger().infoLang("create-focess-sided-socket-client");
                 } catch (Exception e) {
-                    Main.getLogger().thrLang("exception-create-focess-sided-socket-client",e);
+                    FocessQQ.getLogger().thrLang("exception-create-focess-sided-socket-client",e);
                 }
             }
         }
@@ -492,20 +492,20 @@ public class Main {
                 else
                     focessUDPSocket.registerReceiver(udpServerMultiReceiver = new FocessUDPMultiReceiver(focessUDPSocket));
                 udpSocket = focessUDPSocket;
-                Main.getLogger().infoLang("create-focess-udp-socket-client");
+                FocessQQ.getLogger().infoLang("create-focess-udp-socket-client");
             } catch (IllegalPortException e) {
-                Main.getLogger().thrLang("exception-create-focess-udp-socket-client",e);
+                FocessQQ.getLogger().thrLang("exception-create-focess-udp-socket-client",e);
             }
         }
         try {
             PluginClassLoader.enablePlugin(MAIN_PLUGIN);
-            Main.getLogger().debugLang("load-main-plugin");
+            FocessQQ.getLogger().debugLang("load-main-plugin");
         } catch (Exception e) {
             if (e instanceof PluginLoadException && e.getCause() != null && e.getCause() instanceof BotLoginException) {
-                Main.getLogger().fatalLang("fatal-default-bot-login-failed",getUsername());
-                Main.getLogger().thrLang("exception-default-bot-login-failed",e.getCause());
-            } else Main.getLogger().thrLang("exception-load-main-plugin",e);
-            Main.exit();
+                FocessQQ.getLogger().fatalLang("fatal-default-bot-login-failed",getUsername());
+                FocessQQ.getLogger().thrLang("exception-default-bot-login-failed",e.getCause());
+            } else FocessQQ.getLogger().thrLang("exception-load-main-plugin",e);
+            FocessQQ.exit();
         }
     }
 
@@ -514,7 +514,7 @@ public class Main {
      */
     public static void exit() {
         SCHEDULER.run(() -> {
-            Main.getLogger().fatalLang("fatal-exit-failed");
+            FocessQQ.getLogger().fatalLang("fatal-exit-failed");
             Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
             System.exit(0);
         }, Duration.ofSeconds(5) );
@@ -539,10 +539,10 @@ public class Main {
                 gzipOutputStream.finish();
                 gzipOutputStream.close();
                 if (!target.delete())
-                    Main.getLogger().fatalLang("fatal-delete-log-file-failed", target.getName());
+                    FocessQQ.getLogger().fatalLang("fatal-delete-log-file-failed", target.getName());
             }
         } catch (IOException e) {
-            Main.getLogger().thrLang("exception-save-log",e);
+            FocessQQ.getLogger().thrLang("exception-save-log",e);
         }
     }
 
@@ -561,10 +561,10 @@ public class Main {
         private static Map<String, Object> properties;
 
         public MainPlugin() {
-            super("MainPlugin","MidCoard",Main.getVersion());
+            super("MainPlugin","MidCoard", FocessQQ.getVersion());
             if (running) {
-                Main.getLogger().fatalLang("fatal-main-plugin-already-running");
-                Main.exit();
+                FocessQQ.getLogger().fatalLang("fatal-main-plugin-already-running");
+                FocessQQ.exit();
             }
             try {
                 Field field = Plugin.class.getDeclaredField("langConfig");
@@ -581,16 +581,16 @@ public class Main {
 
         @Override
         public void enable() {
-            Main.getLogger().debugLang("start-enable-main-plugin");
+            FocessQQ.getLogger().debugLang("start-enable-main-plugin");
             running = true;
             this.registerListener(new ConsoleListener());
             this.registerListener(new ChatListener());
             this.registerListener(new PluginListener());
-            Main.getLogger().debugLang("register-default-listeners");
+            FocessQQ.getLogger().debugLang("register-default-listeners");
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {
                 requestAccountInformation();
-                Main.getLogger().debugLang("request-account-information");
+                FocessQQ.getLogger().debugLang("request-account-information");
             }
             this.registerBuffer(DataConverter.DEFAULT_DATA_CONVERTER, StringBuffer::allocate);
             this.registerBuffer(DataConverter.INTEGER_DATA_CONVERTER, IntBuffer::allocate);
@@ -599,11 +599,11 @@ public class Main {
             this.registerBuffer(DataConverter.LONG_DATA_CONVERTER, LongBuffer::allocate);
             this.registerBuffer(DataConverter.DOUBLE_DATA_CONVERTER, DoubleBuffer::allocate);
             this.registerBuffer(DataConverter.BOOLEAN_DATA_CONVERTER, BooleanBuffer::allocate);
-            Main.getLogger().debugLang("register-default-buffers");
+            FocessQQ.getLogger().debugLang("register-default-buffers");
             properties = getDefaultConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
-            Main.getLogger().debugLang("load-default-properties");
+            FocessQQ.getLogger().debugLang("load-default-properties");
             this.registerCommand(new LoadCommand());
             this.registerCommand(new UnloadCommand());
             this.registerCommand(new StopCommand());
@@ -613,9 +613,9 @@ public class Main {
             this.registerCommand(new ReloadCommand());
             this.registerCommand(new CommandCommand());
             this.registerCommand(new PluginCommand());
-            Main.getLogger().debugLang("register-default-commands");
+            FocessQQ.getLogger().debugLang("register-default-commands");
             bot = getBotManager().loginDirectly(username,password);
-            Main.getLogger().debugLang("login-default-bot");
+            FocessQQ.getLogger().debugLang("login-default-bot");
             File plugins = new File("plugins");
             if (plugins.exists())
                 for (File file : plugins.listFiles(file -> file.getName().endsWith(".jar")))
@@ -623,56 +623,56 @@ public class Main {
                         Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
                         future.get();
                     } catch (Exception e) {
-                        Main.getLogger().thrLang("exception-load-default-plugin",e);
+                        FocessQQ.getLogger().thrLang("exception-load-default-plugin",e);
                     }
-            Main.getLogger().debugLang("load-default-plugins");
+            FocessQQ.getLogger().debugLang("load-default-plugins");
             Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
-            Main.getLogger().debugLang("setup-shutdown-hook");
+            FocessQQ.getLogger().debugLang("setup-shutdown-hook");
             try {
                 EventManager.submit(new ServerStartEvent());
             } catch (EventSubmitException e) {
-                Main.getLogger().thrLang("exception-submit-server-start-event", e);
+                FocessQQ.getLogger().thrLang("exception-submit-server-start-event", e);
             }
         }
 
         @Override
         public void disable() {
-            Main.getLogger().debugLang("start-disable-main-plugin");
-            for (Plugin plugin : Main.getPlugins())
+            FocessQQ.getLogger().debugLang("start-disable-main-plugin");
+            for (Plugin plugin : FocessQQ.getPlugins())
                 if (!plugin.equals(this))
                     try {
                         PluginClassLoader.disablePlugin(plugin);
                     } catch (Exception e) {
-                        Main.getLogger().thrLang("exception-unload-default-plugin",e);
+                        FocessQQ.getLogger().thrLang("exception-unload-default-plugin",e);
                     }
-            Main.getLogger().debugLang("unload-all-plugins-except-main-plugin");
+            FocessQQ.getLogger().debugLang("unload-all-plugins-except-main-plugin");
             if (Command.unregisterAll())
-                Main.getLogger().debugLang("commands-not-empty");
-            Main.getLogger().debugLang("unregister-all-commands");
+                FocessQQ.getLogger().debugLang("commands-not-empty");
+            FocessQQ.getLogger().debugLang("unregister-all-commands");
             if (ListenerHandler.unregisterAll())
-                Main.getLogger().debugLang("listeners-not-empty");
-            Main.getLogger().debugLang("unregister-all-listeners");
+                FocessQQ.getLogger().debugLang("listeners-not-empty");
+            FocessQQ.getLogger().debugLang("unregister-all-listeners");
             if (DataCollection.unregisterAll())
-                Main.getLogger().debugLang("buffers-not-empty");
-            Main.getLogger().debugLang("unregister-all-buffers");
+                FocessQQ.getLogger().debugLang("buffers-not-empty");
+            FocessQQ.getLogger().debugLang("unregister-all-buffers");
             if (Schedulers.closeAll())
-                Main.getLogger().debugLang("schedulers-not-empty");;
-            Main.getLogger().debugLang("unregister-all-schedulers");
+                FocessQQ.getLogger().debugLang("schedulers-not-empty");;
+            FocessQQ.getLogger().debugLang("unregister-all-schedulers");
             if (bot != null) {
                 SimpleBotManager.removeAll();
-                Main.getLogger().debugLang("remove-all-bots");
+                FocessQQ.getLogger().debugLang("remove-all-bots");
             }
             for (String key : properties.keySet())
                 getDefaultConfig().set(key, properties.get(key));
             getDefaultConfig().save();
-            Main.getLogger().debugLang("save-default-properties");
-            if (Main.getSocket() != null)
-                Main.getSocket().close();
-            if (Main.getUdpSocket() != null)
-                Main.getUdpSocket().close();
-            Main.getLogger().debugLang("close-all-sockets");
+            FocessQQ.getLogger().debugLang("save-default-properties");
+            if (FocessQQ.getSocket() != null)
+                FocessQQ.getSocket().close();
+            if (FocessQQ.getUdpSocket() != null)
+                FocessQQ.getUdpSocket().close();
+            FocessQQ.getLogger().debugLang("close-all-sockets");
             if (!saved) {
-                Main.getLogger().debugLang("save-log");
+                FocessQQ.getLogger().debugLang("save-log");
                 saveLogFile();
                 saved = true;
             }
@@ -722,7 +722,7 @@ public class Main {
         @NotNull
         public static Future<Boolean> exec(CommandSender sender, String command, IOHandler ioHandler) {
             if (sender == CommandSender.CONSOLE)
-                Main.getLogger().consoleInput(command);
+                FocessQQ.getLogger().consoleInput(command);
             List<String> args = Lists.newArrayList();
             StringBuilder stringBuilder = new StringBuilder();
             boolean stack = false;
@@ -774,7 +774,7 @@ public class Main {
                     try {
                         EventManager.submit(event);
                     } catch (EventSubmitException e) {
-                        Main.getLogger().thrLang("exception-submit-command-prepost-event",e);
+                        FocessQQ.getLogger().thrLang("exception-submit-command-prepost-event",e);
                     }
                     if (event.isCancelled())
                         continue;

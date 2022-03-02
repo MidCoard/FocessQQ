@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
@@ -21,12 +21,12 @@ public class FriendCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("friend-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
-            StringBuilder stringBuilder = new StringBuilder(Main.getLangConfig().get("friend-command-list"));
+            StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("friend-command-list"));
             for (Friend friend : bot.getFriends())
                 stringBuilder.append(friend.getNick()).append("(").append(friend.getId()).append("),");
             ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
@@ -34,7 +34,7 @@ public class FriendCommand extends Command {
         }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("friend-command-bot-not-found", id);
                 return CommandResult.REFUSE;

@@ -1,5 +1,6 @@
 package top.focess.qq.api.util.config;
 
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
 
 import java.io.File;
@@ -19,6 +20,8 @@ public class LangConfig extends Config {
     @Override
     public String get(String key) {
         String ret = super.get(key);
+        if (ret == null)
+            FocessQQ.getLogger().debugLang("unknown-key", key);
         return ret != null ? ret : "";
     }
 }

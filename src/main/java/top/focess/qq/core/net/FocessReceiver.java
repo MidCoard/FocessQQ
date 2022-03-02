@@ -3,7 +3,7 @@ package top.focess.qq.core.net;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.ServerReceiver;
@@ -23,7 +23,7 @@ public class FocessReceiver implements ServerReceiver {
     private final Map<String, Map<Class<?>,List<PackHandler>>> packHandlers = Maps.newHashMap();
     private int defaultClientId = 0;
     private final FocessSocket focessSocket;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(Main.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
 
     public FocessReceiver(FocessSocket focessSocket) {
         this.focessSocket = focessSocket;

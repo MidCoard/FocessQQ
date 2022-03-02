@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
@@ -22,13 +22,13 @@ public class GroupCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("group-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
             if (!bot.getGroups().isEmpty()) {
-                StringBuilder stringBuilder = new StringBuilder(Main.getLangConfig().get("group-command-list"));
+                StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("group-command-list"));
                 for (Group group : bot.getGroups())
                     stringBuilder.append(group.getName()).append("(").append(group.getId()).append("),");
                 ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
@@ -37,7 +37,7 @@ public class GroupCommand extends Command {
         }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
         this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
-            Bot bot = Main.getBotManager().getBot(id);
+            Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("group-command-bot-not-found", id);
                 return CommandResult.REFUSE;

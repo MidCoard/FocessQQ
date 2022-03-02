@@ -1,6 +1,6 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
@@ -19,7 +19,7 @@ public class UnloadCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(1, (sender, data, ioHandler) -> {
             Plugin plugin = data.getPlugin();
-            if (plugin == Main.getMainPlugin()) {
+            if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("unload-command-unload-main-plugin");
                 return CommandResult.REFUSE;
             }

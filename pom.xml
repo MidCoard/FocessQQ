@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.0.1.4001</version>
+    <version>4.0.2.1000</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -32,6 +32,8 @@
         <okhttp3.version>4.9.3</okhttp3.version>
         <logback.version>1.2.10</logback.version>
         <jackson.version>2.13.1</jackson.version>
+        <kotlin.version>1.6.0</kotlin.version>
+        <kotlin.native>native-mt</kotlin.native>
     </properties>
 
     <repositories>
@@ -89,22 +91,22 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>1.5.0</version>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.5.0</version>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>1.5.0</version>
+            <version>${kotlin.version}-${kotlin.native}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core-jvm</artifactId>
-            <version>1.5.0</version>
+            <version>${kotlin.version}-${kotlin.native}</version>
         </dependency>
     </dependencies>
 
@@ -226,7 +228,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                top.focess.qq.Main
+                                top.focess.qq.FocessQQ
                             </mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                             <addClasspath>true</addClasspath>
@@ -234,6 +236,20 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>1.5.10</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,6 +1,6 @@
 package top.focess.qq.core.listener;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.EventManager;
@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(Main.getMainPlugin(),10);
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
 
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean,Long>>>> QUESTS = Maps.newHashMap();
 
@@ -72,28 +72,28 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onStrangerChat(StrangerChatEvent event) {
-        Main.getLogger().debug(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
-        Main.getLogger().debugLang("message-chain");
-        event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
+        FocessQQ.getLogger().debug(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
+        FocessQQ.getLogger().debugLang("message-chain");
+        event.getMessage().stream().map(Object::toString).forEach(FocessQQ.getLogger()::debug);
         StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());
         try {
             EventManager.submit(strangerMessageEvent);
         } catch (EventSubmitException e) {
-            Main.getLogger().thrLang("exception-submit-stranger-message-event",e);
+            FocessQQ.getLogger().thrLang("exception-submit-stranger-message-event",e);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGroupChat(GroupChatEvent event) {
-        Main.getLogger().debug(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-        Main.getLogger().debugLang("message-chain");
-        event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
+        FocessQQ.getLogger().debug(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
+        FocessQQ.getLogger().debugLang("message-chain");
+        event.getMessage().stream().map(Object::toString).forEach(FocessQQ.getLogger()::debug);
         CommandSender sender = new CommandSender(event.getMember());
         AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<Boolean> ret = FocessQQ.CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.run(()->{
                     try {
                         if (!ret.get(10, TimeUnit.MINUTES)) {
@@ -101,30 +101,30 @@ public class ChatListener implements Listener {
                             try {
                                 EventManager.submit(groupMessageEvent);
                             } catch (Exception e) {
-                                Main.getLogger().thrLang("exception-submit-group-message-event", e);
+                                FocessQQ.getLogger().thrLang("exception-submit-group-message-event", e);
                             }
                         }
                     } catch (Exception e) {
                         if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
-                            Main.getLogger().thrLang("exception-exec-group-command",e);
+                            FocessQQ.getLogger().thrLang("exception-exec-group-command",e);
                     }
                 });
             } catch (Exception e) {
-                Main.getLogger().thrLang("exception-exec-group-command",e);
+                FocessQQ.getLogger().thrLang("exception-exec-group-command",e);
             }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFriendChat(FriendChatEvent event){
-        Main.getLogger().debug(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-        Main.getLogger().debugLang("message-chain");
-        event.getMessage().stream().map(Object::toString).forEach(Main.getLogger()::debug);
+        FocessQQ.getLogger().debug(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
+        FocessQQ.getLogger().debugLang("message-chain");
+        event.getMessage().stream().map(Object::toString).forEach(FocessQQ.getLogger()::debug);
         CommandSender sender = new CommandSender(event.getFriend());
         AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<Boolean> ret = Main.CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<Boolean> ret = FocessQQ.CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.run(()->{
                     try {
                         if (!ret.get(10,TimeUnit.MINUTES)) {
@@ -132,16 +132,16 @@ public class ChatListener implements Listener {
                             try {
                                 EventManager.submit(friendMessageEvent);
                             } catch (Exception e) {
-                                Main.getLogger().thrLang("exception-submit-friend-message-event", e);
+                                FocessQQ.getLogger().thrLang("exception-submit-friend-message-event", e);
                             }
                         }
                     } catch (Exception e) {
                         if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
-                            Main.getLogger().thrLang("exception-exec-friend-command",e);
+                            FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);
                     }
                 });
             } catch (Exception e) {
-                Main.getLogger().thrLang("exception-exec-friend-command",e);
+                FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);
             }
     }
 }

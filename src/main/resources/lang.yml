@@ -164,4 +164,5 @@ unregister-all-schedulers: Unregister all schedulers
 unregister-all-commands: Unregister all commands
 unregister-all-listeners: Unregister all listeners
 unregister-all-buffers: Unregister all buffers
+unknown-key: Unknown key %s
 

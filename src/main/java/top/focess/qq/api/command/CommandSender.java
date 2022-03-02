@@ -1,6 +1,6 @@
 package top.focess.qq.api.command;
 
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
@@ -58,7 +58,7 @@ public class CommandSender {
         this.member = null;
         this.stranger = null;
         this.friend = friend;
-        this.bot = Main.getBotManager().getBot(friend.getBot().getId());
+        this.bot = FocessQQ.getBotManager().getBot(friend.getBot().getId());
         this.isFriend = true;
         this.isMember = false;
         this.isStranger = false;
@@ -74,7 +74,7 @@ public class CommandSender {
         this.member = member;
         this.stranger = null;
         this.friend = null;
-        this.bot = Main.getBotManager().getBot(member.getBot().getId());
+        this.bot = FocessQQ.getBotManager().getBot(member.getBot().getId());
         this.isMember = true;
         this.isFriend = false;
         this.isStranger = false;
@@ -90,7 +90,7 @@ public class CommandSender {
         this.member = null;
         this.friend = null;
         this.stranger = stranger;
-        this.bot = Main.getBotManager().getBot(this.stranger.getBot().getId());
+        this.bot = FocessQQ.getBotManager().getBot(this.stranger.getBot().getId());
         this.isMember = false;
         this.isFriend = false;
         this.isStranger = true;
@@ -176,7 +176,7 @@ public class CommandSender {
      */
     @Deprecated
     public boolean isAuthor() {
-        return this.isFriend ? this.friend.getId() == Main.getAuthorId() : isMember && this.member.getId() == Main.getAuthorId();
+        return this.isFriend ? this.friend.getId() == FocessQQ.getAuthorId() : isMember && this.member.getId() == FocessQQ.getAuthorId();
     }
 
     /**
@@ -185,7 +185,7 @@ public class CommandSender {
      * @return true if this CommandSender presents its id is equal to the id of the Administrator, false otherwise
      */
     public boolean isAdministrator() {
-        return this.isFriend ? this.friend.getId() == Main.getAdministratorId() : isMember && this.member.getId() == Main.getAdministratorId();
+        return this.isFriend ? this.friend.getId() == FocessQQ.getAdministratorId() : isMember && this.member.getId() == FocessQQ.getAdministratorId();
     }
 
     /**
@@ -262,11 +262,11 @@ public class CommandSender {
     /**
      * Execute command with this CommandSender
      *
-     * @see Main.CommandLine#exec(CommandSender, String)
+     * @see FocessQQ.CommandLine#exec(CommandSender, String)
      * @param command the command CommandSender execute
      */
     public void exec(String command) {
-        Main.CommandLine.exec(this, command);
+        FocessQQ.CommandLine.exec(this, command);
     }
 
     /**

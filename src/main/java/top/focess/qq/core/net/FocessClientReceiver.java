@@ -2,7 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import top.focess.qq.Main;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.*;
@@ -24,7 +24,7 @@ public class FocessClientReceiver implements ClientReceiver {
     private int id;
     private volatile boolean connected = false;
     private final Map<Class<?>,List<PackHandler>> packHandlers = Maps.newHashMap();
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(Main.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
 
     public FocessClientReceiver(FocessSocket focessSocket,String localhost,String host,int port,String name) {
         this.host = host;
