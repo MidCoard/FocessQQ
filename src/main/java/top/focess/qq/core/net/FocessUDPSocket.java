@@ -39,7 +39,7 @@ public class FocessUDPSocket implements Socket {
         this.packet = new DatagramPacket(new byte[1024*1024],1024*1024);
         this.thread = new Thread(()->{
             Main.getLogger().debugLang("start-focess-udp-socket",port);
-            while (true) {
+            while (!socket.isClosed()) {
                 try {
                     socket.receive(this.packet);
                     PacketPreCodec packetPreCodec = new PacketPreCodec();

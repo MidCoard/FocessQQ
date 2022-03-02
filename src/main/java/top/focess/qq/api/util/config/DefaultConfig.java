@@ -1,6 +1,7 @@
 package top.focess.qq.api.util.config;
 
 import java.io.File;
+import java.util.Map;
 
 public class DefaultConfig extends Config {
 
@@ -21,5 +22,10 @@ public class DefaultConfig extends Config {
     @Override
     public void save() {
         super.save();
+    }
+
+    @Override
+    public Map<String, Object> getValues() {
+        return super.getValues();
     }
 }

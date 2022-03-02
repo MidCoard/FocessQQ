@@ -158,3 +158,8 @@ unregister-default-listeners: Unregister default listeners
 unregister-default-commands: Unregister default commands
 close-schedulers: Close schedulers
 schedulers-not-empty: Schedulers are not empty
+unregister-all-schedulers: Unregister all schedulers
+unregister-all-commands: Unregister all commands
+unregister-all-listeners: Unregister all listeners
+unregister-all-buffers: Unregister all buffers
+

@@ -1,9 +1,10 @@
 package top.focess.qq.api.util.config;
 
-import top.focess.qq.api.util.yaml.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
+import top.focess.qq.api.util.yaml.YamlConfiguration;
 
 import java.io.File;
+import java.util.Map;
 
 public abstract class Config {
 
@@ -32,5 +33,9 @@ public abstract class Config {
 
     protected void save() {
         this.yaml.save(file);
+    }
+
+    protected Map<String,Object> getValues() {
+        return this.yaml.getValues();
     }
 }

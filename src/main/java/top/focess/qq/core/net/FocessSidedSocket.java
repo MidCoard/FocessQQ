@@ -36,7 +36,7 @@ public class FocessSidedSocket implements Socket {
         }
         thread = new Thread(() -> {
             Main.getLogger().debugLang("start-focess-sided-socket",localPort);
-            while (true)
+            while (!server.isClosed())
                 try {
                     java.net.Socket socket = server.accept();
                     InputStream inputStream = socket.getInputStream();

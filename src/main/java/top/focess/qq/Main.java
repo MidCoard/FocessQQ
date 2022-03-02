@@ -86,11 +86,6 @@ public class Main {
 
 
     /**
-     * The Bot Manager
-     */
-    private static final BotManager BOT_MANAGER = new SimpleBotManager();
-
-    /**
      * The Focess Logger
      */
     private static final FocessLogger LOGGER = new FocessLogger();
@@ -111,6 +106,10 @@ public class Main {
      */
     private static final MainPlugin MAIN_PLUGIN = new MainPlugin();
 
+    /**
+     * The Bot Manager
+     */
+    private static final BotManager BOT_MANAGER = new SimpleBotManager();
 
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(MAIN_PLUGIN,10);
     private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN);
@@ -428,7 +427,9 @@ public class Main {
             Main.getLogger().debugLang("use-given-account");
         }
         option = options.get("admin");
-        option.get(LongOptionType.LONG_OPTION_TYPE);
+        if (option != null) {
+            administratorId = option.get(LongOptionType.LONG_OPTION_TYPE);
+        }
         Option sidedOption = options.get("sided");
         Option multiOption = options.get("multi");
         option = options.get("server");
@@ -598,7 +599,7 @@ public class Main {
             this.registerBuffer(DataConverter.DOUBLE_DATA_CONVERTER, DoubleBuffer::allocate);
             this.registerBuffer(DataConverter.BOOLEAN_DATA_CONVERTER, BooleanBuffer::allocate);
             Main.getLogger().debugLang("register-default-buffers");
-            properties = getConfig().getValues();
+            properties = getDefaultConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
             Main.getLogger().debugLang("load-default-properties");
@@ -652,9 +653,10 @@ public class Main {
             Main.getLogger().debugLang("unregister-all-listeners");
             if (DataCollection.unregisterAll())
                 Main.getLogger().debugLang("buffers-not-empty");
+            Main.getLogger().debugLang("unregister-all-buffers");
             if (Schedulers.closeAll())
                 Main.getLogger().debugLang("schedulers-not-empty");;
-            Main.getLogger().debugLang("unregister-all-buffers");
+            Main.getLogger().debugLang("unregister-all-schedulers");
             if (bot != null) {
                 SimpleBotManager.removeAll();
                 Main.getLogger().debugLang("remove-all-bots");

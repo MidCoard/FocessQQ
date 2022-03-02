@@ -81,7 +81,7 @@ public abstract class Plugin {
     /**
      * Whether the plugin is enabled or not
      */
-    private boolean isEnabled;
+    private boolean isEnabled = false;
 
     /**
      * Initialize a Plugin instance by its name.
@@ -194,11 +194,13 @@ public abstract class Plugin {
     }
 
     @NotNull
+    @Deprecated
     public File getConfigFile() {
         return config;
     }
 
     @NotNull
+    @Deprecated
     public YamlConfiguration getConfig() {
         return configuration;
     }
