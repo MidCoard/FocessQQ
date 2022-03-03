@@ -1,5 +1,6 @@
 package top.focess;
 
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.util.Pair;
 import top.focess.qq.api.util.json.JSON;
 import top.focess.qq.api.util.network.HttpResponse;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public class TestNetwork {
 
-    public static final NetworkHandler NETWORK_HANDLER = new NetworkHandler();
+    public static final NetworkHandler NETWORK_HANDLER = new NetworkHandler(FocessQQ.getMainPlugin());
 
     public static final String SESSION_ID = "94ad9fca-6188-4772-a1ed-5b6a03ac568b";
 

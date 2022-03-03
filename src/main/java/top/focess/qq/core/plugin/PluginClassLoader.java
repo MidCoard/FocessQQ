@@ -198,14 +198,16 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public static File disablePlugin(Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
-        ListenerHandler.unregister(plugin);
-        FocessQQ.getLogger().debugLang("unregister-listeners");
-        DataCollection.unregister(plugin);
-        FocessQQ.getLogger().debugLang("unregister-buffers");
-        Command.unregister(plugin);
-        FocessQQ.getLogger().debugLang("unregister-commands");
-        Schedulers.close(plugin);
-        FocessQQ.getLogger().debugLang("close-schedulers");
+        if (plugin != FocessQQ.getMainPlugin()) {
+            ListenerHandler.unregister(plugin);
+            FocessQQ.getLogger().debugLang("unregister-listeners");
+            DataCollection.unregister(plugin);
+            FocessQQ.getLogger().debugLang("unregister-buffers");
+            Command.unregister(plugin);
+            FocessQQ.getLogger().debugLang("unregister-commands");
+            Schedulers.close(plugin);
+            FocessQQ.getLogger().debugLang("close-schedulers");
+        }
         // try-catch because it should take over the process
         try {
             plugin.onDisable();

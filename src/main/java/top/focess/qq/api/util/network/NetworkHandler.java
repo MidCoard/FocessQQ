@@ -2,6 +2,7 @@ package top.focess.qq.api.util.network;
 
 import com.google.common.collect.Maps;
 import okhttp3.*;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.json.JSON;
 
 import javax.net.ssl.SSLContext;
@@ -58,6 +59,12 @@ public class NetworkHandler {
         CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
     }
 
+    private final Plugin plugin;
+
+    public NetworkHandler(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
     /**
      * Send a http-request
      *
@@ -99,7 +106,7 @@ public class NetworkHandler {
             return post(url,data,header,mediaType);
         else if (requestType == RequestType.PUT)
             return put(url,data,header,mediaType);
-        return HttpResponse.ofNull();
+        return HttpResponse.ofNull(this.plugin);
     }
 
     private String process(Map<String,Object> data) {
@@ -129,9 +136,9 @@ public class NetworkHandler {
         Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
         try {
             Response response = CLIENT.newCall(request).execute();
-            return new HttpResponse(response.code(),response.headers(),response.body().string());
+            return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
         } catch (IOException e) {
-            return new HttpResponse(e);
+            return new HttpResponse(this.plugin,e);
         }
     }
 
@@ -153,9 +160,9 @@ public class NetworkHandler {
         Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
         try {
             Response response = CLIENT.newCall(request).execute();
-            return new HttpResponse(response.code(),response.headers(),response.body().string());
+            return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
         } catch (IOException e) {
-            return new HttpResponse(e);
+            return new HttpResponse(this.plugin,e);
         }
     }
 
@@ -175,10 +182,14 @@ public class NetworkHandler {
             request = new Request.Builder().url(url).get().headers(Headers.of(header)).build();
         try {
             Response response = CLIENT.newCall(request).execute();
-            return new HttpResponse(response.code(),response.headers(),response.body().string());
+            return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
         } catch (IOException e) {
-            return new HttpResponse(e);
+            return new HttpResponse(this.plugin,e);
         }
+    }
+
+    public Plugin getPlugin() {
+        return plugin;
     }
 
     public enum RequestType {

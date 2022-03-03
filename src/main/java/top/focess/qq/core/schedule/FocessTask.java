@@ -36,6 +36,17 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
+    public void forceCancel() {
+        this.isFinished = false;
+        this.isRunning = false;
+    }
+
+    @Override
+    public boolean isSingleThread() {
+        return this.scheduler instanceof ThreadPoolScheduler;
+    }
+
+    @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
         return this.nativeTask.cancel(mayInterruptIfRunning);
     }
@@ -77,9 +88,9 @@ public class FocessTask implements Task, ITask {
 
     @Override
     public void run() {
-        this.isRunning = false;
-        this.runnable.run();
         this.isRunning = true;
+        this.runnable.run();
+        this.isRunning = false;
         this.isFinished = true;
     }
 

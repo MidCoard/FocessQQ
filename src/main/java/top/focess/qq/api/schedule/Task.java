@@ -7,6 +7,7 @@ import top.focess.qq.api.plugin.Plugin;
  */
 public interface Task{
 
+
     /**
      * Cancel this task
      *

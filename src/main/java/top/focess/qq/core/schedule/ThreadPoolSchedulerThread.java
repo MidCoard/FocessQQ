@@ -5,13 +5,17 @@ import top.focess.qq.FocessQQ;
 public class ThreadPoolSchedulerThread extends Thread{
 
     private final Object NOTIFY = new Object();
+    private final ThreadPoolScheduler scheduler;
+    private final String name;
 
     private boolean isAvailable = true;
     private ITask task;
     private boolean shouldStop = false;
 
-    public ThreadPoolSchedulerThread(String name) {
+    public ThreadPoolSchedulerThread(ThreadPoolScheduler scheduler, String name) {
         super(name);
+        this.scheduler = scheduler;
+        this.name = name;
     }
 
     @Override
@@ -50,4 +54,10 @@ public class ThreadPoolSchedulerThread extends Thread{
             NOTIFY.notify();
         }
     }
+
+    public void cancel() {
+        this.stop();
+        this.scheduler.recreate(this.name);
+    }
+
 }

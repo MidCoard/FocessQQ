@@ -1,19 +1,24 @@
 package top.focess.qq.core.schedule;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.SchedulerClosedException;
+import top.focess.qq.api.exceptions.TaskNotFoundException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
 public class ThreadPoolScheduler extends AScheduler {
 
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
+
+    private final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newHashMap();
 
     private final ThreadPoolSchedulerThread[] threads;
 
@@ -25,7 +30,7 @@ public class ThreadPoolScheduler extends AScheduler {
         super(plugin);
         this.threads = new ThreadPoolSchedulerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
-            threads[i] = new ThreadPoolSchedulerThread(this.getName() + "-" + i);
+            threads[i] = new ThreadPoolSchedulerThread(this,this.getName() + "-" + i);
             threads[i].start();
         }
         new SchedulerThread(this.getName()).start();
@@ -93,6 +98,20 @@ public class ThreadPoolScheduler extends AScheduler {
         return this.shouldStop;
     }
 
+    public void cancel(ITask task) {
+        if (taskThreadMap.containsKey(task)) {
+            taskThreadMap.get(task).cancel();
+            taskThreadMap.remove(task);
+        }
+        else throw new TaskNotFoundException(task);
+    }
+
+    public void recreate(String name) {
+        for (int i = 0;i<threads.length;i++)
+            if (threads[i].getName().equals(name))
+                threads[i] = new ThreadPoolSchedulerThread(this,name);
+    }
+
     private class SchedulerThread extends Thread {
 
         public SchedulerThread(String name) {
@@ -131,10 +150,10 @@ public class ThreadPoolScheduler extends AScheduler {
                                     if (thread == null)
                                         continue;
                                     tasks.poll();
+                                    taskThreadMap.put(task.getTask(), thread);
                                     thread.startTask(task.getTask());
-                                    if (task.getTask().isPeriod()) {
+                                    if (task.getTask().isPeriod())
                                         tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));
-                                    }
                                 }
                             }
                     }

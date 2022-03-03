@@ -82,6 +82,11 @@ public class FocessCallback<V> implements Callback<V>, ITask {
     }
 
     @Override
+    public boolean isSingleThread() {
+        return this.scheduler instanceof ThreadPoolScheduler;
+    }
+
+    @Override
     public void run() {
         this.isRunning = true;
         try {
@@ -101,6 +106,12 @@ public class FocessCallback<V> implements Callback<V>, ITask {
     @Override
     public void setNativeTask(ComparableTask task) {
         this.nativeTask = task;
+    }
+
+    @Override
+    public void forceCancel() {
+        this.isRunning = false;
+        this.isFinished = false;
     }
 
     @Override

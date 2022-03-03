@@ -655,9 +655,6 @@ public class FocessQQ {
             if (DataCollection.unregisterAll())
                 FocessQQ.getLogger().debugLang("buffers-not-empty");
             FocessQQ.getLogger().debugLang("unregister-all-buffers");
-            if (Schedulers.closeAll())
-                FocessQQ.getLogger().debugLang("schedulers-not-empty");;
-            FocessQQ.getLogger().debugLang("unregister-all-schedulers");
             if (bot != null) {
                 SimpleBotManager.removeAll();
                 FocessQQ.getLogger().debugLang("remove-all-bots");
@@ -677,6 +674,10 @@ public class FocessQQ {
                 saved = true;
             }
             running = false;
+            // make sure scheduler is stopped at end of disable
+            if (Schedulers.closeAll())
+                FocessQQ.getLogger().debugLang("schedulers-not-empty");;
+            FocessQQ.getLogger().debugLang("unregister-all-schedulers");
             System.exit(0);
         }
 

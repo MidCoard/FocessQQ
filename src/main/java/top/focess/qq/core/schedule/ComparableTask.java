@@ -20,10 +20,14 @@ public class ComparableTask implements Comparable<ComparableTask> {
     }
 
     public boolean cancel(boolean mayInterruptIfRunning) {
-        if (mayInterruptIfRunning)
-            throw new UnsupportedOperationException();
-        this.isCancelled = true;
-        return this.task.isPeriod() || !this.task.isRunning();
+        synchronized (task) {
+            if (mayInterruptIfRunning && !this.task.isSingleThread())
+                throw new UnsupportedOperationException();
+            if (mayInterruptIfRunning && this.task.isRunning())
+                this.task.cancel0();
+            this.isCancelled = true;
+            return !this.task.isFinished() && (this.task.isPeriod() || !this.task.isRunning());
+        }
     }
 
     public boolean isCancelled() {
