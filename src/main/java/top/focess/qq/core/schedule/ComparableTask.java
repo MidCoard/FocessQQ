@@ -21,6 +21,8 @@ public class ComparableTask implements Comparable<ComparableTask> {
 
     public boolean cancel(boolean mayInterruptIfRunning) {
         synchronized (task) {
+            if (this.isCancelled)
+                return false;
             if (mayInterruptIfRunning && !this.task.isSingleThread())
                 throw new UnsupportedOperationException();
             if (mayInterruptIfRunning && this.task.isRunning())

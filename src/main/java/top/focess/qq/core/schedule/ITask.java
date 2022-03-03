@@ -18,8 +18,8 @@ interface ITask extends Task {
         if (this.getScheduler() instanceof ThreadPoolScheduler)
             ((ThreadPoolScheduler) this.getScheduler()).cancel(this);
         else throw new UnsupportedOperationException();
-        this.forceCancel();
+        this.clear();
     }
 
-    void forceCancel();
+    void clear();
 }

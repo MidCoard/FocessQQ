@@ -36,7 +36,7 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public void forceCancel() {
+    public void clear() {
         this.isFinished = false;
         this.isRunning = false;
     }

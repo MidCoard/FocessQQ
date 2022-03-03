@@ -30,6 +30,7 @@ public class FocessScheduler extends AScheduler {
                 throw new SchedulerClosedException(this);
             FocessTask task = new FocessTask(runnable, this);
             tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
+            tasks.notify();
             return task;
         }
     }
@@ -41,6 +42,7 @@ public class FocessScheduler extends AScheduler {
                 throw new SchedulerClosedException(this);
             FocessTask task = new FocessTask(runnable, period, this);
             tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
+            tasks.notify();
             return task;
         }
     }
@@ -52,6 +54,7 @@ public class FocessScheduler extends AScheduler {
                 throw new SchedulerClosedException(this);
             FocessCallback<V> callback = new FocessCallback<>(callable, this);
             tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), callback));
+            tasks.notify();
             return callback;
         }
     }

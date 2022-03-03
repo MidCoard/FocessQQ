@@ -109,7 +109,7 @@ public class FocessCallback<V> implements Callback<V>, ITask {
     }
 
     @Override
-    public void forceCancel() {
+    public void clear() {
         this.isRunning = false;
         this.isFinished = false;
     }

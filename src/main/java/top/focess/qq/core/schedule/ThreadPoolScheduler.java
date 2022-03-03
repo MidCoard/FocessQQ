@@ -29,10 +29,8 @@ public class ThreadPoolScheduler extends AScheduler {
     public ThreadPoolScheduler(Plugin plugin, int poolSize) {
         super(plugin);
         this.threads = new ThreadPoolSchedulerThread[poolSize];
-        for (int i = 0; i < poolSize; i++) {
+        for (int i = 0; i < poolSize; i++)
             threads[i] = new ThreadPoolSchedulerThread(this,this.getName() + "-" + i);
-            threads[i].start();
-        }
         new SchedulerThread(this.getName()).start();
     }
 
@@ -108,8 +106,10 @@ public class ThreadPoolScheduler extends AScheduler {
 
     public void recreate(String name) {
         for (int i = 0;i<threads.length;i++)
-            if (threads[i].getName().equals(name))
-                threads[i] = new ThreadPoolSchedulerThread(this,name);
+            if (threads[i].getName().equals(name)) {
+                threads[i] = new ThreadPoolSchedulerThread(this, name);
+                break;
+            }
     }
 
     private class SchedulerThread extends Thread {

@@ -16,6 +16,7 @@ public class ThreadPoolSchedulerThread extends Thread{
         super(name);
         this.scheduler = scheduler;
         this.name = name;
+        this.start();
     }
 
     @Override
