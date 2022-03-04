@@ -49,6 +49,7 @@ public class Schedulers {
      * @return true if there are some schedulers not belonging to MainPlugin not been closed, false otherwise
      */
     public static boolean closeAll() {
+        System.out.println("start close all schedulers");
         return AScheduler.closeAll();
     }
 

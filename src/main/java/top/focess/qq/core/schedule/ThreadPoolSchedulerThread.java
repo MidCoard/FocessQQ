@@ -4,7 +4,7 @@ import top.focess.qq.FocessQQ;
 
 public class ThreadPoolSchedulerThread extends Thread{
 
-    private final Object NOTIFY = new Object();
+    private final Object lock = new Object();
     private final ThreadPoolScheduler scheduler;
     private final String name;
 
@@ -22,17 +22,20 @@ public class ThreadPoolSchedulerThread extends Thread{
     @Override
     public void run() {
         while (true) {
-            synchronized (NOTIFY) {
-                try {
-                    if (isAvailable)
-                        NOTIFY.wait();
-                    if (shouldStop)
-                        break;
+            try {
+                if (isAvailable)
+                    synchronized (lock) {
+                        lock.wait();
+                    }
+                if (shouldStop)
+                    break;
+                if (this.task != null) {
                     this.task.run();
-                    this.isAvailable = true;
-                } catch (Exception e) {
-                    FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread",e);
+                    this.task = null;
                 }
+                this.isAvailable = true;
+            } catch (Exception e) {
+                FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread",e);
             }
         }
     }
@@ -42,17 +45,17 @@ public class ThreadPoolSchedulerThread extends Thread{
     }
 
     public void startTask(ITask task) {
-        synchronized (NOTIFY) {
-            this.isAvailable = false;
-            this.task = task;
-            NOTIFY.notify();
+        this.isAvailable = false;
+        this.task = task;
+        synchronized (lock) {
+            lock.notify();
         }
     }
 
     public void close() {
-        synchronized (NOTIFY) {
-            this.shouldStop = true;
-            NOTIFY.notify();
+        this.shouldStop = true;
+        synchronized (lock) {
+            lock.notify();
         }
     }
 

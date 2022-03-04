@@ -18,7 +18,7 @@ public class StopCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor(0, (sender, data, ioHandler) -> {
             ioHandler.outputLang("stop-command-stop");
-            FocessQQ.exit();
+            new StopThread().start();
             return CommandResult.ALLOW;
         });
     }
@@ -26,5 +26,17 @@ public class StopCommand extends Command {
     @Override
     public void usage(CommandSender sender, IOHandler ioHandler) {
         ioHandler.output("Use: stop");
+    }
+
+    private static class StopThread extends Thread {
+
+        public StopThread() {
+            super("Stop-Thread");
+        }
+
+        @Override
+        public void run() {
+            FocessQQ.exit();
+        }
     }
 }

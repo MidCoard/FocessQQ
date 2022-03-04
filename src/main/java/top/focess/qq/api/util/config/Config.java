@@ -38,4 +38,8 @@ public abstract class Config {
     protected Map<String,Object> getValues() {
         return this.yaml.getValues();
     }
+
+    protected boolean contains(String key) {
+        return this.yaml.contains(key);
+    }
 }

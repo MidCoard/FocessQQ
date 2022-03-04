@@ -43,8 +43,8 @@ public interface Callback<V> extends Task, Future<V> {
     /**
      * Wait for this task finished and call the target value
      *
-     * @return the target value
      * @see #waitCall()
+     * @return the target value
      */
     @Override
     default V get() {

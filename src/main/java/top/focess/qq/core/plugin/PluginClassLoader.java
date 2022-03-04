@@ -300,6 +300,7 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     public boolean load() {
+        //make sure only one plugin is loaded at the same time
         synchronized (LOCK) {
             FocessQQ.getLogger().debugLang("start-load-plugin", file.getName());
             try {

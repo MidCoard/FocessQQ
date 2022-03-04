@@ -13,9 +13,9 @@ public class FocessTask implements Task, ITask {
     private final Scheduler scheduler;
     private final String name;
     private Duration period;
-    private boolean isRunning = false;
+    protected boolean isRunning = false;
     private boolean isPeriod = false;
-    private boolean isFinished = false;
+    protected boolean isFinished = false;
     private ComparableTask nativeTask;
 
     FocessTask(Runnable runnable, Scheduler scheduler) {
@@ -36,7 +36,7 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         this.isFinished = false;
         this.isRunning = false;
     }
@@ -52,7 +52,7 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public boolean isRunning() {
+    public synchronized boolean isRunning() {
         return isRunning;
     }
 
@@ -77,7 +77,7 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public boolean isFinished() {
+    public synchronized boolean isFinished() {
         return !this.isPeriod && this.isFinished;
     }
 

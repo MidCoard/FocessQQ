@@ -1,11 +1,12 @@
 package top.focess.qq.core.listener;
 
+import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
+import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventPriority;
 import top.focess.qq.api.event.Listener;
-import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.message.ConsoleMessageEvent;
 import top.focess.qq.api.exceptions.InputTimeoutException;
@@ -13,30 +14,29 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
-import com.google.common.collect.Lists;
 
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class ConsoleListener implements Listener {
 
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
-    public static final Queue<Pair<IOHandler,Long>> QUESTS = Lists.newLinkedList();
+    public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingDeque();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onConsoleChat(ConsoleChatEvent event) {
-        synchronized (ConsoleListener.QUESTS) {
-            if (!QUESTS.isEmpty()) {
-                Pair<IOHandler, Long> element = QUESTS.poll();
-                while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 10 * 1000) {
-                    element.getKey().input(null);
-                    element = QUESTS.poll();
-                }
-                if (element == null)
-                    return;
-                element.getKey().input(event.getMessage());
-                return;
+        if (!QUESTS.isEmpty()) {
+            Pair<IOHandler, Long> element = QUESTS.poll();
+            while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 10 * 1000) {
+                element.getKey().input(null);
+                element = QUESTS.poll();
             }
+            if (element == null)
+                return;
+            element.getKey().input(event.getMessage());
+            return;
         }
         try {
             Future<Boolean> ret = FocessQQ.CommandLine.exec(event.getMessage());
@@ -66,7 +66,7 @@ public class ConsoleListener implements Listener {
      * @param ioHandler the {@link CommandSender#CONSOLE} CommandSender
      */
     public static void registerInputListener(IOHandler ioHandler) {
-        QUESTS.add(Pair.of(ioHandler,System.currentTimeMillis()));
+        QUESTS.offer(Pair.of(ioHandler,System.currentTimeMillis()));
     }
 
 

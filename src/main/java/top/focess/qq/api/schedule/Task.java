@@ -7,7 +7,6 @@ import top.focess.qq.api.plugin.Plugin;
  */
 public interface Task{
 
-
     /**
      * Cancel this task
      *
@@ -74,4 +73,5 @@ public interface Task{
      * @return true if it is cancelled, false otherwise
      */
     boolean isCancelled();
+
 }

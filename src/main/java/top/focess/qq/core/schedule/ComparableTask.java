@@ -19,20 +19,24 @@ public class ComparableTask implements Comparable<ComparableTask> {
         return Long.compare(this.time, o.time);
     }
 
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        synchronized (task) {
-            if (this.isCancelled)
+    public synchronized boolean cancel(boolean mayInterruptIfRunning) {
+        if (this.isCancelled)
+            return false;
+        synchronized (this.task) {
+            if (this.task.isFinished())
                 return false;
-            if (mayInterruptIfRunning && !this.task.isSingleThread())
-                throw new UnsupportedOperationException();
-            if (mayInterruptIfRunning && this.task.isRunning())
-                this.task.cancel0();
+            if (mayInterruptIfRunning) {
+                if (!this.task.isSingleThread())
+                    throw new UnsupportedOperationException();
+                if (this.task.isRunning())
+                    this.task.cancel0();
+            }
             this.isCancelled = true;
-            return !this.task.isFinished() && (this.task.isPeriod() || !this.task.isRunning());
+            return !this.task.isRunning();
         }
     }
 
-    public boolean isCancelled() {
+    public synchronized boolean isCancelled() {
         return this.isCancelled;
     }
 

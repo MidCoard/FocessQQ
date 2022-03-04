@@ -378,16 +378,12 @@ public class FocessQQ {
             e.printStackTrace();
         }
         SCHEDULER.runTimer(()->{
-            synchronized (ConsoleListener.QUESTS) {
-                while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 10 * 1000)
-                    ConsoleListener.QUESTS.poll().getKey().input(null);
-            }
-            synchronized (ChatListener.QUESTS) {
-                for (CommandSender sender : ChatListener.QUESTS.keySet()) {
-                    Queue<Pair<IOHandler, Pair<Boolean, Long>>> queue = ChatListener.QUESTS.get(sender);
-                    while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 10 * 1000)
-                        queue.poll().getKey().input(null);
-                }
+            while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 10 * 1000)
+                ConsoleListener.QUESTS.poll().getKey().input(null);
+            for (CommandSender sender : ChatListener.QUESTS.keySet()) {
+                Queue<Pair<IOHandler, Pair<Boolean, Long>>> queue = ChatListener.QUESTS.get(sender);
+                while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 10 * 1000)
+                    queue.poll().getKey().input(null);
             }
         }, Duration.ZERO,Duration.ofMinutes(1));
 
@@ -402,7 +398,8 @@ public class FocessQQ {
                 new OptionParserClassifier("sided"),
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("udp",IntegerOptionType.INTEGER_OPTION_TYPE),
-                new OptionParserClassifier("multi")
+                new OptionParserClassifier("multi"),
+                new OptionParserClassifier("admin",LongOptionType.LONG_OPTION_TYPE)
         );
         Option option = options.get("help");
         if (option != null) {
@@ -427,9 +424,8 @@ public class FocessQQ {
             FocessQQ.getLogger().debugLang("use-given-account");
         }
         option = options.get("admin");
-        if (option != null) {
+        if (option != null)
             administratorId = option.get(LongOptionType.LONG_OPTION_TYPE);
-        }
         Option sidedOption = options.get("sided");
         Option multiOption = options.get("multi");
         option = options.get("server");
@@ -671,14 +667,16 @@ public class FocessQQ {
             if (!saved) {
                 FocessQQ.getLogger().debugLang("save-log");
                 saveLogFile();
-                saved = true;
             }
             running = false;
             // make sure scheduler is stopped at end of disable
             if (Schedulers.closeAll())
                 FocessQQ.getLogger().debugLang("schedulers-not-empty");;
             FocessQQ.getLogger().debugLang("unregister-all-schedulers");
-            System.exit(0);
+            if (!saved) {
+                saved = true;
+                System.exit(0);
+            }
         }
 
     }

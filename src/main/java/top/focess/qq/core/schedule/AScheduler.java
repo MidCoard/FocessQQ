@@ -45,7 +45,7 @@ public abstract class AScheduler implements Scheduler {
      * @param plugin the plugin
      */
     public static void close(Plugin plugin) {
-        for (Scheduler scheduler : PLUGIN_SCHEDULER_MAP.getOrDefault(plugin, Lists.newArrayList()))
+        for (Scheduler scheduler : PLUGIN_SCHEDULER_MAP.getOrDefault(plugin, Lists.newCopyOnWriteArrayList()))
             scheduler.close();
         PLUGIN_SCHEDULER_MAP.remove(plugin);
     }

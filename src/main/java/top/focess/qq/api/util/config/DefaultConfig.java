@@ -28,4 +28,9 @@ public class DefaultConfig extends Config {
     public Map<String, Object> getValues() {
         return super.getValues();
     }
+
+    @Override
+    public boolean contains(String key) {
+        return super.contains(key);
+    }
 }
