@@ -109,6 +109,10 @@ public class ThreadPoolScheduler extends AScheduler {
             }
     }
 
+    public void rerun(ITask task) {
+        tasks.add(new ComparableTask(System.currentTimeMillis() + task.getPeriod().toMillis(), task));
+    }
+
     private class SchedulerThread extends Thread {
 
         public SchedulerThread(String name) {
@@ -150,10 +154,9 @@ public class ThreadPoolScheduler extends AScheduler {
                                 tasks.poll();
                                 taskThreadMap.put(task.getTask(), thread);
                                 thread.startTask(task.getTask());
-                                if (task.getTask().isPeriod())
-                                    tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));
                             }
                         }
+                    sleep(0);
                 } catch (Exception e) {
                     FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler",e);
                 }

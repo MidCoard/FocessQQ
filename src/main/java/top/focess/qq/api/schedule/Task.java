@@ -11,14 +11,14 @@ public interface Task{
      * Cancel this task
      *
      * @param mayInterruptIfRunning must be false
-     * @return true if it is cancelled, false otherwise
+     * @return true if it is cancelled, false it cannot be cancelled or it is already cancelled
      */
     boolean cancel(boolean mayInterruptIfRunning);
 
     /**
      * Cancel this task
      *
-     * @return true if it is cancelled, false otherwise
+     * @return true if it is cancelled, false it cannot be cancelled or it is already cancelled
      * @see #cancel(boolean)
      */
     default boolean cancel() {

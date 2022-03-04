@@ -20,9 +20,9 @@ public class ComparableTask implements Comparable<ComparableTask> {
     }
 
     public synchronized boolean cancel(boolean mayInterruptIfRunning) {
-        if (this.isCancelled)
-            return false;
         synchronized (this.task) {
+            if (this.isCancelled)
+                return false;
             if (this.task.isFinished())
                 return false;
             if (mayInterruptIfRunning) {
@@ -30,10 +30,12 @@ public class ComparableTask implements Comparable<ComparableTask> {
                     throw new UnsupportedOperationException();
                 if (this.task.isRunning())
                     this.task.cancel0();
-            }
+            } else if (this.task.isRunning())
+                return false;
             this.isCancelled = true;
-            return !this.task.isRunning();
+            this.task.notifyAll();
         }
+        return !this.task.isRunning();
     }
 
     public synchronized boolean isCancelled() {

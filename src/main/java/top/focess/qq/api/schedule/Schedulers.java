@@ -14,7 +14,9 @@ public class Schedulers {
     private Schedulers() {}
 
     /**
-     * New a FocessScheduler
+     * New a FocessScheduler, the scheduler will run all tasks in time order.
+     * For example, if the finish-time of the last task is after the start-time of the next task, the next task will only be executed after the last task is finished.
+     * As a result, the task running in this scheduler cannot be cancelled if it is already running.
      *
      * @param plugin the plugin
      * @return a FocessScheduler
@@ -24,7 +26,9 @@ public class Schedulers {
     }
 
     /**
-     * New a ThreadPoolScheduler
+     * New a ThreadPoolScheduler, the scheduler can run tasks in parallel.
+     * So if the thread-pool is big enough, even if the finish-time of the last task is after the start-time of the next task, the next task will be executed immediately.
+     * As a result, the task running in this scheduler can be cancelled if it is already running.
      *
      * @param plugin the plugin
      * @param poolSize the thread pool size

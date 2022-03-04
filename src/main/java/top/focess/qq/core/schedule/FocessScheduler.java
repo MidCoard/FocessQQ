@@ -96,7 +96,7 @@ public class FocessScheduler extends AScheduler {
                             FocessScheduler.this.wait();
                         }
                     ComparableTask task = tasks.peek();
-                    if (task != null)
+                    if (task != null) {
                         synchronized (task.getTask()) {
                             if (task.isCancelled()) {
                                 tasks.poll();
@@ -104,12 +104,17 @@ public class FocessScheduler extends AScheduler {
                             }
                             if (task.getTime() <= System.currentTimeMillis()) {
                                 tasks.poll();
-                                task.getTask().run();
-                                if (task.getTask().isPeriod()) {
-                                    tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));
-                                }
+                                task.getTask().startRun();
                             }
                         }
+                        if (task.getTask().isRunning()) {
+                            task.getTask().run();
+                            task.getTask().endRun();
+                            if (task.getTask().isPeriod())
+                                tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));
+                        }
+                    }
+                    sleep(0);
                 } catch (Exception e) {
                     FocessQQ.getLogger().thrLang("exception-focess-scheduler",e);
                 }

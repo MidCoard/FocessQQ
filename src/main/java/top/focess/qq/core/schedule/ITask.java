@@ -3,12 +3,13 @@ package top.focess.qq.core.schedule;
 import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
+import java.util.concurrent.ExecutionException;
 
 interface ITask extends Task {
 
     boolean isSingleThread();
 
-    void run();
+    void run() throws ExecutionException;
 
     Duration getPeriod();
 
@@ -22,4 +23,8 @@ interface ITask extends Task {
     }
 
     void clear();
+
+    void startRun();
+
+    void endRun();
 }

@@ -6,6 +6,7 @@ import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class FocessTask implements Task, ITask {
 
@@ -39,6 +40,17 @@ public class FocessTask implements Task, ITask {
     public synchronized void clear() {
         this.isFinished = false;
         this.isRunning = false;
+    }
+
+    @Override
+    public synchronized void startRun() {
+        this.isRunning = true;
+    }
+
+    @Override
+    public synchronized void endRun() {
+        this.isRunning = false;
+        this.isFinished = true;
     }
 
     @Override
@@ -87,11 +99,8 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public void run() {
-        this.isRunning = true;
+    public void run() throws ExecutionException {
         this.runnable.run();
-        this.isRunning = false;
-        this.isFinished = true;
     }
 
     @Override

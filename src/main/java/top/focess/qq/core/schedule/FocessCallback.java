@@ -8,9 +8,8 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FocessCallback<V> extends FocessTask implements Callback<V> {
 
@@ -25,7 +24,7 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     }
 
     @Override
-    public V call() {
+    public V call() throws TaskNotFinishedException, CancellationException {
         if (this.isCancelled())
             throw new CancellationException();
         if (!this.isFinished)
@@ -34,35 +33,38 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     }
 
     @Override
-    public V get(long timeout, @NotNull TimeUnit unit) {
-        //todo
+    public V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException {
+        AtomicBoolean out = new AtomicBoolean(false);
         DEFAULT_SCHEDULER.run(() -> {
+            out.set(true);
             synchronized (FocessCallback.this) {
-                FocessCallback.this.notify();
+                FocessCallback.this.notifyAll();
             }
         }, Duration.ofMillis(unit.toMillis(timeout)));
         synchronized (this) {
-            try {
+            while (true) {
                 this.wait();
-            } catch (InterruptedException ignored) {
+                if (this.isCancelled() || this.isFinished())
+                    break;
+                if (out.get())
+                    throw new TimeoutException();
             }
         }
         return this.call();
     }
 
     @Override
-    public void run() {
-        this.isRunning = true;
+    public void run() throws ExecutionException {
         try {
             value = this.callback.call();
         } catch (Exception e) {
-            value = null;
-        }
-        this.isRunning = false;
-        this.isFinished = true;
-        synchronized (this) {
-            this.notify();
+            throw new ExecutionException(e);
         }
     }
 
+    @Override
+    public synchronized void endRun() {
+        super.endRun();
+        this.notifyAll();
+    }
 }

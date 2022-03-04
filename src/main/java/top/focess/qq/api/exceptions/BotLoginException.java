@@ -5,6 +5,8 @@ package top.focess.qq.api.exceptions;
  */
 public class BotLoginException extends RuntimeException {
 
+
+    //todo rename some of the exceptions
     /**
      * Constructs a BotLoginException
      * @param id the id of the login failed bot

@@ -2,8 +2,7 @@ package top.focess.qq.api.schedule;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * The warped task. You can use this to handle callable processing
@@ -14,17 +13,19 @@ public interface Callback<V> extends Task, Future<V> {
 
     /**
      * Call the target value
-     *
+     * @throws CancellationException if the task is cancelled
+     * @throws top.focess.qq.api.exceptions.TaskNotFinishedException if the task is not finished
      * @return the target value
      */
     V call();
 
     /**
      * Wait for this task finished and call the target value
-     *
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException if there is any exception in the execution processing
      * @return the target value
      */
-    default V waitCall() {
+    default V waitCall() throws InterruptedException, ExecutionException {
         while (!isFinished());
         return call();
     }
@@ -44,20 +45,27 @@ public interface Callback<V> extends Task, Future<V> {
      * Wait for this task finished and call the target value
      *
      * @see #waitCall()
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException if there is any exception in the execution processing
      * @return the target value
      */
     @Override
-    default V get() {
+    default  V get() throws InterruptedException, ExecutionException {
         return this.waitCall();
     }
 
     /**
-     * This method is not supported
+     * Wait for the time and call the target value
      *
-     * @param timeout not supported
-     * @param unit not supported
-     * @return not supported
+     * @param timeout the timeout
+     * @param unit the time unit
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException if there is any exception in the execution processing
+     * @throws TimeoutException if the time is out
+     * @throws CancellationException if the task is cancelled
+     * @return the target value
      */
     @Override
-    V get(long timeout, @NotNull TimeUnit unit);
+    V get(long timeout,@NotNull TimeUnit unit)
+            throws InterruptedException, ExecutionException, TimeoutException, CancellationException;
 }

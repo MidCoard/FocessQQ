@@ -30,7 +30,11 @@ public class ThreadPoolSchedulerThread extends Thread{
                 if (shouldStop)
                     break;
                 if (this.task != null) {
+                    this.task.startRun();
                     this.task.run();
+                    this.task.endRun();
+                    if (this.task.isPeriod())
+                        this.scheduler.rerun(this.task);
                     this.task = null;
                 }
                 this.isAvailable = true;
