@@ -2,6 +2,8 @@ package top.focess.qq.core.schedule;
 
 import top.focess.qq.FocessQQ;
 
+import java.util.concurrent.ExecutionException;
+
 public class ThreadPoolSchedulerThread extends Thread{
 
     private final Object lock = new Object();
@@ -31,7 +33,11 @@ public class ThreadPoolSchedulerThread extends Thread{
                     break;
                 if (this.task != null) {
                     this.task.startRun();
-                    this.task.run();
+                    try {
+                        this.task.run();
+                    } catch (ExecutionException e) {
+                        this.task.setException(e);
+                    }
                     this.task.endRun();
                     if (this.task.isPeriod())
                         this.scheduler.rerun(this.task);

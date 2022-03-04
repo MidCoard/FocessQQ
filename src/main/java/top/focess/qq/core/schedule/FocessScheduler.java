@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 public class FocessScheduler extends AScheduler {
 
@@ -108,7 +109,11 @@ public class FocessScheduler extends AScheduler {
                             }
                         }
                         if (task.getTask().isRunning()) {
-                            task.getTask().run();
+                            try {
+                                task.getTask().run();
+                            } catch(ExecutionException e) {
+                                task.getTask().setException(e);
+                            }
                             task.getTask().endRun();
                             if (task.getTask().isPeriod())
                                 tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));

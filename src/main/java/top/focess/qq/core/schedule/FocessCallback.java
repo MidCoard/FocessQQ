@@ -24,16 +24,18 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     }
 
     @Override
-    public V call() throws TaskNotFinishedException, CancellationException {
+    public V call() throws TaskNotFinishedException, CancellationException, ExecutionException {
         if (this.isCancelled())
             throw new CancellationException();
         if (!this.isFinished)
             throw new TaskNotFinishedException(this);
+        if (this.exception != null)
+            throw this.exception;
         return value;
     }
 
     @Override
-    public V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException {
+    public V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
         AtomicBoolean out = new AtomicBoolean(false);
         DEFAULT_SCHEDULER.run(() -> {
             out.set(true);

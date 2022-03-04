@@ -1,6 +1,7 @@
 package top.focess.qq.api.schedule;
 
 import org.jetbrains.annotations.NotNull;
+import top.focess.qq.api.exceptions.TaskNotFinishedException;
 
 import java.util.concurrent.*;
 
@@ -14,10 +15,11 @@ public interface Callback<V> extends Task, Future<V> {
     /**
      * Call the target value
      * @throws CancellationException if the task is cancelled
-     * @throws top.focess.qq.api.exceptions.TaskNotFinishedException if the task is not finished
+     * @throws TaskNotFinishedException if the task is not finished
+     * @throws ExecutionException if there is any exception in the execution processing
      * @return the target value
      */
-    V call();
+    V call() throws ExecutionException, CancellationException, TaskNotFinishedException;
 
     /**
      * Wait for this task finished and call the target value

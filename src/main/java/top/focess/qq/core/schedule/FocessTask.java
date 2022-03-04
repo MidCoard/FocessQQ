@@ -18,6 +18,7 @@ public class FocessTask implements Task, ITask {
     private boolean isPeriod = false;
     protected boolean isFinished = false;
     private ComparableTask nativeTask;
+    protected ExecutionException exception;
 
     FocessTask(Runnable runnable, Scheduler scheduler) {
         this.runnable = runnable;
@@ -51,6 +52,11 @@ public class FocessTask implements Task, ITask {
     public synchronized void endRun() {
         this.isRunning = false;
         this.isFinished = true;
+    }
+
+    @Override
+    public void setException(ExecutionException e) {
+        this.exception = e;
     }
 
     @Override

@@ -27,4 +27,6 @@ interface ITask extends Task {
     void startRun();
 
     void endRun();
+
+    void setException(ExecutionException e);
 }
