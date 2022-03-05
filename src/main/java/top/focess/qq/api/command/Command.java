@@ -29,7 +29,7 @@ public abstract class Command {
 
     private static final Map<String,Command> COMMANDS_MAP = Maps.newConcurrentMap();
 
-    private final List<Executor> executors = Lists.newArrayList();
+    private final List<Executor> executors = Lists.newCopyOnWriteArrayList();
 
     /**
      * The name of the command
@@ -165,6 +165,7 @@ public abstract class Command {
      */
     public void unregister() {
         this.registered = false;
+        this.executors.clear();
         COMMANDS_MAP.remove(this.getName());
     }
 

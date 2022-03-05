@@ -19,7 +19,7 @@ public class ThreadPoolScheduler extends AScheduler {
 
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
 
-    private final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newHashMap();
+    private final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
 
     private final ThreadPoolSchedulerThread[] threads;
 

@@ -1,5 +1,10 @@
 package top.focess.qq.core.plugin;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandType;
@@ -8,18 +13,13 @@ import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
+import top.focess.qq.api.exceptions.*;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginDescription;
 import top.focess.qq.api.plugin.PluginType;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import top.focess.qq.api.exceptions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,17 +30,13 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class PluginClassLoader extends URLClassLoader {
-    public static final Map<Class<? extends Plugin>, Plugin> CLASS_PLUGIN_MAP = Maps.newHashMap();
-    public static final Map<String, Plugin> NAME_PLUGIN_MAP = Maps.newHashMap();
-    public static final List<Plugin> REGISTERED_PLUGINS = Lists.newCopyOnWriteArrayList();
+    private static final Map<Class<? extends Plugin>, Plugin> CLASS_PLUGIN_MAP = Maps.newConcurrentMap();
+    private static final Map<String, Plugin> NAME_PLUGIN_MAP = Maps.newConcurrentMap();
     private static Field PLUGIN_NAME_FIELD,
             PLUGIN_VERSION_FIELD,
             PLUGIN_AUTHOR_FIELD,
@@ -48,27 +44,6 @@ public class PluginClassLoader extends URLClassLoader {
             COMMAND_ALIASES_FIELD,
             COMMAND_INITIALIZE_FIELD;
     private static Method PLUGIN_INIT_METHOD;
-
-    static {
-        try {
-            PLUGIN_NAME_FIELD = Plugin.class.getDeclaredField("name");
-            PLUGIN_NAME_FIELD.setAccessible(true);
-            PLUGIN_VERSION_FIELD = Plugin.class.getDeclaredField("version");
-            PLUGIN_VERSION_FIELD.setAccessible(true);
-            PLUGIN_AUTHOR_FIELD = Plugin.class.getDeclaredField("author");
-            PLUGIN_AUTHOR_FIELD.setAccessible(true);
-            COMMAND_NAME_FIELD = Command.class.getDeclaredField("name");
-            COMMAND_NAME_FIELD.setAccessible(true);
-            COMMAND_ALIASES_FIELD = Command.class.getDeclaredField("aliases");
-            COMMAND_ALIASES_FIELD.setAccessible(true);
-            COMMAND_INITIALIZE_FIELD = Command.class.getDeclaredField("initialize");
-            COMMAND_INITIALIZE_FIELD.setAccessible(true);
-            PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
-            PLUGIN_INIT_METHOD.setAccessible(true);
-        } catch (Exception e) {
-            FocessQQ.getLogger().thrLang("exception-init-classloader", e);
-        }
-    }
 
     private static final Object LOCK = new Object();
     private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
@@ -118,6 +93,25 @@ public class PluginClassLoader extends URLClassLoader {
     private PluginDescription pluginDescription;
 
     static {
+        try {
+            PLUGIN_NAME_FIELD = Plugin.class.getDeclaredField("name");
+            PLUGIN_NAME_FIELD.setAccessible(true);
+            PLUGIN_VERSION_FIELD = Plugin.class.getDeclaredField("version");
+            PLUGIN_VERSION_FIELD.setAccessible(true);
+            PLUGIN_AUTHOR_FIELD = Plugin.class.getDeclaredField("author");
+            PLUGIN_AUTHOR_FIELD.setAccessible(true);
+            COMMAND_NAME_FIELD = Command.class.getDeclaredField("name");
+            COMMAND_NAME_FIELD.setAccessible(true);
+            COMMAND_ALIASES_FIELD = Command.class.getDeclaredField("aliases");
+            COMMAND_ALIASES_FIELD.setAccessible(true);
+            COMMAND_INITIALIZE_FIELD = Command.class.getDeclaredField("initialize");
+            COMMAND_INITIALIZE_FIELD.setAccessible(true);
+            PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
+            PLUGIN_INIT_METHOD.setAccessible(true);
+        } catch (Exception e) {
+            FocessQQ.getLogger().thrLang("exception-init-classloader", e);
+        }
+
         RESOURCE_HANDLERS.add((name, inputStream, pluginClassLoader) -> {
             if (name.endsWith(".class"))
                 try {
@@ -179,7 +173,6 @@ public class PluginClassLoader extends URLClassLoader {
                 throw new PluginDuplicateException(plugin.getName());
             // no try-catch because it should be noticed by the Plugin User
             plugin.onEnable();
-            REGISTERED_PLUGINS.add(plugin);
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
             NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
             FocessQQ.getLogger().debugLang("end-enable-plugin",plugin.getName());
@@ -214,7 +207,6 @@ public class PluginClassLoader extends URLClassLoader {
         } catch (Exception e) {
             FocessQQ.getLogger().thrLang("exception-plugin-disable", e);
         }
-        REGISTERED_PLUGINS.remove(plugin);
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
         NAME_PLUGIN_MAP.remove(plugin.getName());
         File ret = null;
@@ -260,7 +252,7 @@ public class PluginClassLoader extends URLClassLoader {
      */
     @NotNull
     public static List<Plugin> getPlugins() {
-        return REGISTERED_PLUGINS;
+        return Lists.newArrayList(NAME_PLUGIN_MAP.values());
     }
 
     /**
@@ -297,6 +289,13 @@ public class PluginClassLoader extends URLClassLoader {
         super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
         this.file = file;
         PluginCoreClassLoader.LOADERS.add(this);
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        this.loadedClasses.clear();
+        this.plugin = null;
     }
 
     public boolean load() {

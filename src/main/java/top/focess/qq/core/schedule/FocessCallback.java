@@ -6,6 +6,7 @@ import top.focess.qq.api.exceptions.TaskNotFinishedException;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -37,7 +38,7 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     @Override
     public V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
         AtomicBoolean out = new AtomicBoolean(false);
-        DEFAULT_SCHEDULER.run(() -> {
+        Task task = DEFAULT_SCHEDULER.run(() -> {
             out.set(true);
             synchronized (FocessCallback.this) {
                 FocessCallback.this.notifyAll();
@@ -52,6 +53,7 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
                     throw new TimeoutException();
             }
         }
+        task.cancel();
         return this.call();
     }
 

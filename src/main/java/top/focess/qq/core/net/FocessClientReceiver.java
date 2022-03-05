@@ -1,36 +1,25 @@
 package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.*;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 
-public class FocessClientReceiver implements ClientReceiver {
+public class FocessClientReceiver extends AClientReceiver {
 
-    private final String host;
-    private final int port;
     private final String localhost;
-    private final String name;
     private final FocessSocket focessSocket;
-    private String token;
-    private int id;
     private volatile boolean connected = false;
-    private final Map<Class<?>,List<PackHandler>> packHandlers = Maps.newHashMap();
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
 
     public FocessClientReceiver(FocessSocket focessSocket,String localhost,String host,int port,String name) {
-        this.host = host;
-        this.port = port;
+        super(host,port,name);
         this.localhost = localhost;
-        this.name = name;
         this.focessSocket = focessSocket;
         scheduler.runTimer(()->{
             if (connected)
@@ -57,47 +46,9 @@ public class FocessClientReceiver implements ClientReceiver {
 
     @PacketHandler
     public void onServerPacket(ServerPackPacket packet) {
-        for (PackHandler packHandler : this.packHandlers.getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
-            packHandler.handle(packet.getPacket());
-    }
-
-    public <T extends Packet> void registerPackHandler(Class<T> c,PackHandler<T> packHandler) {
-        this.packHandlers.compute(c,(k,v)->{
-            if (v == null)
-                v = Lists.newArrayList();
-            v.add(packHandler);
-            return v;
-        });
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getHost() {
-        return this.host;
-    }
-
-    @Override
-    public int getPort() {
-        return this.port;
-    }
-
-    @Override
-    public boolean isConnected() {
-        return connected;
-    }
-
-    @Override
-    public int getClientId() {
-        return this.id;
-    }
-
-    @Override
-    public String getClientToken() {
-        return this.token;
+        for (Plugin plugin : this.packHandlers.keySet())
+            for (PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
+                packHandler.handle(packet.getPacket());
     }
 
     @Override

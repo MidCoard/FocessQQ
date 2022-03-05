@@ -1,26 +1,23 @@
 package top.focess.qq.core.net;
 
+import com.google.common.collect.Lists;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.IllegalPortException;
-import top.focess.qq.api.net.*;
+import top.focess.qq.api.net.ClientReceiver;
+import top.focess.qq.api.net.PacketPreCodec;
+import top.focess.qq.api.net.Receiver;
+import top.focess.qq.api.net.ServerReceiver;
 import top.focess.qq.api.net.packet.Packet;
 import top.focess.qq.api.util.Pair;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.ServerSocket;
-import java.util.List;
-import java.util.Map;
 
-public class FocessSocket implements Socket {
+public class FocessSocket extends ASocket {
 
-    private final Map<Class<? extends Packet>,List<Pair<Receiver,Method>>> packetMethods = Maps.newHashMap();
-    private final List<Receiver> receivers = Lists.newArrayList();
     private final Thread thread;
     private final ServerSocket server;
     private final int localPort;
@@ -68,30 +65,11 @@ public class FocessSocket implements Socket {
     private boolean clientSide = false;
 
     public void registerReceiver(Receiver receiver) {
-        this.receivers.add(receiver);
         if (receiver instanceof ServerReceiver)
             serverSide = true;
         if (receiver instanceof ClientReceiver)
             clientSide = true;
-        for (Method method : receiver.getClass().getDeclaredMethods()) {
-            PacketHandler handler;
-            if ((handler = method.getAnnotation(PacketHandler.class)) != null) {
-                if (method.getParameterTypes().length == 1) {
-                    Class<?> packetClass = method.getParameterTypes()[0];
-                    if (Packet.class.isAssignableFrom(packetClass) && !Modifier.isAbstract(packetClass.getModifiers())) {
-                        try {
-                            packetMethods.compute((Class<? extends Packet>) packetClass,(k, v)->{
-                                if (v == null)
-                                    v = Lists.newArrayList();
-                                v.add(Pair.of(receiver,method));
-                                return v;
-                            });
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-            }
-        }
+        super.registerReceiver(receiver);
     }
 
     @Override
@@ -122,12 +100,12 @@ public class FocessSocket implements Socket {
     }
 
     public void close() {
+        for (Receiver receiver : receivers)
+            receiver.close();
         try {
             this.server.close();
         } catch (IOException ignored) {
         }
-        for (Receiver receiver : receivers)
-            receiver.close();
     }
 
     public int getLocalPort() {

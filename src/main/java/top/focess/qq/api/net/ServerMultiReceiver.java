@@ -1,7 +1,6 @@
 package top.focess.qq.api.net;
 
 import top.focess.qq.api.net.packet.Packet;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -24,10 +23,4 @@ public interface ServerMultiReceiver extends ServerReceiver{
      * @return the list of the clients with given name
      */
     List<Client> getClients(String name);
-
-    @Override
-    @Nullable
-    default Client getClient(String name) {
-        return getClients(name).stream().findAny().orElse(null);
-    }
 }

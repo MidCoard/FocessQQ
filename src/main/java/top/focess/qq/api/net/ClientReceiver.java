@@ -1,6 +1,7 @@
 package top.focess.qq.api.net;
 
 import top.focess.qq.api.net.packet.Packet;
+import top.focess.qq.api.plugin.Plugin;
 
 /**
  * The socket receiver for client.
@@ -19,9 +20,10 @@ public interface ClientReceiver extends Receiver {
      *
      * @param c the packet class
      * @param packHandler the packet handler
+     * @param plugin the plugin
      * @param <T> the packet type
      */
-    <T extends Packet> void registerPackHandler(Class<T> c,PackHandler<T> packHandler);
+    <T extends Packet> void registerPackHandler(Plugin plugin, Class<T> c, PackHandler<T> packHandler);
 
     /**
      * Get the name of the client

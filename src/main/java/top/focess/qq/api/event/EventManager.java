@@ -26,7 +26,7 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    public static <T extends Event> void submit(T event) throws EventSubmitException {
+    public synchronized static <T extends Event> void submit(T event) throws EventSubmitException {
         submit(cast(event.getClass()),event);
     }
 
@@ -38,7 +38,7 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    public static <T extends Event> void submit(Class<T> cls,T event) throws EventSubmitException {
+    public synchronized static <T extends Event> void submit(Class<T> cls,T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
@@ -67,7 +67,7 @@ public class EventManager {
      * @param event the event need to be submitted
      * @param <T> the event type
      */
-    public static <T extends Event> void trySubmitOnce(Class<T> cls,T event){
+    public synchronized static <T extends Event> void trySubmitOnce(Class<T> cls,T event){
         try {
             submitOnce(cls,event);
         } catch (EventSubmitException e) {
@@ -83,7 +83,7 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    public static <T extends Event> void submitOnce(Class<T> cls,T event) throws EventSubmitException {
+    public synchronized static <T extends Event> void submitOnce(Class<T> cls,T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {

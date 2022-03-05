@@ -7,21 +7,16 @@ import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.ServerMultiReceiver;
 import top.focess.qq.api.net.packet.*;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
-public class FocessUDPMultiReceiver implements ServerMultiReceiver {
+public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMultiReceiver {
 
-    private final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
-    private final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
-    private final Map<String, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
     private final FocessUDPSocket focessUDPSocket;
-    private int defaultClientId = 0;
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
 
     public FocessUDPMultiReceiver(FocessUDPSocket focessUDPSocket) {
@@ -79,8 +74,9 @@ public class FocessUDPMultiReceiver implements ServerMultiReceiver {
         if (clientInfos.get(packet.getClientId()) != null) {
             SimpleClient simpleClient = clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
-                for (PackHandler packHandler : packHandlers.getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
-                    packHandler.handle(packet.getPacket());
+                for (Plugin plugin : this.packHandlers.keySet())
+                    for (PackHandler packHandler : packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
+                        packHandler.handle(packet.getPacket());
         }
     }
 
@@ -89,50 +85,6 @@ public class FocessUDPMultiReceiver implements ServerMultiReceiver {
         for (SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(client))
                 this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new ServerPackPacket(packet));
-    }
-
-
-
-    @Override
-    public <T extends Packet> void registerPackHandler(String name, Class<T> c, PackHandler<T> packHandler) {
-        packHandlers.compute(name,(k, v)->{
-            if (v == null)
-                v = Maps.newHashMap();
-            v.compute(c,(k1,v1)->{
-                if (v1 == null)
-                    v1 = Lists.newArrayList();
-                v1.add(packHandler);
-                return v1;
-            });
-            return v;
-        });
-    }
-
-    private static String generateToken() {
-        StringBuilder stringBuilder = new StringBuilder();
-        Random random = new Random(System.currentTimeMillis());
-        for (int i = 0;i<64;i++) {
-            switch (random.nextInt(3)) {
-                case 0:
-                    stringBuilder.append((char) ('0' + random.nextInt(10)));
-                    break;
-                case 1:
-                    stringBuilder.append((char)('a' + random.nextInt(26)));
-                    break;
-                case 2:
-                    stringBuilder.append((char)('A' + random.nextInt(26)));
-                    break;
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    @Override
-    public boolean isConnected(String client) {
-        for (Integer id : clientInfos.keySet())
-            if (clientInfos.get(id).getName().equals(client))
-                return true;
-        return false;
     }
 
     @Override

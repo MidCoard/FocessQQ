@@ -69,7 +69,8 @@ public class YamlConfiguration implements SectionMap {
             try {
                 ByteArrayOutputStream stream;
                 ObjectOutputStream outputStream = new ObjectOutputStream(stream = new ByteArrayOutputStream());
-                outputStream.writeObject(value);
+                outputStream.writeUnshared(value);
+                outputStream.reset();
                 outputStream.close();
                 values.put(key,"!!" + Base64.base64Encode(stream.toByteArray()));
             } catch (IOException e) {
@@ -81,6 +82,7 @@ public class YamlConfiguration implements SectionMap {
     @Override
     public <T> T get(String key) {
         Object value = SectionMap.super.get(key);
+        //todo replace the java native serialization
         if (value == null)
             return null;
         if (value.getClass().isPrimitive() || value.getClass().equals(Double.class) || value.getClass().equals(Float.class) || value.getClass().equals(Short.class) || value.getClass().equals(Character.class) || value.getClass().equals(Long.class) || value.getClass().equals(Integer.class) || value.getClass().equals(Boolean.class) || value.getClass().equals(Byte.class))
@@ -92,7 +94,8 @@ public class YamlConfiguration implements SectionMap {
             else if (str.startsWith("!!")) {
                 try {
                     ObjectInputCoreStream inputStream = new ObjectInputCoreStream(new ByteArrayInputStream(Base64.base64Decode(str.substring(2))));
-                    T t = (T) inputStream.readObject();
+                    T t = (T) inputStream.readUnshared();
+                    // must reset, or the object does not gc
                     inputStream.close();
                     return t;
                 } catch (Exception e) {

@@ -609,6 +609,7 @@ public class FocessQQ {
             this.registerCommand(new ReloadCommand());
             this.registerCommand(new CommandCommand());
             this.registerCommand(new PluginCommand());
+            this.registerCommand(new DebugCommand());
             FocessQQ.getLogger().debugLang("register-default-commands");
             bot = getBotManager().loginDirectly(username,password);
             FocessQQ.getLogger().debugLang("login-default-bot");
@@ -655,6 +656,7 @@ public class FocessQQ {
                 SimpleBotManager.removeAll();
                 FocessQQ.getLogger().debugLang("remove-all-bots");
             }
+            //todo why not work
             for (String key : properties.keySet())
                 getDefaultConfig().set(key, properties.get(key));
             getDefaultConfig().save();
