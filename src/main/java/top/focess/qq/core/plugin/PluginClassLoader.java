@@ -200,6 +200,10 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().debugLang("unregister-commands");
             Schedulers.close(plugin);
             FocessQQ.getLogger().debugLang("close-schedulers");
+            if (FocessQQ.getSocket() != null)
+                FocessQQ.getSocket().unregister(plugin);
+            if (FocessQQ.getUdpSocket() != null)
+                FocessQQ.getUdpSocket().unregister(plugin);
         }
         // try-catch because it should take over the process
         try {

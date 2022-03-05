@@ -65,7 +65,8 @@ public class FocessSidedClientReceiver extends AClientReceiver {
     }
 
     @Override
-    public void close() {
+    public boolean close() {
         scheduler.close();
+        return this.unregisterAll();
     }
 }

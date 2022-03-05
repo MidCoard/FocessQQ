@@ -26,7 +26,8 @@ public interface ServerReceiver extends Receiver{
      * @param plugin the plugin
      * @param <T> the packet type
      */
-    <T extends Packet> void registerPackHandler(Plugin plugin, String client, Class<T> c, PackHandler<T> packHandler);
+    <T extends Packet> void register(Plugin plugin, String client, Class<T> c, PackHandler<T> packHandler);
+
 
     /**
      * Indicate the client is connected to server

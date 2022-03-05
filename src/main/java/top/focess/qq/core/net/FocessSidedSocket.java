@@ -67,15 +67,19 @@ public class FocessSidedSocket extends ASocket {
         thread.start();
     }
 
-    public void close() {
+    @Override
+    public boolean close() {
+        boolean ret = false;
+        for (Receiver receiver : receivers)
+            ret = ret || receiver.close();
         try {
             this.server.close();
         } catch (IOException ignored) {
         }
-        for (Receiver receiver : receivers)
-            receiver.close();
+        return ret;
     }
 
+    @Override
     public void registerReceiver(Receiver receiver) {
         if (!(receiver instanceof ServerReceiver))
             throw new UnsupportedOperationException();

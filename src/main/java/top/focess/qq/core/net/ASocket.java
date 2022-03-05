@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import top.focess.qq.api.net.Receiver;
 import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.net.packet.Packet;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.Pair;
 
 import java.lang.reflect.Method;
@@ -37,5 +38,11 @@ public abstract class ASocket implements Socket {
                         }
                     }
                 }
+    }
+
+    @Override
+    public void unregister(Plugin plugin) {
+        for (Receiver receiver : receivers)
+            receiver.unregister(plugin);
     }
 }

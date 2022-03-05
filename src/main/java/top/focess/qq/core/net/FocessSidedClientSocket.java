@@ -81,8 +81,10 @@ public class FocessSidedClientSocket extends ASocket {
     }
 
     @Override
-    public void close() {
+    public boolean close() {
+        boolean ret = false;
         for (Receiver receiver : this.receivers)
-            receiver.close();
+            ret = ret || receiver.close();
+        return ret;
     }
 }

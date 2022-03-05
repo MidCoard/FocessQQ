@@ -86,10 +86,12 @@ public class FocessUDPSocket extends ASocket {
     }
 
     @Override
-    public void close() {
-        this.socket.close();
+    public boolean close() {
+        boolean ret = false;
         for (Receiver receiver: receivers)
-            receiver.close();
+            ret = ret || receiver.close();
+        this.socket.close();
+        return ret;
     }
 
     public void sendPacket(String host, int port, Packet packet) {

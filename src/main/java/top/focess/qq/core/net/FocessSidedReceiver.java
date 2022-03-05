@@ -101,9 +101,10 @@ public class FocessSidedReceiver extends AServerReceiver {
     }
 
     @Override
-    public void close() {
+    public boolean close() {
         scheduler.close();
         for (Integer id : clientInfos.keySet())
             disconnect(id);
+        return this.unregisterAll();
     }
 }

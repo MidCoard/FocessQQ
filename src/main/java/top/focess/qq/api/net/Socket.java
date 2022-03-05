@@ -1,5 +1,7 @@
 package top.focess.qq.api.net;
 
+import top.focess.qq.api.plugin.Plugin;
+
 /**
  * Represents a FocessSocket. This class is used to handle socket.
  */
@@ -27,7 +29,14 @@ public interface Socket {
 
     /**
      * Close the socket
+     *
+     * @return true if there is some resources not closed before, false otherwise
      */
-    void close();
+    boolean close();
 
+    /**
+     * Unregister the packet-handlers of the plugin
+     * @param plugin the plugin
+     */
+    void unregister(Plugin plugin);
 }

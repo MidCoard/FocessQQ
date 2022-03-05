@@ -99,13 +99,16 @@ public class FocessSocket extends ASocket {
         return false;
     }
 
-    public void close() {
+    @Override
+    public boolean close() {
+        boolean ret = false;
         for (Receiver receiver : receivers)
-            receiver.close();
+            ret = ret || receiver.close();
         try {
             this.server.close();
         } catch (IOException ignored) {
         }
+        return ret;
     }
 
     public int getLocalPort() {

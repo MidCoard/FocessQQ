@@ -3,6 +3,7 @@ package top.focess.qq.core.net;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.ServerReceiver;
@@ -19,7 +20,7 @@ public abstract class AServerReceiver implements ServerReceiver {
     protected final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
     protected int defaultClientId = 0;
     protected final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
-    protected final Map<Plugin,Map<String, Map<Class<?>, List<PackHandler>>>> packHandlers = Maps.newHashMap();
+    protected final Map<Plugin,Map<String, Map<Class<?>, List<PackHandler>>>> packHandlers = Maps.newConcurrentMap();
 
     @Override
     public boolean isConnected(String client) {
@@ -52,7 +53,23 @@ public abstract class AServerReceiver implements ServerReceiver {
     }
 
     @Override
-    public <T extends Packet> void registerPackHandler(Plugin plugin, String name, Class<T> c, PackHandler<T> packHandler){
+    public boolean unregisterAll() {
+        boolean ret = false;
+        for (Plugin plugin : this.packHandlers.keySet()) {
+            if (plugin != FocessQQ.getMainPlugin())
+                ret = true;
+            unregister(plugin);
+        }
+        return ret;
+    }
+
+    @Override
+    public void unregister(Plugin plugin) {
+        this.packHandlers.remove(plugin);
+    }
+
+    @Override
+    public <T extends Packet> void register(Plugin plugin, String name, Class<T> c, PackHandler<T> packHandler){
         packHandlers.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Maps.newHashMap();

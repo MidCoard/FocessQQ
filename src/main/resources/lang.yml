@@ -165,4 +165,6 @@ unregister-all-commands: Unregister all commands
 unregister-all-listeners: Unregister all listeners
 unregister-all-buffers: Unregister all buffers
 unknown-key: Unknown key %s
+socket-packet-handler-not-empty: Socket packet handlers are not empty
+udp-socket-packet-handler-not-empty: UDP socket packet handlers are not empty
 

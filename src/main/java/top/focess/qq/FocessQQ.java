@@ -662,9 +662,11 @@ public class FocessQQ {
             getDefaultConfig().save();
             FocessQQ.getLogger().debugLang("save-default-properties");
             if (FocessQQ.getSocket() != null)
-                FocessQQ.getSocket().close();
+                if (FocessQQ.getSocket().close())
+                    FocessQQ.getLogger().debugLang("socket-packet-handler-not-empty");
             if (FocessQQ.getUdpSocket() != null)
-                FocessQQ.getUdpSocket().close();
+                if (FocessQQ.getUdpSocket().close())
+                    FocessQQ.getLogger().debugLang("udp-socket-packet-handler-not-empty");
             FocessQQ.getLogger().debugLang("close-all-sockets");
             if (!saved) {
                 FocessQQ.getLogger().debugLang("save-log");

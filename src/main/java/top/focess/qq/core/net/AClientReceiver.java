@@ -2,6 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.Packet;
@@ -20,7 +21,7 @@ public abstract class AClientReceiver implements ClientReceiver {
     protected volatile boolean connected = false;
 
 
-    protected final Map<Plugin, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newHashMap();
+    protected final Map<Plugin, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newConcurrentMap();
 
     public AClientReceiver(String host, int port, String name) {
         this.host = host;
@@ -29,7 +30,7 @@ public abstract class AClientReceiver implements ClientReceiver {
     }
 
     @Override
-    public <T extends Packet> void registerPackHandler(Plugin plugin, Class<T> c, PackHandler<T> packHandler) {
+    public <T extends Packet> void register(Plugin plugin, Class<T> c, PackHandler<T> packHandler) {
         this.packHandlers.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Maps.newHashMap();
@@ -41,6 +42,22 @@ public abstract class AClientReceiver implements ClientReceiver {
             });
             return v;
         });
+    }
+
+    @Override
+    public void unregister(Plugin plugin) {
+        this.packHandlers.remove(plugin);
+    }
+
+    @Override
+    public boolean unregisterAll() {
+        boolean ret = false;
+        for (Plugin plugin : this.packHandlers.keySet()) {
+            if (plugin != FocessQQ.getMainPlugin())
+                ret = true;
+            unregister(plugin);
+        }
+        return ret;
     }
 
     public String getHost() {

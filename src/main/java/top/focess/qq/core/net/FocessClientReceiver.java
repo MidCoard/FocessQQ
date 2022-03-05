@@ -57,7 +57,8 @@ public class FocessClientReceiver extends AClientReceiver {
     }
 
     @Override
-    public void close() {
+    public boolean close() {
         this.scheduler.close();
+        return this.unregisterAll();
     }
 }
