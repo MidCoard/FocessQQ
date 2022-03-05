@@ -33,4 +33,8 @@ public class DefaultConfig extends Config {
     public boolean contains(String key) {
         return super.contains(key);
     }
+
+    public <T> T getOrDefault(String key,T def) {
+        return contains(key) ? get(key) : def;
+    }
 }

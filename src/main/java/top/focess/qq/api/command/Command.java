@@ -226,22 +226,24 @@ public abstract class Command {
         final int amount = args.length;
         boolean flag = false;
         CommandResult result = CommandResult.NONE;
-        for (final Executor executor : this.executors)
+        for (final Executor executor : this.executors) {
             if (executor.checkCount(amount) && executor.checkArgs(args)) {
-                if (sender.hasPermission(executor.permission))
+                if (sender.hasPermission(executor.permission)) {
                     result = executor.execute(sender, Arrays.copyOfRange(args, executor.getSubCommandsSize(), args.length), ioHandler);
+                }
                 else result = CommandResult.REFUSE;
                 for (CommandResult r : executor.results.keySet())
                     if ((r.getValue() & result.getValue()) != 0)
                         executor.results.get(r).execute(result);
-                CommandExecutedEvent event = new CommandExecutedEvent(executor,args,ioHandler,sender,result);
+                CommandExecutedEvent event = new CommandExecutedEvent(executor, args, ioHandler, sender, result);
                 try {
                     EventManager.submit(event);
                 } catch (EventSubmitException e) {
-                    FocessQQ.getLogger().thrLang("exception-submit-command-executed-event",e);
+                    FocessQQ.getLogger().thrLang("exception-submit-command-executed-event", e);
                 }
                 flag = true;
             }
+        }
         if ((!flag && this.executorPermission.test(sender)) || result == CommandResult.ARGS)
             this.usage(sender, ioHandler);
         return true;
@@ -274,6 +276,7 @@ public abstract class Command {
      * @param sender the executor which need to print help information
      * @param ioHandler the receiver which need to print help information
      */
+    @Deprecated
     public abstract void usage(CommandSender sender, IOHandler ioHandler);
 
     public boolean isInitialize() {
@@ -351,19 +354,6 @@ public abstract class Command {
             return this.subCommands.length;
         }
 
-        /**
-         * Set the executor Mirai Permission
-         * (Only if the CommandSender has the command that this executor belongs to and this executor's permissions, this executor runs)
-         *
-         * @param permission the executor Mirai Permission
-         * @return the Executor itself
-         */
-        @NotNull
-        @Deprecated
-        public Executor setPermission(@NotNull MemberPermission permission) {
-            this.permission = CommandPermission.toCommandPermission(permission);
-            return this;
-        }
 
         /**
          * Set the executor Mirai Permission

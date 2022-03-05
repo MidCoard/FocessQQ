@@ -136,10 +136,10 @@ public class ThreadPoolScheduler extends AScheduler {
                 try {
                     if (shouldStop)
                         break;
-                    if (tasks.isEmpty())
-                        synchronized (ThreadPoolScheduler.this) {
+                    synchronized (ThreadPoolScheduler.this) {
+                        if (tasks.isEmpty())
                             ThreadPoolScheduler.this.wait();
-                        }
+                    }
                     ComparableTask task = tasks.peek();
                     if (task != null)
                         synchronized (task.getTask()) {

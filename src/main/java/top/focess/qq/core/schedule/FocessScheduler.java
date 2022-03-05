@@ -92,10 +92,10 @@ public class FocessScheduler extends AScheduler {
                 try {
                     if (shouldStop)
                         break;
-                    if (tasks.isEmpty())
-                        synchronized (FocessScheduler.this) {
+                    synchronized (FocessScheduler.this) {
+                        if (tasks.isEmpty())
                             FocessScheduler.this.wait();
-                        }
+                    }
                     ComparableTask task = tasks.peek();
                     if (task != null) {
                         synchronized (task.getTask()) {
