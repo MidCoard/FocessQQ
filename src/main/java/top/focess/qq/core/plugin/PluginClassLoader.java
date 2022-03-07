@@ -17,9 +17,13 @@ import top.focess.qq.api.exceptions.*;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginDescription;
 import top.focess.qq.api.plugin.PluginType;
+import top.focess.qq.api.schedule.Callback;
+import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.schedule.Task;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.qq.core.debug.Section;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +34,13 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.time.Duration;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -159,6 +169,8 @@ public class PluginClassLoader extends URLClassLoader {
         });
     }
 
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),1);
+
     /**
      * Used to enable plugin
      *
@@ -167,6 +179,20 @@ public class PluginClassLoader extends URLClassLoader {
      * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
      */
     public static void enablePlugin(Plugin plugin) {
+        Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
+        Section section = Section.startSection("plugin-enable",task, Duration.ofSeconds(10));
+        try {
+            task.join();
+        } catch (ExecutionException | InterruptedException | CancellationException e) {
+            if (e.getCause() instanceof PluginLoadException)
+                throw (PluginLoadException)e.getCause();
+            else if (e.getCause() instanceof PluginDuplicateException)
+                throw (PluginDuplicateException)e.getCause();
+        }
+        section.stop();
+    }
+
+    private static void enablePlugin0(Plugin plugin) {
         try {
             FocessQQ.getLogger().debugLang("start-enable-plugin",plugin.getName());
             if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
@@ -189,7 +215,19 @@ public class PluginClassLoader extends URLClassLoader {
      * @param plugin the plugin need to be disabled
      * @return the plugin jar file, or null if the plugin is MainPlugin
      */
+    @Nullable
     public static File disablePlugin(Plugin plugin) {
+        Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
+        Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(10));
+        File file = null;
+        try {
+          file = callback.waitCall();
+        } catch (InterruptedException | ExecutionException | CancellationException ignored) {}
+        section.stop();
+        return file;
+    }
+
+    public static File disablePlugin0(Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
         if (plugin != FocessQQ.getMainPlugin()) {
             ListenerHandler.unregister(plugin);

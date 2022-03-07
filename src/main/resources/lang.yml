@@ -6,6 +6,7 @@ fatal-save-data: Main Thread shuts down without saving Data. Try to save data no
 fatal-main-plugin-already-running: Main Plugin is already running. Force shutdown!
 fatal-simple-bot-manager-already-exist: SimpleBotManager already exists. Force shutdown!
 fatal-create-cache-dir-failed: Failed to create cache directory %s.
+fatal-reload-plugin: Failed to reload plugin %s.
 exception-uncaught-exception: Uncaught exception
 exception-submit-console-chat-event: Submit console input event exception
 exception-submit-plugin-unload-event: Submit plugin unload event exception
@@ -167,4 +168,5 @@ unregister-all-buffers: Unregister all buffers
 unknown-key: Unknown key %s
 socket-packet-handler-not-empty: Socket packet handlers are not empty
 udp-socket-packet-handler-not-empty: UDP socket packet handlers are not empty
+debug-section-timeout: Section %s is timeout
 

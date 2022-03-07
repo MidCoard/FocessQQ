@@ -1,7 +1,6 @@
 package top.focess.qq.api.command.data;
 
 import java.nio.CharBuffer;
-import java.nio.IntBuffer;
 
 /**
  * Represent a buffer of String.
@@ -41,5 +40,10 @@ public class StringBuffer extends DataBuffer<String> {
     @Override
     public String get() {
         return new String(charBuffers[intBuffer.get()].array());
+    }
+
+    @Override
+    public String get(int index) {
+        return new String(charBuffers[intBuffer.get(index)].array());
     }
 }

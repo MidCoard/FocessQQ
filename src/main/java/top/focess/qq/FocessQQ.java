@@ -1,6 +1,5 @@
 package top.focess.qq;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import net.mamoe.mirai.contact.Friend;
@@ -9,10 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotManager;
-import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandSender;
-import top.focess.qq.api.command.DataCollection;
-import top.focess.qq.api.command.DataConverter;
+import top.focess.qq.api.command.*;
 import top.focess.qq.api.command.converter.CommandDataConverter;
 import top.focess.qq.api.command.converter.PluginDataConverter;
 import top.focess.qq.api.command.data.StringBuffer;
@@ -20,7 +16,6 @@ import top.focess.qq.api.command.data.*;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
-import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.event.server.ServerStartEvent;
 import top.focess.qq.api.exceptions.BotLoginException;
 import top.focess.qq.api.exceptions.EventSubmitException;
@@ -33,7 +28,6 @@ import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
-import top.focess.qq.api.util.CombinedFuture;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
 import top.focess.qq.api.util.config.LangConfig;
@@ -111,7 +105,6 @@ public class FocessQQ {
      */
     private static final BotManager BOT_MANAGER = new SimpleBotManager();
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(MAIN_PLUGIN,10);
     private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN);
 
     /**
@@ -366,6 +359,8 @@ public class FocessQQ {
         }
     }
 
+    private static Options options;
+
     public static void main(String[] args) {
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
             FocessQQ.getLogger().thrLang("exception-uncaught-exception",e);
@@ -378,11 +373,11 @@ public class FocessQQ {
             e.printStackTrace();
         }
         SCHEDULER.runTimer(()->{
-            while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 10 * 1000)
+            while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 5 * 1000)
                 ConsoleListener.QUESTS.poll().getKey().input(null);
             for (CommandSender sender : ChatListener.QUESTS.keySet()) {
                 Queue<Pair<IOHandler, Pair<Boolean, Long>>> queue = ChatListener.QUESTS.get(sender);
-                while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 10 * 1000)
+                while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 5 * 1000)
                     queue.poll().getKey().input(null);
             }
         }, Duration.ZERO,Duration.ofMinutes(1));
@@ -390,7 +385,7 @@ public class FocessQQ {
         CONSOLE_INPUT_THREAD.start();
         FocessQQ.getLogger().debugLang("start-console-input-thread");
 
-        Options options = Options.parse(args,
+        options = Options.parse(args,
                 new OptionParserClassifier("help"),
                 new OptionParserClassifier("user", LongOptionType.LONG_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("server", IntegerOptionType.INTEGER_OPTION_TYPE),
@@ -399,7 +394,8 @@ public class FocessQQ {
                 new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("udp",IntegerOptionType.INTEGER_OPTION_TYPE),
                 new OptionParserClassifier("multi"),
-                new OptionParserClassifier("admin",LongOptionType.LONG_OPTION_TYPE)
+                new OptionParserClassifier("admin",LongOptionType.LONG_OPTION_TYPE),
+                new OptionParserClassifier("noDefaultPluginLoad")
         );
         Option option = options.get("help");
         if (option != null) {
@@ -614,7 +610,7 @@ public class FocessQQ {
             bot = getBotManager().loginDirectly(username,password);
             FocessQQ.getLogger().debugLang("login-default-bot");
             File plugins = new File("plugins");
-            if (plugins.exists())
+            if (plugins.exists() && options.get("noDefaultPluginLoad") == null)
                 for (File file : plugins.listFiles(file -> file.getName().endsWith(".jar")))
                     try {
                         Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
@@ -685,111 +681,5 @@ public class FocessQQ {
 
     }
 
-
-    /**
-     * The CommandLine Tool Class can be used to exec command with customize executor, arguments and receiver.
-     */
-    public static class CommandLine {
-
-        /**
-         * Execute command using {@link CommandSender#CONSOLE}
-         *
-         * @param command the command Console executes.
-         * @return a Future representing pending completion of the command
-         */
-        @NotNull
-        public static Future<Boolean> exec(String command) {
-            return exec(CommandSender.CONSOLE, command);
-        }
-
-        /**
-         * Execute command with sender
-         *
-         * @param sender the executor
-         * @param command the command CommandSender executes.
-         * @return a Future representing pending completion of the command
-         */
-        @NotNull
-        public static Future<Boolean> exec(CommandSender sender, String command) {
-            return exec(sender, command, sender.getIOHandler());
-        }
-
-        /**
-         * Execute command with sender executing and ioHandler receiving
-         *
-         * @param sender the executor
-         * @param command the command CommandSender executes.
-         * @param ioHandler the receiver
-         * @return a Future representing pending completion of the command
-         */
-        @NotNull
-        public static Future<Boolean> exec(CommandSender sender, String command, IOHandler ioHandler) {
-            if (sender == CommandSender.CONSOLE)
-                FocessQQ.getLogger().consoleInput(command);
-            List<String> args = Lists.newArrayList();
-            StringBuilder stringBuilder = new StringBuilder();
-            boolean stack = false;
-            boolean ignore = false;
-            for (char c : command.toCharArray()) {
-                if (ignore) {
-                    ignore = false;
-                    switch (c) {
-                        case 'a':stringBuilder.append((char)7);break;
-                        case 'b':stringBuilder.append((char)8);break;
-                        case 'f':stringBuilder.append((char)12);break;
-                        case 'n':stringBuilder.append((char)10);break;
-                        case 'r':stringBuilder.append((char)13);break;
-                        case 't':stringBuilder.append((char)9);break;
-                        case 'v':stringBuilder.append((char)11);break;
-                        case '0':stringBuilder.append((char)0);break;
-                        default:stringBuilder.append(c);break;
-                    }
-                } else if (c == '\\')
-                    ignore = true;
-                else if (c == ' ') {
-                    if (!stack) {
-                        if (stringBuilder.length() > 0){
-                            args.add(stringBuilder.toString());
-                            stringBuilder.delete(0, stringBuilder.length());
-                        }
-                    } else
-                        stringBuilder.append(c);
-                } else if (c == '"')
-                    stack = !stack;
-                else
-                    stringBuilder.append(c);
-            }
-            if (stringBuilder.length() != 0)
-                args.add(stringBuilder.toString());
-            if (args.size() == 0)
-                return CompletableFuture.completedFuture(false);
-            String name = args.get(0);
-            args.remove(0);
-            return exec0(sender, name, args.toArray(new String[0]), ioHandler,command);
-        }
-
-        private static Future<Boolean> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler,String rawCommand) {
-            boolean flag = false;
-            CombinedFuture ret = new CombinedFuture();
-            for (Command com : Command.getCommands())
-                if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
-                    CommandPrepostEvent event = new CommandPrepostEvent(sender,com,args,ioHandler);
-                    try {
-                        EventManager.submit(event);
-                    } catch (EventSubmitException e) {
-                        FocessQQ.getLogger().thrLang("exception-submit-command-prepost-event",e);
-                    }
-                    if (event.isCancelled())
-                        continue;
-                    if (sender != CommandSender.CONSOLE)
-                        IOHandler.getConsoleIoHandler().outputLang("command-exec",sender.toString(),rawCommand);
-                    flag = true;
-                    ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
-                }
-            if (!flag && sender == CommandSender.CONSOLE)
-                ioHandler.outputLang("unknown-command",command);
-            return ret;
-        }
-    }
 
 }

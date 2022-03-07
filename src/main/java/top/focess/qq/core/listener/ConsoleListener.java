@@ -2,6 +2,7 @@ package top.focess.qq.core.listener;
 
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
+import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
@@ -14,11 +15,11 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
+import top.focess.qq.core.debug.Section;
 
+import java.time.Duration;
 import java.util.Queue;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ConsoleListener implements Listener {
 
@@ -29,7 +30,7 @@ public class ConsoleListener implements Listener {
     public void onConsoleChat(ConsoleChatEvent event) {
         if (!QUESTS.isEmpty()) {
             Pair<IOHandler, Long> element = QUESTS.poll();
-            while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 10 * 1000) {
+            while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 5 * 1000) {
                 element.getKey().input(null);
                 element = QUESTS.poll();
             }
@@ -39,10 +40,11 @@ public class ConsoleListener implements Listener {
             return;
         }
         try {
-            Future<Boolean> ret = FocessQQ.CommandLine.exec(event.getMessage());
+            Future<Boolean> ret = CommandLine.exec(event.getMessage());
             EXECUTOR.run(()->{
+                Section section = Section.startSection("command-console-exec",ret, Duration.ofMinutes(10));
                 try {
-                    if (!ret.get(10, TimeUnit.MINUTES)) {
+                    if (!ret.get()) {
                         ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
                         try {
                             EventManager.submit(consoleMessageEvent);
@@ -51,9 +53,10 @@ public class ConsoleListener implements Listener {
                         }
                     }
                 } catch (Exception e) {
-                    if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
+                    if (!(e.getCause() instanceof InputTimeoutException))
                         FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
                 }
+                section.stop();
             });
         } catch (Exception e) {
             FocessQQ.getLogger().thrLang("exception-exec-console-command",e);

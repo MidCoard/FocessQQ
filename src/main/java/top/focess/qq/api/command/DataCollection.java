@@ -1,11 +1,12 @@
 package top.focess.qq.api.command;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.data.DataBuffer;
 import top.focess.qq.api.plugin.Plugin;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
+import java.nio.BufferUnderflowException;
 import java.util.List;
 import java.util.Map;
 
@@ -89,51 +90,6 @@ public class DataCollection {
     }
 
     /**
-     * Write a String argument
-     *
-     * @param s String argument
-     */
-    void write(String s) {
-        this.write(String.class, s);
-    }
-
-    /**
-     * Write a int argument
-     *
-     * @param i int argument
-     */
-    void writeInt(int i) {
-        this.write(Integer.class, i);
-    }
-
-    /**
-     * Write a double argument
-     *
-     * @param d double argument
-     */
-    void writeDouble(double d) {
-        this.write(Double.class, d);
-    }
-
-    /**
-     * Write a boolean argument
-     *
-     * @param b boolean argument
-     */
-    void writeBoolean(boolean b) {
-        this.write(Boolean.class, b);
-    }
-
-    /**
-     * Write a long argument
-     *
-     * @param l long argument
-     */
-    void writeLong(long l) {
-        this.write(Long.class, l);
-    }
-
-    /**
      * Get String argument in order
      *
      * @return the String argument in order
@@ -179,15 +135,6 @@ public class DataCollection {
     }
 
     /**
-     * Write a Plugin argument
-     *
-     * @param p Plugin argument
-     */
-    public void writePlugin(Plugin p) {
-        this.write(Plugin.class, p);
-    }
-
-    /**
      * Get Plugin argument in order
      *
      * @return the Plugin argument in order
@@ -205,23 +152,55 @@ public class DataCollection {
     }
 
     /**
-     * Write a Command argument
-     * @param command Command argument
+     * Get buffer element
+     *
+     * @param cls the buffer elements' class
+     * @param t the default value
+     * @param <T> the buffer elements' type
+     * @throws UnsupportedOperationException if the buffer is not registered
+     * @return the buffer element
      */
-    public void writeCommand(Command command) {
-        this.write(Command.class, command);
+    public <T> T getOrDefault(Class<T> cls,T t) {
+        try {
+            if (buffers.get(cls) == null)
+                throw new UnsupportedOperationException();
+            return (T) buffers.get(cls).get();
+        } catch (BufferUnderflowException e) {
+            return t;
+        }
     }
 
     /**
-     * Write customize buffer element
+     *
+     * Get buffer element
+     *
+     * @param cls the buffer elements' class
+     * @param t the default value
+     * @param index the buffer element index
+     * @param <T> the buffer elements' type
+     * @throws UnsupportedOperationException if the buffer is not registered
+     * @return the buffer element
+     */
+    public <T> T getOrDefault(Class<T> cls,int index, T t) {
+        try {
+            if (buffers.get(cls) == null)
+                throw new UnsupportedOperationException();
+            return (T) buffers.get(cls).get(index);
+        } catch (BufferUnderflowException e) {
+            return t;
+        }
+    }
+
+    /**
+     * Write buffer element
      *
      * @param cls the buffer elements' class
      * @param t the buffer element
      * @param <T> the buffer elements' type
      * @throws UnsupportedOperationException if the buffer is not registered
      */
-    public <T> void write(Class<T> cls, T t) {
-        buffers.compute(cls, (Key, value) -> {
+    <T> void write(Class<T> cls, T t) {
+        buffers.compute(cls, (key, value) -> {
             if (value == null)
                 throw new UnsupportedOperationException();
             value.put(t);
@@ -230,17 +209,33 @@ public class DataCollection {
     }
 
     /**
-     * Get customize buffer element
+     * Get buffer element
      *
      * @param c the buffer elements' class
      * @param <T> the buffer elements' type
      * @throws UnsupportedOperationException if the buffer is not registered
-     * @return T the buffer element
+     * @return the buffer element
      */
     public <T> T get(Class<T> c) {
         if (buffers.get(c) == null)
             throw new UnsupportedOperationException();
         return (T) buffers.get(c).get();
+    }
+
+    /**
+     *
+     * Get buffer element
+     *
+     * @param index the buffer element index
+     * @param c the buffer elements' class
+     * @param <T> the buffer elements' type
+     * @throws UnsupportedOperationException if the buffer is not registered
+     * @return the buffer element
+     */
+    public <T> T get(Class<T> c,int index) {
+        if (buffers.get(c) == null)
+            throw new UnsupportedOperationException();
+        return (T) buffers.get(c).get(index);
     }
 
     /**

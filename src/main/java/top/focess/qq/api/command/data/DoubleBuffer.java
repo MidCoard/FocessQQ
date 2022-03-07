@@ -35,4 +35,9 @@ public class DoubleBuffer extends DataBuffer<Double> {
     public Double get() {
         return this.buffer.get();
     }
+
+    @Override
+    public Double get(int index) {
+        return this.buffer.get(index);
+    }
 }

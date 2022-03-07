@@ -35,4 +35,9 @@ public class LongBuffer extends DataBuffer<Long> {
     public Long get() {
         return this.buffer.get();
     }
+
+    @Override
+    public Long get(int index) {
+        return this.buffer.get(index);
+    }
 }

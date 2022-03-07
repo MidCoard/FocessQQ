@@ -27,11 +27,7 @@ public interface Callback<V> extends Task, Future<V> {
      * @throws ExecutionException if there is any exception in the execution processing
      * @return the target value
      */
-    default V waitCall() throws InterruptedException, ExecutionException {
-        while (!isFinished());
-        return call();
-    }
-
+    V waitCall() throws InterruptedException, ExecutionException;
     /**
      * Indicate whether this task is done or not
      *
@@ -70,4 +66,9 @@ public interface Callback<V> extends Task, Future<V> {
     @Override
     V get(long timeout,@NotNull TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException, CancellationException;
+
+    @Override
+    default void join() throws ExecutionException, CancellationException, InterruptedException {
+        this.waitCall();
+    }
 }

@@ -36,6 +36,12 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     }
 
     @Override
+    public V waitCall() throws InterruptedException, ExecutionException {
+        super.join();
+        return this.call();
+    }
+
+    @Override
     public V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
         AtomicBoolean out = new AtomicBoolean(false);
         Task task = DEFAULT_SCHEDULER.run(() -> {
@@ -66,9 +72,4 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
         }
     }
 
-    @Override
-    public synchronized void endRun() {
-        super.endRun();
-        this.notifyAll();
-    }
 }

@@ -1,8 +1,11 @@
 package top.focess.qq.core.listener;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.event.EventHandler;
+import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandSender;
+import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventPriority;
 import top.focess.qq.api.event.Listener;
@@ -18,12 +21,12 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
+import top.focess.qq.core.debug.Section;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
@@ -51,7 +54,7 @@ public class ChatListener implements Listener {
         QUESTS.compute(sender, (k, v) -> {
             if (v != null && !v.isEmpty()) {
                 Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
-                while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 10) {
+                while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 5) {
                     element.getKey().input(null);
                     element = v.poll();
                 }
@@ -89,10 +92,11 @@ public class ChatListener implements Listener {
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<Boolean> ret = FocessQQ.CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<Boolean> ret = CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.run(()->{
+                    Section section = Section.startSection("command-group-exec",ret, Duration.ofMinutes(10));
                     try {
-                        if (!ret.get(10, TimeUnit.MINUTES)) {
+                        if (!ret.get()) {
                             GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(),event.getMember(),event.getMessage(),event.getSource());
                             try {
                                 EventManager.submit(groupMessageEvent);
@@ -101,9 +105,10 @@ public class ChatListener implements Listener {
                             }
                         }
                     } catch (Exception e) {
-                        if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
+                        if (!(e.getCause() instanceof InputTimeoutException))
                             FocessQQ.getLogger().thrLang("exception-exec-group-command",e);
                     }
+                    section.stop();
                 });
             } catch (Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-group-command",e);
@@ -120,10 +125,11 @@ public class ChatListener implements Listener {
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<Boolean> ret = FocessQQ.CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<Boolean> ret = CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.run(()->{
+                    Section section = Section.startSection("command-friend-exec",ret, Duration.ofMinutes(10));
                     try {
-                        if (!ret.get(10,TimeUnit.MINUTES)) {
+                        if (!ret.get()) {
                             FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage());
                             try {
                                 EventManager.submit(friendMessageEvent);
@@ -132,9 +138,10 @@ public class ChatListener implements Listener {
                             }
                         }
                     } catch (Exception e) {
-                        if (!(e instanceof InputTimeoutException) && !(e instanceof TimeoutException))
+                        if (!(e.getCause() instanceof InputTimeoutException))
                             FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);
                     }
+                    section.stop();
                 });
             } catch (Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);

@@ -1,15 +1,18 @@
 package top.focess.qq.core.commands;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandArgument;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.command.converter.PluginDataConverter;
-import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.plugin.PluginClassLoader;
 
 import java.io.File;
+import java.util.List;
 
 public class ReloadCommand extends Command {
 
@@ -22,6 +25,10 @@ public class ReloadCommand extends Command {
         if (plugin == FocessQQ.getMainPlugin())
             return false;
         File pluginFile = PluginClassLoader.disablePlugin(plugin);
+        if (pluginFile == null) {
+            FocessQQ.getLogger().fatalLang("fatal-reload-plugin", plugin.getName());
+            return false;
+        }
         PluginClassLoader classLoader;
         try {
             classLoader = new PluginClassLoader(pluginFile);
@@ -40,7 +47,7 @@ public class ReloadCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(1, (sender, data, ioHandler) -> {
+        this.addExecutor( (sender, data, ioHandler) -> {
             Plugin plugin = data.getPlugin();
             if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("reload-command-reload-main-plugin");
@@ -54,11 +61,12 @@ public class ReloadCommand extends Command {
                 ioHandler.outputLang("reload-command-reload-plugin-succeed", plugin.getName());
             else ioHandler.outputLang("reload-command-reload-plugin-failed", plugin.getName());
             return CommandResult.ALLOW;
-        }).setDataConverters(PluginDataConverter.PLUGIN_DATA_CONVERTER);
+        }, CommandArgument.of(PluginDataConverter.PLUGIN_DATA_CONVERTER));
     }
 
     @Override
-    public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: reload <plugin>");
+    @NotNull
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: reload <plugin>");
     }
 }

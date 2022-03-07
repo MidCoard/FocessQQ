@@ -1,6 +1,7 @@
 package top.focess.qq.api.command.data;
 
 import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 
 /**
  * Represent a buffer of Object.
@@ -36,23 +37,20 @@ public class ObjectBuffer extends DataBuffer<Object> {
 
     @Override
     public void put(Object o) {
-        check();
-        objects[pos++] = o;
-    }
-
-    private void check() {
         if (pos == limit)
             throw new BufferOverflowException();
+        objects[pos++] = o;
     }
 
     @Override
     public Object get() {
-        check2();
+        if (pos == limit)
+            throw new BufferUnderflowException();
         return objects[pos++];
     }
 
-    private void check2() {
-        if (pos == limit)
-            throw new IndexOutOfBoundsException(pos + ":" + limit);
+    @Override
+    public Object get(int index) {
+        return objects[index];
     }
 }

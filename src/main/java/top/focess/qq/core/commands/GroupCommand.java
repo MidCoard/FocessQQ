@@ -1,15 +1,15 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandResult;
-import top.focess.qq.api.command.CommandSender;
-import top.focess.qq.api.command.DataConverter;
-import top.focess.qq.api.exceptions.InputTimeoutException;
-import top.focess.qq.api.util.IOHandler;
+import com.google.common.collect.Lists;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.code.MiraiCode;
+import org.jetbrains.annotations.NotNull;
+import top.focess.qq.FocessQQ;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.command.*;
+import top.focess.qq.api.exceptions.InputTimeoutException;
+
+import java.util.List;
 
 public class GroupCommand extends Command {
 
@@ -20,7 +20,7 @@ public class GroupCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
+        this.addExecutor( (sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
@@ -34,8 +34,8 @@ public class GroupCommand extends Command {
                 ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             } else ioHandler.outputLang("group-command-no-group");
             return CommandResult.ALLOW;
-        }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
-        this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
+        }, CommandArgument.of("list"),CommandArgument.ofLong());
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
@@ -57,11 +57,13 @@ public class GroupCommand extends Command {
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;
-        },"send").setDataConverters(DataConverter.LONG_DATA_CONVERTER,DataConverter.LONG_DATA_CONVERTER);
+        },CommandArgument.of("send"),CommandArgument.ofLong(),CommandArgument.ofLong());
     }
 
+    @NotNull
     @Override
-    public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: group list <username>\n" + "Use: group send <username> <group>");
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: group list <bot-id>",
+                "Use: group send <bot-id> <group-id>");
     }
 }

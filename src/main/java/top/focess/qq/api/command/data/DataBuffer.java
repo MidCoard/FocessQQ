@@ -25,4 +25,11 @@ public abstract class DataBuffer<T> {
      * @return element in the buffer in order
      */
     public abstract T get();
+
+    /**
+     * Get element in the buffer by index
+     * @param index the element index
+     * @return element in the index of the buffer
+     */
+    public abstract T get(int index);
 }

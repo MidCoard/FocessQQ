@@ -262,11 +262,11 @@ public class CommandSender {
     /**
      * Execute command with this CommandSender
      *
-     * @see FocessQQ.CommandLine#exec(CommandSender, String)
+     * @see CommandLine#exec(CommandSender, String)
      * @param command the command CommandSender execute
      */
     public void exec(String command) {
-        FocessQQ.CommandLine.exec(this, command);
+        CommandLine.exec(this, command);
     }
 
     /**

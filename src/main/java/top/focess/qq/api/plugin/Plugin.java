@@ -1,5 +1,7 @@
 package top.focess.qq.api.plugin;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.DataCollection;
@@ -17,8 +19,6 @@ import top.focess.qq.api.util.yaml.YamlConfiguration;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,12 +108,13 @@ public abstract class Plugin {
     private void init() {
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(name);
-        if (Plugin.getPlugin(this.getClass()) != null)
-            throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
-        if (this.getClass() != FocessQQ.MainPlugin.class)
+        if (this.getClass() != FocessQQ.MainPlugin.class) {
+            if (Plugin.getPlugin(this.getClass()) != null)
+                throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
             this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
+        }
         else this.pluginDescription = new PluginDescription();
-        if (!this.getClass().getName().equals(this.pluginDescription.getMain()) && this.getClass() != FocessQQ.MainPlugin.class)
+        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
             throw new IllegalStateException("Cannot new a plugin at runtime");
         if (!getDefaultFolder().exists())
             if (!getDefaultFolder().mkdirs())

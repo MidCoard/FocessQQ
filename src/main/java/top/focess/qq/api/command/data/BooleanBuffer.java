@@ -34,6 +34,11 @@ public class BooleanBuffer extends DataBuffer<Boolean> {
     }
 
     @Override
+    public Boolean get(int index) {
+        return this.byteBuffer.get(index) != 0;
+    }
+
+    @Override
     public void flip() {
         this.byteBuffer.flip();
     }

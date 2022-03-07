@@ -11,7 +11,7 @@ public class PluginDescription {
     }
 
     PluginDescription() {
-        this.main = "com.focess.Main$MainPlugin";
+        this.main = "top.focess.qq.FocessQQ$MainPlugin";
     }
 
     public String getMain() {

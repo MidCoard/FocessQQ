@@ -35,4 +35,9 @@ public class IntBuffer extends DataBuffer<Integer> {
     public Integer get() {
         return this.buffer.get();
     }
+
+    @Override
+    public Integer get(int index) {
+        return this.buffer.get(index);
+    }
 }

@@ -37,4 +37,9 @@ public class PluginBuffer extends DataBuffer<Plugin> {
     public Plugin get() {
         return Plugin.getPlugin(stringBuffer.get());
     }
+
+    @Override
+    public Plugin get(int index) {
+        return Plugin.getPlugin(stringBuffer.get(index));
+    }
 }

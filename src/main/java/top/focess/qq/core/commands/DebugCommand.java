@@ -1,12 +1,16 @@
 package top.focess.qq.core.commands;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.plugin.PluginClassLoader;
+
+import java.util.List;
 
 public class DebugCommand extends Command {
 
@@ -17,10 +21,10 @@ public class DebugCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(0,(sender, dataCollection, ioHandler) -> {
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
             for (Plugin plugin : PluginClassLoader.getPlugins()) {
                 if (plugin != FocessQQ.getMainPlugin())
-                    FocessQQ.CommandLine.exec("unload " + plugin.getName());
+                    CommandLine.exec("unload " + plugin.getName());
                 if (plugin.getName().contains("SICE"))
                     System.out.println(plugin.getClass().getClassLoader().getParent());
             }
@@ -29,7 +33,8 @@ public class DebugCommand extends Command {
     }
 
     @Override
-    public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: debug");
+    @NotNull
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: debug");
     }
 }

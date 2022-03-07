@@ -1,7 +1,6 @@
 package top.focess.qq.api.command.converter;
 
 import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.DataCollection;
 
 /**
  * Convert the String argument to Command argument
@@ -19,11 +18,6 @@ public class CommandDataConverter extends NullDataConverter<Command> {
             if (command.getName().equals(s))
                 return command;
         return null;
-    }
-
-    @Override
-    protected void connect(DataCollection dataCollection, Command command) {
-        dataCollection.writeCommand(command);
     }
 
     @Override

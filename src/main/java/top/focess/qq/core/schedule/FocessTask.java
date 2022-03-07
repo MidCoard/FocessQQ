@@ -6,6 +6,7 @@ import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 public class FocessTask implements Task, ITask {
@@ -52,6 +53,7 @@ public class FocessTask implements Task, ITask {
     public synchronized void endRun() {
         this.isRunning = false;
         this.isFinished = true;
+        this.notifyAll();
     }
 
     @Override
@@ -102,6 +104,15 @@ public class FocessTask implements Task, ITask {
     @Override
     public boolean isCancelled() {
         return this.nativeTask.isCancelled();
+    }
+
+    @Override
+    public void join() throws InterruptedException, CancellationException {
+        synchronized (this) {
+            this.wait();
+            if (this.isCancelled())
+                throw new CancellationException();
+        }
     }
 
     @Override

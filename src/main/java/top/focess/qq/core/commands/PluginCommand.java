@@ -1,11 +1,14 @@
 package top.focess.qq.core.commands;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.util.IOHandler;
+
+import java.util.List;
 
 public class PluginCommand extends Command {
 
@@ -28,7 +31,9 @@ public class PluginCommand extends Command {
     }
 
     @Override
-    public void usage(CommandSender commandSender, IOHandler ioHandler) {
-        ioHandler.output("Use: plugin list");
+    @NotNull
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: plugin list");
     }
+
 }

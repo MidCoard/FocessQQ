@@ -1,13 +1,17 @@
 package top.focess.qq.core.commands;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandArgument;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.command.converter.PluginDataConverter;
-import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.plugin.PluginClassLoader;
+
+import java.util.List;
 
 public class UnloadCommand extends Command {
     public UnloadCommand() {
@@ -17,7 +21,7 @@ public class UnloadCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(1, (sender, data, ioHandler) -> {
+        this.addExecutor( (sender, data, ioHandler) -> {
             Plugin plugin = data.getPlugin();
             if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("unload-command-unload-main-plugin");
@@ -30,12 +34,13 @@ public class UnloadCommand extends Command {
             ioHandler.outputLang("unload-command-unload", plugin.getName());
             PluginClassLoader.disablePlugin(plugin);
             return CommandResult.ALLOW;
-        }).setDataConverters(PluginDataConverter.PLUGIN_DATA_CONVERTER);
+        }, CommandArgument.of(PluginDataConverter.PLUGIN_DATA_CONVERTER));
     }
 
     @Override
-    public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: unload <plugin>");
+    @NotNull
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: unload <plugin>");
     }
 
 

@@ -1,15 +1,15 @@
 package top.focess.qq.core.commands;
 
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandResult;
-import top.focess.qq.api.command.CommandSender;
-import top.focess.qq.api.command.DataConverter;
-import top.focess.qq.api.exceptions.InputTimeoutException;
-import top.focess.qq.api.util.IOHandler;
+import com.google.common.collect.Lists;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.message.code.MiraiCode;
+import org.jetbrains.annotations.NotNull;
+import top.focess.qq.FocessQQ;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.command.*;
+import top.focess.qq.api.exceptions.InputTimeoutException;
+
+import java.util.List;
 
 public class FriendCommand extends Command {
     public FriendCommand() {
@@ -19,7 +19,7 @@ public class FriendCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(1, (sender, dataCollection, ioHandler) -> {
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
@@ -31,8 +31,8 @@ public class FriendCommand extends Command {
                 stringBuilder.append(friend.getNick()).append("(").append(friend.getId()).append("),");
             ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             return CommandResult.ALLOW;
-        }, "list").setDataConverters(DataConverter.LONG_DATA_CONVERTER);
-        this.addExecutor(2,(sender, dataCollection, ioHandler) -> {
+        }, CommandArgument.of("list"),CommandArgument.ofLong());
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
@@ -54,11 +54,13 @@ public class FriendCommand extends Command {
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;
-        },"send").setDataConverters(DataConverter.LONG_DATA_CONVERTER,DataConverter.LONG_DATA_CONVERTER);
+        },CommandArgument.of("send"),CommandArgument.ofLong(),CommandArgument.ofLong());
     }
 
     @Override
-    public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: friend list <username>\n" + "Use: friend send <username> <friend>");
+    @NotNull
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: friend list <bot-id>"
+                , "Use: friend send <bot-id> <friend-id>");
     }
 }

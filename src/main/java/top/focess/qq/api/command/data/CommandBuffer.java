@@ -32,4 +32,13 @@ public class CommandBuffer extends DataBuffer<Command> {
                 return command;
         return null;
     }
+
+    @Override
+    public Command get(int index) {
+        String name = stringBuffer.get(index);
+        for (Command command:Command.getCommands())
+            if (command.getName().equals(name))
+                return command;
+        return null;
+    }
 }

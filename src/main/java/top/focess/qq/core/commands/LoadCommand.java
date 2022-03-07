@@ -1,14 +1,17 @@
 package top.focess.qq.core.commands;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandArgument;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
-import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.plugin.PluginClassLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class LoadCommand extends Command {
 
@@ -19,7 +22,7 @@ public class LoadCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(1, (sender, data, ioHandler) -> {
+        this.addExecutor((sender, data, ioHandler) -> {
             String path = data.get();
             File file = new File(path);
             if (file.exists() && file.getName().endsWith(".jar")) {
@@ -39,12 +42,13 @@ public class LoadCommand extends Command {
             }
             ioHandler.outputLang("load-command-file-not-exist", path);
             return CommandResult.REFUSE;
-        });
+        }, CommandArgument.ofString());
     }
 
+    @NotNull
     @Override
-    public void usage(CommandSender sender, IOHandler ioHandler) {
-        ioHandler.output("Use: load <path>");
+    public List<String> usage(CommandSender sender) {
+        return Lists.newArrayList("Use: load <file>");
     }
 
 
