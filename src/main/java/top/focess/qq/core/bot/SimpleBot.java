@@ -1,12 +1,12 @@
 package top.focess.qq.core.bot;
 
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.Bot;
 import com.google.common.collect.Lists;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.focess.qq.FocessQQ;
+import top.focess.qq.api.bot.Bot;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +15,7 @@ public class SimpleBot implements Bot {
 
     private final long username;
     private final String password;
-    private final net.mamoe.mirai.Bot nativeBot;
+    private net.mamoe.mirai.Bot nativeBot;
 
     public SimpleBot(long username, String password, net.mamoe.mirai.Bot bot) {
         this.username = username;
@@ -96,6 +96,10 @@ public class SimpleBot implements Bot {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setNativeBot(net.mamoe.mirai.Bot nativeBot) {
+        this.nativeBot = nativeBot;
     }
 
     @Override

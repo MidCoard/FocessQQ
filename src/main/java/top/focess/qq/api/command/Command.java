@@ -264,6 +264,7 @@ public abstract class Command {
                         FocessQQ.getLogger().thrLang("exception-submit-command-executed-event", e);
                     }
                     flag = true;
+                    break;
                 }
             }
         if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))  {
@@ -453,8 +454,6 @@ public abstract class Command {
             if (args.length < this.commandArguments.length - this.nullableCommandArguments)
                 return null;
             List<CommandArgument<?>> commandArgumentList = Lists.newArrayList();
-            System.out.println(Arrays.toString(args));
-            System.out.println(Arrays.toString(this.commandArguments));
             boolean ret = dfsCheck(args,0,0,this.commandArguments.length - args.length,commandArgumentList);
             if (!ret)
                 return null;

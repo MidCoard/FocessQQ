@@ -54,7 +54,7 @@ public class BotCommand extends Command {
             bot.logout();
             ioHandler.outputLang("bot-command-logout-succeed",bot.getId());
             return CommandResult.ALLOW;
-        },CommandArgument.of("login"),CommandArgument.ofLong());
+        },CommandArgument.of("logout"),CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
@@ -65,7 +65,7 @@ public class BotCommand extends Command {
             bot.relogin();
             ioHandler.outputLang("bot-command-relogin-succeed",bot.getId());
             return CommandResult.ALLOW;
-        },CommandArgument.of("login"),CommandArgument.ofLong());
+        },CommandArgument.of("relogin"),CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
