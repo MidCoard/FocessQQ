@@ -1,5 +1,6 @@
 package top.focess.qq.core.schedule;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
@@ -10,6 +11,7 @@ import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
@@ -21,7 +23,7 @@ public class ThreadPoolScheduler extends AScheduler {
 
     private final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
 
-    private final ThreadPoolSchedulerThread[] threads;
+    private final List<ThreadPoolSchedulerThread> threads = Lists.newArrayList();
 
     private boolean shouldStop = false;
 
@@ -32,9 +34,8 @@ public class ThreadPoolScheduler extends AScheduler {
     public ThreadPoolScheduler(Plugin plugin, int poolSize) {
         super(plugin);
         this.name = this.getPlugin().getName() + "-ThreadPoolScheduler-" + UUID.randomUUID().toString().substring(0,8);
-        this.threads = new ThreadPoolSchedulerThread[poolSize];
         for (int i = 0; i < poolSize; i++)
-            threads[i] = new ThreadPoolSchedulerThread(this,this.getName() + "-" + i);
+            threads.add(new ThreadPoolSchedulerThread(this,this.getName() + "-" + i));
         new SchedulerThread(this.getName()).start();
     }
 
@@ -102,9 +103,9 @@ public class ThreadPoolScheduler extends AScheduler {
     }
 
     public void recreate(String name) {
-        for (int i = 0;i<threads.length;i++)
-            if (threads[i].getName().equals(name)) {
-                threads[i] = new ThreadPoolSchedulerThread(this, name);
+        for (int i = 0;i<threads.size();i++)
+            if (threads.get(i).getName().equals(name)) {
+                threads.set(i, new ThreadPoolSchedulerThread(this, name));
                 break;
             }
     }
@@ -120,14 +121,16 @@ public class ThreadPoolScheduler extends AScheduler {
         }
 
         private ThreadPoolSchedulerThread getAvailableThread() {
-            for (int i = 1;i <= threads.length;i++) {
-                int next = (currentThread + i) % threads.length;
-                if (threads[next].isAvailable()) {
+            for (int i = 1;i <= threads.size();i++) {
+                int next = (currentThread + i) % threads.size();
+                if (threads.get(next).isAvailable()) {
                     currentThread = next;
-                    return threads[next];
+                    return threads.get(next);
                 }
             }
-            return null;
+            ThreadPoolSchedulerThread thread = new ThreadPoolSchedulerThread(ThreadPoolScheduler.this, ThreadPoolScheduler.this.getName() + "-" + threads.size());
+            threads.add(thread);
+            return thread;
         }
 
         @Override

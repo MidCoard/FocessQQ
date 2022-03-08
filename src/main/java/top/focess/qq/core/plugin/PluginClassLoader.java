@@ -180,7 +180,7 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public static void enablePlugin(Plugin plugin) {
         Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
-        Section section = Section.startSection("plugin-enable",task, Duration.ofSeconds(10));
+        Section section = Section.startSection("plugin-enable",task, Duration.ofSeconds(30));
         try {
             task.join();
         } catch (ExecutionException | InterruptedException | CancellationException e) {

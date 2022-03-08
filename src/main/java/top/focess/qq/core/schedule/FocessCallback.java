@@ -42,7 +42,11 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     }
 
     @Override
-    public V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
+    public synchronized V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
+        if (this.isFinished())
+            return value;
+        if (this.isCancelled())
+            throw new CancellationException();
         AtomicBoolean out = new AtomicBoolean(false);
         Task task = DEFAULT_SCHEDULER.run(() -> {
             out.set(true);
@@ -50,14 +54,12 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
                 FocessCallback.this.notifyAll();
             }
         }, Duration.ofMillis(unit.toMillis(timeout)));
-        synchronized (this) {
-            while (true) {
-                this.wait();
-                if (this.isCancelled() || this.isFinished())
-                    break;
-                if (out.get())
-                    throw new TimeoutException();
-            }
+        while (true) {
+            this.wait();
+            if (this.isCancelled() || this.isFinished())
+                break;
+            if (out.get())
+                throw new TimeoutException();
         }
         task.cancel();
         return this.call();

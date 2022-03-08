@@ -19,7 +19,7 @@ public class ComparableTask implements Comparable<ComparableTask> {
         return Long.compare(this.time, o.time);
     }
 
-    public synchronized boolean cancel(boolean mayInterruptIfRunning) {
+    public boolean cancel(boolean mayInterruptIfRunning) {
         synchronized (this.task) {
             if (this.isCancelled)
                 return false;
@@ -34,12 +34,14 @@ public class ComparableTask implements Comparable<ComparableTask> {
                 return false;
             this.isCancelled = true;
             this.task.notifyAll();
+            return !this.task.isRunning();
         }
-        return !this.task.isRunning();
     }
 
-    public synchronized boolean isCancelled() {
-        return this.isCancelled;
+    public boolean isCancelled() {
+        synchronized (this.task) {
+            return this.isCancelled;
+        }
     }
 
     long getTime(){

@@ -73,4 +73,13 @@ public class CommandArgument<V> {
         if (!this.isDefault())
             this.getDataConverter().put(dataCollection, arg);
     }
+
+    @Override
+    public String toString() {
+        return "CommandArgument{" +
+                "dataConverter=" + dataConverter +
+                ", value=" + value +
+                ", isNullable=" + isNullable +
+                '}';
+    }
 }

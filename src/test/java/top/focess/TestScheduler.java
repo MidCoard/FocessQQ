@@ -1,31 +1,36 @@
 package top.focess;
 
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.schedule.Task;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class TestScheduler {
 
-    public static void main(String[] args){
-        Callable<String> callable = () -> {
-            Thread.sleep(3000);
-            throw new NullPointerException();
-//            return new NetworkHandler(FocessQQ.getMainPlugin()).request("https://www.baidu.com", NetworkHandler.RequestType.GET).getResponse();
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         };
         Scheduler scheduler = Schedulers.newFocessScheduler(new FocessQQ.MainPlugin());
-        Callback<String> callback = scheduler.submit(callable);
+        Task task = scheduler.run(runnable);
         System.out.println(System.currentTimeMillis());
         try {
-            System.out.println(callback.get(5000, TimeUnit.MILLISECONDS));
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            task.join();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        task.join();
         System.out.println(System.currentTimeMillis());
     }
 }

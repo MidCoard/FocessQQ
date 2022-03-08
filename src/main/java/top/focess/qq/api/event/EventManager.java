@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class EventManager {
 
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),1);
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
 
     private static final Map<Class<? extends Event>, ListenerHandler> LISTENER_HANDLER_MAP = Maps.newHashMap();
 
@@ -35,15 +35,15 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    public synchronized static <T extends Event> void submit(T event) throws EventSubmitException {
-        Task task = SCHEDULER.run(()-> {
+    public static <T extends Event> void submit(T event) throws EventSubmitException {
+        Task task = SCHEDULER.run(() -> {
             try {
-                submit(cast(event.getClass()),event);
+                submit(cast(event.getClass()), event);
             } catch (EventSubmitException e) {
                 e.printStackTrace();
             }
         });
-        Section section = Section.startSection("event-submit",task, Duration.ofSeconds(10));
+        Section section = Section.startSection("event-submit", task, Duration.ofSeconds(10));
         try {
             task.join();
         } catch (ExecutionException | InterruptedException | CancellationException e) {
@@ -61,7 +61,7 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    private synchronized static <T extends Event> void submit(Class<T> cls,T event) throws EventSubmitException {
+    private static <T extends Event> void submit(Class<T> cls,T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
@@ -90,7 +90,7 @@ public class EventManager {
      * @param event the event need to be submitted
      * @param <T> the event type
      */
-    private synchronized static <T extends Event> void trySubmitOnce(Class<T> cls,T event){
+    private static <T extends Event> void trySubmitOnce(Class<T> cls,T event){
         try {
             submitOnce(cls,event);
         } catch (EventSubmitException e) {
@@ -106,7 +106,7 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    private synchronized static <T extends Event> void submitOnce(Class<T> cls,T event) throws EventSubmitException {
+    private static <T extends Event> void submitOnce(Class<T> cls,T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
