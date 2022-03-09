@@ -652,7 +652,6 @@ public class FocessQQ {
                 SimpleBotManager.removeAll();
                 FocessQQ.getLogger().debugLang("remove-all-bots");
             }
-            //todo why not work
             for (String key : properties.keySet())
                 getDefaultConfig().set(key, properties.get(key));
             getDefaultConfig().save();

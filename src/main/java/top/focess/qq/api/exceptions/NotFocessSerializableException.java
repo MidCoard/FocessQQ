@@ -1,0 +1,15 @@
+package top.focess.qq.api.exceptions;
+
+/**
+ * Thrown to indicate that an object is not serializable.
+ */
+public class NotFocessSerializableException extends RuntimeException {
+
+    /**
+     * Constructs a NotFocessSerializableException
+     * @param cls the class that is not serializable
+     */
+    public NotFocessSerializableException(String cls) {
+        super("The class " + cls + " is not FocessSerializable");
+    }
+}

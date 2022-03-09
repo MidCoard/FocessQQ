@@ -1,9 +1,11 @@
 package top.focess.qq.api.net.packet;
 
+import top.focess.qq.api.serialize.FocessSerializable;
+
 /**
  * This is the base class of all packets.
  */
-public abstract class Packet {
+public abstract class Packet implements FocessSerializable {
 
     /**
      * Get the packet id

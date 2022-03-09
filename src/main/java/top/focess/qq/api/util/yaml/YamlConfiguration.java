@@ -1,16 +1,27 @@
 package top.focess.qq.api.util.yaml;
 
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.YamlLoadException;
-import top.focess.qq.api.util.Base64;
-import top.focess.qq.api.util.SectionMap;
-import top.focess.qq.core.plugin.ObjectInputCoreStream;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
+import top.focess.qq.FocessQQ;
+import top.focess.qq.api.exceptions.NotFocessSerializableException;
+import top.focess.qq.api.exceptions.SerializationParseException;
+import top.focess.qq.api.exceptions.YamlLoadException;
+import top.focess.qq.api.serialize.FocessSerializable;
+import top.focess.qq.api.util.SectionMap;
+import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class is used to define a YAML configuration.
@@ -19,6 +30,62 @@ public class YamlConfiguration implements SectionMap {
 
     private static final Yaml YAML = new Yaml();
     private final Map<String, Object> values;
+    private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
+    private static final Map<Class<?>, ReservedHandler<?>> CLASS_RESERVED_HANDLER_MAP = Maps.newHashMap();
+
+    static {
+        CLASS_RESERVED_HANDLER_MAP.put(Class.class, new ReservedHandler<Class>() {
+            @Override
+            public Object write(Class value) {
+                return value.getName();
+            }
+
+            @Override
+            public Class read(Object value) {
+                try {
+                    String cls = value.toString();
+                    switch (cls) {
+                        case "byte":
+                            return byte.class;
+                        case "short":
+                            return short.class;
+                        case "int":
+                            return int.class;
+                        case "long":
+                            return long.class;
+                        case "float":
+                            return float.class;
+                        case "double":
+                            return double.class;
+                        case "boolean":
+                            return boolean.class;
+                        case "char":
+                            return char.class;
+                        case "void":
+                            return void.class;
+                        default:
+                            return PluginCoreClassLoader.forName(cls);
+                    }
+                } catch (ClassNotFoundException e) {
+                    throw new SerializationParseException(e);
+                }
+            }
+        });
+        CLASS_RESERVED_HANDLER_MAP.put(ArrayList.class, new ReservedHandler<ArrayList>() {
+            @Override
+            public Object write(ArrayList list) {
+                return list.stream().map(YamlConfiguration::write).collect(Collectors.toList());
+            }
+
+            @Override
+            public ArrayList read(Object value) {
+                List list = (List) value;
+                ArrayList ret = Lists.newArrayList();;
+                for (Object o : list) ret.add(YamlConfiguration.read(o));
+                return ret;
+            }
+        });
+    }
 
     /**
      * Initialize the YamlConfiguration with existed key-value pairs or not
@@ -42,9 +109,8 @@ public class YamlConfiguration implements SectionMap {
             reader.close();
             return yamlConfiguration;
         } catch (IOException e) {
-            FocessQQ.getLogger().thrLang("exception-load-file",e);
+            throw new YamlLoadException(e);
         }
-        return null;
     }
 
     public static YamlConfiguration load(InputStream inputStream) {
@@ -58,51 +124,111 @@ public class YamlConfiguration implements SectionMap {
         return new YamlConfigurationSection(this,values);
     }
 
+
+
     @Override
     public void set(String key, Object value) {
-        if (value == null) {
-            values.put(key,"null");
-        } else if (value.getClass().isPrimitive() || value.getClass().equals(Double.class) || value.getClass().equals(Float.class) || value.getClass().equals(Short.class) || value.getClass().equals(Character.class) || value.getClass().equals(Long.class) || value.getClass().equals(Integer.class) || value.getClass().equals(Boolean.class) || value.getClass().equals(Byte.class) || value.getClass().equals(String.class)) {
-            values.put(key, value);
+        values.put(key,write(value));
+    }
+
+    private static <T> Object write(Object value) {
+        if (value == null)
+            return null;
+        if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)
+            return value;
+        if (value.getClass().isArray()) {
+            Map<String,Object> ret = Maps.newHashMap();
+            ret.put("class","!!" + value.getClass().getComponentType().getName());
+            List list = Lists.newArrayList();
+            for (int i = 0; i < Array.getLength(value); i++)
+                list.add(write(Array.get(value, i)));
+            ret.put("value",list);
+            ret.put("array",true);
+            return ret;
         }
-        else {
-            try {
-                ByteArrayOutputStream stream;
-                ObjectOutputStream outputStream = new ObjectOutputStream(stream = new ByteArrayOutputStream());
-                outputStream.writeUnshared(value);
-                outputStream.reset();
-                outputStream.close();
-                values.put(key,"!!" + Base64.base64Encode(stream.toByteArray()));
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (value instanceof FocessSerializable) {
+            Map<String,Object> ret = Maps.newHashMap();
+            ret.put("class","!!" + value.getClass().getName());
+            Map<String,Object> data = ((FocessSerializable) value).serialize();
+            if (data != null) {
+                ret.put("value",data);
+                ret.put("serialize",true);
+                return ret;
             }
+            data = Maps.newHashMap();
+            for (Field field : value.getClass().getDeclaredFields()) {
+                if ((field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) == 0){
+                    field.setAccessible(true);
+                    try {
+                        data.put(field.getName(),write(field.get(value)));
+                    } catch (IllegalAccessException e) {
+                        throw new NotFocessSerializableException(value.getClass().getName());
+                    }
+                }
+            }
+            ret.put("value",data);
+            return ret;
         }
+        if (CLASS_RESERVED_HANDLER_MAP.containsKey(value.getClass())) {
+            Map<String,Object> ret = Maps.newHashMap();
+            T t = (T) value;
+            ReservedHandler<T> handler = (ReservedHandler<T>) CLASS_RESERVED_HANDLER_MAP.get(value.getClass());
+            ret.put("value",handler.write(t));
+            ret.put("class","!!" + value.getClass().getName());
+            return ret;
+        }
+        throw new NotFocessSerializableException(value.getClass().getName());
     }
 
     @Override
     public <T> T get(String key) {
         Object value = SectionMap.super.get(key);
-        //todo replace the java native serialization
+        return (T) read(value);
+    }
+
+    private static <T> Object read(Object value) {
         if (value == null)
             return null;
-        if (value.getClass().isPrimitive() || value.getClass().equals(Double.class) || value.getClass().equals(Float.class) || value.getClass().equals(Short.class) || value.getClass().equals(Character.class) || value.getClass().equals(Long.class) || value.getClass().equals(Integer.class) || value.getClass().equals(Boolean.class) || value.getClass().equals(Byte.class))
-            return (T) value;
-        else {
-            String str = (String) value;
-            if (str.equals("null"))
-                return null;
-            else if (str.startsWith("!!")) {
+        if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)
+            return value;
+        if (value instanceof Map) {
+            Map<String,Object> map = (Map<String,Object>) value;
+            if (map.containsKey("class") && map.containsKey("value")) {
+                String className = map.get("class").toString().substring(2);
                 try {
-                    ObjectInputCoreStream inputStream = new ObjectInputCoreStream(new ByteArrayInputStream(Base64.base64Decode(str.substring(2))));
-                    T t = (T) inputStream.readUnshared();
-                    // must reset, or the object does not gc
-                    inputStream.close();
-                    return t;
+                    Class<?> cls = PluginCoreClassLoader.forName(className);
+                    Object v = map.get("value");
+                    if (v instanceof List && Boolean.parseBoolean(String.valueOf(map.get("array")))) {
+                        List list = (List) v;
+                        Object array = Array.newInstance(cls,list.size());
+                        for (int i = 0; i < list.size(); i++)
+                            Array.set(array,i,read(list.get(i)));
+                        return array;
+                    }
+                    if (v instanceof Map && FocessSerializable.class.isAssignableFrom(cls)) {
+                        Map<String,Object> data = (Map<String,Object>) v;
+                        if (Boolean.parseBoolean(String.valueOf(map.get("serialize")))) {
+                            Method method = cls.getMethod("deserialize", Map.class);
+                            return method.invoke(null, data);
+                        }
+                        Object o = PROVIDER.newInstance(cls);
+                        for (String key : data.keySet()) {
+                            Field f = cls.getDeclaredField(key);
+                            f.setAccessible(true);
+                            f.set(o, read(data.get(key)));
+                        }
+                        return o;
+                    }
+                    if (CLASS_RESERVED_HANDLER_MAP.containsKey(cls)) {
+                        ReservedHandler<T> handler = (ReservedHandler<T>) CLASS_RESERVED_HANDLER_MAP.get(cls);
+                        return handler.read(v);
+                    }
                 } catch (Exception e) {
-                    throw new YamlLoadException(e);
+                    throw new SerializationParseException(e);
                 }
-            } else return (T) value;
+            }
         }
+        throw new SerializationParseException("Unknown class: " + value.getClass().getName());
     }
 
     @Override
@@ -133,5 +259,12 @@ public class YamlConfiguration implements SectionMap {
     @Override
     public String toString() {
         return values.toString();
+    }
+
+    private interface ReservedHandler<T> {
+
+        Object write(T value);
+
+        T read(Object value);
     }
 }
