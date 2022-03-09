@@ -28,6 +28,10 @@ public class CommandArgument<V> {
         return new CommandArgument<>(DataConverter.LONG_DATA_CONVERTER,null);
     }
 
+    public static CommandArgument<Integer> ofInt() {
+        return new CommandArgument<>(DataConverter.INTEGER_DATA_CONVERTER,null);
+    }
+
     public boolean isNullable() {
         return isNullable;
     }
