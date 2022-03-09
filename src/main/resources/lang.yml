@@ -61,7 +61,7 @@ exception-focess-scheduler: Focess scheduler exception
 exception-thread-pool-scheduler: Thread pool scheduler exception
 exception-thread-pool-scheduler-thread: Thread pool scheduler thread exception
 exception-default-bot-login-failed: Default bot login failed exception
-exception-serialize-field: %s in %s serialize field exception
+exception-serialize-field: "%s in %s serialize field exception"
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
