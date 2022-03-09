@@ -6,6 +6,7 @@ import com.google.common.primitives.Bytes;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.NotFocessSerializableException;
 import top.focess.qq.api.serialize.FocessSerializable;
+import top.focess.qq.api.serialize.FocessWriter;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 import static top.focess.qq.core.serialize.Opcodes.*;
 
-public class FocessWriter {
+public class SimpleFocessWriter extends FocessWriter {
 
     private final List<Byte> data = Lists.newArrayList();
 
@@ -214,6 +215,6 @@ public class FocessWriter {
     }
 
     private interface Writer<T> {
-        void write(T t,FocessWriter writer) throws NotFocessSerializableException;
+        void write(T t, SimpleFocessWriter writer) throws NotFocessSerializableException;
     }
 }

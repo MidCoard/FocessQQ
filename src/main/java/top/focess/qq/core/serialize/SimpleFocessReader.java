@@ -3,6 +3,7 @@ package top.focess.qq.core.serialize;
 import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import top.focess.qq.api.exceptions.SerializationParseException;
+import top.focess.qq.api.serialize.FocessReader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
 import java.lang.reflect.Array;
@@ -13,7 +14,7 @@ import java.util.*;
 
 import static top.focess.qq.core.serialize.Opcodes.*;
 
-public class FocessReader {
+public class SimpleFocessReader extends FocessReader {
 
     private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
 
@@ -92,7 +93,7 @@ public class FocessReader {
 
     private int pointer;
 
-    public FocessReader(byte[] bytes) {
+    public SimpleFocessReader(byte[] bytes) {
         this.bytes = bytes;
         this.pointer = 0;
     }
@@ -267,10 +268,10 @@ public class FocessReader {
 
 
     private interface Reader<T> extends ReaderT<T>{
-         void read(T t,FocessReader reader) throws SerializationParseException;
+         void read(T t, SimpleFocessReader reader) throws SerializationParseException;
 
         @Override
-        default T readT(Class<T> cls, FocessReader reader) {
+        default T readT(Class<T> cls, SimpleFocessReader reader) {
             T t = (T) PROVIDER.newInstance(cls);
             read(t,reader);
             return t;
@@ -278,7 +279,7 @@ public class FocessReader {
     }
 
     private interface ReaderT<T> {
-        T readT(Class<T> cls,FocessReader reader) throws SerializationParseException;
+        T readT(Class<T> cls, SimpleFocessReader reader) throws SerializationParseException;
     }
 
 }
