@@ -269,12 +269,19 @@ public abstract class Command {
             }
         if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))  {
             List<String> usage = this.usage(sender);
-            if (usage.size() != 0) {
-                StringBuilder stringBuilder = new StringBuilder(usage.get(0));
-                for (int i = 1;i<usage.size();i++)
-                    stringBuilder.append('\n').append(usage.get(i));
-                ioHandler.output(stringBuilder.toString());
+            int pos = 0;
+            final int targetPos = 7;
+            StringBuilder stringBuilder = null;
+            while (pos != usage.size()) {
+                if (pos % targetPos == 0) {
+                    if (stringBuilder != null)
+                        ioHandler.output(stringBuilder.toString());
+                    stringBuilder = new StringBuilder(usage.get(pos));
+                } else stringBuilder.append('\n').append(usage.get(pos));
+                pos++;
             }
+            if (stringBuilder != null)
+                ioHandler.output(stringBuilder.toString());
         }
         return true;
     }

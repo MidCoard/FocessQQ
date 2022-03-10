@@ -188,6 +188,8 @@ public class PluginClassLoader extends URLClassLoader {
                 throw (PluginLoadException)e.getCause();
             else if (e.getCause() instanceof PluginDuplicateException)
                 throw (PluginDuplicateException)e.getCause();
+            else if (e.getCause() instanceof PluginUnloadException)
+                throw (PluginUnloadException)e.getCause();
         }
         section.stop();
     }
