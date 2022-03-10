@@ -399,7 +399,10 @@ public class PluginClassLoader extends URLClassLoader {
                 if (e instanceof IllegalStateException)
                     FocessQQ.getLogger().debugLang("plugin-depend-on-other-plugin");
                 if (plugin != null) {
-                    FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
+                    if (!(e instanceof PluginUnloadException))
+                        FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
+                    else
+                        FocessQQ.getLogger().debugLang("plugin-unload-self",plugin.getName());
                     ListenerHandler.unregister(plugin);
                     DataCollection.unregister(plugin);
                     Command.unregister(plugin);

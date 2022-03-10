@@ -12,6 +12,7 @@ import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.exceptions.PluginDuplicateException;
 import top.focess.qq.api.exceptions.PluginLoaderException;
+import top.focess.qq.api.exceptions.PluginUnloadException;
 import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.version.Version;
@@ -293,5 +294,14 @@ public abstract class Plugin {
 
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    /**
+     * Used to unload this plugin during enabling process
+     *
+     * This should be called in the {@link #enable()} method
+     */
+    public void unload() {
+        throw new PluginUnloadException();
     }
 }

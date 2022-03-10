@@ -170,4 +170,5 @@ unknown-key: Unknown key %s
 socket-packet-handler-not-empty: Socket packet handlers are not empty
 udp-socket-packet-handler-not-empty: UDP socket packet handlers are not empty
 debug-section-timeout: Section %s is timeout
+plugin-unload-self: "%s unload itself"
 
