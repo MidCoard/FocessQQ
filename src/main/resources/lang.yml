@@ -65,7 +65,7 @@ exception-serialize-field: "%s in %s serialize field exception"
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
-start-main: Hi, this is MiraiQQ Framework@%s!
+start-main: Hi, this is FocessQQ Framework@%s!
 start-enable-plugin: Enable plugin %s
 start-disable-plugin: Disable plugin %s
 start-load-plugin: Start loading file %s
@@ -114,7 +114,7 @@ command-command-unload-main-plugin-command: Cannot unload main plugin command %s
 unload-command-unload-main-plugin: Can't unload the Main Plugin, if you want to stop the server use stop command.
 unload-command-plugin-loader-error: The classloader of the plugin %s is not PluginClassLoader
 unload-command-unload: Unload plugin %s
-stop-command-stop: Stop MiraiQQ Framework...
+stop-command-stop: Stop FocessQQ Framework...
 load-command-file-not-exist: The file %s does not exist
 load-command-load-succeed: Load plugin %s successfully
 load-command-load-failed: Failed to load file %s

@@ -12,7 +12,7 @@ public class Property {
     /**
      * Indicate whether it has the key or not
      *
-     * @param key the MiraiQQ framework properties' key
+     * @param key the FocessQQ framework properties' key
      * @return true if it has the key, false otherwise
      */
     public static boolean hasKey(String key) {
@@ -22,8 +22,8 @@ public class Property {
     /**
      * Set the property
      *
-     * @param key the MiraiQQ framework properties' key
-     * @param value the MiraiQQ framework properties' value
+     * @param key the FocessQQ framework properties' key
+     * @param value the FocessQQ framework properties' value
      */
     public static void put(String key, Object value) {
         FocessQQ.MainPlugin.getProperties().put(key, value);
@@ -32,7 +32,7 @@ public class Property {
     /**
      * Get the value of the key in the properties
      *
-     * @param key the MiraiQQ framework properties' key
+     * @param key the FocessQQ framework properties' key
      * @param <T> the desired T type
      * @throws ClassCastException if the desired T type is not equal to its original type
      * @return the desired value
@@ -42,9 +42,21 @@ public class Property {
     }
 
     /**
+     * Get the value of the key in the properties or default value if the key is not existed
+     * 
+     * @param key the FocessQQ framework properties' key
+     * @param t the default value
+     * @param <T> the desired T type
+     * @return the desired value, or the default value
+     */
+    public static <T> T getOrDefault(String key ,T t) {
+        return (T) FocessQQ.MainPlugin.getProperties().getOrDefault(key,t);
+    }
+
+    /**
      * Remove the property
      *
-     * @param key the MiraiQQ framework properties' key
+     * @param key the FocessQQ framework properties' key
      */
     public static void remove(String key) {
         FocessQQ.MainPlugin.getProperties().remove(key);

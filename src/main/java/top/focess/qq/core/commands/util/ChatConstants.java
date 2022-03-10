@@ -2,7 +2,7 @@ package top.focess.qq.core.commands.util;
 
 public class ChatConstants {
 
-    public static final String HEADER = "[MiraiQQ]";
+    public static final String HEADER = "[FocessQQ]";
     public static final String CONSOLE_OUTPUT_HEADER = HEADER + "[Console] -> ";
     public static final String CONSOLE_INPUT_HEADER = HEADER + "[Console] <- ";
     public static final String CONSOLE_FATAL_HEADER = HEADER + " + ";
