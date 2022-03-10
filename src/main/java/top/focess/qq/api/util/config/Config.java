@@ -42,4 +42,8 @@ public abstract class Config {
     protected boolean contains(String key) {
         return this.yaml.contains(key);
     }
+
+    protected void remove(String key) {
+        this.yaml.remove(key);
+    }
 }

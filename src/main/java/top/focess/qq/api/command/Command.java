@@ -268,20 +268,7 @@ public abstract class Command {
                 }
             }
         if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))  {
-            List<String> usage = this.usage(sender);
-            int pos = 0;
-            final int targetPos = 7;
-            StringBuilder stringBuilder = null;
-            while (pos != usage.size()) {
-                if (pos % targetPos == 0) {
-                    if (stringBuilder != null)
-                        ioHandler.output(stringBuilder.toString());
-                    stringBuilder = new StringBuilder(usage.get(pos));
-                } else stringBuilder.append('\n').append(usage.get(pos));
-                pos++;
-            }
-            if (stringBuilder != null)
-                ioHandler.output(stringBuilder.toString());
+            infoUsage(sender,ioHandler);
         }
         return true;
     }
@@ -306,6 +293,23 @@ public abstract class Command {
      */
     @NotNull
     public abstract List<String> usage(CommandSender sender);
+
+    public final void infoUsage(CommandSender sender, IOHandler ioHandler) {
+        List<String> usage = this.usage(sender);
+        int pos = 0;
+        final int targetPos = 7;
+        StringBuilder stringBuilder = null;
+        while (pos != usage.size()) {
+            if (pos % targetPos == 0) {
+                if (stringBuilder != null)
+                    ioHandler.output(stringBuilder.toString());
+                stringBuilder = new StringBuilder(usage.get(pos));
+            } else stringBuilder.append('\n').append(usage.get(pos));
+            pos++;
+        }
+        if (stringBuilder != null)
+            ioHandler.output(stringBuilder.toString());
+    }
 
     public boolean isInitialize() {
         return initialize;

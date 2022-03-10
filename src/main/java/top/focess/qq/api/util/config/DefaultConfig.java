@@ -37,4 +37,9 @@ public class DefaultConfig extends Config {
     public <T> T getOrDefault(String key,T def) {
         return contains(key) ? get(key) : def;
     }
+
+    @Override
+    public void remove(String key) {
+        super.remove(key);
+    }
 }
