@@ -231,6 +231,12 @@ public class PluginClassLoader extends URLClassLoader {
 
     public static File disablePlugin0(Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
+        // try-catch because it should take over the process
+        try {
+            plugin.onDisable();
+        } catch (Exception e) {
+            FocessQQ.getLogger().thrLang("exception-plugin-disable", e);
+        }
         if (plugin != FocessQQ.getMainPlugin()) {
             ListenerHandler.unregister(plugin);
             FocessQQ.getLogger().debugLang("unregister-listeners");
@@ -244,12 +250,6 @@ public class PluginClassLoader extends URLClassLoader {
                 FocessQQ.getSocket().unregister(plugin);
             if (FocessQQ.getUdpSocket() != null)
                 FocessQQ.getUdpSocket().unregister(plugin);
-        }
-        // try-catch because it should take over the process
-        try {
-            plugin.onDisable();
-        } catch (Exception e) {
-            FocessQQ.getLogger().thrLang("exception-plugin-disable", e);
         }
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
         NAME_PLUGIN_MAP.remove(plugin.getName());
