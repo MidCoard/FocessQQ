@@ -19,8 +19,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +84,64 @@ public class YamlConfiguration implements SectionMap {
             public ArrayList read(Object value) {
                 List list = (List) value;
                 ArrayList ret = Lists.newArrayList();;
+                for (Object o : list) ret.add(YamlConfiguration.read(o));
+                return ret;
+            }
+        });
+
+        CLASS_RESERVED_HANDLER_MAP.put(HashSet.class, new ReservedHandler<HashSet>() {
+            @Override
+            public Object write(HashSet set) {
+                return set.stream().map(YamlConfiguration::write).collect(Collectors.toList());
+            }
+
+            @Override
+            public HashSet read(Object value) {
+                List list = (List) value;
+                HashSet ret = new HashSet();
+                for (Object o : list) ret.add(YamlConfiguration.read(o));
+                return ret;
+            }
+        });
+        CLASS_RESERVED_HANDLER_MAP.put(ConcurrentHashMap.class, new ReservedHandler<ConcurrentHashMap>() {
+            @Override
+            public Object write(ConcurrentHashMap map) {
+                return map;
+            }
+
+            @Override
+            public ConcurrentHashMap read(Object value) {
+                Map map = (Map) value;
+                return new ConcurrentHashMap(map);
+            }
+        });
+
+        CLASS_RESERVED_HANDLER_MAP.put(ConcurrentHashMap.KeySetView.class, new ReservedHandler<ConcurrentHashMap.KeySetView>() {
+            @Override
+            public Object write(ConcurrentHashMap.KeySetView set) {
+                return set.stream().map(YamlConfiguration::write).collect(Collectors.toList());
+            }
+
+            @Override
+            public ConcurrentHashMap.KeySetView read(Object value) {
+                List list = (List) value;
+                ConcurrentHashMap.KeySetView ret = ConcurrentHashMap.newKeySet();
+                for (Object o : list) ret.add(YamlConfiguration.read(o));
+                return ret;
+            }
+        });
+
+        CLASS_RESERVED_HANDLER_MAP.put(CopyOnWriteArrayList.class, new ReservedHandler<CopyOnWriteArrayList>() {
+
+            @Override
+            public Object write(CopyOnWriteArrayList value) {
+                return value.stream().map(YamlConfiguration::write).collect(Collectors.toList());
+            }
+
+            @Override
+            public CopyOnWriteArrayList read(Object value) {
+                List list = (List) value;
+                CopyOnWriteArrayList ret = new CopyOnWriteArrayList();
                 for (Object o : list) ret.add(YamlConfiguration.read(o));
                 return ret;
             }

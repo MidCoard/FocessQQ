@@ -36,7 +36,6 @@ import java.util.Objects;
  */
 public abstract class Plugin {
 
-    private static final String path = Plugin.class.getProtectionDomain().getCodeSource().getLocation().getFile();
     /**
      * The plugin author
      */
@@ -192,7 +191,7 @@ public abstract class Plugin {
 
     @NotNull
     public File getDefaultFolder() {
-        return new File(new File(new File(path).getParent(), "plugins"), this.getName());
+        return new File(new File("plugins"), this.getName());
     }
 
     @NotNull

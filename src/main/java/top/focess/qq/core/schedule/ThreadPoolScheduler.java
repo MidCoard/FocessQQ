@@ -24,6 +24,7 @@ public class ThreadPoolScheduler extends AScheduler {
     private final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
 
     private final List<ThreadPoolSchedulerThread> threads = Lists.newArrayList();
+    private final boolean immediate;
 
     private boolean shouldStop = false;
 
@@ -31,12 +32,17 @@ public class ThreadPoolScheduler extends AScheduler {
 
     private final String name;
 
-    public ThreadPoolScheduler(Plugin plugin, int poolSize) {
+    public ThreadPoolScheduler(Plugin plugin, int poolSize, boolean isImmediate,String name) {
         super(plugin);
-        this.name = this.getPlugin().getName() + "-ThreadPoolScheduler-" + UUID.randomUUID().toString().substring(0,8);
+        this.name = name;
         for (int i = 0; i < poolSize; i++)
             threads.add(new ThreadPoolSchedulerThread(this,this.getName() + "-" + i));
         new SchedulerThread(this.getName()).start();
+        this.immediate = isImmediate;
+    }
+
+    public ThreadPoolScheduler(Plugin plugin, int poolSize) {
+        this(plugin, poolSize, false,plugin.getName() + "-ThreadPoolScheduler-" + UUID.randomUUID().toString().substring(0,8));
     }
 
     @Override
@@ -128,9 +134,12 @@ public class ThreadPoolScheduler extends AScheduler {
                     return threads.get(next);
                 }
             }
-            ThreadPoolSchedulerThread thread = new ThreadPoolSchedulerThread(ThreadPoolScheduler.this, ThreadPoolScheduler.this.getName() + "-" + threads.size());
-            threads.add(thread);
-            return thread;
+            if (immediate) {
+                ThreadPoolSchedulerThread thread = new ThreadPoolSchedulerThread(ThreadPoolScheduler.this, ThreadPoolScheduler.this.getName() + "-" + threads.size());
+                threads.add(thread);
+                return thread;
+            }
+            return null;
         }
 
         @Override

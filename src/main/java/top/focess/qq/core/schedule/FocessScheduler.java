@@ -21,10 +21,14 @@ public class FocessScheduler extends AScheduler {
 
     private boolean shouldStop = false;
 
-    public FocessScheduler(@NotNull Plugin plugin) {
+    public FocessScheduler(@NotNull Plugin plugin, String name) {
         super(plugin);
-        this.name = this.getPlugin().getName() + "-FocessScheduler-" + UUID.randomUUID().toString().substring(0,8);
+        this.name = name;
         new SchedulerThread(this.getName()).start();
+    }
+
+    public FocessScheduler(@NotNull Plugin plugin) {
+        this(plugin, plugin.getName() + "-FocessScheduler-" + UUID.randomUUID().toString().substring(0,8));
     }
 
     @Override
@@ -111,8 +115,8 @@ public class FocessScheduler extends AScheduler {
                         if (task.getTask().isRunning()) {
                             try {
                                 task.getTask().run();
-                            } catch(ExecutionException e) {
-                                task.getTask().setException(e);
+                            } catch(Exception e) {
+                                task.getTask().setException(new ExecutionException(e));
                             }
                             task.getTask().endRun();
                             if (task.getTask().isPeriod())

@@ -21,7 +21,7 @@ import java.util.concurrent.Future;
 public class CommandLine {
 
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10,false,"CommandLine");
 
     /**
      * Execute command using {@link CommandSender#CONSOLE}

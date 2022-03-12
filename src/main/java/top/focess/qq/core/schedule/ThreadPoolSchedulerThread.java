@@ -35,8 +35,8 @@ public class ThreadPoolSchedulerThread extends Thread{
                     this.task.startRun();
                     try {
                         this.task.run();
-                    } catch (ExecutionException e) {
-                        this.task.setException(e);
+                    } catch (Exception e) {
+                        this.task.setException(new ExecutionException(e));
                     }
                     this.task.endRun();
                     if (this.task.isPeriod())

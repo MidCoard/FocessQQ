@@ -10,6 +10,6 @@ public class IllegalCommandClassException extends RuntimeException {
      * @param c the illegal command class
      */
     public IllegalCommandClassException(Class<?> c) {
-        super("The class " + c.getName() + " is not an illegal Command class.");
+        super("The class " + c.getName() + " is an illegal Command class.");
     }
 }

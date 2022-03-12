@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FocessCallback<V> extends FocessTask implements Callback<V> {
 
-    private final static Scheduler DEFAULT_SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
+    private final static Scheduler DEFAULT_SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10,false,"FocessCallback");
 
     private final Callable<V> callback;
     private V value;

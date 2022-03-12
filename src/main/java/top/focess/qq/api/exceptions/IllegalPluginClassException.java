@@ -8,6 +8,6 @@ public class IllegalPluginClassException extends RuntimeException {
      * @param c the illegal plugin class
      */
     public IllegalPluginClassException(Class<?> c) {
-        super("The class " + c.getName() + " is not an illegal Plugin class");
+        super("The class " + c.getName() + " is an illegal Plugin class");
     }
 }

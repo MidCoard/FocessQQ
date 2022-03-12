@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +61,11 @@ public class SimpleFocessWriter extends FocessWriter {
             }
         });
         CLASS_WRITER_MAP.put(Class.class, (Writer<Class>) (clazz, writer) -> writer.writeString(clazz.getName()));
+        CLASS_WRITER_MAP.put(ConcurrentHashMap.KeySetView.class,(Writer<ConcurrentHashMap.KeySetView>) (set, writer)->{
+            writer.writeInt(set.size());
+            for(Object o:set)
+                writer.writeObject(o);
+        });
     }
 
     private void writeInt(int v) {

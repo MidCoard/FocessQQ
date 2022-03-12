@@ -107,7 +107,7 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public synchronized void join() throws InterruptedException, CancellationException {
+    public synchronized void join() throws InterruptedException, CancellationException, ExecutionException {
         if (this.isFinished())
             return;
         if (this.isCancelled())
@@ -115,6 +115,8 @@ public class FocessTask implements Task, ITask {
         this.wait();
         if (this.isCancelled())
             throw new CancellationException();
+        if (this.exception != null)
+            throw this.exception;
     }
 
     @Override

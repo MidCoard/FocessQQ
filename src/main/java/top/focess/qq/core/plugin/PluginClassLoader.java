@@ -169,7 +169,7 @@ public class PluginClassLoader extends URLClassLoader {
         });
     }
 
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),1);
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),1,false,"EnablePlugin");
 
     /**
      * Used to enable plugin

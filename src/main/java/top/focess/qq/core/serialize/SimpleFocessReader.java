@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static top.focess.qq.core.serialize.Opcodes.*;
 
@@ -87,6 +88,11 @@ public class SimpleFocessReader extends FocessReader {
             }
         });
 
+        CLASS_READER_MAP.put(ConcurrentHashMap.KeySetView.class,(Reader<ConcurrentHashMap.KeySetView>) (t, reader)->{
+            int length = reader.readInt();
+            for (int i = 0;i<length;i++)
+                t.add(reader.readObject());
+        });
     }
 
     private final byte[] bytes;

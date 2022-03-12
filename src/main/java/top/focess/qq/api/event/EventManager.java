@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class EventManager {
 
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10,false ,"EventManager");
 
     private static final Map<Class<? extends Event>, ListenerHandler> LISTENER_HANDLER_MAP = Maps.newHashMap();
 

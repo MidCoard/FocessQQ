@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 
 public class ConsoleListener implements Listener {
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10);
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10,false,"ConsoleListener");
     public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingDeque();
 
     @EventHandler(priority = EventPriority.HIGHEST)
