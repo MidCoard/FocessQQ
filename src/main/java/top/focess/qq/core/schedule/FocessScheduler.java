@@ -20,7 +20,7 @@ public class FocessScheduler extends AScheduler {
     private final String name;
     private final Thread thread;
 
-    private boolean shouldStop = false;
+    private volatile boolean shouldStop = false;
 
     public FocessScheduler(@NotNull Plugin plugin, String name) {
         super(plugin);
@@ -102,9 +102,9 @@ public class FocessScheduler extends AScheduler {
         public void run() {
             while (true) {
                 try {
-                    if (shouldStop)
-                        break;
                     synchronized (FocessScheduler.this) {
+                        if (shouldStop)
+                            break;
                         if (tasks.isEmpty())
                             FocessScheduler.this.wait();
                     }

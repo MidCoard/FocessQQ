@@ -410,6 +410,7 @@ public class PluginClassLoader extends URLClassLoader {
                     ListenerHandler.unregister(plugin);
                     DataCollection.unregister(plugin);
                     Command.unregister(plugin);
+                    Schedulers.close(plugin);
                 }
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;

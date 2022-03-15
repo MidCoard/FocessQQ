@@ -26,7 +26,7 @@ public class ThreadPoolScheduler extends AScheduler {
     private final List<ThreadPoolSchedulerThread> threads = Lists.newArrayList();
     private final boolean immediate;
 
-    private boolean shouldStop = false;
+    private volatile boolean shouldStop = false;
 
     private int currentThread = 0;
 
@@ -158,9 +158,9 @@ public class ThreadPoolScheduler extends AScheduler {
         public void run() {
             while (true) {
                 try {
-                    if (shouldStop)
-                        break;
                     synchronized (ThreadPoolScheduler.this) {
+                        if (shouldStop)
+                            break;
                         if (tasks.isEmpty())
                             ThreadPoolScheduler.this.wait();
                     }
