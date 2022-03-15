@@ -55,6 +55,7 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public @NotNull Future<Bot> login(long id, String password) {
+        //todo add plugin argument
         return SCHEDULER.submit(() -> loginDirectly(id,password));
     }
 
