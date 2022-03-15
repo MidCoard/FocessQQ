@@ -6,7 +6,6 @@ import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.data.DataBuffer;
 import top.focess.qq.api.plugin.Plugin;
 
-import java.nio.BufferUnderflowException;
 import java.util.List;
 import java.util.Map;
 
@@ -165,7 +164,7 @@ public class DataCollection {
             if (buffers.get(cls) == null)
                 throw new UnsupportedOperationException();
             return (T) buffers.get(cls).get();
-        } catch (BufferUnderflowException e) {
+        } catch (Exception e) {
             return t;
         }
     }
@@ -186,7 +185,7 @@ public class DataCollection {
             if (buffers.get(cls) == null)
                 throw new UnsupportedOperationException();
             return (T) buffers.get(cls).get(index);
-        } catch (BufferUnderflowException e) {
+        } catch (Exception e) {
             return t;
         }
     }

@@ -467,7 +467,7 @@ public abstract class Command {
             boolean ret = dfsCheck(args,0,0,this.commandArguments.length - args.length,commandArgumentList);
             if (!ret)
                 return null;
-            DataCollection dataCollection = new DataCollection(commandArgumentList.stream().map(CommandArgument::getDataConverter).toArray(DataConverter[]::new));
+            DataCollection dataCollection = new DataCollection(Arrays.stream(this.commandArguments).map(CommandArgument::getDataConverter).toArray(DataConverter[]::new));
             for (int i = 0; i < args.length; i++)
                 commandArgumentList.get(i).put(dataCollection, args[i]);
             dataCollection.flip();
