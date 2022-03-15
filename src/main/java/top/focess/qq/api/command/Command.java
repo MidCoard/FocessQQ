@@ -268,8 +268,8 @@ public abstract class Command {
                 }
             }
         if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))
-            infoUsage(sender,ioHandler);
-        return true;
+            infoUsage(sender, ioHandler);
+        return result == CommandResult.ALLOW;
     }
 
     @NotNull
