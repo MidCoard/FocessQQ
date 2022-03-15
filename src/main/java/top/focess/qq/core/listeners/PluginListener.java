@@ -1,4 +1,4 @@
-package top.focess.qq.core.listener;
+package top.focess.qq.core.listeners;
 
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventHandler;

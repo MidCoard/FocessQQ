@@ -267,9 +267,8 @@ public abstract class Command {
                     break;
                 }
             }
-        if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))  {
+        if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))
             infoUsage(sender,ioHandler);
-        }
         return true;
     }
 

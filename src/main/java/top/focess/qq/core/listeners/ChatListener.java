@@ -1,4 +1,4 @@
-package top.focess.qq.core.listener;
+package top.focess.qq.core.listeners;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -30,7 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10,false,"ChatListener");
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),5,true,"ChatListener");
 
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean,Long>>>> QUESTS = Maps.newConcurrentMap();
 

@@ -4,7 +4,7 @@ import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
-import top.focess.qq.core.listener.ChatListener;
+import top.focess.qq.core.listeners.ChatListener;
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Member;

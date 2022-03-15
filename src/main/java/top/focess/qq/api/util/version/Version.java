@@ -2,8 +2,6 @@ package top.focess.qq.api.util.version;
 
 import top.focess.qq.api.exceptions.VersionFormatException;
 
-import java.util.Arrays;
-
 /**
  * Represents a version of a plugin.
  */
@@ -120,10 +118,6 @@ public class Version {
             throw new VersionFormatException(version);
         }
         this.length = temp.length;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(Arrays.toString("".split("\\.")));
     }
 
     public int getMajor() {

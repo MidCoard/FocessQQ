@@ -18,13 +18,15 @@ public class FocessScheduler extends AScheduler {
 
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
     private final String name;
+    private final Thread thread;
 
     private boolean shouldStop = false;
 
     public FocessScheduler(@NotNull Plugin plugin, String name) {
         super(plugin);
         this.name = name;
-        new SchedulerThread(this.getName()).start();
+        this.thread = new SchedulerThread(this.getName());
+        this.thread.start();
     }
 
     public FocessScheduler(@NotNull Plugin plugin) {
@@ -82,6 +84,12 @@ public class FocessScheduler extends AScheduler {
     @Override
     public boolean isClosed() {
         return shouldStop;
+    }
+
+    @Override
+    public synchronized void closeNow() {
+        this.close();
+        this.thread.stop();
     }
 
     private class SchedulerThread extends Thread {

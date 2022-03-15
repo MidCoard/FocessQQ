@@ -39,6 +39,7 @@ public class ThreadPoolSchedulerThread extends Thread{
                         this.task.setException(new ExecutionException(e));
                     }
                     this.task.endRun();
+                    this.scheduler.taskThreadMap.remove(this.task);
                     if (this.task.isPeriod())
                         this.scheduler.rerun(this.task);
                     this.task = null;
@@ -67,6 +68,11 @@ public class ThreadPoolSchedulerThread extends Thread{
         synchronized (lock) {
             lock.notify();
         }
+    }
+
+    public void closeNow() {
+        this.close();
+        this.stop();
     }
 
     public void cancel() {

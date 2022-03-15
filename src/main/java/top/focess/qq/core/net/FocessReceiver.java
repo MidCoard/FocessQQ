@@ -14,7 +14,7 @@ import java.time.Duration;
 public class FocessReceiver extends AServerReceiver {
 
     private final FocessSocket focessSocket;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessReceiver");
 
     public FocessReceiver(FocessSocket focessSocket) {
         this.focessSocket = focessSocket;

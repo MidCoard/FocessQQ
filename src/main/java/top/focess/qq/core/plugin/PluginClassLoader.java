@@ -169,7 +169,7 @@ public class PluginClassLoader extends URLClassLoader {
         });
     }
 
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),1,false,"EnablePlugin");
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),2,false,"EnablePlugin");
 
     /**
      * Used to enable plugin
@@ -179,19 +179,21 @@ public class PluginClassLoader extends URLClassLoader {
      * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
      */
     public static void enablePlugin(Plugin plugin) {
-        Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
-        Section section = Section.startSection("plugin-enable",task, Duration.ofSeconds(30));
-        try {
-            task.join();
-        } catch (ExecutionException | InterruptedException | CancellationException e) {
-            if (e.getCause() instanceof PluginLoadException)
-                throw (PluginLoadException)e.getCause();
-            else if (e.getCause() instanceof PluginDuplicateException)
-                throw (PluginDuplicateException)e.getCause();
-            else if (e.getCause() instanceof PluginUnloadException)
-                throw (PluginUnloadException)e.getCause();
-        }
-        section.stop();
+        if (plugin.getClass() != FocessQQ.MainPlugin.class) {
+            Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
+            Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
+            try {
+                task.join();
+            } catch (ExecutionException | InterruptedException | CancellationException e) {
+                if (e.getCause() instanceof PluginLoadException)
+                    throw (PluginLoadException) e.getCause();
+                else if (e.getCause() instanceof PluginDuplicateException)
+                    throw (PluginDuplicateException) e.getCause();
+                else if (e.getCause() instanceof PluginUnloadException)
+                    throw (PluginUnloadException) e.getCause();
+            }
+            section.stop();
+        } else enablePlugin0(plugin);
     }
 
     private static void enablePlugin0(Plugin plugin) {
@@ -220,7 +222,7 @@ public class PluginClassLoader extends URLClassLoader {
     @Nullable
     public static File disablePlugin(Plugin plugin) {
         Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
-        Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(10));
+        Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
         File file = null;
         try {
           file = callback.waitCall();

@@ -3,7 +3,7 @@ package top.focess.qq.api.util;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.exceptions.InputTimeoutException;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.core.listener.ConsoleListener;
+import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
 import org.jetbrains.annotations.Nullable;

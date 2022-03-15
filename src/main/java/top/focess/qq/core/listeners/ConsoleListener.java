@@ -1,4 +1,4 @@
-package top.focess.qq.core.listener;
+package top.focess.qq.core.listeners;
 
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 
 public class ConsoleListener implements Listener {
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),10,false,"ConsoleListener");
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),5,true,"ConsoleListener");
     public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingDeque();
 
     @EventHandler(priority = EventPriority.HIGHEST)

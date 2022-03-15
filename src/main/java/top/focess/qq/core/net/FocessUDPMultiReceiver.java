@@ -17,7 +17,7 @@ import java.util.List;
 public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMultiReceiver {
 
     private final FocessUDPSocket focessUDPSocket;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(),"FocessUDPMultiReceiver");
 
     public FocessUDPMultiReceiver(FocessUDPSocket focessUDPSocket) {
         this.focessUDPSocket = focessUDPSocket;

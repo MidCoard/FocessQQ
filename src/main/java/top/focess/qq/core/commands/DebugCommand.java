@@ -25,8 +25,6 @@ public class DebugCommand extends Command {
             for (Plugin plugin : PluginClassLoader.getPlugins()) {
                 if (plugin != FocessQQ.getMainPlugin())
                     CommandLine.exec("unload " + plugin.getName());
-                if (plugin.getName().contains("SICE"))
-                    System.out.println(plugin.getClass().getClassLoader().getParent());
             }
             return CommandResult.ALLOW;
         });

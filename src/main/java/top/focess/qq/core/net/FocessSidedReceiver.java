@@ -17,7 +17,7 @@ import java.util.Queue;
 public class FocessSidedReceiver extends AServerReceiver {
 
     private final Map<String, Queue<Packet>> packets = Maps.newConcurrentMap();
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessSidedReceiver");
 
     public FocessSidedReceiver() {
         scheduler.runTimer(()->{

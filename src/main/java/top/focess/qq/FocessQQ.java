@@ -35,9 +35,9 @@ import top.focess.qq.api.util.logger.FocessLogger;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
-import top.focess.qq.core.listener.ChatListener;
-import top.focess.qq.core.listener.ConsoleListener;
-import top.focess.qq.core.listener.PluginListener;
+import top.focess.qq.core.listeners.ChatListener;
+import top.focess.qq.core.listeners.ConsoleListener;
+import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.util.option.Option;
@@ -105,7 +105,7 @@ public class FocessQQ {
      */
     private static final BotManager BOT_MANAGER = new SimpleBotManager();
 
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN);
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN,"FocessQQ");
 
     /**
      * Indicate MainPlugin is running. True after MainPlugin is loaded.
@@ -345,7 +345,7 @@ public class FocessQQ {
     private static void requestAccountInformation() {
         try {
             IOHandler.getConsoleIoHandler().outputLang("input-account-username");
-            String str = IOHandler.getConsoleIoHandler().input();
+            String str = IOHandler.getConsoleIoHandler().input().trim();
             if (str.equals("stop")) {
                 FocessQQ.getLogger().debugLang("save-log");
                 saveLogFile();
@@ -575,15 +575,14 @@ public class FocessQQ {
         public void enable() {
             FocessQQ.getLogger().debugLang("start-enable-main-plugin");
             running = true;
+            properties = getDefaultConfig().getValues();
+            if (properties == null)
+                properties = Maps.newHashMap();
+            FocessQQ.getLogger().debugLang("load-default-properties");
             this.registerListener(new ConsoleListener());
             this.registerListener(new ChatListener());
             this.registerListener(new PluginListener());
             FocessQQ.getLogger().debugLang("register-default-listeners");
-            // first register listener then request account information because the request process may need the listener, especially ConsoleListener
-            if (username == null || password == null) {
-                requestAccountInformation();
-                FocessQQ.getLogger().debugLang("request-account-information");
-            }
             this.registerBuffer(DataConverter.DEFAULT_DATA_CONVERTER, StringBuffer::allocate);
             this.registerBuffer(DataConverter.INTEGER_DATA_CONVERTER, IntBuffer::allocate);
             this.registerBuffer(PluginDataConverter.PLUGIN_DATA_CONVERTER, PluginBuffer::allocate);
@@ -592,10 +591,6 @@ public class FocessQQ {
             this.registerBuffer(DataConverter.DOUBLE_DATA_CONVERTER, DoubleBuffer::allocate);
             this.registerBuffer(DataConverter.BOOLEAN_DATA_CONVERTER, BooleanBuffer::allocate);
             FocessQQ.getLogger().debugLang("register-default-buffers");
-            properties = getDefaultConfig().getValues();
-            if (properties == null)
-                properties = Maps.newHashMap();
-            FocessQQ.getLogger().debugLang("load-default-properties");
             this.registerCommand(new LoadCommand());
             this.registerCommand(new UnloadCommand());
             this.registerCommand(new StopCommand());
@@ -607,6 +602,11 @@ public class FocessQQ {
             this.registerCommand(new PluginCommand());
             this.registerCommand(new DebugCommand());
             FocessQQ.getLogger().debugLang("register-default-commands");
+            // first register listener then request account information because the request process may need the listener, especially ConsoleListener
+            if (username == null || password == null) {
+                requestAccountInformation();
+                FocessQQ.getLogger().debugLang("request-account-information");
+            }
             bot = getBotManager().loginDirectly(username,password);
             FocessQQ.getLogger().debugLang("login-default-bot");
             File plugins = new File("plugins");
@@ -634,7 +634,8 @@ public class FocessQQ {
             for (Plugin plugin : FocessQQ.getPlugins())
                 if (!plugin.equals(this))
                     try {
-                        PluginClassLoader.disablePlugin(plugin);
+                        Future<Boolean> future = CommandLine.exec("unload " + plugin.getName());
+                        future.get();
                     } catch (Exception e) {
                         FocessQQ.getLogger().thrLang("exception-unload-default-plugin",e);
                     }

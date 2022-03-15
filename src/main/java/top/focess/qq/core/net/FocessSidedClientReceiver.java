@@ -15,7 +15,7 @@ import java.util.Queue;
 public class FocessSidedClientReceiver extends AClientReceiver {
 
     private final FocessSidedClientSocket focessSidedClientSocket;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessSidedClientReceiver");
     private final Queue<Packet> packets = Queues.newConcurrentLinkedQueue();
 
     public FocessSidedClientReceiver(FocessSidedClientSocket focessSidedClientSocket, String name) {

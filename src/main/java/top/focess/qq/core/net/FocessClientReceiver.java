@@ -15,7 +15,7 @@ public class FocessClientReceiver extends AClientReceiver {
     private final String localhost;
     private final FocessSocket focessSocket;
     private volatile boolean connected = false;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessClientReceiver");
 
     public FocessClientReceiver(FocessSocket focessSocket,String localhost,String host,int port,String name) {
         super(host,port,name);

@@ -46,7 +46,7 @@ public interface Scheduler {
      * @param <V> the return type
      * @return the warped task
      */
-    default  <V> Callback<V> submit(Callable<V> callable) {
+    default <V> Callback<V> submit(Callable<V> callable) {
         return this.submit(callable, Duration.ZERO);
     }
 
@@ -90,4 +90,9 @@ public interface Scheduler {
      * @return true if this scheduler is closed, false otherwise
      */
     boolean isClosed();
+
+    /**
+     * Close this scheduler even if there are tasks running
+     */
+    void closeNow();
 }

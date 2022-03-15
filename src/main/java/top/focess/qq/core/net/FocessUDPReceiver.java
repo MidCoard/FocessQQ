@@ -14,7 +14,7 @@ import java.time.Duration;
 public class FocessUDPReceiver extends AServerReceiver{
 
     private final FocessUDPSocket focessUDPSocket;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(),"FocessUDPReceiver");
 
     public FocessUDPReceiver(FocessUDPSocket focessUDPSocket) {
         this.focessUDPSocket = focessUDPSocket;

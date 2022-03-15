@@ -21,7 +21,7 @@ public class ThreadPoolScheduler extends AScheduler {
 
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
 
-    private final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
+    final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
 
     private final List<ThreadPoolSchedulerThread> threads = Lists.newArrayList();
     private final boolean immediate;
@@ -100,6 +100,16 @@ public class ThreadPoolScheduler extends AScheduler {
         return this.shouldStop;
     }
 
+    @Override
+    public void closeNow() {
+        super.close();
+        this.shouldStop = true;
+        cancelAll();
+        for (ThreadPoolSchedulerThread thread : this.threads)
+            thread.closeNow();
+        this.notify();
+    }
+
     public void cancel(ITask task) {
         if (taskThreadMap.containsKey(task)) {
             taskThreadMap.get(task).cancel();
@@ -117,6 +127,8 @@ public class ThreadPoolScheduler extends AScheduler {
     }
 
     public void rerun(ITask task) {
+        if (this.shouldStop)
+            return;
         tasks.add(new ComparableTask(System.currentTimeMillis() + task.getPeriod().toMillis(), task));
     }
 

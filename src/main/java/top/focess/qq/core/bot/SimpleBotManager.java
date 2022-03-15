@@ -40,7 +40,7 @@ import java.util.concurrent.Future;
 
 public class SimpleBotManager implements BotManager {
 
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
 
     private static final Map<Bot,List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 

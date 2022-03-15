@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 
 public class Section {
 
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin());
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "Section");
 
     private final String name;
     private final Task task;
