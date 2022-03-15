@@ -154,6 +154,8 @@ public class SimpleFocessReader extends FocessReader {
     }
 
     public Object read() {
+        if (this.pointer >= this.bytes.length)
+            throw new SerializationParseException("Read over");
         byte start = readByte();
         if (start != C_START)
             throw new SerializationParseException("Start code is not correct");
