@@ -3,6 +3,7 @@ package top.focess.qq.api.bot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.exceptions.BotLoginException;
+import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -17,9 +18,10 @@ public interface BotManager {
      *
      * @param id the id of the bot
      * @param password the password of the bot
+     * @param plugin the plugin
      * @return the bot
      */
-    @NotNull Future<Bot> login(long id,String password);
+    @NotNull Future<Bot> login(long id,String password,Plugin plugin);
 
     /**
      * Login and get the bot with id and password
@@ -27,11 +29,12 @@ public interface BotManager {
      *
      * @param id the id of the bot
      * @param password the password of the bot
+     * @param plugin the plugin
      * @throws BotLoginException if the bot login failed
      * @return the bot
      */
     @NotNull
-    Bot loginDirectly(long id, String password);
+    Bot loginDirectly(long id, String password, Plugin plugin);
 
     /**
      * Login the bot

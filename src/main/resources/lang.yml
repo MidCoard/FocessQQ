@@ -107,6 +107,7 @@ bot-command-relogin-succeed: Bot %d relogin successfully
 bot-command-bot-exist: Bot %d already exists
 bot-command-login-failed: Bot %d failed to login
 bot-command-remove-succeed: Bot %d removed successfully
+bot-command-relogin-failed: Bot %d failed to relogin
 command-command-unload: Unload command %s
 command-command-list: "The following commands are :"
 command-command-no-command: There is no command
@@ -171,4 +172,5 @@ socket-packet-handler-not-empty: Socket packet handlers are not empty
 udp-socket-packet-handler-not-empty: UDP socket packet handlers are not empty
 debug-section-timeout: Section %s is timeout
 plugin-unload-self: "%s unload itself"
+remove-bot: Remove bot
 

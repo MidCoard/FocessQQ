@@ -607,7 +607,7 @@ public class FocessQQ {
                 requestAccountInformation();
                 FocessQQ.getLogger().debugLang("request-account-information");
             }
-            bot = getBotManager().loginDirectly(username,password);
+            bot = getBotManager().loginDirectly(username,password,this);
             FocessQQ.getLogger().debugLang("login-default-bot");
             File plugins = new File("plugins");
             if (plugins.exists() && options.get("noDefaultPluginLoad") == null)

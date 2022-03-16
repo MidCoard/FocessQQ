@@ -62,8 +62,9 @@ public class BotCommand extends Command {
                 ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
             }
-            bot.relogin();
-            ioHandler.outputLang("bot-command-relogin-succeed",bot.getId());
+            if (bot.relogin())
+                ioHandler.outputLang("bot-command-relogin-succeed",bot.getId());
+            else ioHandler.outputLang("bot-command-relogin-failed",bot.getId());
             return CommandResult.ALLOW;
         },CommandArgument.of("relogin"),CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
@@ -71,7 +72,7 @@ public class BotCommand extends Command {
             Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 try {
-                    FocessQQ.getBotManager().login(id, dataCollection.get());
+                    FocessQQ.getBotManager().login(id, dataCollection.get(), FocessQQ.getMainPlugin());
                 } catch (BotLoginException e) {
                     ioHandler.outputLang("bot-command-login-failed",id);
                     return CommandResult.REFUSE;

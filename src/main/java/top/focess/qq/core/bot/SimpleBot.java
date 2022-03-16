@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,12 +16,14 @@ public class SimpleBot implements Bot {
 
     private final long username;
     private final String password;
+    private final Plugin plugin;
     private net.mamoe.mirai.Bot nativeBot;
 
-    public SimpleBot(long username, String password, net.mamoe.mirai.Bot bot) {
+    public SimpleBot(long username, String password, net.mamoe.mirai.Bot bot, Plugin plugin) {
         this.username = username;
         this.password = password;
         this.nativeBot = bot;
+        this.plugin = plugin;
     }
 
     @Override
@@ -115,5 +118,9 @@ public class SimpleBot implements Bot {
     @Override
     public int hashCode() {
         return nativeBot != null ? nativeBot.hashCode() : 0;
+    }
+
+    public Plugin getPlugin() {
+        return plugin;
     }
 }

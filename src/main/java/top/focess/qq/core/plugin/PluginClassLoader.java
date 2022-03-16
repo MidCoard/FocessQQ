@@ -23,6 +23,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.schedule.Task;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.debug.Section;
 
 import java.io.File;
@@ -169,7 +170,8 @@ public class PluginClassLoader extends URLClassLoader {
         });
     }
 
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),2,false,"EnablePlugin");
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),2,false,"PluginLoader");
+    private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(),"GC");
 
     /**
      * Used to enable plugin
@@ -228,6 +230,7 @@ public class PluginClassLoader extends URLClassLoader {
           file = callback.waitCall();
         } catch (InterruptedException | ExecutionException | CancellationException ignored) {}
         section.stop();
+        GC_SCHEDULER.run(System::gc,Duration.ofSeconds(1));
         return file;
     }
 
@@ -248,6 +251,8 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().debugLang("unregister-commands");
             Schedulers.close(plugin);
             FocessQQ.getLogger().debugLang("close-schedulers");
+            SimpleBotManager.remove(plugin);
+            FocessQQ.getLogger().debugLang("remove-bot");
             if (FocessQQ.getSocket() != null)
                 FocessQQ.getSocket().unregister(plugin);
             if (FocessQQ.getUdpSocket() != null)
@@ -411,6 +416,11 @@ public class PluginClassLoader extends URLClassLoader {
                     DataCollection.unregister(plugin);
                     Command.unregister(plugin);
                     Schedulers.close(plugin);
+                    SimpleBotManager.remove(plugin);
+                    if (FocessQQ.getSocket() != null)
+                        FocessQQ.getSocket().unregister(plugin);
+                    if (FocessQQ.getUdpSocket() != null)
+                        FocessQQ.getUdpSocket().unregister(plugin);
                 }
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;

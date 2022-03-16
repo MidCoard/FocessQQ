@@ -27,6 +27,7 @@ import top.focess.qq.api.event.request.FriendRequestEvent;
 import top.focess.qq.api.event.request.GroupRequestEvent;
 import top.focess.qq.api.exceptions.BotLoginException;
 import top.focess.qq.api.exceptions.EventSubmitException;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
@@ -44,6 +45,8 @@ public class SimpleBotManager implements BotManager {
 
     private static final Map<Bot,List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 
+    private static final Map<Plugin,List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
+
     private static final Map<Long,Bot> BOTS = Maps.newConcurrentMap();
 
     public SimpleBotManager() {
@@ -54,13 +57,12 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
-    public @NotNull Future<Bot> login(long id, String password) {
-        //todo add plugin argument
-        return SCHEDULER.submit(() -> loginDirectly(id,password));
+    public @NotNull Future<Bot> login(long id, String password,Plugin plugin) {
+        return SCHEDULER.submit(() -> loginDirectly(id,password,plugin));
     }
 
     @Override
-    public @NotNull Bot loginDirectly(long id, String password) {
+    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin) {
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
         File cache = new File("devices/" + id + "/cache");
@@ -107,7 +109,7 @@ public class SimpleBotManager implements BotManager {
         } catch(Exception e) {
             throw new BotLoginException(id,e);
         }
-        Bot b = new SimpleBot(id,password, bot);
+        Bot b = new SimpleBot(id,password, bot,plugin);
         try {
             EventManager.submit(new BotLoginEvent(b));
         } catch (EventSubmitException e) {
@@ -187,6 +189,12 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         BOT_LISTENER_MAP.put(b,listeners);
+        PLUGIN_BOT_MAP.compute(plugin,(k,v)->{
+            if (v == null)
+                v = Lists.newArrayList();
+            v.add(b);
+            return v;
+        });
         BOTS.put(id,b);
         return b;
     }
@@ -381,6 +389,12 @@ public class SimpleBotManager implements BotManager {
         Bot b = BOTS.remove(FocessQQ.getBot().getId());
         if (b != null)
             b.logout();
+    }
+
+    public static void remove(Plugin plugin) {
+        for (Bot b : PLUGIN_BOT_MAP.getOrDefault(plugin,Lists.newArrayList()))
+            FocessQQ.getBotManager().remove(b.getId());
+        PLUGIN_BOT_MAP.remove(plugin);
     }
 
 

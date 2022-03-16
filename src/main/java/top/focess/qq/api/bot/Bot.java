@@ -4,6 +4,7 @@ import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
 
@@ -109,4 +110,11 @@ public interface Bot {
      * @return true if this is the default bot, false otherwise
      */
     boolean isDefaultBot();
+
+    /**
+     * Get the plugin of the bot
+     *
+     * @return the plugin of the bot
+     */
+    Plugin getPlugin();
 }
