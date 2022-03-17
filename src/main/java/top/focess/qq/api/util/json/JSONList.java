@@ -3,7 +3,6 @@ package top.focess.qq.api.util.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import top.focess.qq.api.exceptions.JSONParseException;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,7 +1,5 @@
 package top.focess.qq.api.util.version;
 
-import top.focess.qq.api.exceptions.VersionFormatException;
-
 /**
  * Represents a version of a plugin.
  */

@@ -25,15 +25,17 @@ public interface Bot {
      * Relogin the bot
      *
      * @return true if the bot is online, false otherwise
+     * @throws BotLoginException throw if the bot login failed
      */
-    boolean relogin();
+    boolean relogin() throws BotLoginException;
 
     /**
      * Login the bot
      *
      * @return true if the bot is not online, false otherwise
+     * @throws BotLoginException throw if the bot login failed
      */
-    boolean login();
+    boolean login() throws BotLoginException;
 
     /**
      * Logout the bot

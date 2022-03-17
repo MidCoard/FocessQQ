@@ -2,7 +2,7 @@ package top.focess.qq.core.schedule;
 
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.TaskNotFinishedException;
+import top.focess.qq.api.schedule.TaskNotFinishedException;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;

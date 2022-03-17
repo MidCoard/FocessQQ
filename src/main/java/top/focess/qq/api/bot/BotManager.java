@@ -2,7 +2,6 @@ package top.focess.qq.api.bot;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.focess.qq.api.exceptions.BotLoginException;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
@@ -34,15 +33,16 @@ public interface BotManager {
      * @return the bot
      */
     @NotNull
-    Bot loginDirectly(long id, String password, Plugin plugin);
+    Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException;
 
     /**
      * Login the bot
      *
      * @param bot the bot need to log in
      * @return true if the bot is not online, false otherwise
+     * @throws BotLoginException if the bot login failed
      */
-    boolean login(Bot bot);
+    boolean login(Bot bot) throws BotLoginException;
 
     /**
      * Logout the bot
@@ -65,8 +65,9 @@ public interface BotManager {
      *
      * @param bot the bot need to relogin
      * @return true if the bot is online, false otherwise
+     * @throws BotLoginException if the bot login failed
      */
-    boolean relogin(@NotNull Bot bot);
+    boolean relogin(@NotNull Bot bot) throws BotLoginException;
 
     /**
      * Get the list of bots

@@ -1,4 +1,4 @@
-package top.focess.qq.api.exceptions;
+package top.focess.qq.api.serialize;
 
 /**
  * Thrown to indicate that an object is not serializable.

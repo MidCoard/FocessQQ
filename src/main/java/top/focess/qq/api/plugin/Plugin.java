@@ -10,9 +10,7 @@ import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.ListenerHandler;
-import top.focess.qq.api.exceptions.PluginDuplicateException;
-import top.focess.qq.api.exceptions.PluginLoaderException;
-import top.focess.qq.api.exceptions.PluginUnloadException;
+import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.version.Version;
@@ -108,7 +106,7 @@ public abstract class Plugin {
     private void init() {
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(name);
-        if (this.getClass() != FocessQQ.MainPlugin.class) {
+        if (this.getClass() != FocessQQ.MainPlugin.class || FocessQQ.isRunning()) {
             if (Plugin.getPlugin(this.getClass()) != null)
                 throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
             this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
@@ -132,9 +130,21 @@ public abstract class Plugin {
                 FocessQQ.getLogger().thrLang("exception-create-config-file",e);
             }
         }
-        configuration = YamlConfiguration.loadFile(config);
-        defaultConfig = new DefaultConfig(config);
-        langConfig = new LangConfig(loadResource("lang.yml"));
+        try {
+            configuration = YamlConfiguration.loadFile(config);
+        } catch (YamlLoadException e) {
+            FocessQQ.getLogger().thrLang("exception-load-configuration",e);
+        }
+        try {
+            defaultConfig = new DefaultConfig(config);
+        } catch (YamlLoadException e) {
+            FocessQQ.getLogger().thrLang("exception-load-default-configuration",e);
+        }
+        try {
+            langConfig = new LangConfig(loadResource("lang.yml"));
+        } catch (YamlLoadException e) {
+            FocessQQ.getLogger().thrLang("exception-load-lang-configuration",e);
+        }
     }
 
     /**

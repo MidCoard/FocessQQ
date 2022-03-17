@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.command.*;
-import top.focess.qq.api.exceptions.InputTimeoutException;
+import top.focess.qq.api.util.InputTimeoutException;
 
 import java.util.List;
 

@@ -1,12 +1,13 @@
-package top.focess.qq.api.exceptions;
+package top.focess.qq.api.bot;
+
+import java.io.IOException;
 
 /**
  * Thrown to indicate a bot login failed
  */
-public class BotLoginException extends RuntimeException {
+public class BotLoginException extends IOException {
 
 
-    //todo rename some of the exceptions
     /**
      * Constructs a BotLoginException
      * @param id the id of the login failed bot

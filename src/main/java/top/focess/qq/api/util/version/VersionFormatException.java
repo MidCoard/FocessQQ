@@ -1,4 +1,4 @@
-package top.focess.qq.api.exceptions;
+package top.focess.qq.api.util.version;
 
 
 /**

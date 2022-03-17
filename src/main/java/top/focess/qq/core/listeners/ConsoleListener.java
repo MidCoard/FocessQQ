@@ -10,7 +10,7 @@ import top.focess.qq.api.event.EventPriority;
 import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.message.ConsoleMessageEvent;
-import top.focess.qq.api.exceptions.InputTimeoutException;
+import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;

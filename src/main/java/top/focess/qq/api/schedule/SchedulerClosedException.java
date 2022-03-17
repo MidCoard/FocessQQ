@@ -1,11 +1,9 @@
-package top.focess.qq.api.exceptions;
-
-import top.focess.qq.api.schedule.Scheduler;
+package top.focess.qq.api.schedule;
 
 /**
  * Thrown to indicate a scheduler is closed
  */
-public class SchedulerClosedException extends RuntimeException{
+public class SchedulerClosedException extends IllegalStateException{
 
     /**
      * Constructs a SchedulerClosedException

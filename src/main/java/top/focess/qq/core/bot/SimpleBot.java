@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
@@ -33,12 +34,12 @@ public class SimpleBot implements Bot {
     }
 
     @Override
-    public boolean relogin() {
+    public boolean relogin() throws BotLoginException {
         return FocessQQ.getBotManager().relogin(this);
     }
 
     @Override
-    public boolean login() {
+    public boolean login() throws BotLoginException {
         return FocessQQ.getBotManager().login(this);
     }
 

@@ -1,6 +1,4 @@
-package top.focess.qq.api.exceptions;
-
-import top.focess.qq.api.event.Event;
+package top.focess.qq.api.event;
 
 /**
  * Thrown to indicate there is any invalid section in Event Submit Chain

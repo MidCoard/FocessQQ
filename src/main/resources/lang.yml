@@ -28,6 +28,7 @@ exception-submit-group-request-event: Submit group request event exception
 exception-submit-friend-input-status-event: Submit friend input status event exception
 exception-submit-stranger-chat-event: Submit stranger chat event exception
 exception-submit-stranger-message-event: Submit stranger message event exception
+exception-submit-server-stop-event: Submit server stop event exception
 exception-save-log: Save log exception
 exception-create-focess-socket-server: Create focess socket server exception
 exception-create-focess-sided-socket-server: Create focess sided socket server exception
@@ -62,6 +63,11 @@ exception-thread-pool-scheduler: Thread pool scheduler exception
 exception-thread-pool-scheduler-thread: Thread pool scheduler thread exception
 exception-default-bot-login-failed: Default bot login failed exception
 exception-serialize-field: "%s in %s serialize field exception"
+exception-load-configuration: Load configuration exception
+exception-load-main-plugin-lang-yml: Load MainPlugin lang.yml exception
+exception-load-lang-configuration: Load lang configuration exception
+exception-login-default-bot: Login default bot exception
+exception-command-execute: Command execute exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
@@ -88,7 +94,7 @@ load-plugin-class: Load plugin class
 load-command-class: Load command class
 load-depend-plugin: Load depended plugin
 load-depend-plugin-succeed: Load depended plugin %s successfully
-load-depend-plugin-failed: Failed to load depended plugin file %s
+load-depend-plugin-failed: Failed to load dependent plugin file %s
 load-plugin-classes: Load plugin classes %d
 load-default-plugins: Load default plugins
 load-default-properties: Load default properties
@@ -173,4 +179,5 @@ udp-socket-packet-handler-not-empty: UDP socket packet handlers are not empty
 debug-section-timeout: Section %s is timeout
 plugin-unload-self: "%s unload itself"
 remove-bot: Remove bot
+command-execute-exception: Command execute exception, %s
 

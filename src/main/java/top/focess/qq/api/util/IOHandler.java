@@ -1,7 +1,6 @@
 package top.focess.qq.api.util;
 
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.InputTimeoutException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
@@ -73,7 +72,7 @@ public abstract class IOHandler {
      * @return the input String
      * @throws InputTimeoutException if the command has waited for more than 10 minutes to get executor input string
      */
-    public String input() {
+    public String input() throws InputTimeoutException {
         if (!this.flag)
             hasInput();
         this.flag = false;

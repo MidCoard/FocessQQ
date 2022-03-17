@@ -1,4 +1,4 @@
-package top.focess.qq.api.exceptions;
+package top.focess.qq.api.plugin;
 
 /**
  * Thrown to indicate this plugin should be disabled.

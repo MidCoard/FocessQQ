@@ -3,7 +3,6 @@ package top.focess.qq.api.util.network;
 import okhttp3.Headers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.focess.qq.api.exceptions.HttpResponseException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.json.JSON;
 
@@ -80,6 +79,7 @@ public class HttpResponse {
     /**
      * Initialize a HttpResponse without exceptions
      *
+     * @param plugin the request plugin
      * @param code the response code
      * @param headers the response header
      * @param value the response data
@@ -107,9 +107,10 @@ public class HttpResponse {
      * Get the values as JSON instance
      *
      * @return JSON instance of this response data
+     * @throws HttpResponseException if there is something wrong with this request
      */
     @NotNull
-    public JSON getAsJSON() {
+    public JSON getAsJSON() throws HttpResponseException {
         if (isError())
             throw new HttpResponseException();
         return new JSON(this.value);

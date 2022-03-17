@@ -2,7 +2,7 @@ package top.focess.qq.core.serialize;
 
 import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import top.focess.qq.api.exceptions.SerializationParseException;
+import top.focess.qq.api.serialize.SerializationParseException;
 import top.focess.qq.api.serialize.FocessReader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 

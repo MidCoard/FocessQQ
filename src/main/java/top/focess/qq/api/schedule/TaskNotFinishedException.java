@@ -1,11 +1,11 @@
-package top.focess.qq.api.exceptions;
+package top.focess.qq.api.schedule;
 
 import top.focess.qq.api.schedule.Callback;
 
 /**
  * Thrown to indicate the task is not finished
  */
-public class TaskNotFinishedException extends RuntimeException {
+public class TaskNotFinishedException extends IllegalStateException {
 
     /**
      * Constructs a TaskNotFinishedException

@@ -2,7 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.IllegalPortException;
+import top.focess.qq.api.net.IllegalPortException;
 import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PacketPreCodec;
 import top.focess.qq.api.net.Receiver;

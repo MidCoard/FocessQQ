@@ -3,7 +3,7 @@ package top.focess.qq.core.schedule;
 import com.google.common.collect.Queues;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.SchedulerClosedException;
+import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Task;

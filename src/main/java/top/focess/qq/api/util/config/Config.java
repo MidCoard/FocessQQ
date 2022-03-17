@@ -1,6 +1,7 @@
 package top.focess.qq.api.util.config;
 
 import org.jetbrains.annotations.Nullable;
+import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
 
 import java.io.File;
@@ -13,7 +14,7 @@ public abstract class Config {
 
     protected YamlConfiguration yaml;
 
-    protected Config(@Nullable File file) {
+    protected Config(@Nullable File file) throws YamlLoadException {
         this.file = file;
         this.yaml = this.file != null && this.file.exists() ? YamlConfiguration.loadFile(file) : new YamlConfiguration(null);
     }

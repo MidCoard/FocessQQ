@@ -1,11 +1,13 @@
 package top.focess.qq.api.util.config;
 
+import top.focess.qq.api.util.yaml.YamlLoadException;
+
 import java.io.File;
 import java.util.Map;
 
 public class DefaultConfig extends Config {
 
-    public DefaultConfig(File file) {
+    public DefaultConfig(File file) throws YamlLoadException {
         super(file);
     }
 

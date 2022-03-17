@@ -6,17 +6,13 @@ import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandType;
-import top.focess.qq.api.command.DataCollection;
+import top.focess.qq.api.command.*;
 import top.focess.qq.api.event.EventManager;
+import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
-import top.focess.qq.api.exceptions.*;
-import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.plugin.PluginDescription;
-import top.focess.qq.api.plugin.PluginType;
+import top.focess.qq.api.plugin.*;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
@@ -201,8 +197,6 @@ public class PluginClassLoader extends URLClassLoader {
     private static void enablePlugin0(Plugin plugin) {
         try {
             FocessQQ.getLogger().debugLang("start-enable-plugin",plugin.getName());
-            if (getPlugin(plugin.getClass()) != null || getPlugin(plugin.getName()) != null)
-                throw new PluginDuplicateException(plugin.getName());
             // no try-catch because it should be noticed by the Plugin User
             plugin.onEnable();
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);

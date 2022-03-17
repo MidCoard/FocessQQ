@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.NotFocessSerializableException;
+import top.focess.qq.api.serialize.NotFocessSerializableException;
 import top.focess.qq.api.serialize.FocessSerializable;
 import top.focess.qq.api.serialize.FocessWriter;
 

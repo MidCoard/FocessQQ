@@ -7,6 +7,7 @@ import net.mamoe.mirai.contact.Group;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.command.*;
 import top.focess.qq.api.command.converter.CommandDataConverter;
@@ -14,18 +15,14 @@ import top.focess.qq.api.command.converter.PluginDataConverter;
 import top.focess.qq.api.command.data.StringBuffer;
 import top.focess.qq.api.command.data.*;
 import top.focess.qq.api.event.EventManager;
+import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.server.ServerStartEvent;
-import top.focess.qq.api.exceptions.BotLoginException;
-import top.focess.qq.api.exceptions.EventSubmitException;
-import top.focess.qq.api.exceptions.IllegalPortException;
-import top.focess.qq.api.exceptions.PluginLoadException;
-import top.focess.qq.api.net.ClientReceiver;
-import top.focess.qq.api.net.ServerMultiReceiver;
-import top.focess.qq.api.net.ServerReceiver;
-import top.focess.qq.api.net.Socket;
+import top.focess.qq.api.event.server.ServerStopEvent;
+import top.focess.qq.api.net.*;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.api.plugin.PluginLoadException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
@@ -33,6 +30,7 @@ import top.focess.qq.api.util.Pair;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.logger.FocessLogger;
 import top.focess.qq.api.util.version.Version;
+import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
 import top.focess.qq.core.listeners.ChatListener;
@@ -55,7 +53,7 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
 import java.util.zip.GZIPOutputStream;
 
 public class FocessQQ {
@@ -74,7 +72,6 @@ public class FocessQQ {
         } catch (Exception e) {
             version = new Version("build");
         }
-
         VERSION = version;
     }
 
@@ -140,7 +137,15 @@ public class FocessQQ {
     /**
      * The lang config
      */
-    private static final LangConfig LANG_CONFIG = new LangConfig(FocessQQ.class.getResourceAsStream("/lang.yml"));
+    private static LangConfig langConfig;
+
+    static {
+        try {
+            langConfig = new LangConfig(FocessQQ.class.getResourceAsStream("/lang.yml"));
+        } catch (YamlLoadException e) {
+            FocessQQ.getLogger().thrLang("exception-load-main-plugin-lang-yml",e);
+        }
+    }
 
     /**
      * The default client receiver
@@ -373,6 +378,7 @@ public class FocessQQ {
             e.printStackTrace();
         }
         SCHEDULER.runTimer(()->{
+            // it has been sure not null
             while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 5 * 1000)
                 ConsoleListener.QUESTS.poll().getKey().input(null);
             for (CommandSender sender : ChatListener.QUESTS.keySet()) {
@@ -520,7 +526,7 @@ public class FocessQQ {
             if (latest.exists()) {
                 String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
                 File target = new File("logs", name + ".log");
-                Files.copy(latest, target);
+                Files.copy(latest, target); // use beta
                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(new File("logs", name + ".gz")));
                 FileInputStream inputStream = new FileInputStream(target);
                 byte[] buf = new byte[1024];
@@ -539,7 +545,7 @@ public class FocessQQ {
     }
 
     public static LangConfig getLangConfig() {
-        return LANG_CONFIG;
+        return langConfig;
     }
 
     /**
@@ -561,7 +567,7 @@ public class FocessQQ {
             try {
                 Field field = Plugin.class.getDeclaredField("langConfig");
                 field.setAccessible(true);
-                field.set(this,LANG_CONFIG);
+                field.set(this, langConfig);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -607,10 +613,16 @@ public class FocessQQ {
                 requestAccountInformation();
                 FocessQQ.getLogger().debugLang("request-account-information");
             }
-            bot = getBotManager().loginDirectly(username,password,this);
+            try {
+                bot = getBotManager().loginDirectly(username,password,this);
+            } catch (BotLoginException e) {
+                FocessQQ.getLogger().thrLang("exception-login-default-bot",e);
+                FocessQQ.exit();
+            }
             FocessQQ.getLogger().debugLang("login-default-bot");
             File plugins = new File("plugins");
-            if (plugins.exists() && options.get("noDefaultPluginLoad") == null)
+            if (plugins.exists() && plugins.isDirectory() && options.get("noDefaultPluginLoad") == null)
+                // plugins folder exists and is a directory so the warning is a mistake
                 for (File file : plugins.listFiles(file -> file.getName().endsWith(".jar")))
                     try {
                         Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
@@ -631,6 +643,11 @@ public class FocessQQ {
         @Override
         public void disable() {
             FocessQQ.getLogger().debugLang("start-disable-main-plugin");
+            try {
+                EventManager.submit(new ServerStopEvent());
+            } catch (EventSubmitException e) {
+                FocessQQ.getLogger().thrLang("exception-submit-server-stop-event", e);
+            }
             for (Plugin plugin : FocessQQ.getPlugins())
                 if (!plugin.equals(this))
                     try {
@@ -671,7 +688,7 @@ public class FocessQQ {
             running = false;
             // make sure scheduler is stopped at end of disable
             if (Schedulers.closeAll())
-                FocessQQ.getLogger().debugLang("schedulers-not-empty");;
+                FocessQQ.getLogger().debugLang("schedulers-not-empty");
             FocessQQ.getLogger().debugLang("unregister-all-schedulers");
             if (!saved) {
                 saved = true;

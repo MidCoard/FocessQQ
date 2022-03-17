@@ -15,8 +15,8 @@ import top.focess.qq.api.event.chat.StrangerChatEvent;
 import top.focess.qq.api.event.message.FriendMessageEvent;
 import top.focess.qq.api.event.message.GroupMessageEvent;
 import top.focess.qq.api.event.message.StrangerMessageEvent;
-import top.focess.qq.api.exceptions.EventSubmitException;
-import top.focess.qq.api.exceptions.InputTimeoutException;
+import top.focess.qq.api.event.EventSubmitException;
+import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
@@ -71,9 +71,9 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onStrangerChat(StrangerChatEvent event) {
-        FocessQQ.getLogger().debug(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
-        FocessQQ.getLogger().debugLang("message-chain");
-        event.getMessage().stream().map(Object::toString).forEach(FocessQQ.getLogger()::debug);
+        IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
+        IOHandler.getConsoleIoHandler().output("message-chain");
+        event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());
         try {
             EventManager.submit(strangerMessageEvent);
@@ -84,9 +84,9 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGroupChat(GroupChatEvent event) {
-        FocessQQ.getLogger().debug(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-        FocessQQ.getLogger().debugLang("message-chain");
-        event.getMessage().stream().map(Object::toString).forEach(FocessQQ.getLogger()::debug);
+        IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
+        IOHandler.getConsoleIoHandler().output("message-chain");
+        event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getMember());
         AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
@@ -117,9 +117,9 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFriendChat(FriendChatEvent event){
-        FocessQQ.getLogger().debug(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-        FocessQQ.getLogger().debugLang("message-chain");
-        event.getMessage().stream().map(Object::toString).forEach(FocessQQ.getLogger()::debug);
+        IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
+        IOHandler.getConsoleIoHandler().output("message-chain");
+        event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getFriend());
         AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);

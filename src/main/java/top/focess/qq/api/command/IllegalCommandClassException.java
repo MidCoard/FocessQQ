@@ -1,9 +1,9 @@
-package top.focess.qq.api.exceptions;
+package top.focess.qq.api.command;
 
 /**
  * Thrown to indicate this class is not an illegal Command class
  */
-public class IllegalCommandClassException extends RuntimeException {
+public class IllegalCommandClassException extends IllegalArgumentException {
     /**
      * Constructs a IllegalCommandClassException
      *

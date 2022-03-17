@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.command.CommandPrepostEvent;
-import top.focess.qq.api.exceptions.EventSubmitException;
+import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.CombinedFuture;

@@ -6,9 +6,8 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.exceptions.NotFocessSerializableException;
-import top.focess.qq.api.exceptions.SerializationParseException;
-import top.focess.qq.api.exceptions.YamlLoadException;
+import top.focess.qq.api.serialize.NotFocessSerializableException;
+import top.focess.qq.api.serialize.SerializationParseException;
 import top.focess.qq.api.serialize.FocessSerializable;
 import top.focess.qq.api.util.SectionMap;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
@@ -162,8 +161,9 @@ public class YamlConfiguration implements SectionMap {
      *
      * @param file where to load
      * @return YAML configuration
+     * @throws YamlLoadException if there is any io exception in loading the file
      */
-    public static YamlConfiguration loadFile(File file) {
+    public static YamlConfiguration loadFile(File file) throws YamlLoadException {
         try {
             FileReader reader = new FileReader(file);
             YamlConfiguration yamlConfiguration = new YamlConfiguration(YAML.load(reader));

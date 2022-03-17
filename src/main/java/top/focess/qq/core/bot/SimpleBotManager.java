@@ -25,8 +25,9 @@ import top.focess.qq.api.event.recall.FriendRecallEvent;
 import top.focess.qq.api.event.recall.GroupRecallEvent;
 import top.focess.qq.api.event.request.FriendRequestEvent;
 import top.focess.qq.api.event.request.GroupRequestEvent;
-import top.focess.qq.api.exceptions.BotLoginException;
-import top.focess.qq.api.exceptions.EventSubmitException;
+import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.event.EventSubmitException;
+import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
@@ -62,7 +63,7 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
-    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin) {
+    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException {
         BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
         File cache = new File("devices/" + id + "/cache");
@@ -83,14 +84,21 @@ public class SimpleBotManager implements BotManager {
                     FocessQQ.getLogger().thrLang("exception-load-captcha-picture",e);
                 }
                 FocessQQ.getLogger().infoLang("input-captcha-code");
-                return IOHandler.getConsoleIoHandler().input();
+                try {
+                    return IOHandler.getConsoleIoHandler().input();
+                } catch (InputTimeoutException e) {
+                    return "";
+                }
             }
 
             @Nullable
             @Override
             public Object onSolveSliderCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
-                IOHandler.getConsoleIoHandler().input();
+                try {
+                    IOHandler.getConsoleIoHandler().input();
+                } catch (InputTimeoutException ignored) {
+                }
                 return null;
             }
 
@@ -98,7 +106,10 @@ public class SimpleBotManager implements BotManager {
             @Override
             public Object onSolveUnsafeDeviceLoginVerify(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
-                IOHandler.getConsoleIoHandler().input();
+                try {
+                    IOHandler.getConsoleIoHandler().input();
+                } catch (InputTimeoutException ignored) {
+                }
                 return null;
             }
         });
@@ -200,7 +211,7 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
-    public boolean login(Bot b) {
+    public boolean login(Bot b) throws BotLoginException {
         if (!b.isOnline() && b instanceof SimpleBot) {
             long id = b.getId();
             BotConfiguration configuration = BotConfiguration.getDefault();
@@ -223,14 +234,21 @@ public class SimpleBotManager implements BotManager {
                         FocessQQ.getLogger().thrLang("exception-load-captcha-picture",e);
                     }
                     FocessQQ.getLogger().infoLang("input-captcha-code");
-                    return IOHandler.getConsoleIoHandler().input();
+                    try {
+                        return IOHandler.getConsoleIoHandler().input();
+                    } catch (InputTimeoutException e) {
+                        return null;
+                    }
                 }
 
                 @Nullable
                 @Override
                 public Object onSolveSliderCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
                     FocessQQ.getLogger().info(s);
-                    IOHandler.getConsoleIoHandler().input();
+                    try {
+                        IOHandler.getConsoleIoHandler().input();
+                    } catch (InputTimeoutException ignored) {
+                    }
                     return null;
                 }
 
@@ -238,7 +256,10 @@ public class SimpleBotManager implements BotManager {
                 @Override
                 public Object onSolveUnsafeDeviceLoginVerify(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
                     FocessQQ.getLogger().info(s);
-                    IOHandler.getConsoleIoHandler().input();
+                    try {
+                        IOHandler.getConsoleIoHandler().input();
+                    } catch (InputTimeoutException ignored) {
+                    }
                     return null;
                 }
             });
@@ -357,7 +378,7 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
-    public boolean relogin(@NotNull Bot bot) {
+    public boolean relogin(@NotNull Bot bot) throws BotLoginException {
         boolean ret = this.logout(bot) & this.login(bot);
         try {
             EventManager.submit(new BotReloginEvent(bot));

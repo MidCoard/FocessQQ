@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.command.*;
-import top.focess.qq.api.exceptions.BotLoginException;
+import top.focess.qq.api.bot.BotLoginException;
 
 import java.util.List;
 
@@ -40,7 +40,12 @@ public class BotCommand extends Command {
                 ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
             }
-            bot.login();
+            try {
+                bot.login();
+            } catch (BotLoginException e) {
+                ioHandler.outputLang("bot-command-login-failed",id);
+                return CommandResult.REFUSE;
+            }
             ioHandler.outputLang("bot-command-login-succeed",bot.getId());
             return CommandResult.ALLOW;
         },CommandArgument.of("login"),CommandArgument.ofLong());
@@ -62,21 +67,24 @@ public class BotCommand extends Command {
                 ioHandler.outputLang("bot-command-bot-not-exist",id);
                 return CommandResult.REFUSE;
             }
-            if (bot.relogin())
-                ioHandler.outputLang("bot-command-relogin-succeed",bot.getId());
-            else ioHandler.outputLang("bot-command-relogin-failed",bot.getId());
+            try {
+                if (bot.relogin())
+                    ioHandler.outputLang("bot-command-relogin-succeed",bot.getId());
+                else {
+                    ioHandler.outputLang("bot-command-relogin-failed",bot.getId());
+                    return CommandResult.REFUSE;
+                }
+            } catch (BotLoginException e) {
+                ioHandler.outputLang("bot-command-relogin-failed",bot.getId());
+                return CommandResult.REFUSE;
+            }
             return CommandResult.ALLOW;
         },CommandArgument.of("relogin"),CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             long id = dataCollection.getLong();
             Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
-                try {
-                    FocessQQ.getBotManager().login(id, dataCollection.get(), FocessQQ.getMainPlugin());
-                } catch (BotLoginException e) {
-                    ioHandler.outputLang("bot-command-login-failed",id);
-                    return CommandResult.REFUSE;
-                }
+                FocessQQ.getBotManager().login(id, dataCollection.get(), FocessQQ.getMainPlugin());
                 ioHandler.outputLang("bot-command-login-succeed",id);
                 return CommandResult.ALLOW;
             }

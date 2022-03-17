@@ -6,9 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.command.CommandExecutedEvent;
-import top.focess.qq.api.exceptions.CommandDuplicateException;
-import top.focess.qq.api.exceptions.CommandLoadException;
-import top.focess.qq.api.exceptions.EventSubmitException;
+import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginType;
 import top.focess.qq.api.util.IOHandler;
@@ -141,7 +139,7 @@ public abstract class Command {
      */
     public static void register(@NotNull Plugin plugin, @NotNull final Command command) {
         if (command.name == null)
-            throw new IllegalStateException("CommandType dose not contain name or the constructor does not super name");
+            throw new IllegalStateException("CommandType does not contain name or the constructor does not super name");
         if (COMMANDS_MAP.containsKey(command.getName()))
             throw new CommandDuplicateException(command.getName());
         command.registered = true;
@@ -253,7 +251,13 @@ public abstract class Command {
             if (sender.hasPermission(executor.permission)) {
                 DataCollection dataCollection;
                 if ((dataCollection = executor.check(args)) != null) {
-                    result = executor.execute(sender, dataCollection, ioHandler);
+                    try {
+                        result = executor.execute(sender, dataCollection, ioHandler);
+                    } catch (Exception e) {
+                        result = CommandResult.REFUSE;
+                        FocessQQ.getLogger().thrLang("exception-command-execute", e);
+                        ioHandler.outputLang("command-execute-exception",e.getMessage());
+                    }
                     for (CommandResult r : executor.results.keySet())
                         if ((r.getValue() & result.getValue()) != 0)
                             executor.results.get(r).execute(result);
