@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandArgument;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.plugin.Plugin;
@@ -19,7 +20,7 @@ public class PluginCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(0,(sender,data,ioHandler)->{
+        this.addExecutor((sender,data,ioHandler)->{
             if (FocessQQ.getPlugins().size() != 0) {
                 StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("plugin-command-list"));
                 for (Plugin plugin : FocessQQ.getPlugins())
@@ -27,7 +28,7 @@ public class PluginCommand extends Command {
                 ioHandler.output(stringBuilder.toString());
             } else ioHandler.outputLang("plugin-command-no-plugin");
             return CommandResult.ALLOW;
-        },"list");
+        }, CommandArgument.of("list"));
     }
 
     @Override

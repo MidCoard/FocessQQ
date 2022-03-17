@@ -19,7 +19,7 @@ public class StopCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor(0, (sender, data, ioHandler) -> {
+        this.addExecutor((sender, data, ioHandler) -> {
             ioHandler.outputLang("stop-command-stop");
             new StopThread().start();
             return CommandResult.ALLOW;

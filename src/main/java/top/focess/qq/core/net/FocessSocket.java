@@ -18,7 +18,6 @@ import java.net.ServerSocket;
 
 public class FocessSocket extends ASocket {
 
-    private final Thread thread;
     private final ServerSocket server;
     private final int localPort;
 
@@ -29,8 +28,8 @@ public class FocessSocket extends ASocket {
         } catch (IOException e) {
             throw new IllegalPortException(localPort);
         }
-        thread = new Thread(() -> {
-            FocessQQ.getLogger().debugLang("start-focess-socket",localPort);
+        Thread thread = new Thread(() -> {
+            FocessQQ.getLogger().debugLang("start-focess-socket", localPort);
             while (!server.isClosed())
                 try {
                     java.net.Socket socket = server.accept();
@@ -53,7 +52,7 @@ public class FocessSocket extends ASocket {
                             }
                         }
                 } catch (IOException e) {
-                    FocessQQ.getLogger().thrLang("exception-focess-socket",e);
+                    FocessQQ.getLogger().thrLang("exception-focess-socket", e);
                     if (this.server.isClosed())
                         return;
                 }

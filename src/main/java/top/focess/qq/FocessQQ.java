@@ -82,12 +82,6 @@ public class FocessQQ {
     private static final FocessLogger LOGGER = new FocessLogger();
 
     /**
-     * The Author QQ number
-     */
-    @Deprecated
-    private static final long AUTHOR_ID = 2624646185L;
-
-    /**
      * The administrator QQ number
      */
     private static long administratorId = 0;
@@ -249,11 +243,6 @@ public class FocessQQ {
         return administratorId;
     }
 
-    @Deprecated
-    public static long getAuthorId() {
-        return AUTHOR_ID;
-    }
-
     public static BotManager getBotManager() {
         return BOT_MANAGER;
     }
@@ -323,18 +312,6 @@ public class FocessQQ {
     @Nullable
     public static Plugin getPlugin(Class<? extends Plugin> cls) {
         return PluginClassLoader.getPlugin(cls);
-    }
-
-    /**
-     *
-     * get Author as a Friend
-     *
-     * @return Author as a Friend
-     */
-    @Deprecated
-    @NotNull
-    public static Friend getAuthor() {
-        return getBot().getFriendOrFail(getAuthorId());
     }
 
     /**

@@ -50,18 +50,6 @@ public abstract class Plugin {
     private String name;
 
     /**
-     * The plugin configuration stored in YAML
-     */
-    @Deprecated
-    private YamlConfiguration configuration;
-
-    /**
-     * The plugin configuration file
-     */
-    @Deprecated
-    private File config;
-
-    /**
      * The plugin language config
      */
     private LangConfig langConfig;
@@ -117,7 +105,7 @@ public abstract class Plugin {
         if (!getDefaultFolder().exists())
             if (!getDefaultFolder().mkdirs())
                 FocessQQ.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
-        config = new File(getDefaultFolder(), "config.yml");
+        File config = new File(getDefaultFolder(), "config.yml");
         if (!config.exists()) {
             try {
                 InputStream configResource = loadResource("config.yml");
@@ -129,11 +117,6 @@ public abstract class Plugin {
             } catch (IOException e) {
                 FocessQQ.getLogger().thrLang("exception-create-config-file",e);
             }
-        }
-        try {
-            configuration = YamlConfiguration.loadFile(config);
-        } catch (YamlLoadException e) {
-            FocessQQ.getLogger().thrLang("exception-load-configuration",e);
         }
         try {
             defaultConfig = new DefaultConfig(config);
@@ -202,18 +185,6 @@ public abstract class Plugin {
     @NotNull
     public File getDefaultFolder() {
         return new File(new File("plugins"), this.getName());
-    }
-
-    @NotNull
-    @Deprecated
-    public File getConfigFile() {
-        return config;
-    }
-
-    @NotNull
-    @Deprecated
-    public YamlConfiguration getConfig() {
-        return configuration;
     }
 
     @Override

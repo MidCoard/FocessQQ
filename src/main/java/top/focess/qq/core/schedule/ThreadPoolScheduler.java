@@ -180,7 +180,6 @@ public class ThreadPoolScheduler extends AScheduler {
                                 thread.startTask(task.getTask());
                             }
                         }
-                    sleep(0);
                 } catch (Exception e) {
                     FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler",e);
                 }

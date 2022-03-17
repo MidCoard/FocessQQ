@@ -131,7 +131,6 @@ public class FocessScheduler extends AScheduler {
                                 tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));
                         }
                     }
-                    sleep(0);
                 } catch (Exception e) {
                     FocessQQ.getLogger().thrLang("exception-focess-scheduler",e);
                 }

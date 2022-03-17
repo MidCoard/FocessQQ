@@ -1,18 +1,17 @@
 package top.focess.qq.api.command;
 
+import com.google.common.collect.Maps;
+import net.mamoe.mirai.contact.Friend;
+import net.mamoe.mirai.contact.Member;
+import net.mamoe.mirai.contact.Stranger;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
 import top.focess.qq.core.listeners.ChatListener;
-import com.google.common.collect.Maps;
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.Member;
-import net.mamoe.mirai.contact.MemberPermission;
-import net.mamoe.mirai.contact.Stranger;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -116,26 +115,7 @@ public class CommandSender {
         return isFriend;
     }
 
-    /**
-     * Indicate whether this CommandSender owns the permission
-     *
-     * @param permission the compared permission
-     * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
-     */
-    @Deprecated
-    public boolean hasPermission(MemberPermission permission) {
-        if (isAdministrator())
-            return true;
-        switch (permission) {
-            case MEMBER:
-                return true;
-            case ADMINISTRATOR:
-                return this.getPermission().permission == MemberPermission.ADMINISTRATOR || this.getPermission().permission == MemberPermission.OWNER;
-            case OWNER:
-                return this.getPermission().permission == MemberPermission.OWNER;
-        }
-        return false;
-    }
+
     /**
      * Indicate whether this CommandSender owns the permission
      *
@@ -167,16 +147,6 @@ public class CommandSender {
     @EnsuresNonNullIf( expression = "getMember()",result = true)
     public boolean isMember() {
         return isMember;
-    }
-
-    /**
-     * Indicate whether this is an Author Mirai Friend Instance or an Author Mirai Member Instance
-     *
-     * @return true if this CommandSender presents its id is equal to the id of the author, false otherwise
-     */
-    @Deprecated
-    public boolean isAuthor() {
-        return this.isFriend ? this.friend.getId() == FocessQQ.getAuthorId() : isMember && this.member.getId() == FocessQQ.getAuthorId();
     }
 
     /**

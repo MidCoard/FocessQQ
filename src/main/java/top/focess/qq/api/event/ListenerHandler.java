@@ -19,7 +19,7 @@ public class ListenerHandler {
     //only access in classloader, classloader is in lock process
     private static final List<ListenerHandler> LISTENER_HANDLER_LIST = Lists.newArrayList();
     private static final Map<Plugin, List<Listener>> PLUGIN_LISTENER_MAP = Maps.newConcurrentMap();
-    private static final Map<Listener,Plugin> LISTENER_PLUGIN_MAP = Maps.newConcurrentMap();
+    static final Map<Listener,Plugin> LISTENER_PLUGIN_MAP = Maps.newConcurrentMap();
 
     //listeners only in one ListenerHandler, and one ListenerHandler only access by synchronized
     private final Map<Listener, List<Pair<Method, EventHandler>>> listeners = Maps.newHashMap();
@@ -101,15 +101,6 @@ public class ListenerHandler {
             v.add(Pair.of(method, handler));
             return v;
         });
-    }
-
-    /**
-     * Get the plugin of the listener
-     *
-     * @return the plugin of the listener
-     */
-    public Plugin getPlugin() {
-        return LISTENER_PLUGIN_MAP.get(this);
     }
 
     /**

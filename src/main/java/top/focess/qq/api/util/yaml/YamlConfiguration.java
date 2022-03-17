@@ -82,7 +82,7 @@ public class YamlConfiguration implements SectionMap {
             @Override
             public ArrayList read(Object value) {
                 List list = (List) value;
-                ArrayList ret = Lists.newArrayList();;
+                ArrayList ret = Lists.newArrayList();
                 for (Object o : list) ret.add(YamlConfiguration.read(o));
                 return ret;
             }

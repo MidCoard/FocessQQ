@@ -19,7 +19,6 @@ public class FocessSidedSocket extends ASocket {
 
     private final int localPort;
     private final ServerSocket server;
-    private final Thread thread;
 
     public FocessSidedSocket(int localPort) throws IllegalPortException {
         this.localPort = localPort;
@@ -28,8 +27,8 @@ public class FocessSidedSocket extends ASocket {
         } catch (IOException e) {
             throw new IllegalPortException(localPort);
         }
-        thread = new Thread(() -> {
-            FocessQQ.getLogger().debugLang("start-focess-sided-socket",localPort);
+        Thread thread = new Thread(() -> {
+            FocessQQ.getLogger().debugLang("start-focess-sided-socket", localPort);
             while (!server.isClosed())
                 try {
                     java.net.Socket socket = server.accept();
@@ -49,7 +48,7 @@ public class FocessSidedSocket extends ASocket {
                                 Object o = method.invoke(pair.getKey(), packet);
                                 if (o != null) {
                                     PacketPreCodec handler = new PacketPreCodec();
-                                    handler.writePacket((Packet)o);
+                                    handler.writePacket((Packet) o);
                                     outputStream.write(handler.getBytes());
                                     outputStream.flush();
                                 }
@@ -59,7 +58,7 @@ public class FocessSidedSocket extends ASocket {
                         }
                     socket.shutdownOutput();
                 } catch (IOException e) {
-                    FocessQQ.getLogger().thrLang("exception-focess-sided-socket",e);
+                    FocessQQ.getLogger().thrLang("exception-focess-sided-socket", e);
                     if (this.server.isClosed())
                         return;
                 }

@@ -193,33 +193,6 @@ public abstract class Command {
      * </code>
      * which means that it runs when you just execute the command without anything.
      *
-     * @param count the arguments' length that you need
-     * @param executor the executor to define this command
-     * @param subCommands the known arguments for this executor
-     * @return the Executor to define other proprieties
-     */
-    @NotNull
-    @Deprecated
-    public final Executor addExecutor(final int count, final @NotNull CommandExecutor executor, final String... subCommands) {
-        Executor executor1 = new Executor(count, executor,this.executorPermission,this,subCommands);
-        this.executors.add(executor1);
-        return executor1;
-    }
-
-    /**
-     * Add default executor to define how to execute this command.
-     *
-     * for example :
-     * <code>
-     *     this.addExecutor(1, ... ,"example");
-     * </code>
-     * which means that it runs when you execute the command with "example" "xxx".
-     *
-     * <code>
-     *     this.addExecutor(0, ...);
-     * </code>
-     * which means that it runs when you just execute the command without anything.
-     *
      * @param executor the executor to define this command
      * @param commandArguments the defined arguments for this executor
      * @return the Executor to define other proprieties
@@ -339,20 +312,7 @@ public abstract class Command {
         private CommandPermission permission = CommandPermission.MEMBER;
         private Predicate<CommandSender> executorPermission;
         private final Command command;
-        private int nullableCommandArguments;
-
-        @Deprecated
-        private Executor(final int count,final CommandExecutor executor,final Predicate<CommandSender> executorPermission,final Command command,final String... subCommands) {
-            this.executor = executor;
-            this.executorPermission = executorPermission;
-            this.command = command;
-            this.commandArguments = new CommandArgument[count + subCommands.length];
-            for (int i = 0; i < subCommands.length; i++)
-                this.commandArguments[i] = CommandArgument.of(subCommands[i]);
-            for (int i = subCommands.length; i < count + subCommands.length; i++)
-                this.commandArguments[i] = CommandArgument.of(DataConverter.DEFAULT_DATA_CONVERTER);
-            this.nullableCommandArguments = 0;
-        }
+        private final int nullableCommandArguments;
 
         private Executor(CommandExecutor executor, Predicate<CommandSender> executorPermission, Command command, CommandArgument<?>[] commandArguments) {
             this.executor = executor;
@@ -393,26 +353,6 @@ public abstract class Command {
         @NotNull
         public Executor addCommandResultExecutor(@NotNull CommandResult result,@NotNull CommandResultExecutor executor) {
             results.put(result, executor);
-            return this;
-        }
-
-        /**
-         * Set the DataConverters for the arguments.
-         *
-         * @param dataConverters used to parser arguments this executor needs.
-         * @return the Executor itself
-         */
-        @NotNull
-        @Deprecated
-        public Executor setDataConverters(@NotNull DataConverter<?>... dataConverters) {
-            int pos = 0;
-            for (int i = 0;i<commandArguments.length;i++) {
-                CommandArgument<?> commandArgument = commandArguments[i];
-                if (!commandArgument.isDefault())
-                    if (pos < dataConverters.length)
-                        commandArguments[i] = CommandArgument.of(dataConverters[pos++]);
-                    else commandArguments[i] = CommandArgument.of(DataConverter.DEFAULT_DATA_CONVERTER);
-            }
             return this;
         }
 
