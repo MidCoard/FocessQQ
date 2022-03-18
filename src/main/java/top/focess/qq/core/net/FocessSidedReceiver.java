@@ -3,6 +3,7 @@ package top.focess.qq.core.net;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.*;
@@ -62,6 +63,7 @@ public class FocessSidedReceiver extends AServerReceiver {
         return null;
     }
 
+    @Nullable
     @PacketHandler
     public Packet onClientPacket(ClientPackPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
@@ -76,6 +78,7 @@ public class FocessSidedReceiver extends AServerReceiver {
         return null;
     }
 
+    @Nullable
     @PacketHandler
     public Packet onWait(WaitPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {

@@ -1,11 +1,11 @@
 package top.focess.qq.api.event.request;
 
+import net.mamoe.mirai.contact.Group;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.bot.BotEvent;
-import net.mamoe.mirai.contact.Group;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Called when a friend-request comes
@@ -46,7 +46,7 @@ public class FriendRequestEvent extends BotEvent {
      * @param group the group of the stranger where the application comes from
      * @param message the message of the application
      */
-    public FriendRequestEvent(Bot bot, long id, String nick, Group group, String message) {
+    public FriendRequestEvent(Bot bot, long id, String nick, @Nullable Group group, String message) {
         super(bot);
         this.id = id;
         this.nick = nick;
@@ -58,7 +58,7 @@ public class FriendRequestEvent extends BotEvent {
         return id;
     }
 
-    @NotNull
+    @NonNull
     public String getNick() {
         return nick;
     }
@@ -68,7 +68,7 @@ public class FriendRequestEvent extends BotEvent {
         return group;
     }
 
-    @NotNull
+    @NonNull
     public String getMessage() {
         return message;
     }

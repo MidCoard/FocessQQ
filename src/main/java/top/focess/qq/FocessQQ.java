@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
@@ -84,7 +84,8 @@ public class FocessQQ {
     /**
      * The administrator QQ number
      */
-    private static long administratorId = 0;
+    @Nullable
+    private static Long administratorId;
 
     /**
      * The Main Plugin Instance
@@ -225,12 +226,12 @@ public class FocessQQ {
         return running;
     }
 
-    @NotNull
+    @NonNull
     public static FocessLogger getLogger() {
         return LOGGER;
     }
 
-    @NotNull
+    @NonNull
     public static Bot getBot() {
         return bot;
     }
@@ -239,10 +240,12 @@ public class FocessQQ {
         return username;
     }
 
-    public static long getAdministratorId() {
+    @Nullable
+    public static Long getAdministratorId() {
         return administratorId;
     }
 
+    @NonNull
     public static BotManager getBotManager() {
         return BOT_MANAGER;
     }
@@ -262,11 +265,13 @@ public class FocessQQ {
         return clientReceiver;
     }
 
-    public static @Nullable Socket getUdpSocket() {
+    @Nullable
+    public static Socket getUdpSocket() {
         return udpSocket;
     }
 
-    public static @Nullable ServerReceiver getUdpServerReceiver() {
+    @Nullable
+    public static  ServerReceiver getUdpServerReceiver() {
         return udpServerReceiver;
     }
 
@@ -275,6 +280,7 @@ public class FocessQQ {
         return udpServerMultiReceiver;
     }
 
+    @NonNull
     public static Version getVersion() {
         return VERSION;
     }
@@ -288,6 +294,7 @@ public class FocessQQ {
      *
      * @return all the loaded plugins
      */
+    @NonNull
     public static List<Plugin> getPlugins() {
         return PluginClassLoader.getPlugins();
     }
@@ -321,7 +328,9 @@ public class FocessQQ {
      */
     @Nullable
     public static Friend getAdministrator() {
-        return getBot().getFriend(getAdministratorId());
+        if (administratorId == null)
+            return null;
+        return getBot().getFriend(administratorId);
     }
 
     private static void requestAccountInformation() {
@@ -354,16 +363,25 @@ public class FocessQQ {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         SCHEDULER.runTimer(()->{
-            // it has been sure not null
-            while (!ConsoleListener.QUESTS.isEmpty() && (System.currentTimeMillis() - ConsoleListener.QUESTS.peek().getValue()) > 60 * 5 * 1000)
-                ConsoleListener.QUESTS.poll().getKey().input(null);
-            for (CommandSender sender : ChatListener.QUESTS.keySet()) {
-                Queue<Pair<IOHandler, Pair<Boolean, Long>>> queue = ChatListener.QUESTS.get(sender);
-                while (!queue.isEmpty() && (System.currentTimeMillis() - queue.peek().getValue().getValue()) > 60 * 5 * 1000)
-                    queue.poll().getKey().input(null);
+            Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
+            while (consoleElement != null && System.currentTimeMillis() - consoleElement.getValue() > 60 * 5 * 1000) {
+                consoleElement.getKey().input(null);
+                consoleElement = ConsoleListener.QUESTS.poll();
             }
-        }, Duration.ZERO,Duration.ofMinutes(1));
+            for (CommandSender sender : ChatListener.QUESTS.keySet())
+                ChatListener.QUESTS.compute(sender, (k, v) -> {
+                    if (v != null) {
+                        Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
+                        while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 5) {
+                            element.getKey().input(null);
+                            element = v.poll();
+                        }
+                    }
+                    return v;
+                });
+        }, Duration.ZERO,Duration.ofSeconds(10));
 
         CONSOLE_INPUT_THREAD.start();
         FocessQQ.getLogger().debugLang("start-console-input-thread");
@@ -598,15 +616,17 @@ public class FocessQQ {
             }
             FocessQQ.getLogger().debugLang("login-default-bot");
             File plugins = new File("plugins");
-            if (plugins.exists() && plugins.isDirectory() && options.get("noDefaultPluginLoad") == null)
-                // plugins folder exists and is a directory so the warning is a mistake
-                for (File file : plugins.listFiles(file -> file.getName().endsWith(".jar")))
-                    try {
-                        Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
-                        future.get();
-                    } catch (Exception e) {
-                        FocessQQ.getLogger().thrLang("exception-load-default-plugin",e);
-                    }
+            if (plugins.exists() && plugins.isDirectory() && options.get("noDefaultPluginLoad") == null) {
+                File[] files = plugins.listFiles(file -> file.getName().endsWith(".jar"));
+                if (files != null)
+                    for (File file :files)
+                        try {
+                            Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
+                            future.get();
+                        } catch (Exception e) {
+                            FocessQQ.getLogger().thrLang("exception-load-default-plugin", e);
+                        }
+            }
             FocessQQ.getLogger().debugLang("load-default-plugins");
             Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
             FocessQQ.getLogger().debugLang("setup-shutdown-hook");

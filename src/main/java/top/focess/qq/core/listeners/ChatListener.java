@@ -44,7 +44,7 @@ public class ChatListener implements Listener {
     public static void registerInputListener(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
         QUESTS.compute(commandSender, (k, v) -> {
             if (v == null)
-                v = Queues.newConcurrentLinkedQueue();
+                v = Queues.newLinkedBlockingDeque();
             v.offer(Pair.of(ioHandler, Pair.of(flag, System.currentTimeMillis())));
             return v;
         });
@@ -52,7 +52,7 @@ public class ChatListener implements Listener {
 
     private static void updateInput(CommandSender sender, String content, String miraiContent, AtomicBoolean flag) {
         QUESTS.compute(sender, (k, v) -> {
-            if (v != null && !v.isEmpty()) {
+            if (v != null) {
                 Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
                 while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 5) {
                     element.getKey().input(null);

@@ -1,11 +1,12 @@
 package top.focess.qq.api.event.recall;
 
+import net.mamoe.mirai.contact.Group;
+import net.mamoe.mirai.contact.Member;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.bot.BotEvent;
-import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.contact.Member;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a Member recall a message in a Group
@@ -25,6 +26,7 @@ public class GroupRecallEvent extends BotEvent {
     /**
      * The member who recalls the message
      */
+    @Nullable
     private final Member operator;
 
     /**
@@ -35,14 +37,14 @@ public class GroupRecallEvent extends BotEvent {
      * @param messageIds the message ids
      * @param operator the member who recalls the message
      */
-    public GroupRecallEvent(Bot bot, Member member, int[] messageIds, Member operator) {
+    public GroupRecallEvent(Bot bot, Member member, int[] messageIds, @Nullable Member operator) {
         super(bot);
         this.member = member;
         this.messageIds = messageIds;
         this.operator = operator;
     }
 
-    @NotNull
+    @NonNull
     public Member getMember() {
         return member;
     }
@@ -56,12 +58,12 @@ public class GroupRecallEvent extends BotEvent {
      *
      * @return the Group where the member recalls the message
      */
-    @NotNull
+    @NonNull
     public Group getGroup() {
         return this.member.getGroup();
     }
 
-    @NotNull
+    @Nullable
     public Member getOperator() {
         return operator;
     }

@@ -32,7 +32,7 @@ public class Options {
         return options;
     }
 
-    private void add(Option option) {
+    private void add(@Nullable Option option) {
         if (option == null)
             return;
         this.options.put(option.getName(),option);

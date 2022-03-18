@@ -24,12 +24,12 @@ import java.util.concurrent.Future;
 public class ConsoleListener implements Listener {
 
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),5,true,"ConsoleListener");
-    public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingDeque();
+    public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingQueue();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onConsoleChat(ConsoleChatEvent event) {
-        if (!QUESTS.isEmpty()) {
-            Pair<IOHandler, Long> element = QUESTS.poll();
+        Pair<IOHandler, Long> element;
+        if ((element = QUESTS.poll()) != null) {
             while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 5 * 1000) {
                 element.getKey().input(null);
                 element = QUESTS.poll();

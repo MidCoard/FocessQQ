@@ -50,13 +50,6 @@ public class SimpleBotManager implements BotManager {
 
     private static final Map<Long,Bot> BOTS = Maps.newConcurrentMap();
 
-    public SimpleBotManager() {
-        if (FocessQQ.getBotManager() != null) {
-            FocessQQ.getLogger().fatalLang("fatal-simple-bot-manager-already-exist");
-            FocessQQ.exit();
-        }
-    }
-
     @Override
     public @NotNull Future<Bot> login(long id, String password,Plugin plugin) {
         return SCHEDULER.submit(() -> loginDirectly(id,password,plugin));
@@ -393,6 +386,7 @@ public class SimpleBotManager implements BotManager {
         return Lists.newArrayList(BOTS.values());
     }
 
+    @Nullable
     @Override
     public Bot remove(long id) {
         if (FocessQQ.getBot().getId() == id)

@@ -146,7 +146,7 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents a Mirai Member instance, false otherwise
      */
-    @EnsuresNonNullIf( expression = "getMember",result = true)
+    @EnsuresNonNullIf(expression = "getMember", result = true)
     public boolean isMember() {
         return isMember;
     }
@@ -157,6 +157,8 @@ public class CommandSender {
      * @return true if this CommandSender presents its id is equal to the id of the Administrator, false otherwise
      */
     public boolean isAdministrator() {
+        if (FocessQQ.getAdministratorId() == null)
+            return false;
         return this.isFriend ? this.friend.getId() == FocessQQ.getAdministratorId() : isMember && this.member.getId() == FocessQQ.getAdministratorId();
     }
 

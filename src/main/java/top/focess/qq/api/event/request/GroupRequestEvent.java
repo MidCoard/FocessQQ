@@ -1,9 +1,10 @@
 package top.focess.qq.api.event.request;
 
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.event.bot.BotEvent;
-import top.focess.qq.api.event.ListenerHandler;
 import net.mamoe.mirai.contact.Friend;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.event.ListenerHandler;
+import top.focess.qq.api.event.bot.BotEvent;
 
 /**
  * Called when a group-request comes
@@ -22,6 +23,7 @@ public class GroupRequestEvent extends BotEvent {
     /**
      * The invitor of the request
      */
+    @Nullable
     private final Friend invitor;
     /**
      * The request status
@@ -36,7 +38,7 @@ public class GroupRequestEvent extends BotEvent {
      * @param name the name of the group
      * @param invitor the invitor of the request
      */
-    public GroupRequestEvent(Bot bot, long id, String name, Friend invitor) {
+    public GroupRequestEvent(Bot bot, long id, String name, @Nullable Friend invitor) {
         super(bot);
         this.id = id;
         this.name = name;
@@ -51,6 +53,7 @@ public class GroupRequestEvent extends BotEvent {
         return name;
     }
 
+    @Nullable
     public Friend getInvitor() {
         return invitor;
     }
