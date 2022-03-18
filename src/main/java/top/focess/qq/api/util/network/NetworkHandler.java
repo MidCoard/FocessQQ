@@ -2,8 +2,11 @@ package top.focess.qq.api.util.network;
 
 import com.google.common.collect.Maps;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.json.JSON;
+import top.focess.qq.core.commands.util.ChatConstants;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
@@ -17,6 +20,8 @@ import java.util.concurrent.TimeUnit;
  * This is a network util class.
  */
 public class NetworkHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
 
     /**
      * Used to indicate this http-request accepts JSON
@@ -132,12 +137,15 @@ public class NetworkHandler {
         if (mediaType.equals(JSON))
             value = new JSON(data).toJson();
         else value = process(data);
-        RequestBody requestBody = RequestBody.create(mediaType,value);
+        RequestBody requestBody = RequestBody.create(value,mediaType);
         Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
         try {
             Response response = CLIENT.newCall(request).execute();
+            // Call#execute() returns a non-null Response object
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Response: " + response.body().string());
             return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
-        } catch (IOException e) {
+        } catch (Exception e) {
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
@@ -156,12 +164,15 @@ public class NetworkHandler {
         if (mediaType.equals(JSON))
             value = new JSON(data).toJson();
         else value = process(data);
-        RequestBody requestBody = RequestBody.create(mediaType,value);
+        RequestBody requestBody = RequestBody.create(value,mediaType);
         Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
         try {
             Response response = CLIENT.newCall(request).execute();
+            // Call#execute() returns a non-null Response object
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Response: " + response.body().string());
             return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
         } catch (IOException e) {
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
@@ -182,8 +193,11 @@ public class NetworkHandler {
             request = new Request.Builder().url(url).get().headers(Headers.of(header)).build();
         try {
             Response response = CLIENT.newCall(request).execute();
+            // Call#execute() returns a non-null Response object
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Response: " + response.body().string());
             return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
         } catch (IOException e) {
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
