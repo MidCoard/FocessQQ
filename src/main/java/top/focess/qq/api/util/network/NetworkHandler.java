@@ -54,12 +54,12 @@ public class NetworkHandler {
                     }
                 }
         };
-        SSLContext sslContext = null;
+        SSLContext sslContext;
         try {
             sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null,managers,new SecureRandom());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
     }
@@ -142,8 +142,9 @@ public class NetworkHandler {
         try {
             Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Response: " + response.body().string());
-            return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
+            String body = response.body().string();
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Response: " + body);
+            return new HttpResponse(this.plugin,response.code(),response.headers(),body);
         } catch (Exception e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
@@ -169,8 +170,9 @@ public class NetworkHandler {
         try {
             Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Response: " + response.body().string());
-            return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
+            String body = response.body().string();
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Response: " + body);
+            return new HttpResponse(this.plugin,response.code(),response.headers(),body);
         } catch (IOException e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
@@ -194,8 +196,9 @@ public class NetworkHandler {
         try {
             Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Response: " + response.body().string());
-            return new HttpResponse(this.plugin,response.code(),response.headers(),response.body().string());
+            String body = response.body().string();
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Response: " + body);
+            return new HttpResponse(this.plugin,response.code(),response.headers(),body);
         } catch (IOException e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);

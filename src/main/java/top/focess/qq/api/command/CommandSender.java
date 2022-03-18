@@ -38,6 +38,8 @@ public class CommandSender {
     private final boolean isStranger;
 
     private CommandSender() {
+        if (CONSOLE != null)
+            throw new IllegalStateException("CommandSender.CONSOLE is not null");
         this.member = null;
         this.friend = null;
         this.stranger = null;
@@ -144,7 +146,7 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents a Mirai Member instance, false otherwise
      */
-    @EnsuresNonNullIf( expression = "getMember()",result = true)
+    @EnsuresNonNullIf( expression = "getMember",result = true)
     public boolean isMember() {
         return isMember;
     }
@@ -181,7 +183,7 @@ public class CommandSender {
         if (o == null || getClass() != o.getClass()) return false;
         CommandSender sender = (CommandSender) o;
         if (this.isMember() && sender.isMember()) {
-            return sender.getMember().getGroup() == this.getMember().getGroup() && sender.getMember().getId() == this.getMember().getId();
+            return sender.getMember().getGroup().getId() == this.getMember().getGroup().getId() && sender.getMember().getId() == this.getMember().getId();
         } else if (this.isFriend() && sender.isFriend()) {
             return sender.getFriend().getId() == this.getFriend().getId();
         } else return this.isConsole() && sender.isConsole();

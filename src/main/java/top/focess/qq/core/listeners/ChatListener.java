@@ -72,7 +72,7 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onStrangerChat(StrangerChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
-        IOHandler.getConsoleIoHandler().output("message-chain");
+        IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());
         try {
@@ -85,7 +85,7 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGroupChat(GroupChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
-        IOHandler.getConsoleIoHandler().output("message-chain");
+        IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getMember());
         AtomicBoolean flag = new AtomicBoolean(false);
@@ -118,7 +118,7 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFriendChat(FriendChatEvent event){
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
-        IOHandler.getConsoleIoHandler().output("message-chain");
+        IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getFriend());
         AtomicBoolean flag = new AtomicBoolean(false);
