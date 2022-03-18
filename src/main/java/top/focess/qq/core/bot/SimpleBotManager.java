@@ -12,12 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.event.EventManager;
-import top.focess.qq.api.event.bot.BotLoginEvent;
-import top.focess.qq.api.event.bot.BotLogoutEvent;
+import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.bot.BotReloginEvent;
-import top.focess.qq.api.event.bot.FriendInputStatusEvent;
+import top.focess.qq.api.event.bot.*;
 import top.focess.qq.api.event.chat.FriendChatEvent;
 import top.focess.qq.api.event.chat.GroupChatEvent;
 import top.focess.qq.api.event.chat.StrangerChatEvent;
@@ -25,13 +25,11 @@ import top.focess.qq.api.event.recall.FriendRecallEvent;
 import top.focess.qq.api.event.recall.GroupRecallEvent;
 import top.focess.qq.api.event.request.FriendRequestEvent;
 import top.focess.qq.api.event.request.GroupRequestEvent;
-import top.focess.qq.api.bot.BotLoginException;
-import top.focess.qq.api.event.EventSubmitException;
-import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.api.util.InputTimeoutException;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
@@ -192,6 +190,22 @@ public class SimpleBotManager implements BotManager {
                 FocessQQ.getLogger().thrLang("exception-submit-stranger-chat-event",ex);
             }
         }));
+        listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
+            BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getTarget());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
+            }
+        }));
+        listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class,event->{
+            BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,event.getMessage(),event.getTarget(),event);
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                FocessQQ.getLogger().thrLang("exception-submit-bot-pre-send-message-event",ex);
+            }
+        }));
         BOT_LISTENER_MAP.put(b,listeners);
         PLUGIN_BOT_MAP.compute(plugin,(k,v)->{
             if (v == null)
@@ -340,6 +354,22 @@ public class SimpleBotManager implements BotManager {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-stranger-chat-event",ex);
+                }
+            }));
+            listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
+                BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getTarget());
+                try {
+                    EventManager.submit(e);
+                } catch (EventSubmitException ex) {
+                    FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
+                }
+            }));
+            listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class,event->{
+                BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,event.getMessage(),event.getTarget(),event);
+                try {
+                    EventManager.submit(e);
+                } catch (EventSubmitException ex) {
+                    FocessQQ.getLogger().thrLang("exception-submit-bot-pre-send-message-event",ex);
                 }
             }));
             BOT_LISTENER_MAP.put(b,listeners);

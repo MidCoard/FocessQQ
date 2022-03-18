@@ -28,6 +28,8 @@ exception-submit-friend-input-status-event: Submit friend input status event exc
 exception-submit-stranger-chat-event: Submit stranger chat event exception
 exception-submit-stranger-message-event: Submit stranger message event exception
 exception-submit-server-stop-event: Submit server stop event exception
+exception-submit-bot-send-message-event: Submit bot send message event exception
+exception-submit-bot-pre-send-message-event: Submit bot presend message event exception
 exception-save-log: Save log exception
 exception-create-focess-socket-server: Create focess socket server exception
 exception-create-focess-sided-socket-server: Create focess sided socket server exception

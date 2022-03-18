@@ -236,6 +236,10 @@ public class FocessQQ {
         return administratorId;
     }
 
+    public static boolean hasAdministratorId() {
+        return administratorId != null;
+    }
+
     @NonNull
     public static BotManager getBotManager() {
         return BOT_MANAGER;

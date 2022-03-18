@@ -47,7 +47,7 @@ Maven 依赖
 <dependency>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.0.7.2000</version>
+    <version>4.0.7.3000</version>
 </dependency>
 ```
 
