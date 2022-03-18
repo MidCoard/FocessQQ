@@ -30,6 +30,7 @@ public class FocessSidedReceiver extends AServerReceiver {
         }, Duration.ZERO,Duration.ofSeconds(1));
     }
 
+    @Nullable
     @PacketHandler
     public ConnectedPacket onConnect(SidedConnectPacket packet) {
         for (SimpleClient simpleClient : clientInfos.values())
@@ -41,6 +42,7 @@ public class FocessSidedReceiver extends AServerReceiver {
         return new ConnectedPacket(simpleClient.getId(), simpleClient.getToken());
     }
 
+    @Nullable
     @PacketHandler
     public DisconnectedPacket onDisconnect(DisconnectPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {
@@ -51,6 +53,7 @@ public class FocessSidedReceiver extends AServerReceiver {
         return null;
     }
 
+    @Nullable
     @PacketHandler
     public Packet onHeart(HeartPacket packet) {
         if (clientInfos.get(packet.getClientId()) != null) {

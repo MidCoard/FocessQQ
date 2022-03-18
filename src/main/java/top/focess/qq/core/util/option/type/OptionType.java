@@ -1,5 +1,6 @@
 package top.focess.qq.core.util.option.type;
 
+
 public abstract class OptionType<T> {
 
     public abstract T parse(String v);

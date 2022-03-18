@@ -3,6 +3,7 @@ package top.focess.qq.core.schedule;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.schedule.TaskNotFoundException;
@@ -138,6 +139,7 @@ public class ThreadPoolScheduler extends AScheduler {
             super(name);
         }
 
+        @Nullable
         private ThreadPoolSchedulerThread getAvailableThread() {
             for (int i = 1;i <= threads.size();i++) {
                 int next = (currentThread + i) % threads.size();

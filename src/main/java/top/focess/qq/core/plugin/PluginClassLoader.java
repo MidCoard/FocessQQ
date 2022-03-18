@@ -228,6 +228,7 @@ public class PluginClassLoader extends URLClassLoader {
         return file;
     }
 
+    @Nullable
     public static File disablePlugin0(Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
         // try-catch because it should take over the process
@@ -340,7 +341,6 @@ public class PluginClassLoader extends URLClassLoader {
     public void close() throws IOException {
         super.close();
         this.loadedClasses.clear();
-        this.plugin = null;
     }
 
     public boolean load() {

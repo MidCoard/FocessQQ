@@ -2,8 +2,9 @@ package top.focess.qq.core.serialize;
 
 import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import top.focess.qq.api.serialize.SerializationParseException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.serialize.FocessReader;
+import top.focess.qq.api.serialize.SerializationParseException;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
 import java.lang.reflect.Array;
@@ -153,6 +154,7 @@ public class SimpleFocessReader extends FocessReader {
         return readByte() == 1;
     }
 
+    @Nullable
     public Object read() {
         if (this.pointer >= this.bytes.length)
             throw new SerializationParseException("Read over");
@@ -196,6 +198,7 @@ public class SimpleFocessReader extends FocessReader {
         }
     }
 
+    @Nullable
     private <T> Object readObject() {
         byte type = readByte();
         switch (type) {

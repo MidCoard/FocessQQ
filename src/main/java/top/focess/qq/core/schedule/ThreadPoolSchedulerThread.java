@@ -1,5 +1,6 @@
 package top.focess.qq.core.schedule;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 
 import java.util.concurrent.ExecutionException;
@@ -11,6 +12,7 @@ public class ThreadPoolSchedulerThread extends Thread{
     private final String name;
 
     private boolean isAvailable = true;
+    @Nullable
     private ITask task;
     private boolean shouldStop = false;
 

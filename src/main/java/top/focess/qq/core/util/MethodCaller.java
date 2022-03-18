@@ -1,9 +1,11 @@
 package top.focess.qq.core.util;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
 public class MethodCaller {
 
+    @Nullable
     public static Class<?> getCallerClass() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         if (stackTraceElements.length < 4)

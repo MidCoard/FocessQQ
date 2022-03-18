@@ -1,5 +1,6 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.command.Command;
 
 public class CommandBuffer extends DataBuffer<Command> {
@@ -24,6 +25,7 @@ public class CommandBuffer extends DataBuffer<Command> {
         this.stringBuffer.put(command.getName());
     }
 
+    @Nullable
     @Override
     public Command get() {
         String name = stringBuffer.get();
@@ -33,6 +35,7 @@ public class CommandBuffer extends DataBuffer<Command> {
         return null;
     }
 
+    @Nullable
     @Override
     public Command get(int index) {
         String name = stringBuffer.get(index);

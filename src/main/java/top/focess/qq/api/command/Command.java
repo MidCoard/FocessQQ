@@ -3,6 +3,7 @@ package top.focess.qq.api.command;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.command.CommandExecutedEvent;
@@ -402,6 +403,7 @@ public abstract class Command {
             return command;
         }
 
+        @Nullable
         private DataCollection check(String[] args) {
             if (args.length > this.commandArguments.length)
                 return null;

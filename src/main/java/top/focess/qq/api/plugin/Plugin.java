@@ -1,7 +1,7 @@
 package top.focess.qq.api.plugin;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.DataCollection;
@@ -10,11 +10,11 @@ import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.ListenerHandler;
-import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -123,11 +123,7 @@ public abstract class Plugin {
         } catch (YamlLoadException e) {
             FocessQQ.getLogger().thrLang("exception-load-default-configuration",e);
         }
-        try {
-            langConfig = new LangConfig(loadResource("lang.yml"));
-        } catch (YamlLoadException e) {
-            FocessQQ.getLogger().thrLang("exception-load-lang-configuration",e);
-        }
+        langConfig = new LangConfig(loadResource("lang.yml"));
     }
 
     /**
@@ -137,6 +133,7 @@ public abstract class Plugin {
      * @param plugin the class instance of the plugin
      * @return the plugin instance
      */
+    @Nullable
     public static Plugin getPlugin(Class<? extends Plugin> plugin) {
         return PluginClassLoader.getPlugin(plugin);
     }
@@ -148,6 +145,7 @@ public abstract class Plugin {
      * @param name the name of the plugin
      * @return the plugin instance
      */
+    @Nullable
     public static Plugin getPlugin(String name) {
         return PluginClassLoader.getPlugin(name);
     }
@@ -157,7 +155,7 @@ public abstract class Plugin {
         return PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
     }
 
-    @NotNull
+    @NonNull
     public String getName() {
         return name;
     }
@@ -182,13 +180,13 @@ public abstract class Plugin {
         this.isEnabled = false;
     }
 
-    @NotNull
+    @NonNull
     public File getDefaultFolder() {
         return new File(new File("plugins"), this.getName());
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.checkerframework.checker.nullness.qual.Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -268,6 +266,7 @@ public abstract class Plugin {
         return pluginDescription;
     }
 
+    @Nullable
     public InputStream loadResource(String path) {
         return this.getClass().getClassLoader().getResourceAsStream(path);
     }

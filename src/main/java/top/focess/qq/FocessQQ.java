@@ -30,7 +30,6 @@ import top.focess.qq.api.util.Pair;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.logger.FocessLogger;
 import top.focess.qq.api.util.version.Version;
-import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
 import top.focess.qq.core.listeners.ChatListener;
@@ -132,15 +131,7 @@ public class FocessQQ {
     /**
      * The lang config
      */
-    private static LangConfig langConfig;
-
-    static {
-        try {
-            langConfig = new LangConfig(FocessQQ.class.getResourceAsStream("/lang.yml"));
-        } catch (YamlLoadException e) {
-            FocessQQ.getLogger().thrLang("exception-load-main-plugin-lang-yml",e);
-        }
-    }
+    private static final LangConfig LANG_CONFIG = new LangConfig(FocessQQ.class.getResourceAsStream("/lang.yml"));
 
     /**
      * The default client receiver
@@ -540,7 +531,7 @@ public class FocessQQ {
     }
 
     public static LangConfig getLangConfig() {
-        return langConfig;
+        return LANG_CONFIG;
     }
 
     /**
@@ -562,7 +553,7 @@ public class FocessQQ {
             try {
                 Field field = Plugin.class.getDeclaredField("langConfig");
                 field.setAccessible(true);
-                field.set(this, langConfig);
+                field.set(this, LANG_CONFIG);
             } catch (Exception e) {
                 e.printStackTrace();
             }

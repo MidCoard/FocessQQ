@@ -1,6 +1,7 @@
 package top.focess.qq.api.command;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CommandArgument<V> {
 
@@ -8,7 +9,7 @@ public class CommandArgument<V> {
     private final V value;
     private final boolean isNullable;
 
-    private CommandArgument(@NotNull DataConverter<V> dataConverter,V value) {
+    private CommandArgument(@NotNull DataConverter<V> dataConverter, @Nullable V value) {
         this.dataConverter = dataConverter;
         this.value = value;
         this.isNullable = false;

@@ -1,5 +1,7 @@
 package top.focess.qq.api.serialize;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ public interface FocessSerializable extends Serializable {
      *
      * @return the serialized object, null if it should serialize all fields in the object.
      */
+    @Nullable
     default Map<String,Object> serialize() {
         return null;
     }

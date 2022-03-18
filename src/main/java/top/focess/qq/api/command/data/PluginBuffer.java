@@ -1,5 +1,6 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.plugin.Plugin;
 
 /**
@@ -33,11 +34,13 @@ public class PluginBuffer extends DataBuffer<Plugin> {
         stringBuffer.put(plugin.getName());
     }
 
+    @Nullable
     @Override
     public Plugin get() {
         return Plugin.getPlugin(stringBuffer.get());
     }
 
+    @Nullable
     @Override
     public Plugin get(int index) {
         return Plugin.getPlugin(stringBuffer.get(index));

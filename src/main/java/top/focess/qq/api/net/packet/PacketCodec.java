@@ -1,5 +1,6 @@
 package top.focess.qq.api.net.packet;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.net.PacketPreCodec;
 
 /**
@@ -15,6 +16,7 @@ public abstract class PacketCodec<T extends Packet>{
      * @param packetPreCodec the precodec
      * @return the packet
      */
+    @Nullable
     public abstract T readPacket(PacketPreCodec packetPreCodec);
 
     /**

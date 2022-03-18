@@ -1,5 +1,6 @@
 package top.focess.qq.api.net.packet;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.net.PacketPreCodec;
 
 /**
@@ -7,11 +8,14 @@ import top.focess.qq.api.net.PacketPreCodec;
  */
 public class ClientPackPacketCodec extends PacketCodec<ClientPackPacket>{
 
+    @Nullable
     @Override
     public ClientPackPacket readPacket(PacketPreCodec packetPreCodec) {
         int clientId = packetPreCodec.readInt();
         String token = packetPreCodec.readString();
         Packet packet = packetPreCodec.readPacket();
+        if (packet == null)
+            return null;
         return new ClientPackPacket(clientId,token,packet);
     }
 

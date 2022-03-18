@@ -146,7 +146,7 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents a Mirai Member instance, false otherwise
      */
-    @EnsuresNonNullIf(expression = "getMember", result = true)
+    @EnsuresNonNullIf(expression = "getMember()", result = true)
     public boolean isMember() {
         return isMember;
     }

@@ -1,5 +1,6 @@
 package top.focess.qq.api.command.converter;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.command.Command;
 
 /**
@@ -12,6 +13,7 @@ public class CommandDataConverter extends NullDataConverter<Command> {
      */
     public static final CommandDataConverter COMMAND_DATA_CONVERTER = new CommandDataConverter();
 
+    @Nullable
     @Override
     public Command convert(String s) {
         for (Command command:Command.getCommands())

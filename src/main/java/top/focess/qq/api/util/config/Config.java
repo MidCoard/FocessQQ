@@ -1,10 +1,11 @@
 package top.focess.qq.api.util.config;
 
-import org.jetbrains.annotations.Nullable;
-import top.focess.qq.api.util.yaml.YamlLoadException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.qq.api.util.yaml.YamlLoadException;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Map;
 
 public abstract class Config {
@@ -17,6 +18,11 @@ public abstract class Config {
     protected Config(@Nullable File file) throws YamlLoadException {
         this.file = file;
         this.yaml = this.file != null && this.file.exists() ? YamlConfiguration.loadFile(file) : new YamlConfiguration(null);
+    }
+
+    protected Config(@Nullable InputStream stream) {
+        this.file = null;
+        this.yaml = YamlConfiguration.load(stream);
     }
 
     @Nullable
@@ -33,6 +39,8 @@ public abstract class Config {
     }
 
     protected void save() {
+        if (file == null)
+            throw new UnsupportedOperationException("File is null");
         this.yaml.save(file);
     }
 

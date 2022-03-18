@@ -3,12 +3,13 @@ package top.focess.qq.api.util.yaml;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.Yaml;
 import top.focess.qq.FocessQQ;
+import top.focess.qq.api.serialize.FocessSerializable;
 import top.focess.qq.api.serialize.NotFocessSerializableException;
 import top.focess.qq.api.serialize.SerializationParseException;
-import top.focess.qq.api.serialize.FocessSerializable;
 import top.focess.qq.api.util.SectionMap;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
@@ -163,7 +164,7 @@ public class YamlConfiguration implements SectionMap {
      * @return YAML configuration
      * @throws YamlLoadException if there is any io exception in loading the file
      */
-    public static YamlConfiguration loadFile(File file) throws YamlLoadException {
+    public static YamlConfiguration loadFile(@NonNull File file) throws YamlLoadException {
         try {
             FileReader reader = new FileReader(file);
             YamlConfiguration yamlConfiguration = new YamlConfiguration(YAML.load(reader));
@@ -174,7 +175,8 @@ public class YamlConfiguration implements SectionMap {
         }
     }
 
-    public static YamlConfiguration load(InputStream inputStream) {
+    public static YamlConfiguration load(@Nullable InputStream inputStream) {
+        if (inputStream == null) return new YamlConfiguration(null);
         return new YamlConfiguration(YAML.load(inputStream));
     }
 
@@ -192,6 +194,7 @@ public class YamlConfiguration implements SectionMap {
         values.put(key,write(value));
     }
 
+    @Nullable
     private static <T> Object write(Object value) {
         if (value == null)
             return null;
@@ -241,12 +244,14 @@ public class YamlConfiguration implements SectionMap {
         throw new NotFocessSerializableException(value.getClass().getName());
     }
 
+    @Nullable
     @Override
     public <T> T get(String key) {
         Object value = SectionMap.super.get(key);
         return (T) read(value);
     }
 
+    @Nullable
     private static <T> Object read(Object value) {
         if (value == null)
             return null;

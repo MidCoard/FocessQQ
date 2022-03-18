@@ -42,6 +42,7 @@ public abstract class IOHandler {
         CONSOLE_IO_HANDLER = consoleIoHandler;
     }
 
+    @Nullable
     protected volatile String value = null;
 
     protected volatile boolean flag = false;

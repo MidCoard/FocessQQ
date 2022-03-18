@@ -26,7 +26,7 @@ public class PluginCoreClassLoader extends ClassLoader {
      * @return the target plugin, @null if the class is loaded by default classloader
      */
     @Nullable
-    public static Plugin getClassLoadedBy(Class<?> clazz) {
+    public static Plugin getClassLoadedBy(@Nullable Class<?> clazz) {
         if (clazz == null)
             return null;
         if (clazz.getClassLoader() instanceof PluginClassLoader)

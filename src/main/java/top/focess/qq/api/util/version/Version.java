@@ -144,6 +144,6 @@ public class Version {
             return major + "." + minor + "." + revision + (build == null ? "" : "-" + build);
         else if (length == 4)
             return major + "." + minor + "." + revision + "." + build;
-        return null;
+        throw new VersionFormatException("");
     }
 }

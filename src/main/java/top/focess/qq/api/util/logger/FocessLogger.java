@@ -15,20 +15,6 @@ public class FocessLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(FocessLogger.class);
 
-    private static FocessLogger FOCESS_LOG;
-
-    /**
-     * Initialize a logger for this framework.
-     * Never instance it! It will be instanced when bot bootstraps automatically.
-     *
-     * @see FocessQQ#getLogger()
-     */
-    public FocessLogger() {
-        if (FOCESS_LOG != null)
-            throw new UnsupportedOperationException();
-        FOCESS_LOG = this;
-    }
-
     /**
      * Log a message with INFO level
      *

@@ -32,7 +32,8 @@ public class Option {
 
     public <T> T get(OptionType<T> optionType) {
         Queue<String> options = optionTypes.getOrDefault(optionType,Queues.newConcurrentLinkedQueue());
-        T t = optionType.parse(options.poll());
+        String v = options.poll();
+        T t = optionType.parse(v == null ? "" : v);
         optionTypes.put(optionType,options);
         return t;
     }

@@ -1,5 +1,6 @@
 package top.focess.qq.api.command.converter;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.plugin.Plugin;
 
 /**
@@ -12,6 +13,7 @@ public class PluginDataConverter extends NullDataConverter<Plugin> {
      */
     public static final PluginDataConverter PLUGIN_DATA_CONVERTER = new PluginDataConverter();
 
+    @Nullable
     @Override
     public Plugin convert(String arg) {
         return Plugin.getPlugin(arg);
