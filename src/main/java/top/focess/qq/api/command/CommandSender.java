@@ -113,6 +113,7 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents a Mirai Friend instance, false otherwise
      */
+    @EnsuresNonNullIf(expression = "getFriend()", result = true)
     public boolean isFriend() {
         return isFriend;
     }
