@@ -124,4 +124,11 @@ public class SimpleBot implements Bot {
     public Plugin getPlugin() {
         return plugin;
     }
+
+    @Override
+    public boolean isAdministrator() {
+        if (FocessQQ.getAdministratorId() == null)
+            return false;
+        return this.getId() == FocessQQ.getAdministratorId();
+    }
 }

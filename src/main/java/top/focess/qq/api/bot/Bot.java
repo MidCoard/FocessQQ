@@ -119,4 +119,10 @@ public interface Bot {
      * @return the plugin of the bot
      */
     Plugin getPlugin();
+
+    /**
+     * Indicate this is the Administrator
+     * @return true if this is the Administrator, false otherwise
+     */
+    boolean isAdministrator();
 }
