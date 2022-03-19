@@ -1,7 +1,7 @@
 package top.focess.qq.api.command;
 
 /**
- * Thrown to indicate this class is not an illegal Command class
+ * Thrown to indicate this class is an illegal Command class
  */
 public class IllegalCommandClassException extends IllegalArgumentException {
     /**

@@ -1,6 +1,6 @@
 package top.focess.qq.api.event;
 /**
- * Thrown to indicate this class is not an illegal Listener class
+ * Thrown to indicate this class is an illegal Listener class
  */
 public class IllegalListenerClassException extends IllegalArgumentException {
     /**

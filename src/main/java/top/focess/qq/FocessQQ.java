@@ -650,6 +650,9 @@ public class FocessQQ {
             if (DataCollection.unregisterAll())
                 FocessQQ.getLogger().debugLang("buffers-not-empty");
             FocessQQ.getLogger().debugLang("unregister-all-buffers");
+            if (CommandLine.unregisterAll())
+                FocessQQ.getLogger().debugLang("special-arguments-not-empty");
+            FocessQQ.getLogger().debugLang("unregister-all-special-arguments");
             if (bot != null) {
                 SimpleBotManager.removeAll();
                 FocessQQ.getLogger().debugLang("remove-all-bots");

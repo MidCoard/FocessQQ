@@ -170,6 +170,8 @@ unregister-default-listeners: Unregister default listeners
 unregister-default-commands: Unregister default commands
 close-schedulers: Close schedulers
 schedulers-not-empty: Schedulers are not empty
+special-arguments-not-empty: Special arguments are not empty
+unregister-special-argument: Unregister special arguments
 unregister-all-schedulers: Unregister all schedulers
 unregister-all-commands: Unregister all commands
 unregister-all-listeners: Unregister all listeners
@@ -181,4 +183,5 @@ debug-section-timeout: Section %s is timeout
 plugin-unload-self: "%s unload itself"
 remove-bot: Remove bot
 command-execute-exception: Command execute exception, %s
+unregister-all-special-arguments: Unregister all special arguments
 

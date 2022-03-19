@@ -1,6 +1,6 @@
 package top.focess.qq.api.plugin;
 /**
- * Thrown to indicate this class is not an illegal Plugin class
+ * Thrown to indicate this class is an illegal Plugin class
  */
 public class IllegalPluginClassException extends IllegalArgumentException {
     /**

@@ -199,6 +199,19 @@ public class PluginClassLoader extends URLClassLoader {
                 }
             } else throw new IllegalDataConverterClassException(field.getType());
         });
+
+        FIELD_ANNOTATION_HANDLERS.put(SpecialArgumentType.class,(field, annotation, classLoader) -> {
+            SpecialArgumentType specialArgumentType = (SpecialArgumentType) annotation;
+            if (SpecialArgumentHandler.class.isAssignableFrom(field.getType())) {
+                try {
+                    String name = specialArgumentType.name();
+                    Plugin plugin = classLoader.plugin;
+                    plugin.registerSpecialArgumentHandler(name, (SpecialArgumentHandler) field.get(null));
+                } catch (Exception e) {
+                    throw new IllegalSpecialArgumentHandlerClassException((Class<? extends SpecialArgumentHandler>) field.getType(), e);
+                }
+            } throw new IllegalSpecialArgumentHandlerClassException(field.getType());
+        });
     }
 
     private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),2,false,"PluginLoader");
@@ -286,6 +299,8 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().debugLang("close-schedulers");
             SimpleBotManager.remove(plugin);
             FocessQQ.getLogger().debugLang("remove-bot");
+            CommandLine.unregister(plugin);
+            FocessQQ.getLogger().debugLang("unregister-special-arguments");
             if (FocessQQ.getSocket() != null)
                 FocessQQ.getSocket().unregister(plugin);
             if (FocessQQ.getUdpSocket() != null)
@@ -450,6 +465,7 @@ public class PluginClassLoader extends URLClassLoader {
                     Command.unregister(plugin);
                     Schedulers.close(plugin);
                     SimpleBotManager.remove(plugin);
+                    CommandLine.unregister(plugin);
                     if (FocessQQ.getSocket() != null)
                         FocessQQ.getSocket().unregister(plugin);
                     if (FocessQQ.getUdpSocket() != null)

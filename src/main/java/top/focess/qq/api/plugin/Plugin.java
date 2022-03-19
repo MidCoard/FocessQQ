@@ -3,9 +3,7 @@ package top.focess.qq.api.plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.DataCollection;
-import top.focess.qq.api.command.DataConverter;
+import top.focess.qq.api.command.*;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.Listener;
@@ -231,6 +229,7 @@ public abstract class Plugin {
     /**
      * Register the command
      * @param command the command need to be registered
+     * @see Command#register(Plugin, Command)
      */
     public void registerCommand(Command command) {
         Command.register(this,command);
@@ -241,6 +240,7 @@ public abstract class Plugin {
      *
      * @param dataConverter the buffer data converter
      * @param bufferGetter the getter of the buffer
+     * @see DataCollection#register(Plugin, DataConverter, DataCollection.BufferGetter)
      */
     public void registerBuffer(DataConverter<?> dataConverter, DataCollection.BufferGetter bufferGetter) {
         DataCollection.register(this,dataConverter,bufferGetter);
@@ -282,5 +282,16 @@ public abstract class Plugin {
      */
     public void unload() {
         throw new PluginUnloadException();
+    }
+
+    /**
+     * Register the special argument handler
+     *
+     * @param name the name of the special argument handler
+     * @param handler the special argument handler
+     * @see CommandLine#register(Plugin, String, SpecialArgumentHandler)
+     */
+    public void registerSpecialArgumentHandler(String name, SpecialArgumentHandler handler) {
+        CommandLine.register(this,name,handler);
     }
 }

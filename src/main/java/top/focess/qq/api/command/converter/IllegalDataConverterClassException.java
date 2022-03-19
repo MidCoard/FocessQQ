@@ -3,7 +3,7 @@ package top.focess.qq.api.command.converter;
 import top.focess.qq.api.command.DataConverter;
 
 /**
- * Thrown to indicate this class is not an illegal DataConverter class
+ * Thrown to indicate this class is an illegal DataConverter class
  */
 public class IllegalDataConverterClassException extends IllegalArgumentException {
 
