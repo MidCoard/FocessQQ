@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.CommandLine;
+import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
@@ -92,11 +93,11 @@ public class ChatListener implements Listener {
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<Boolean> ret = CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.run(()->{
                     Section section = Section.startSection("command-group-exec",ret, Duration.ofMinutes(10));
                     try {
-                        if (!ret.get()) {
+                        if (ret.get() == CommandResult.NONE) {
                             GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(),event.getMember(),event.getMessage(),event.getSource());
                             try {
                                 EventManager.submit(groupMessageEvent);
@@ -125,11 +126,11 @@ public class ChatListener implements Listener {
         updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<Boolean> ret = CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().contentToString());
                 EXECUTOR.run(()->{
                     Section section = Section.startSection("command-friend-exec",ret, Duration.ofMinutes(10));
                     try {
-                        if (!ret.get()) {
+                        if (ret.get() == CommandResult.NONE) {
                             FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage());
                             try {
                                 EventManager.submit(friendMessageEvent);

@@ -3,6 +3,7 @@ package top.focess.qq.core.listeners;
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.CommandLine;
+import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
@@ -40,11 +41,11 @@ public class ConsoleListener implements Listener {
             return;
         }
         try {
-            Future<Boolean> ret = CommandLine.exec(event.getMessage());
+            Future<CommandResult> ret = CommandLine.exec(event.getMessage());
             EXECUTOR.run(()->{
                 Section section = Section.startSection("command-console-exec",ret, Duration.ofMinutes(10));
                 try {
-                    if (!ret.get()) {
+                    if (ret.get() == CommandResult.NONE) {
                         ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
                         try {
                             EventManager.submit(consoleMessageEvent);

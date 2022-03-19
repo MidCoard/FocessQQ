@@ -617,7 +617,7 @@ public class FocessQQ {
                 if (files != null)
                     for (File file :files)
                         try {
-                            Future<Boolean> future = CommandLine.exec("load plugins/" + file.getName());
+                            Future<CommandResult> future = CommandLine.exec("load plugins/" + file.getName());
                             future.get();
                         } catch (Exception e) {
                             FocessQQ.getLogger().thrLang("exception-load-default-plugin", e);
@@ -644,7 +644,7 @@ public class FocessQQ {
             for (Plugin plugin : FocessQQ.getPlugins())
                 if (!plugin.equals(this))
                     try {
-                        Future<Boolean> future = CommandLine.exec("unload " + plugin.getName());
+                        Future<CommandResult> future = CommandLine.exec("unload " + plugin.getName());
                         future.get();
                     } catch (Exception e) {
                         FocessQQ.getLogger().thrLang("exception-unload-default-plugin",e);

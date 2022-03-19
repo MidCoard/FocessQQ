@@ -15,6 +15,11 @@ public class Version {
     public static final Version BETA_VERSION = new Version("beta");
 
     /**
+     * Represents a build version of a plugin.
+     */
+    public static final Version BUILD_VERSION = new Version("build");
+
+    /**
      * Represents a default release version of a plugin.
      */
     public static final Version DEFAULT_VERSION = new Version("1.0.0");

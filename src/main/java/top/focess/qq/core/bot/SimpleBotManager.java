@@ -207,8 +207,6 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
-            if (event.getSender().getId() != b.getId())
-                return;
             BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getSubject());
             try {
                 EventManager.submit(e);
@@ -384,8 +382,6 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
-                if (event.getSender().getId() != b.getId())
-                    return;
                 BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getSubject());
                 try {
                     EventManager.submit(e);

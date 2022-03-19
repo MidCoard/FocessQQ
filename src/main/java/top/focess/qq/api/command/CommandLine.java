@@ -10,7 +10,6 @@ import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
-import top.focess.qq.api.util.CombinedFuture;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
 
@@ -36,7 +35,7 @@ public class CommandLine {
      * @return a Future representing pending completion of the command
      */
     @NotNull
-    public static Future<Boolean> exec(String command) {
+    public static Future<CommandResult> exec(String command) {
         return exec(CommandSender.CONSOLE, command);
     }
 
@@ -48,7 +47,7 @@ public class CommandLine {
      * @return a Future representing pending completion of the command
      */
     @NotNull
-    public static Future<Boolean> exec(CommandSender sender, String command) {
+    public static Future<CommandResult> exec(CommandSender sender, String command) {
         return exec(sender, command, sender.getIOHandler());
     }
 
@@ -61,7 +60,7 @@ public class CommandLine {
      * @return a Future representing pending completion of the command
      */
     @NotNull
-    public static Future<Boolean> exec(CommandSender sender, String command, IOHandler ioHandler) {
+    public static Future<CommandResult> exec(CommandSender sender, String command, IOHandler ioHandler) {
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
         List<String> args = Lists.newArrayList();
@@ -121,15 +120,15 @@ public class CommandLine {
         if (stringBuilder.length() != 0)
             args.add(stringBuilder.toString());
         if (args.size() == 0)
-            return CompletableFuture.completedFuture(false);
+            return CompletableFuture.completedFuture(CommandResult.NONE);
         String name = args.get(0);
         args.remove(0);
         return exec0(sender, name, args.toArray(new String[0]), ioHandler, command);
     }
 
-    private static Future<Boolean> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler, String rawCommand) {
+    private static Future<CommandResult> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler, String rawCommand) {
         boolean flag = false;
-        CombinedFuture ret = new CombinedFuture();
+        Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
         for (Command com : Command.getCommands())
             if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
                 for (int i = 0;i<args.length;i++)
@@ -139,7 +138,6 @@ public class CommandLine {
                             args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(sender,com,args,i);
                         else args[i] = args[i].substring(1);
                     }
-
                 CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
                 try {
                     EventManager.submit(event);
@@ -152,7 +150,7 @@ public class CommandLine {
                 if (sender != CommandSender.CONSOLE)
                     IOHandler.getConsoleIoHandler().outputLang("command-exec", sender.toString(), rawCommand);
                 flag = true;
-                ret.combine(EXECUTOR.submit(() -> com.execute(sender, args, ioHandler)));
+                ret = EXECUTOR.submit(() -> com.execute(sender, args, ioHandler));
             }
         if (!flag && sender == CommandSender.CONSOLE)
             ioHandler.outputLang("unknown-command", command);

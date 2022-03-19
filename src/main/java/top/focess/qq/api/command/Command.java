@@ -212,13 +212,13 @@ public abstract class Command {
      * @param sender the executor
      * @param args the arguments that command spilt by spaces
      * @param ioHandler the receiver
-     * @return an Executor that help to define the executor of this command
+     * @return the command result
      */
-    public final boolean execute(@NotNull final CommandSender sender, @NotNull final String[] args,@NotNull IOHandler ioHandler) {
+    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args,@NotNull IOHandler ioHandler) {
         if (!this.isRegistered())
-            return false;
+            return CommandResult.COMMAND_REFUSED;
         if (!sender.hasPermission(this.getPermission()))
-            return false;
+            return CommandResult.COMMAND_REFUSED;
         boolean flag = false;
         CommandResult result = CommandResult.NONE;
         for (final Executor executor : this.executors)
@@ -247,7 +247,7 @@ public abstract class Command {
             }
         if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS))
             infoUsage(sender, ioHandler);
-        return result == CommandResult.ALLOW;
+        return result;
     }
 
     @NotNull

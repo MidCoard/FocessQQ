@@ -9,10 +9,13 @@ public enum CommandResult {
      */
     ALLOW(1),
     /**
-     * It is not accepted by the CommandExecutor or the Command
+     * It is not accepted by the CommandExecutor
      */
     REFUSE(2),
-    MESSAGE(4),
+    /**
+     * It is not accepted by the Command
+     */
+    COMMAND_REFUSED(4),
     /**
      * It indicates that print help information to the receiver
      */
@@ -20,11 +23,11 @@ public enum CommandResult {
     /**
      * It includes all CommandResult
      */
-    ALL(ALLOW, REFUSE, MESSAGE, ARGS),
+    ALL(ALLOW, REFUSE, COMMAND_REFUSED, ARGS),
     /**
-     * It includes all positive CommandResult
+     * It includes all negative CommandResult
      */
-    POSITIVE(ALLOW, MESSAGE),
+    NEGATIVE(REFUSE, COMMAND_REFUSED,ARGS),
     /**
      * No signal
      */
