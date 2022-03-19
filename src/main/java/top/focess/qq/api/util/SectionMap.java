@@ -81,4 +81,8 @@ public interface SectionMap extends Serializable {
      * @throws UnsupportedOperationException if there is no section named key
      */
     SectionMap getSection(String key);
+
+    default <T> T getOrDefault(String key, T defaultValue) {
+        return this.getValues().containsKey(key) ? this.get(key) : defaultValue;
+    }
 }

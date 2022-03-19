@@ -32,7 +32,7 @@ import top.focess.qq.api.util.logger.FocessLogger;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
-import top.focess.qq.core.commands.special.PreviousArgumentHandler;
+import top.focess.qq.core.commands.special.*;
 import top.focess.qq.core.listeners.ChatListener;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
@@ -592,6 +592,12 @@ public class FocessQQ {
             this.registerCommand(new DebugCommand());
             FocessQQ.getLogger().debugLang("register-default-commands");
             this.registerSpecialArgumentHandler("previous", new PreviousArgumentHandler());
+            this.registerSpecialArgumentHandler("next", new NextArgumentHandler());
+            this.registerSpecialArgumentHandler("random_int", new RandomIntegerArgumentHandler());
+            this.registerSpecialArgumentHandler("random_double", new RandomDoubleArgumentHandler());
+            this.registerSpecialArgumentHandler("self", new SelfIdArgumentHandler());
+            this.registerSpecialArgumentHandler("target", new TargetIdArgumentHandler());
+            this.registerSpecialArgumentHandler("previous_command",new PreviousCommandArgumentHandler());
             FocessQQ.getLogger().debugLang("register-default-special-argument-handlers");
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {

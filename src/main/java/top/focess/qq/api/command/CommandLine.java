@@ -139,6 +139,7 @@ public class CommandLine {
                             args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(sender,com,args,i);
                         else args[i] = args[i].substring(1);
                     }
+
                 CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
                 try {
                     EventManager.submit(event);
@@ -147,6 +148,7 @@ public class CommandLine {
                 }
                 if (event.isCancelled())
                     continue;
+                sender.getSession().set("@previous_command", rawCommand);
                 if (sender != CommandSender.CONSOLE)
                     IOHandler.getConsoleIoHandler().outputLang("command-exec", sender.toString(), rawCommand);
                 flag = true;
