@@ -9,6 +9,10 @@ import top.focess.qq.api.command.SpecialArgumentHandler;
 public class TargetIdArgumentHandler implements SpecialArgumentHandler {
     @Override
     public @NonNull String handle(CommandSender sender, Command command, String[] args, int i) {
-        return String.valueOf(FocessQQ.getBot().getId());
+        if (sender.isFriend())
+            return String.valueOf(FocessQQ.getBot().getId());
+        if (sender.isMember())
+            return String.valueOf(sender.getMember().getGroup().getId());
+        return "";
     }
 }
