@@ -187,6 +187,7 @@ public class PluginClassLoader extends URLClassLoader {
                     Plugin plugin = classLoader.plugin;
                     DataConverter dataConverter = (DataConverter) field.get(null);
                     Constructor<DataBuffer<?>> constructor = (Constructor<DataBuffer<?>>) dataConverterType.buffer().getDeclaredConstructor(int.class);
+                    constructor.setAccessible(true);
                     plugin.registerBuffer(dataConverter, size -> {
                         try {
                             return constructor.newInstance(size);
@@ -210,7 +211,7 @@ public class PluginClassLoader extends URLClassLoader {
                 } catch (Exception e) {
                     throw new IllegalSpecialArgumentHandlerClassException((Class<? extends SpecialArgumentHandler>) field.getType(), e);
                 }
-            } throw new IllegalSpecialArgumentHandlerClassException(field.getType());
+            } else throw new IllegalSpecialArgumentHandlerClassException(field.getType());
         });
     }
 
@@ -490,8 +491,10 @@ public class PluginClassLoader extends URLClassLoader {
             if (Modifier.isStatic(field.getModifiers()))
                 for (Class<? extends Annotation> annotation : FIELD_ANNOTATION_HANDLERS.keySet()) {
                     Annotation a;
-                    if ((a = field.getAnnotation(annotation)) != null)
+                    if ((a = field.getAnnotation(annotation)) != null) {
+                        field.setAccessible(true);
                         FIELD_ANNOTATION_HANDLERS.get(annotation).handle(field, a, this);
+                    }
                 }
     }
 

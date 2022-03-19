@@ -1,10 +1,8 @@
 package top.focess;
 
-import com.google.common.collect.Lists;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Queue;
+import top.focess.qq.api.command.SpecialArgumentHandler;
 
 public class Test {
 
@@ -42,11 +40,6 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        Queue<B> queue = Lists.newLinkedList();
-        queue.add(new B());
-        if (!queue.isEmpty())
-            queue.poll().c();
-        if (!Test2.QUEUE.isEmpty())
-            Test2.QUEUE.poll().c();
+        System.out.println(SpecialArgumentHandler.class.isAssignableFrom(SpecialArgumentHandler.class));
     }
 }

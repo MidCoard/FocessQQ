@@ -497,10 +497,19 @@ public class FocessQQ {
         }
     }
 
+    private static final Object STOP_LOCK = new Object();
+
+    private static Boolean isStopped = false;
+
     /**
      * Exit Bot
      */
     public static void exit() {
+        synchronized (STOP_LOCK) {
+            if (isStopped)
+                return;
+            isStopped = true;
+        }
         SCHEDULER.run(() -> {
             FocessQQ.getLogger().fatalLang("fatal-exit-failed");
             Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
