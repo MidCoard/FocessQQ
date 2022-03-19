@@ -7,9 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.*;
-import top.focess.qq.api.event.EventManager;
-import top.focess.qq.api.event.EventSubmitException;
-import top.focess.qq.api.event.ListenerHandler;
+import top.focess.qq.api.command.converter.DataConverterType;
+import top.focess.qq.api.command.converter.IllegalDataConverterClassException;
+import top.focess.qq.api.command.data.DataBuffer;
+import top.focess.qq.api.event.*;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 import top.focess.qq.api.plugin.*;
@@ -25,9 +26,7 @@ import top.focess.qq.core.debug.Section;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -55,6 +54,7 @@ public class PluginClassLoader extends URLClassLoader {
     private static final Object LOCK = new Object();
     private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
+    private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
 
     private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
 
@@ -137,9 +137,7 @@ public class PluginClassLoader extends URLClassLoader {
             CommandType commandType = (CommandType) annotation;
             if (Command.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
-                    Plugin plugin = Plugin.getPlugin(commandType.plugin());
-                    if (plugin == null)
-                        throw new IllegalCommandClassException(c);
+                    Plugin plugin = classLoader.plugin;
                     Command command = (Command) c.newInstance();
                     if (!commandType.name().isEmpty()){
                         COMMAND_NAME_FIELD.set(command,commandType.name());
@@ -153,7 +151,7 @@ public class PluginClassLoader extends URLClassLoader {
                             COMMAND_INITIALIZE_FIELD.set(command,true);
                         }
                     }
-                    Command.register(plugin, command);
+                    plugin.registerCommand(command);
                     return true;
                 } catch (Exception e) {
                     if (e instanceof CommandDuplicateException)
@@ -163,6 +161,39 @@ public class PluginClassLoader extends URLClassLoader {
                     throw new CommandLoadException((Class<? extends Command>) c, e);
                 }
             } else throw new IllegalCommandClassException(c);
+        });
+
+        HANDLERS.put(ListenerType.class, (c, annotation, classLoader) -> {
+            if (Listener.class.isAssignableFrom(c) && !Modifier.isInterface(c.getModifiers()) && !Modifier.isAbstract(c.getModifiers())) {
+                try {
+                    Plugin plugin = classLoader.plugin;
+                    Listener listener = (Listener) c.newInstance();
+                    plugin.registerListener(listener);
+                    return true;
+                } catch (Exception e) {
+                    throw new IllegalListenerClassException((Class<? extends Listener>) c, e);
+                }
+            } else throw new IllegalListenerClassException(c);
+        });
+
+        FIELD_ANNOTATION_HANDLERS.put(DataConverterType.class,(field, annotation, classLoader) -> {
+            DataConverterType dataConverterType = (DataConverterType) annotation;
+            if (DataConverter.class.isAssignableFrom(field.getType())) {
+                try {
+                    Plugin plugin = classLoader.plugin;
+                    DataConverter dataConverter = (DataConverter) field.get(null);
+                    Constructor<DataBuffer<?>> constructor = (Constructor<DataBuffer<?>>) dataConverterType.buffer().getDeclaredConstructor(int.class);
+                    plugin.registerBuffer(dataConverter, size -> {
+                        try {
+                            return constructor.newInstance(size);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                } catch (Exception e) {
+                    throw new IllegalDataConverterClassException((Class<? extends DataConverter>) field.getType(), e);
+                }
+            } else throw new IllegalDataConverterClassException(field.getType());
         });
     }
 
@@ -175,6 +206,8 @@ public class PluginClassLoader extends URLClassLoader {
      * @param plugin the plugin need to be enabled
      * @throws PluginLoaderException    if the classloader of the plugin is not {@link PluginClassLoader}
      * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
+     * @throws PluginLoadException      if there is an error while enabling the plugin
+     * @throws PluginUnloadException    if the plugin should be unloaded
      */
     public static void enablePlugin(Plugin plugin) {
         if (plugin.getClass() != FocessQQ.MainPlugin.class) {
@@ -378,7 +411,7 @@ public class PluginClassLoader extends URLClassLoader {
 
                 for (Class<?> c : loadedClasses)
                     analyseClass(c);
-                FocessQQ.getLogger().debugLang("load-command-class");
+                FocessQQ.getLogger().debugLang("load-class");
 
                 FocessQQ.getLogger().debugLang("load-depend-plugin");
                 for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {

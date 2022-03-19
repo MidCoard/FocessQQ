@@ -1,7 +1,5 @@
 package top.focess.qq.api.command;
 
-import top.focess.qq.api.plugin.Plugin;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,13 +11,6 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandType {
-
-    /**
-     * Set the plugin the command belongs to
-     *
-     * @return the plugin the command belongs to
-     */
-    Class<? extends Plugin> plugin();
 
     /**
      * Set the name of the command
