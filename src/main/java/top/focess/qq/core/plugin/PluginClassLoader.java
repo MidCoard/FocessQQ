@@ -300,7 +300,7 @@ public class PluginClassLoader extends URLClassLoader {
             SimpleBotManager.remove(plugin);
             FocessQQ.getLogger().debugLang("remove-bot");
             CommandLine.unregister(plugin);
-            FocessQQ.getLogger().debugLang("unregister-special-arguments");
+            FocessQQ.getLogger().debugLang("unregister-special-argument-handlers");
             if (FocessQQ.getSocket() != null)
                 FocessQQ.getSocket().unregister(plugin);
             if (FocessQQ.getUdpSocket() != null)

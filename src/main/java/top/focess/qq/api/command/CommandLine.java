@@ -136,7 +136,7 @@ public class CommandLine {
                     if (args[i].startsWith("\"@")) {
                         String head = args[i].substring(2);
                         if (SPECIAL_ARGUMENT_HANDLERS.containsKey(head))
-                            SPECIAL_ARGUMENT_HANDLERS.get(head).handle(sender,com);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(sender,com,args,i);
                         else args[i] = args[i].substring(1);
                     }
                 CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);

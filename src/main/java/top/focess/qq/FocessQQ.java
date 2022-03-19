@@ -32,6 +32,7 @@ import top.focess.qq.api.util.logger.FocessLogger;
 import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
+import top.focess.qq.core.commands.special.PreviousArgumentHandler;
 import top.focess.qq.core.listeners.ChatListener;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
@@ -590,6 +591,8 @@ public class FocessQQ {
             this.registerCommand(new PluginCommand());
             this.registerCommand(new DebugCommand());
             FocessQQ.getLogger().debugLang("register-default-commands");
+            this.registerSpecialArgumentHandler("previous", new PreviousArgumentHandler());
+            FocessQQ.getLogger().debugLang("register-default-special-argument-handlers");
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {
                 requestAccountInformation();
@@ -651,8 +654,8 @@ public class FocessQQ {
                 FocessQQ.getLogger().debugLang("buffers-not-empty");
             FocessQQ.getLogger().debugLang("unregister-all-buffers");
             if (CommandLine.unregisterAll())
-                FocessQQ.getLogger().debugLang("special-arguments-not-empty");
-            FocessQQ.getLogger().debugLang("unregister-all-special-arguments");
+                FocessQQ.getLogger().debugLang("special-argument-handlers-not-empty");
+            FocessQQ.getLogger().debugLang("unregister-all-special-argument-handlers");
             if (bot != null) {
                 SimpleBotManager.removeAll();
                 FocessQQ.getLogger().debugLang("remove-all-bots");
