@@ -206,6 +206,14 @@ public class SimpleBotManager implements BotManager {
                 FocessQQ.getLogger().thrLang("exception-submit-bot-pre-send-message-event",ex);
             }
         }));
+        listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
+            BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getSubject());
+            try {
+                EventManager.submit(e);
+            } catch (EventSubmitException ex) {
+                FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
+            }
+        }));
         BOT_LISTENER_MAP.put(b,listeners);
         PLUGIN_BOT_MAP.compute(plugin,(k,v)->{
             if (v == null)
@@ -357,6 +365,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
+                System.out.println(event.getBot().getId() + " " + event.getMessage());
                 BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getTarget());
                 try {
                     EventManager.submit(e);
@@ -370,6 +379,14 @@ public class SimpleBotManager implements BotManager {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-bot-pre-send-message-event",ex);
+                }
+            }));
+            listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
+                BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getSubject());
+                try {
+                    EventManager.submit(e);
+                } catch (EventSubmitException ex) {
+                    FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
                 }
             }));
             BOT_LISTENER_MAP.put(b,listeners);
