@@ -463,6 +463,13 @@ public class PluginClassLoader extends URLClassLoader {
             if ((a = c.getAnnotation(annotation)) != null)
                 HANDLERS.get(annotation).handle(c, a, this);
         }
+        for (Field field : c.getDeclaredFields())
+            if (Modifier.isStatic(field.getModifiers()))
+                for (Class<? extends Annotation> annotation : FIELD_ANNOTATION_HANDLERS.keySet()) {
+                    Annotation a;
+                    if ((a = field.getAnnotation(annotation)) != null)
+                        FIELD_ANNOTATION_HANDLERS.get(annotation).handle(field, a, this);
+                }
     }
 
     public Class<?> findClass(String name, boolean resolve) throws ClassNotFoundException {
