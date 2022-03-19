@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -131,7 +130,7 @@ public class FocessQQ {
     /**
      * The lang config
      */
-    private static final LangConfig LANG_CONFIG = new LangConfig(FocessQQ.class.getResourceAsStream("/lang.yml"));
+    private static final LangConfig LANG_CONFIG = MAIN_PLUGIN.getLangConfig();
 
     /**
      * The default client receiver
@@ -553,13 +552,6 @@ public class FocessQQ {
             if (running) {
                 FocessQQ.getLogger().fatalLang("fatal-main-plugin-already-running");
                 FocessQQ.exit();
-            }
-            try {
-                Field field = Plugin.class.getDeclaredField("langConfig");
-                field.setAccessible(true);
-                field.set(this, LANG_CONFIG);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 

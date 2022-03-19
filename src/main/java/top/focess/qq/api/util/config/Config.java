@@ -30,6 +30,7 @@ public abstract class Config {
         return file;
     }
 
+    @Nullable
     protected <T> T get(String key) {
         return this.yaml.get(key);
     }

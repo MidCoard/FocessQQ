@@ -25,9 +25,12 @@ import top.focess.qq.core.debug.Section;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.net.MalformedURLException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.time.Duration;
@@ -92,6 +95,7 @@ public class PluginClassLoader extends URLClassLoader {
             }
         } else throw new IllegalPluginClassException(c);
     };
+    private final JarFile jarFile;
 
     public PluginDescription getPluginDescription() {
         return this.pluginDescription;
@@ -257,6 +261,7 @@ public class PluginClassLoader extends URLClassLoader {
           file = callback.waitCall();
         } catch (InterruptedException | ExecutionException | CancellationException ignored) {}
         section.stop();
+        if (!GC_SCHEDULER.isClosed())
         GC_SCHEDULER.run(System::gc,Duration.ofSeconds(1));
         return file;
     }
@@ -364,9 +369,10 @@ public class PluginClassLoader extends URLClassLoader {
 
     private final Set<Class<?>> loadedClasses = Sets.newHashSet();
 
-    public PluginClassLoader(@NotNull File file) throws MalformedURLException {
+    public PluginClassLoader(@NotNull File file) throws IOException {
         super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
         this.file = file;
+        this.jarFile = new JarFile(file);
         PluginCoreClassLoader.LOADERS.add(this);
     }
 
@@ -374,6 +380,7 @@ public class PluginClassLoader extends URLClassLoader {
     public void close() throws IOException {
         super.close();
         this.loadedClasses.clear();
+        this.jarFile.close();
     }
 
     public boolean load() {
@@ -381,7 +388,6 @@ public class PluginClassLoader extends URLClassLoader {
         synchronized (LOCK) {
             FocessQQ.getLogger().debugLang("start-load-plugin", file.getName());
             try {
-                JarFile jarFile = new JarFile(file);
                 Enumeration<JarEntry> entries = jarFile.entries();
                 while (entries.hasMoreElements()) {
                     JarEntry jarEntry = entries.nextElement();
@@ -448,7 +454,8 @@ public class PluginClassLoader extends URLClassLoader {
                         FocessQQ.getSocket().unregister(plugin);
                     if (FocessQQ.getUdpSocket() != null)
                         FocessQQ.getUdpSocket().unregister(plugin);
-                }
+                } else if (e instanceof PluginLoadException)
+                    FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;
             }
@@ -484,5 +491,14 @@ public class PluginClassLoader extends URLClassLoader {
         if (resolve)
             resolveClass(c);
         return c;
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String name) {
+        try {
+            return jarFile.getInputStream(jarFile.getEntry(name));
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

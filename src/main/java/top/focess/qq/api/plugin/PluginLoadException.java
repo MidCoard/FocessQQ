@@ -1,7 +1,5 @@
 package top.focess.qq.api.plugin;
 
-import top.focess.qq.api.plugin.Plugin;
-
 /**
  * Thrown to indicate there is any exception thrown in the initializing process
  */

@@ -61,8 +61,8 @@ public class ChatListener implements Listener {
                 if (element == null)
                     return v;
                 if (element.getValue().getKey())
-                    element.getKey().input(content);
-                else element.getKey().input(miraiContent);
+                    element.getKey().input(miraiContent);
+                else element.getKey().input(content);
                 flag.set(true);
             }
             return v;

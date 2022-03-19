@@ -14,7 +14,7 @@ public interface Scheduler {
      * Run a task now
      *
      * @param runnable the task
-     * @return the warped task
+     * @return the wrapped task
      */
     default Task run(Runnable runnable) {
         return this.run(runnable, Duration.ZERO);
@@ -25,7 +25,7 @@ public interface Scheduler {
      *
      * @param runnable the task
      * @param delay the delay
-     * @return the warped task
+     * @return the wrapped task
      */
     Task run(Runnable runnable, Duration delay);
 
@@ -35,7 +35,7 @@ public interface Scheduler {
      * @param runnable the task
      * @param delay the delay
      * @param period the period
-     * @return the warped task
+     * @return the wrapped task
      */
     Task runTimer(Runnable runnable, Duration delay, Duration period);
 
@@ -44,7 +44,7 @@ public interface Scheduler {
      *
      * @param callable the task
      * @param <V> the return type
-     * @return the warped task
+     * @return the wrapped task
      */
     default <V> Callback<V> submit(Callable<V> callable) {
         return this.submit(callable, Duration.ZERO);
@@ -56,7 +56,7 @@ public interface Scheduler {
      * @param callable the task
      * @param delay the delay
      * @param <V> the return type
-     * @return the warped task
+     * @return the wrapped task
      */
     <V> Callback<V> submit(Callable<V> callable, Duration delay);
 
