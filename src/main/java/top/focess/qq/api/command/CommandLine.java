@@ -67,6 +67,7 @@ public class CommandLine {
         StringBuilder stringBuilder = new StringBuilder();
         boolean stack = false;
         boolean ignore = false;
+        Character last = null;
         for (char c : command.toCharArray()) {
             if (ignore) {
                 ignore = false;
@@ -111,11 +112,12 @@ public class CommandLine {
                     stringBuilder.append(c);
             } else if (c == '"')
                 stack = !stack;
-            else if (c == '@' && !stack) {
+            else if (c == '@' && !stack && last != null && last == ' ') {
                 stringBuilder.append('"');
                 stringBuilder.append('@');
             }
             else stringBuilder.append(c);
+            last = c;
         }
         if (stringBuilder.length() != 0)
             args.add(stringBuilder.toString());
