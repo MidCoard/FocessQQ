@@ -92,7 +92,7 @@ create-focess-sided-socket-client: Create focess sided socket client
 create-focess-udp-socket-client: Create focess udp socket client
 load-main-plugin: Load main plugin
 load-plugin-class: Load plugin class
-load-command-class: Load command class
+load-class: Load classes
 load-depend-plugin: Load depended plugin
 load-depend-plugin-succeed: Load depended plugin %s successfully
 load-depend-plugin-failed: Failed to load dependent plugin file %s

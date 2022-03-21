@@ -2,7 +2,10 @@ package top.focess;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import top.focess.qq.api.command.SpecialArgumentHandler;
+import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.qq.api.util.yaml.YamlLoadException;
+
+import java.io.File;
 
 public class Test {
 
@@ -39,7 +42,8 @@ public class Test {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(SpecialArgumentHandler.class.isAssignableFrom(SpecialArgumentHandler.class));
+    public static void main(String[] args) throws YamlLoadException {
+        YamlConfiguration yamlConfiguration = YamlConfiguration.loadFile(new File("config.yml"));
+        System.out.println(yamlConfiguration.get("user").toString());
     }
 }
