@@ -1,12 +1,10 @@
 package top.focess.qq.api.util.logger;
 
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.plugin.Plugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.focess.qq.core.commands.util.ChatConstants;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is a logger util class.
@@ -31,10 +29,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void infoLang(String key,Object... objects) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
-        if (plugin == null)
-            info(String.format(FocessQQ.getLangConfig().get(key), objects));
-        else info(String.format(plugin.getLangConfig().get(key), objects));
+        info(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -63,10 +58,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void thrLang(String key,Throwable e,Object... objects) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
-        if (plugin == null)
-            thr(String.format(FocessQQ.getLangConfig().get(key), objects),e);
-        else thr(String.format(plugin.getLangConfig().get(key), objects),e);
+        thr(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects),e);
     }
 
 
@@ -85,10 +77,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void fatalLang(String key,Object... objects) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
-        if (plugin == null)
-            fatal(String.format(FocessQQ.getLangConfig().get(key), objects));
-        else fatal(String.format(plugin.getLangConfig().get(key), objects));
+        fatal(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -107,10 +96,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void debugLang(String key,Object... objects) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
-        if (plugin == null)
-            debug(String.format(FocessQQ.getLangConfig().get(key), objects));
-        else debug(String.format(plugin.getLangConfig().get(key), objects));
+        debug(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**

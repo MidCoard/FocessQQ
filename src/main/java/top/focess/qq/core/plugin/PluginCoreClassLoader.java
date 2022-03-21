@@ -1,8 +1,10 @@
 package top.focess.qq.core.plugin;
 
-import top.focess.qq.api.plugin.Plugin;
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import top.focess.qq.FocessQQ;
+import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
 
@@ -34,6 +36,20 @@ public class PluginCoreClassLoader extends ClassLoader {
                 if (pluginClassLoader.getLoadedClasses().contains(clazz))
                     return pluginClassLoader.getPlugin();
         return null;
+    }
+
+    /**
+     * Get the plugin of the loaded class
+     *
+     * @param clazz the class
+     * @return the target plugin, {@code FocessQQ#getMainPlugin()} if the class is loaded by default classloader
+     */
+    @NonNull
+    public static Plugin getClassLoadedByOrDefault(@Nullable  Class<?> clazz) {
+        Plugin plugin = getClassLoadedBy(clazz);
+        if (plugin == null)
+            return FocessQQ.getMainPlugin();
+        return plugin;
     }
 
     @Override

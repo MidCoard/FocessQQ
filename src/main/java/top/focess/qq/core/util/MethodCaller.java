@@ -1,6 +1,6 @@
 package top.focess.qq.core.util;
 
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
 public class MethodCaller {

@@ -154,7 +154,7 @@ public abstract class Plugin {
     }
 
     @NonNull
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -179,7 +179,7 @@ public abstract class Plugin {
     }
 
     @NonNull
-    public File getDefaultFolder() {
+    public final File getDefaultFolder() {
         return new File(new File("plugins"), this.getName());
     }
 
@@ -203,7 +203,7 @@ public abstract class Plugin {
      *
      * @param listener the listener need to be registered
      */
-    public void registerListener(Listener listener) {
+    public final void registerListener(Listener listener) {
         ListenerHandler.register(this, listener);
         for (Method method : listener.getClass().getDeclaredMethods()) {
             EventHandler handler;
@@ -231,7 +231,7 @@ public abstract class Plugin {
      * @param command the command need to be registered
      * @see Command#register(Plugin, Command)
      */
-    public void registerCommand(Command command) {
+    public final void registerCommand(Command command) {
         Command.register(this,command);
     }
 
@@ -242,36 +242,36 @@ public abstract class Plugin {
      * @param bufferGetter the getter of the buffer
      * @see DataCollection#register(Plugin, DataConverter, DataCollection.BufferGetter)
      */
-    public void registerBuffer(DataConverter<?> dataConverter, DataCollection.BufferGetter bufferGetter) {
+    public final void registerBuffer(DataConverter<?> dataConverter, DataCollection.BufferGetter bufferGetter) {
         DataCollection.register(this,dataConverter,bufferGetter);
     }
 
-    public String getAuthor() {
+    public final String getAuthor() {
         return author;
     }
 
-    public Version getVersion() {
+    public final Version getVersion() {
         return version;
     }
 
-    public LangConfig getLangConfig() {
+    public final LangConfig getLangConfig() {
         return langConfig;
     }
 
-    public DefaultConfig getDefaultConfig() {
+    public final DefaultConfig getDefaultConfig() {
         return defaultConfig;
     }
 
-    public PluginDescription getPluginDescription() {
+    public final PluginDescription getPluginDescription() {
         return pluginDescription;
     }
 
     @Nullable
-    public InputStream loadResource(String path) {
+    public final InputStream loadResource(String path) {
         return this.getClass().getClassLoader().getResourceAsStream(path);
     }
 
-    public boolean isEnabled() {
+    public final boolean isEnabled() {
         return isEnabled;
     }
 
@@ -280,7 +280,7 @@ public abstract class Plugin {
      *
      * This should be called in the {@link #enable()} method
      */
-    public void unload() {
+    public final void unload() {
         throw new PluginUnloadException();
     }
 
@@ -291,7 +291,7 @@ public abstract class Plugin {
      * @param handler the special argument handler
      * @see CommandLine#register(Plugin, String, SpecialArgumentHandler)
      */
-    public void registerSpecialArgumentHandler(String name, SpecialArgumentHandler handler) {
+    public final void registerSpecialArgumentHandler(String name, SpecialArgumentHandler handler) {
         CommandLine.register(this,name,handler);
     }
 }

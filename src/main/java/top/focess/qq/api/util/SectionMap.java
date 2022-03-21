@@ -3,6 +3,7 @@ package top.focess.qq.api.util;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * This is an util class to define basic access to the data.
@@ -82,7 +83,24 @@ public interface SectionMap extends Serializable {
      */
     SectionMap getSection(String key);
 
+    /**
+     * Get the value of the key-value pair
+     * @param key the key of the key-value pair
+     * @param defaultValue the default value
+     * @param <T> the desired type
+     * @return the desired value or defaultValue if there is no value
+     */
     default <T> T getOrDefault(String key, T defaultValue) {
         return this.getValues().containsKey(key) ? this.get(key) : defaultValue;
+    }
+
+    /**
+     * compute the value of the key-value pair
+     *
+     * @param key the key of the key-value pair
+     * @param remappingFunction the remapping function
+     */
+    default void compute(String key, BiFunction<? super String, ? super Object, ?> remappingFunction) {
+        this.getValues().compute(key, remappingFunction);
     }
 }

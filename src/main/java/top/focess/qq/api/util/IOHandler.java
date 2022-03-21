@@ -1,11 +1,10 @@
 package top.focess.qq.api.util;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -61,10 +60,7 @@ public abstract class IOHandler {
      * @param objects the objects need to replace
      */
     public void outputLang(String key,Object... objects) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
-        if (plugin == null)
-            output(String.format(FocessQQ.getLangConfig().get(key), objects));
-        else output(String.format(plugin.getLangConfig().get(key), objects));
+        output(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
