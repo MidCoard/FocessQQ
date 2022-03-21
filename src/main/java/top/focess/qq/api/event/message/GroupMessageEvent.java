@@ -1,11 +1,11 @@
 package top.focess.qq.api.event.message;
 
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.event.ListenerHandler;
-import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.OnlineMessageSource;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.Group;
+import top.focess.qq.api.bot.Member;
+import top.focess.qq.api.event.ListenerHandler;
 
 /**
  * Called when a member who chats in the group the bot is in (this does not execute any commands)

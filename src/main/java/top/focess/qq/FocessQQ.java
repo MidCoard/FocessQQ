@@ -2,13 +2,9 @@ package top.focess.qq;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.Group;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.BotLoginException;
-import top.focess.qq.api.bot.BotManager;
+import top.focess.qq.api.bot.*;
 import top.focess.qq.api.command.*;
 import top.focess.qq.api.command.converter.CommandDataConverter;
 import top.focess.qq.api.command.converter.PluginDataConverter;

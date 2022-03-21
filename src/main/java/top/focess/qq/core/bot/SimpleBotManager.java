@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class SimpleBotManager implements BotManager {
@@ -119,7 +120,7 @@ public class SimpleBotManager implements BotManager {
         }
         List<Listener<?>> listeners = Lists.newArrayList();
         listeners.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-            GroupChatEvent e = new GroupChatEvent(b,event.getSender(), event.getMessage(),event.getSource());
+            GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getSender())), event.getMessage(),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
@@ -127,7 +128,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-            FriendChatEvent e = new FriendChatEvent(b,event.getFriend(), event.getMessage(),event.getSource());
+            FriendChatEvent e = new FriendChatEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getMessage(),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException eventSubmitException) {
@@ -293,7 +294,7 @@ public class SimpleBotManager implements BotManager {
             }
             List<Listener<?>> listeners = Lists.newArrayList();
             listeners.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-                GroupChatEvent e = new GroupChatEvent(b,event.getSender(), event.getMessage(),event.getSource());
+                GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getSender())), event.getMessage(),event.getSource());
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException eventSubmitException) {
@@ -301,7 +302,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-                FriendChatEvent e = new FriendChatEvent(b,event.getFriend(), event.getMessage(),event.getSource());
+                FriendChatEvent e = new FriendChatEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getMessage(),event.getSource());
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException eventSubmitException) {
@@ -404,6 +405,10 @@ public class SimpleBotManager implements BotManager {
         for (Listener<?> listener : BOT_LISTENER_MAP.getOrDefault(bot,Lists.newArrayList()))
             listener.complete();
         BOT_LISTENER_MAP.remove(bot);
+        SimpleFriend.remove(bot);
+        SimpleGroup.remove(bot);
+        SimpleStranger.remove(bot);
+        SimpleMember.remove(bot);
         try {
             EventManager.submit(new BotLogoutEvent(bot));
         } catch (EventSubmitException e) {

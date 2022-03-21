@@ -85,7 +85,7 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGroupChat(GroupChatEvent event) {
-        IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getNameCard(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
+        IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getCardName(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getMember());
@@ -118,7 +118,7 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFriendChat(FriendChatEvent event){
-        IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getNick(), event.getFriend().getId()));
+        IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getRawName(), event.getFriend().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getFriend());

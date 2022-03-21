@@ -1,17 +1,18 @@
 package top.focess.qq.core.bot;
 
-import com.google.common.collect.Lists;
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.Group;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.bot.Friend;
+import top.focess.qq.api.bot.Group;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SimpleBot implements Bot {
 
@@ -28,7 +29,6 @@ public class SimpleBot implements Bot {
     }
 
     @Override
-    @NotNull
     public net.mamoe.mirai.Bot getNativeBot() {
         return this.nativeBot;
     }
@@ -48,29 +48,36 @@ public class SimpleBot implements Bot {
         return FocessQQ.getBotManager().logout(this);
     }
 
+
+
     @Override
-    public @NotNull Friend getFriendOrFail(long id) {
-        return this.nativeBot.getFriendOrFail(id);
+    public @NonNull Friend getFriendOrFail(long id) {
+        return SimpleFriend.get(this, this.nativeBot.getFriendOrFail(id));
+    }
+
+    @Override
+    public @NonNull Group getGroupOrFail(long id) {
+        return SimpleGroup.get(this,this.nativeBot.getGroupOrFail(id));
     }
 
     @Override
     public @Nullable Group getGroup(long id) {
-        return this.nativeBot.getGroup(id);
+        return SimpleGroup.get(this,this.nativeBot.getGroup(id));
     }
 
     @Override
     public @Nullable Friend getFriend(long id) {
-        return this.nativeBot.getFriend(id);
+        return SimpleFriend.get(this,this.nativeBot.getFriend(id));
     }
 
     @Override
     public @NotNull List<Friend> getFriends() {
-        return Lists.newArrayList(this.nativeBot.getFriends());
+        return this.nativeBot.getFriends().stream().map(i -> SimpleFriend.get(this, i)).collect(Collectors.toList());
     }
 
     @Override
     public @NotNull List<Group> getGroups() {
-        return Lists.newArrayList(this.nativeBot.getGroups());
+        return this.nativeBot.getGroups().stream().map(i -> SimpleGroup.get(this, i)).collect(Collectors.toList());
     }
 
     @Override
@@ -81,7 +88,7 @@ public class SimpleBot implements Bot {
     @Override
     @NotNull
     public Friend getAsFriend() {
-        return this.nativeBot.getAsFriend();
+        return SimpleFriend.get(this, this.nativeBot.getAsFriend());
     }
 
     @Override

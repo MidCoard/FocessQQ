@@ -1,9 +1,9 @@
 package top.focess.qq.api.event.message;
 
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.event.ListenerHandler;
-import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.message.data.MessageChain;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.Friend;
+import top.focess.qq.api.event.ListenerHandler;
 
 /**
  * Called when a friend chat with bot (this does not execute any commands)

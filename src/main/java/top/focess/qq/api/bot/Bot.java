@@ -1,9 +1,7 @@
 package top.focess.qq.api.bot;
 
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.Group;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
@@ -18,7 +16,6 @@ public interface Bot {
      *
      * @return the Mirai Bot Instance
      */
-    @NotNull
     net.mamoe.mirai.Bot getNativeBot();
 
     /**
@@ -51,8 +48,17 @@ public interface Bot {
      * @return the friend with special id
      * @throws NullPointerException throw if the friend with special id does not exist
      */
-    @NotNull
+    @NonNull
     Friend getFriendOrFail(long id);
+
+    /**
+     * Get the group with special id
+     * @param id the group id
+     * @return the group with special id
+     * @throws NullPointerException throw if the group with special id does not exist
+     */
+    @NonNull
+    Group getGroupOrFail(long id);
 
     /**
      * Get the group with special id
@@ -74,14 +80,14 @@ public interface Bot {
      * Get all the friends
      * @return all the friends
      */
-    @NotNull
+    @NonNull
     List<Friend> getFriends();
 
     /**
      * Get all the groups
      * @return all the groups
      */
-    @NotNull
+    @NonNull
     List<Group> getGroups();
 
     /**
@@ -96,7 +102,7 @@ public interface Bot {
      *
      * @return the bot itself as a friend
      */
-    @NotNull
+    @NonNull
     Friend getAsFriend();
 
     /**

@@ -1,14 +1,14 @@
 package top.focess.qq.api.command;
 
 import com.google.common.collect.Maps;
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.Member;
-import net.mamoe.mirai.contact.Stranger;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.Friend;
+import top.focess.qq.api.bot.Member;
+import top.focess.qq.api.bot.Stranger;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
 import top.focess.qq.core.listeners.ChatListener;
@@ -79,7 +79,7 @@ public class CommandSender {
         this.isMember = true;
         this.isFriend = false;
         this.isStranger = false;
-        this.permission = CommandPermission.toCommandPermission(member.getPermission());
+        this.permission = member.getPermission();
     }
 
     /**
@@ -174,9 +174,9 @@ public class CommandSender {
 
     public String toString() {
         if (this.isFriend())
-            return friend.getNick() + "(" + this.friend.getId() + ")";
+            return friend.getRawName() + "(" + this.friend.getId() + ")";
         else if (this.isMember)
-            return member.getNameCard() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "]";
+            return member.getCardName() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "]";
         else return "CONSOLE";
     }
 
