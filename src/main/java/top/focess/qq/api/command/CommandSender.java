@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * This class present an executor to execute command. We can use it to distinguish different permissions.
  */
-public class CommandSender {
+public final class CommandSender {
 
     private static final Map<CommandSender, Session> SESSIONS = Maps.newHashMap();
 

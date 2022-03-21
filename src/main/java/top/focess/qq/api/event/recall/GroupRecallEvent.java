@@ -1,10 +1,10 @@
 package top.focess.qq.api.event.recall;
 
-import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.contact.Member;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.Group;
+import top.focess.qq.api.bot.Member;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.bot.BotEvent;
 

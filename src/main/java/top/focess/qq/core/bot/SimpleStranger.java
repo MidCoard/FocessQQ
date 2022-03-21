@@ -1,7 +1,6 @@
 package top.focess.qq.core.bot;
 
 import com.google.common.collect.Maps;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Stranger;
@@ -15,7 +14,6 @@ public class SimpleStranger extends SimpleSpeaker implements Stranger {
     private final net.mamoe.mirai.contact.Stranger stranger;
 
     @Nullable
-    @Contract("_,!null -> !null")
     public static SimpleStranger get(Bot bot, net.mamoe.mirai.contact.Stranger stranger) {
         if (stranger == null)
             return null;

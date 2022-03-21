@@ -1,10 +1,10 @@
 package top.focess.qq.api.event.chat;
 
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.event.ListenerHandler;
-import net.mamoe.mirai.contact.Stranger;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.OnlineMessageSource;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.Stranger;
+import top.focess.qq.api.event.ListenerHandler;
 
 /**
  * Called when a stranger chat with bot

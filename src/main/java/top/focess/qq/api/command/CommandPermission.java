@@ -22,14 +22,6 @@ public enum CommandPermission {
         this.priority = commandPermission.priority;
     }
 
-    public static CommandPermission toCommandPermission(MemberPermission permission) {
-        if (permission == MemberPermission.OWNER)
-            return OWNER;
-        else if (permission == MemberPermission.ADMINISTRATOR)
-            return ADMINISTRATOR;
-        else return MEMBER;
-    }
-
     public boolean hasPermission(CommandPermission permission) {
         return this.priority >= permission.priority;
     }

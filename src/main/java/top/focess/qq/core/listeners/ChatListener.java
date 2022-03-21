@@ -72,7 +72,7 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onStrangerChat(StrangerChatEvent event) {
-        IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getNick(), event.getStranger().getId()));
+        IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getRawName(), event.getStranger().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());

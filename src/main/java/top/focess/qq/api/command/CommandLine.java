@@ -63,6 +63,20 @@ public class CommandLine {
     public static Future<CommandResult> exec(CommandSender sender, String command, IOHandler ioHandler) {
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
+        List<String> args = splitCommand(command);
+        if (args.size() == 0)
+            return CompletableFuture.completedFuture(CommandResult.NONE);
+        String name = args.get(0);
+        args.remove(0);
+        return exec0(sender, name, args.toArray(new String[0]), ioHandler, command);
+    }
+
+    /**
+     * Split the command into arguments
+     * @param command the command needed to be split
+     * @return the split arguments
+     */
+    public static List<String> splitCommand(String command) {
         List<String> args = Lists.newArrayList();
         StringBuilder stringBuilder = new StringBuilder();
         boolean stack = false;
@@ -121,11 +135,7 @@ public class CommandLine {
         }
         if (stringBuilder.length() != 0)
             args.add(stringBuilder.toString());
-        if (args.size() == 0)
-            return CompletableFuture.completedFuture(CommandResult.NONE);
-        String name = args.get(0);
-        args.remove(0);
-        return exec0(sender, name, args.toArray(new String[0]), ioHandler, command);
+        return args;
     }
 
     private static Future<CommandResult> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler, String rawCommand) {

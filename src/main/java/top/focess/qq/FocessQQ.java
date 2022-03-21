@@ -29,6 +29,7 @@ import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
 import top.focess.qq.core.commands.special.*;
+import top.focess.qq.core.commands.ExecCommand;
 import top.focess.qq.core.listeners.ChatListener;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
@@ -595,6 +596,7 @@ public class FocessQQ {
             this.registerCommand(new CommandCommand());
             this.registerCommand(new PluginCommand());
             this.registerCommand(new DebugCommand());
+            this.registerCommand(new ExecCommand());
             FocessQQ.getLogger().debugLang("register-default-commands");
             this.registerSpecialArgumentHandler("previous", new PreviousArgumentHandler());
             this.registerSpecialArgumentHandler("next", new NextArgumentHandler());

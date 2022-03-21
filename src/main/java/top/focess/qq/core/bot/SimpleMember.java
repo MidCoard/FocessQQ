@@ -1,6 +1,7 @@
 package top.focess.qq.core.bot;
 
 import com.google.common.collect.Maps;
+import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Group;
@@ -8,6 +9,8 @@ import top.focess.qq.api.bot.Member;
 import top.focess.qq.api.command.CommandPermission;
 
 import java.util.Map;
+
+import static top.focess.qq.api.command.CommandPermission.*;
 
 public class SimpleMember extends SimpleContact implements Member {
 
@@ -32,7 +35,9 @@ public class SimpleMember extends SimpleContact implements Member {
     }
 
     @Nullable
-    public static Member get(Bot bot, net.mamoe.mirai.contact.Member member) {
+    public static Member get(Bot bot, @Nullable net.mamoe.mirai.contact.Member member) {
+        if (member == null)
+            return null;
         Group group = bot.getGroup(member.getGroup().getId());
         if (group == null)
             return null;
@@ -65,6 +70,11 @@ public class SimpleMember extends SimpleContact implements Member {
 
     @Override
     public CommandPermission getPermission() {
-        return CommandPermission.toCommandPermission(this.nativeMember.getPermission());
+        MemberPermission permission = this.nativeMember.getPermission();
+        if (permission == MemberPermission.OWNER)
+            return OWNER;
+        else if (permission == MemberPermission.ADMINISTRATOR)
+            return ADMINISTRATOR;
+        else return MEMBER;
     }
 }

@@ -136,7 +136,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-            GroupRecallEvent e = new GroupRecallEvent(b,event.getAuthor(),event.getMessageIds(),event.getOperator());
+            GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getAuthor())),event.getMessageIds(),SimpleMember.get(b,event.getOperator()));
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -144,7 +144,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
-            FriendRecallEvent e = new FriendRecallEvent(b,event.getAuthor(),event.getMessageIds());
+            FriendRecallEvent e = new FriendRecallEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getAuthor())),event.getMessageIds());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -152,7 +152,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
-            FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),event.getFromGroup(),event.getMessage());
+            FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -164,7 +164,7 @@ public class SimpleBotManager implements BotManager {
                 else event.reject(e.isBlackList());
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
-            GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),event.getInvitor());
+            GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),SimpleFriend.get(b,event.getInvitor()));
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -176,7 +176,7 @@ public class SimpleBotManager implements BotManager {
                 else event.ignore();
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
-            FriendInputStatusEvent e = new FriendInputStatusEvent(b,event.getFriend(), event.getInputting());
+            FriendInputStatusEvent e = new FriendInputStatusEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getInputting());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -184,7 +184,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
-            StrangerChatEvent e = new StrangerChatEvent(b,event.getMessage(),event.getSender(),event.getSource());
+            StrangerChatEvent e = new StrangerChatEvent(b,event.getMessage(), Objects.requireNonNull(SimpleStranger.get(b, event.getSender())),event.getSource());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -192,7 +192,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
-            BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getTarget());
+            BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -200,7 +200,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class,event->{
-            BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,event.getMessage(),event.getTarget(),event);
+            BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,event.getMessage(), Objects.requireNonNull(SimpleContact.get(b, event.getTarget())),event);
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -208,7 +208,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
-            BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getSubject());
+            BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(), Objects.requireNonNull(SimpleContact.get(b, event.getSubject())));
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
@@ -310,7 +310,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-                GroupRecallEvent e = new GroupRecallEvent(b,event.getAuthor(),event.getMessageIds(),event.getOperator());
+                GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getAuthor())),event.getMessageIds(),SimpleMember.get(b,event.getOperator()));
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -318,7 +318,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
-                FriendRecallEvent e = new FriendRecallEvent(b,event.getAuthor(),event.getMessageIds());
+                FriendRecallEvent e = new FriendRecallEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getAuthor())),event.getMessageIds());
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -326,7 +326,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
-                FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),event.getFromGroup(),event.getMessage());
+                FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -338,7 +338,7 @@ public class SimpleBotManager implements BotManager {
                     else event.reject(e.isBlackList());
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
-                GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),event.getInvitor());
+                GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),SimpleFriend.get(b,event.getInvitor()));
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -350,7 +350,7 @@ public class SimpleBotManager implements BotManager {
                     else event.ignore();
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
-                FriendInputStatusEvent e = new FriendInputStatusEvent(b,event.getFriend(), event.getInputting());
+                FriendInputStatusEvent e = new FriendInputStatusEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getInputting());
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -358,7 +358,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
-                StrangerChatEvent e = new StrangerChatEvent(b,event.getMessage(),event.getSender(),event.getSource());
+                StrangerChatEvent e = new StrangerChatEvent(b,event.getMessage(),Objects.requireNonNull(SimpleStranger.get(b, event.getSender())),event.getSource());
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -367,7 +367,7 @@ public class SimpleBotManager implements BotManager {
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
                 System.out.println(event.getBot().getId() + " " + event.getMessage());
-                BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getTarget());
+                BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -375,7 +375,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class,event->{
-                BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,event.getMessage(),event.getTarget(),event);
+                BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,event.getMessage(),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())),event);
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {
@@ -383,7 +383,7 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
-                BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),event.getSubject());
+                BotSendMessageEvent e = new BotSendMessageEvent(b,event.getMessage(),Objects.requireNonNull(SimpleContact.get(b, event.getSubject())));
                 try {
                     EventManager.submit(e);
                 } catch (EventSubmitException ex) {

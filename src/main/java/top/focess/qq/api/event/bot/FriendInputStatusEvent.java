@@ -1,8 +1,8 @@
 package top.focess.qq.api.event.bot;
 
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.Friend;
 import top.focess.qq.api.event.ListenerHandler;
-import net.mamoe.mirai.contact.Friend;
 
 /**
  * Called when friend input status is changed
