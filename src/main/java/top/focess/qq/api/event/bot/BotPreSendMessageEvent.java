@@ -1,9 +1,9 @@
 package top.focess.qq.api.event.bot;
 
 import net.mamoe.mirai.event.events.MessagePreSendEvent;
-import net.mamoe.mirai.message.data.Message;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Contact;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.event.ListenerHandler;
 
 /**
@@ -52,6 +52,6 @@ public class BotPreSendMessageEvent extends BotEvent {
     }
 
     public void setMessage(Message message) {
-        this.event.setMessage(message);
+        this.event.setMessage(message.getNativeMessage());
     }
 }

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Friend;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandArgument;
 import top.focess.qq.api.command.CommandResult;
@@ -51,7 +52,7 @@ public class FriendCommand extends Command {
                     ioHandler.outputLang("friend-command-friend-not-found");
                     return CommandResult.REFUSE;
                 }
-                friend.sendMessage(MiraiCode.deserializeMiraiCode(message));
+                friend.sendMessage(new Message(MiraiCode.deserializeMiraiCode(message)));
             } catch (InputTimeoutException exception) {
                 ioHandler.outputLang("friend-command-input-timeout");
                 return CommandResult.REFUSE;

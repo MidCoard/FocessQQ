@@ -90,10 +90,10 @@ public class ChatListener implements Listener {
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getMember());
         AtomicBoolean flag = new AtomicBoolean(false);
-        updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+        updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
                 EXECUTOR.run(()->{
                     Section section = Section.startSection("command-group-exec",ret, Duration.ofMinutes(10));
                     try {
@@ -123,10 +123,10 @@ public class ChatListener implements Listener {
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
         CommandSender sender = new CommandSender(event.getFriend());
         AtomicBoolean flag = new AtomicBoolean(false);
-        updateInput(sender, event.getMessage().contentToString(), event.getMessage().serializeToMiraiCode(), flag);
+        updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().contentToString());
+                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
                 EXECUTOR.run(()->{
                     Section section = Section.startSection("command-friend-exec",ret, Duration.ofMinutes(10));
                     try {

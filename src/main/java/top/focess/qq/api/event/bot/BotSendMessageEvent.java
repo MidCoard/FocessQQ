@@ -1,8 +1,8 @@
 package top.focess.qq.api.event.bot;
 
-import net.mamoe.mirai.message.data.Message;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Contact;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.event.ListenerHandler;
 
 /**
