@@ -52,12 +52,12 @@ public class SimpleBot implements Bot {
 
     @Override
     public @NonNull Friend getFriendOrFail(long id) {
-        return SimpleFriend.get(this, this.nativeBot.getFriendOrFail(id));
+        return Objects.requireNonNull(SimpleFriend.get(this, this.nativeBot.getFriendOrFail(id)));
     }
 
     @Override
     public @NonNull Group getGroupOrFail(long id) {
-        return SimpleGroup.get(this,this.nativeBot.getGroupOrFail(id));
+        return Objects.requireNonNull(SimpleGroup.get(this, this.nativeBot.getGroupOrFail(id)));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SimpleBot implements Bot {
     @Override
     @NotNull
     public Friend getAsFriend() {
-        return SimpleFriend.get(this, this.nativeBot.getAsFriend());
+        return Objects.requireNonNull(SimpleFriend.get(this, this.nativeBot.getAsFriend()));
     }
 
     @Override
@@ -138,4 +138,5 @@ public class SimpleBot implements Bot {
             return false;
         return this.getId() == FocessQQ.getAdministratorId();
     }
+
 }

@@ -52,5 +52,4 @@ public class SimpleFriend extends SimpleSpeaker implements Friend {
     public void delete() {
         this.nativeFriend.delete();
     }
-
 }
