@@ -7,7 +7,7 @@ import top.focess.qq.api.bot.Stranger;
 
 import java.util.Map;
 
-public class SimpleStranger extends SimpleSpeaker implements Stranger {
+public class SimpleStranger extends SimpleTransmitter implements Stranger {
 
     private static final Map<Long, Map<Long,SimpleStranger>> STRANGER_MAP = Maps.newConcurrentMap();
 

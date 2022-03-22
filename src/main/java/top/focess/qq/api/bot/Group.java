@@ -4,7 +4,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
-public interface Group extends Speaker{
+public interface Group extends Transmitter {
 
     /**
      * Quit the group

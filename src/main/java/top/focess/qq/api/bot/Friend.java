@@ -2,7 +2,7 @@ package top.focess.qq.api.bot;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface Friend extends Speaker{
+public interface Friend extends Transmitter {
 
     /**
      * Get the friend's raw name (its nickname)

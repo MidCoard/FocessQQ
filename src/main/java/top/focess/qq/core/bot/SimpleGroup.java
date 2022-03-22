@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SimpleGroup extends SimpleSpeaker implements Group {
+public class SimpleGroup extends SimpleTransmitter implements Group {
 
     private static final Map<Long, Map<Long,SimpleGroup>> GROUP_MAP = Maps.newConcurrentMap();
 

@@ -8,7 +8,7 @@ import top.focess.qq.api.bot.Friend;
 
 import java.util.Map;
 
-public class SimpleFriend extends SimpleSpeaker implements Friend {
+public class SimpleFriend extends SimpleTransmitter implements Friend {
 
     private static final Map<Long, Map<Long,SimpleFriend>> FRIEND_MAP = Maps.newConcurrentMap();
     private final net.mamoe.mirai.contact.Friend nativeFriend;
