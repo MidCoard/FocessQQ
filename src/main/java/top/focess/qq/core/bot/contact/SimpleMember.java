@@ -1,4 +1,4 @@
-package top.focess.qq.core.bot;
+package top.focess.qq.core.bot.contact;
 
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.MemberPermission;

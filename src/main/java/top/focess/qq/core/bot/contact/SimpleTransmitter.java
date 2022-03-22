@@ -1,4 +1,4 @@
-package top.focess.qq.core.bot;
+package top.focess.qq.core.bot.contact;
 
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.message.data.Image;

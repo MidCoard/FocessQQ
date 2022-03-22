@@ -9,6 +9,8 @@ import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.Friend;
 import top.focess.qq.api.bot.Group;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.core.bot.contact.SimpleFriend;
+import top.focess.qq.core.bot.contact.SimpleGroup;
 
 import java.util.List;
 import java.util.Objects;

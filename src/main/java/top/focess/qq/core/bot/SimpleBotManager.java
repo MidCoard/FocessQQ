@@ -30,6 +30,7 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.InputTimeoutException;
+import top.focess.qq.core.bot.contact.*;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
@@ -152,7 +153,7 @@ public class SimpleBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
-            FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
+            FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(), SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
             try {
                 EventManager.submit(e);
             } catch (EventSubmitException ex) {
