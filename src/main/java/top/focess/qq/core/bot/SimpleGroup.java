@@ -1,12 +1,16 @@
 package top.focess.qq.core.bot;
 
 import com.google.common.collect.Maps;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Group;
 import top.focess.qq.api.bot.Member;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SimpleGroup extends SimpleSpeaker implements Group {
 
@@ -51,6 +55,12 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
 
     @Override
     public Member getMemberOrFail(long id) {
-        return SimpleMember.get(this,this.nativeGroup.getOrFail(id));
+        return Objects.requireNonNull(SimpleMember.get(this,this.nativeGroup.getOrFail(id)));
     }
+
+    @Override
+    public @NonNull List<Member> getMembers() {
+        return this.nativeGroup.getMembers().stream().map(i -> SimpleMember.get(this,i)).collect(Collectors.toList());
+    }
+
 }

@@ -1,5 +1,9 @@
 package top.focess.qq.api.bot;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.List;
+
 public interface Group extends Speaker{
 
     /**
@@ -22,5 +26,11 @@ public interface Group extends Speaker{
      */
     Member getMemberOrFail(long id);
 
+    /**
+     * Get the group's all members
+     * @return the all members
+     */
+    @NonNull
+    List<Member> getMembers();
 
 }
