@@ -1,9 +1,9 @@
 package top.focess.qq.api.event.chat;
 
-import net.mamoe.mirai.message.data.OnlineMessageSource;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Friend;
 import top.focess.qq.api.bot.message.MessageChain;
+import top.focess.qq.api.bot.message.MessageSource;
 import top.focess.qq.api.event.ListenerHandler;
 
 /**
@@ -20,7 +20,7 @@ public class FriendChatEvent extends ChatEvent {
     /**
      * The source of the message
      */
-    private final OnlineMessageSource.Incoming.FromFriend source;
+    private final MessageSource source;
 
     /**
      * Constructs a FriendChatEvent
@@ -29,8 +29,8 @@ public class FriendChatEvent extends ChatEvent {
      * @param message the chat message
      * @param source the source of the message
      */
-    public FriendChatEvent(Bot bot, Friend friend, MessageChain message, OnlineMessageSource.Incoming.FromFriend source) {
-        super(bot,message);
+    public FriendChatEvent(Bot bot, Friend friend, MessageChain message, MessageSource source) {
+        super(bot,message, source);
         this.friend = friend;
         this.source = source;
     }
@@ -39,7 +39,7 @@ public class FriendChatEvent extends ChatEvent {
         return friend;
     }
 
-    public OnlineMessageSource.Incoming.FromFriend getSource() {
+    public MessageSource getSource() {
         return source;
     }
 }

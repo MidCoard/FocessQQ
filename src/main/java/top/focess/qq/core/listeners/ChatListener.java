@@ -75,7 +75,7 @@ public class ChatListener implements Listener {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getRawName(), event.getStranger().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).forEach(IOHandler.getConsoleIoHandler()::output);
-        StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger());
+        StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger(),event.getSource());
         try {
             EventManager.submit(strangerMessageEvent);
         } catch (EventSubmitException e) {
@@ -131,7 +131,7 @@ public class ChatListener implements Listener {
                     Section section = Section.startSection("command-friend-exec",ret, Duration.ofMinutes(10));
                     try {
                         if (ret.get() == CommandResult.NONE) {
-                            FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage());
+                            FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage(),event.getSource());
                             try {
                                 EventManager.submit(friendMessageEvent);
                             } catch (Exception e) {

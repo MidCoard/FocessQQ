@@ -1,10 +1,10 @@
 package top.focess.qq.api.event.message;
 
-import net.mamoe.mirai.message.data.OnlineMessageSource;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Group;
 import top.focess.qq.api.bot.Member;
 import top.focess.qq.api.bot.message.MessageChain;
+import top.focess.qq.api.bot.message.MessageSource;
 import top.focess.qq.api.event.ListenerHandler;
 
 /**
@@ -20,11 +20,6 @@ public class GroupMessageEvent extends MessageEvent {
     private final Member member;
 
     /**
-     * The source of the message
-     */
-    private final OnlineMessageSource.Incoming.FromGroup source;
-
-    /**
      * Constructs a GroupMessageEvent
      *
      * @param bot the bot
@@ -32,10 +27,9 @@ public class GroupMessageEvent extends MessageEvent {
      * @param message the chat message
      * @param source the source of the message
      */
-    public GroupMessageEvent(Bot bot, Member member, MessageChain message, OnlineMessageSource.Incoming.FromGroup source) {
-        super(bot,message);
+    public GroupMessageEvent(Bot bot, Member member, MessageChain message, MessageSource source) {
+        super(bot,message, source);
         this.member = member;
-        this.source = source;
     }
 
     public Member getMember() {
@@ -49,9 +43,5 @@ public class GroupMessageEvent extends MessageEvent {
      */
     public Group getGroup() {
         return this.member.getGroup();
-    }
-
-    public OnlineMessageSource.Incoming.FromGroup getSource() {
-        return source;
     }
 }
