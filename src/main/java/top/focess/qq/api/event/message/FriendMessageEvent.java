@@ -24,6 +24,7 @@ public class FriendMessageEvent extends MessageEvent{
      * @param bot the bot
      * @param message the chat message
      * @param friend the friend who chats with bot
+     * @param source the source of the message
      */
     public FriendMessageEvent(Bot bot, Friend friend, MessageChain message, MessageSource source) {
         super(bot,message,source);
