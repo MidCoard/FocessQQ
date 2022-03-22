@@ -41,4 +41,8 @@ public abstract class SimpleContact implements Contact {
     public Bot getBot() {
         return this.bot;
     }
+
+    public net.mamoe.mirai.contact.Contact getNativeContact() {
+        return this.contact;
+    }
 }

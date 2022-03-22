@@ -16,7 +16,6 @@ public abstract class SimpleTransmitter extends SimpleContact implements Transmi
 
     @Override
     public void sendMessage(String message) {
-        //todo message system
         this.contact.sendMessage(message);
     }
 
