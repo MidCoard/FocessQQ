@@ -24,4 +24,12 @@ public class MessageChain extends Message implements Iterable<Message> {
     public String toMiraiCode() {
         return ((net.mamoe.mirai.message.data.MessageChain)this.message).serializeToMiraiCode();
     }
+
+    public Message get(int index) {
+        return new Message(((net.mamoe.mirai.message.data.MessageChain)this.message).get(index));
+    }
+
+    public int size() {
+        return ((net.mamoe.mirai.message.data.MessageChain)this.message).size();
+    }
 }

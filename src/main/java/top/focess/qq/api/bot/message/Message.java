@@ -16,4 +16,12 @@ public class Message {
     public String toString() {
         return this.message.contentToString();
     }
+
+    public static Message of(net.mamoe.mirai.message.data.Message message) {
+        return new Message(message);
+    }
+
+    public Message plus(Message message) {
+        return new Message(this.message.plus(message.message));
+    }
 }
