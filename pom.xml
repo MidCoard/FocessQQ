@@ -30,11 +30,12 @@
         <poi.version>5.2.0</poi.version>
         <okhttp3.version>4.9.3</okhttp3.version>
         <logback.version>1.2.11</logback.version>
-        <jackson.version>[2.14,)</jackson.version>
+        <jackson.version>2.13.2</jackson.version>
         <checker.version>3.21.3</checker.version>
         <errorprone.version>9+181-r4173-1</errorprone.version>
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.native>native-mt</kotlin.native>
+        <xstream.version>1.4.19</xstream.version>
     </properties>
 
     <repositories>
@@ -123,7 +124,7 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.19</version>
+            <version>${xstream.version}</version>
         </dependency>
     </dependencies>
 
