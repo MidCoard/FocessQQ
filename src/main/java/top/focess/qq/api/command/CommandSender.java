@@ -251,7 +251,6 @@ public class CommandSender {
      * @return Session of sender
      */
     public Session getSession() {
-
         if (SESSIONS.containsKey(this))
             return SESSIONS.get(this);
         else {

@@ -30,7 +30,7 @@
         <poi.version>5.2.0</poi.version>
         <okhttp3.version>4.9.3</okhttp3.version>
         <logback.version>1.2.11</logback.version>
-        <jackson.version>2.13.2</jackson.version>
+        <jackson.version>[2.14,)</jackson.version>
         <checker.version>3.21.3</checker.version>
         <errorprone.version>9+181-r4173-1</errorprone.version>
         <kotlin.version>1.5.0</kotlin.version>
@@ -43,6 +43,7 @@
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
     </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.checkerframework</groupId>

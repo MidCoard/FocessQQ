@@ -347,12 +347,14 @@ public class FocessQQ {
             FocessQQ.getLogger().fatalLang("fatal-uncaught-exception");
             FocessQQ.exit();
         });
+
         try {
             FocessQQ.getLogger().debugLang("setup-uncaught-exception-handler");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
         }
+
         SCHEDULER.runTimer(()->{
             Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
             while (consoleElement != null && System.currentTimeMillis() - consoleElement.getValue() > 60 * 5 * 1000) {
