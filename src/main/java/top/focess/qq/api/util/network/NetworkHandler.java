@@ -143,10 +143,10 @@ public class NetworkHandler {
             Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             String body = response.body().string();
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Response: " + body);
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Response: " + body);
             return new HttpResponse(this.plugin,response.code(),response.headers(),body);
         } catch (Exception e) {
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
@@ -171,10 +171,10 @@ public class NetworkHandler {
             Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             String body = response.body().string();
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Response: " + body);
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Response: " + body);
             return new HttpResponse(this.plugin,response.code(),response.headers(),body);
         } catch (IOException e) {
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
@@ -197,10 +197,10 @@ public class NetworkHandler {
             Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             String body = response.body().string();
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Response: " + body);
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
             return new HttpResponse(this.plugin,response.code(),response.headers(),body);
         } catch (IOException e) {
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
+            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
