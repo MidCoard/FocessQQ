@@ -42,10 +42,7 @@ import top.focess.qq.core.util.option.type.IntegerOptionType;
 import top.focess.qq.core.util.option.type.LongOptionType;
 import top.focess.qq.core.util.option.type.OptionType;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -354,8 +351,8 @@ public class FocessQQ {
             FocessQQ.getLogger().debugLang("setup-uncaught-exception-handler");
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(0);
         }
-
         SCHEDULER.runTimer(()->{
             Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
             while (consoleElement != null && System.currentTimeMillis() - consoleElement.getValue() > 60 * 5 * 1000) {
