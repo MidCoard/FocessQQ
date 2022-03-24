@@ -1,5 +1,6 @@
 package top.focess.qq.api.command;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -9,10 +10,12 @@ import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Friend;
 import top.focess.qq.api.bot.Member;
 import top.focess.qq.api.bot.Stranger;
+import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
 import top.focess.qq.core.listeners.ChatListener;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -277,5 +280,16 @@ public class CommandSender {
      */
     public boolean isStranger() {
         return isStranger;
+    }
+
+    public static void clear(Plugin plugin) {
+        SESSIONS.values().stream().map(Session::getValues).forEach(map ->{
+            List<String> keys = Lists.newArrayList();
+            map.forEach((key,value) -> {
+               if (key.startsWith(plugin.getName() + ":"))
+                   keys.add(key);
+            });
+            keys.forEach(map::remove);
+        });
     }
 }

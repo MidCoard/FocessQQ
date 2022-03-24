@@ -310,6 +310,8 @@ public class PluginClassLoader extends URLClassLoader {
             if (FocessQQ.getUdpSocket() != null)
                 FocessQQ.getUdpSocket().unregister(plugin);
         }
+        CommandSender.clear(plugin);
+        FocessQQ.getLogger().debugLang("clear-command-sender-session",plugin.getName());
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
         NAME_PLUGIN_MAP.remove(plugin.getName());
         File ret = null;

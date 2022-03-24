@@ -188,4 +188,5 @@ register-default-special-argument-handlers: Register default special argument ha
 exec-command-empty-command: The command is empty
 exec-command-error-command: Exec cannot execute command named itself
 section-exception: Section %s exception, %s
+clear-command-sender-session: Clear command sender session with plugin %s
 
