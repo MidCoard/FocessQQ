@@ -30,8 +30,7 @@ public class SimpleMember extends SimpleContact implements Member {
             return null;
         if (group.getBot().getId() != member.getBot().getId())
             return null;
-        Map<Long, SimpleMember> map = GROUP_MEMBER_MAP.computeIfAbsent(group.getBot().getId(), k -> Maps.newConcurrentMap());
-        return map.computeIfAbsent(member.getId(), k -> new SimpleMember(group, member));
+        return GROUP_MEMBER_MAP.computeIfAbsent(group.getBot().getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(member.getId(), k -> new SimpleMember(group, member));
     }
 
     @Nullable

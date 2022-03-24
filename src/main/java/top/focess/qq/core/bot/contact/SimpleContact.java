@@ -1,8 +1,6 @@
 package top.focess.qq.core.bot.contact;
 
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.Member;
-import net.mamoe.mirai.contact.Stranger;
+import net.mamoe.mirai.contact.*;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.Contact;
@@ -29,6 +27,10 @@ public abstract class SimpleContact implements Contact {
             return SimpleMember.get(bot, (Member) contact);
         if (contact instanceof Friend)
             return SimpleFriend.get(bot, (Friend) contact);
+        if (contact instanceof Group)
+            return SimpleGroup.get(bot, (Group) contact);
+        if (contact instanceof OtherClient)
+            return SimpleOtherClient.get(bot, (OtherClient) contact);
         return null;
     }
 

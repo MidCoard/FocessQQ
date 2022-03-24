@@ -19,8 +19,7 @@ public class SimpleStranger extends SimpleTransmitter implements Stranger {
             return null;
         if (bot.getId() != stranger.getBot().getId())
             return null;
-        Map<Long, SimpleStranger> map = STRANGER_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap());
-        return map.computeIfAbsent(stranger.getId(), k -> new SimpleStranger(bot, stranger));
+        return STRANGER_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(stranger.getId(), k -> new SimpleStranger(bot, stranger));
     }
 
     private SimpleStranger(Bot bot, net.mamoe.mirai.contact.Stranger stranger) {

@@ -24,8 +24,7 @@ public class SimpleFriend extends SimpleSpeaker implements Friend {
             return null;
         if (bot.getId() != nativeFriend.getBot().getId())
             return null;
-        Map<Long, SimpleFriend> map = FRIEND_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap());
-        return map.computeIfAbsent(nativeFriend.getId(), k -> new SimpleFriend(bot, nativeFriend));
+        return FRIEND_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(nativeFriend.getId(), k -> new SimpleFriend(bot, nativeFriend));
     }
 
     public static void remove(Bot bot) {

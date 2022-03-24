@@ -29,8 +29,7 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
             return null;
         if (bot.getId() != group.getBot().getId())
             return null;
-        Map<Long,SimpleGroup> map = GROUP_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap());
-        return map.computeIfAbsent(group.getId(), k -> new SimpleGroup(bot, group));
+        return GROUP_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(group.getId(), k -> new SimpleGroup(bot, group));
     }
 
     public static void remove(Bot bot) {
