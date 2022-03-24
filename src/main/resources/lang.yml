@@ -187,4 +187,5 @@ unregister-all-special-argument-handlers: Unregister all special arguments
 register-default-special-argument-handlers: Register default special argument handlers
 exec-command-empty-command: The command is empty
 exec-command-error-command: Exec cannot execute command named itself
+section-exception: Section %s exception, %s
 

@@ -39,15 +39,16 @@ public class EventManager {
             try {
                 submit(cast(event.getClass()), event);
             } catch (EventSubmitException e) {
-                e.printStackTrace();
+                throw new EventSubmitRuntimeException(e);
             }
         });
         Section section = Section.startSection("event-submit", task, Duration.ofSeconds(10));
         try {
             task.join();
         } catch (ExecutionException | InterruptedException | CancellationException e) {
-            if (e.getCause() instanceof EventSubmitException)
-                throw (EventSubmitException) e.getCause();
+            if (e.getCause() instanceof EventSubmitRuntimeException)
+                throw (EventSubmitException) e.getCause().getCause();
+            else FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
         }
         section.stop();
     }
@@ -89,12 +90,8 @@ public class EventManager {
      * @param event the event need to be submitted
      * @param <T> the event type
      */
-    private static <T extends Event> void trySubmitOnce(Class<T> cls,T event){
-        try {
-            submitOnce(cls,event);
-        } catch (EventSubmitException e) {
-            FocessQQ.getLogger().trace("Try Submitting Failed",e);
-        }
+    private static <T extends Event> void trySubmitOnce(Class<T> cls,T event) throws EventSubmitException {
+        submitOnce(cls,event);
     }
 
     /**
@@ -122,6 +119,13 @@ public class EventManager {
             }
             listenerHandler.submit(event);
         } else throw new EventSubmitException(event, "This event is an abstract class.");
+    }
+
+    private static class EventSubmitRuntimeException extends RuntimeException {
+
+        public EventSubmitRuntimeException(EventSubmitException e) {
+            super(e);
+        }
     }
 
 }

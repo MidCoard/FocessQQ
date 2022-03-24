@@ -240,6 +240,7 @@ public class PluginClassLoader extends URLClassLoader {
                     throw (PluginDuplicateException) e.getCause();
                 else if (e.getCause() instanceof PluginUnloadException)
                     throw (PluginUnloadException) e.getCause();
+                else FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
             }
             section.stop();
         } else enablePlugin0(plugin);
@@ -273,7 +274,9 @@ public class PluginClassLoader extends URLClassLoader {
         File file = null;
         try {
           file = callback.waitCall();
-        } catch (InterruptedException | ExecutionException | CancellationException ignored) {}
+        } catch (InterruptedException | ExecutionException | CancellationException e) {
+            FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+        }
         section.stop();
         if (!GC_SCHEDULER.isClosed())
         GC_SCHEDULER.run(System::gc,Duration.ofSeconds(1));
