@@ -2,7 +2,7 @@ package top.focess.qq.core.bot.contact;
 
 import net.mamoe.mirai.contact.AudioSupported;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Speaker;
+import top.focess.qq.api.bot.contact.Speaker;
 
 public abstract class SimpleSpeaker extends SimpleTransmitter implements Speaker {
 

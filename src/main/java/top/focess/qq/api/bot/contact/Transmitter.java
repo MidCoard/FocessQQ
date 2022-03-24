@@ -1,4 +1,4 @@
-package top.focess.qq.api.bot;
+package top.focess.qq.api.bot.contact;
 
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.utils.ExternalResource;

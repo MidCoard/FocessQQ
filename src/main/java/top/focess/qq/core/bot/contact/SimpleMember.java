@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Group;
-import top.focess.qq.api.bot.Member;
+import top.focess.qq.api.bot.contact.Group;
+import top.focess.qq.api.bot.contact.Member;
 import top.focess.qq.api.command.CommandPermission;
 
 import java.util.Map;

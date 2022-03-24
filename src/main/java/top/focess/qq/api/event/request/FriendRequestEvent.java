@@ -3,7 +3,7 @@ package top.focess.qq.api.event.request;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Group;
+import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.bot.BotEvent;
 

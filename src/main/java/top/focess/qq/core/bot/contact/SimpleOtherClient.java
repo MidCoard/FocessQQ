@@ -3,7 +3,7 @@ package top.focess.qq.core.bot.contact;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.OtherClient;
+import top.focess.qq.api.bot.contact.OtherClient;
 
 import java.util.Map;
 

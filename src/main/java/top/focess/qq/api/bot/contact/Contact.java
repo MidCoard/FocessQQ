@@ -1,4 +1,6 @@
-package top.focess.qq.api.bot;
+package top.focess.qq.api.bot.contact;
+
+import top.focess.qq.api.bot.Bot;
 
 public interface Contact {
 

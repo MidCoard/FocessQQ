@@ -2,6 +2,8 @@ package top.focess.qq.api.bot;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import top.focess.qq.api.bot.contact.Friend;
+import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;

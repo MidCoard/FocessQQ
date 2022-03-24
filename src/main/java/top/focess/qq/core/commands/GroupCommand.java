@@ -5,7 +5,7 @@ import net.mamoe.mirai.message.code.MiraiCode;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Group;
+import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandArgument;

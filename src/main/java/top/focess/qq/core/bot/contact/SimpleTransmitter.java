@@ -4,7 +4,7 @@ import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.utils.ExternalResource;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Transmitter;
+import top.focess.qq.api.bot.contact.Transmitter;
 import top.focess.qq.api.bot.message.Message;
 
 public abstract class SimpleTransmitter extends SimpleContact implements Transmitter {

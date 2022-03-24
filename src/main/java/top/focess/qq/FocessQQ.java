@@ -5,6 +5,8 @@ import com.google.common.io.Files;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.*;
+import top.focess.qq.api.bot.contact.Friend;
+import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.command.*;
 import top.focess.qq.api.command.converter.CommandDataConverter;
 import top.focess.qq.api.command.converter.PluginDataConverter;

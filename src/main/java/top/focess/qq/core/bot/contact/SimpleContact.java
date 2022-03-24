@@ -3,7 +3,7 @@ package top.focess.qq.core.bot.contact;
 import net.mamoe.mirai.contact.*;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Contact;
+import top.focess.qq.api.bot.contact.Contact;
 
 public abstract class SimpleContact implements Contact {
 

@@ -1,4 +1,4 @@
-package top.focess.qq.api.bot;
+package top.focess.qq.api.bot.contact;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 

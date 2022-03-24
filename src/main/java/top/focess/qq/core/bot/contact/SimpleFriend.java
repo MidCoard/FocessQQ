@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Friend;
+import top.focess.qq.api.bot.contact.Friend;
 
 import java.util.Map;
 

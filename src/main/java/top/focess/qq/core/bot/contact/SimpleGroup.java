@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.Group;
-import top.focess.qq.api.bot.Member;
+import top.focess.qq.api.bot.contact.Group;
+import top.focess.qq.api.bot.contact.Member;
 
 import java.util.List;
 import java.util.Map;
