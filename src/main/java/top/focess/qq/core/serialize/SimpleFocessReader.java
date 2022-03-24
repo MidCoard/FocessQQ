@@ -20,46 +20,58 @@ public class SimpleFocessReader extends FocessReader {
 
     private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
 
-    private static final Map<Class<?>,ReaderT<?>> CLASS_READER_MAP = Maps.newHashMap();
+    private static final Map<Class<?>, Reader<?>> CLASS_READER_MAP = Maps.newHashMap();
 
     static {
         CLASS_READER_MAP.put(ArrayList.class, (Reader<ArrayList>) (t, reader) -> {
+            ArrayList list = new ArrayList();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.add(reader.readObject());
+                list.add(reader.readObject());
+            return list;
         });
 
         CLASS_READER_MAP.put(LinkedList.class, (Reader<LinkedList>) (t, reader) -> {
+            LinkedList list = new LinkedList();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.offer(reader.readObject());
+                list.offer(reader.readObject());
+            return list;
         });
 
         CLASS_READER_MAP.put(HashMap.class, (Reader<HashMap>) (t, reader) -> {
+            HashMap hashMap = new HashMap();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.put(reader.readObject(),reader.readObject());
+                hashMap.put(reader.readObject(),reader.readObject());
+            return hashMap;
         });
 
         CLASS_READER_MAP.put(TreeMap.class, (Reader<TreeMap>) (t, reader) -> {
+            TreeMap treeMap = new TreeMap();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.put(reader.readObject(),reader.readObject());
+                treeMap.put(reader.readObject(),reader.readObject());
+            return treeMap;
         });
 
         CLASS_READER_MAP.put(HashSet.class, (Reader<HashSet>) (t, reader) -> {
+            HashSet hashSet = new HashSet();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.add(reader.readObject());
+                hashSet.add(reader.readObject());
+            return hashSet;
         });
 
         CLASS_READER_MAP.put(TreeSet.class, (Reader<TreeSet>) (t, reader) -> {
+            TreeSet treeSet = new TreeSet();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.add(reader.readObject());
+                treeSet.add(reader.readObject());
+            return treeSet;
         });
 
-        CLASS_READER_MAP.put(Class.class, (ReaderT<Class>) (t, reader) -> {
+        CLASS_READER_MAP.put(Class.class, (Reader<Class>) (t, reader) -> {
             try {
                 String cls = reader.readString();
                 switch (cls) {
@@ -90,9 +102,11 @@ public class SimpleFocessReader extends FocessReader {
         });
 
         CLASS_READER_MAP.put(ConcurrentHashMap.KeySetView.class,(Reader<ConcurrentHashMap.KeySetView>) (t, reader)->{
+            ConcurrentHashMap.KeySetView keySetView = ConcurrentHashMap.newKeySet();
             int length = reader.readInt();
             for (int i = 0;i<length;i++)
-                t.add(reader.readObject());
+                keySetView.add(reader.readObject());
+            return keySetView;
         });
     }
 
@@ -265,9 +279,9 @@ public class SimpleFocessReader extends FocessReader {
                 String className = readString();
                 try {
                     Class<T> cls = (Class<T>) PluginCoreClassLoader.forName(className);
-                    ReaderT<T> reader;
-                    if ((reader = (ReaderT<T>) CLASS_READER_MAP.get(cls)) != null)
-                        return reader.readT(cls, this);
+                    Reader<T> reader;
+                    if ((reader = (Reader<T>) CLASS_READER_MAP.get(cls)) != null)
+                        return reader.read(cls, this);
                 } catch (ClassNotFoundException e) {
                     throw new SerializationParseException(e);
                 }
@@ -277,20 +291,8 @@ public class SimpleFocessReader extends FocessReader {
         }
     }
 
-
-    private interface Reader<T> extends ReaderT<T>{
-         void read(T t, SimpleFocessReader reader) throws SerializationParseException;
-
-        @Override
-        default T readT(Class<T> cls, SimpleFocessReader reader) {
-            T t = (T) PROVIDER.newInstance(cls);
-            read(t,reader);
-            return t;
-        }
-    }
-
-    private interface ReaderT<T> {
-        T readT(Class<T> cls, SimpleFocessReader reader) throws SerializationParseException;
+    private interface Reader<T> {
+        T read(Class<T> cls, SimpleFocessReader reader) throws SerializationParseException;
     }
 
 }
