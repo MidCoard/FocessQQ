@@ -62,4 +62,9 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
         return this.nativeGroup.getMembers().stream().map(i -> SimpleMember.get(this,i)).collect(Collectors.toList());
     }
 
+    @Override
+    public Member getAsMember() {
+        return Objects.requireNonNull(SimpleMember.get(this,this.nativeGroup.getBotAsMember()));
+    }
+
 }

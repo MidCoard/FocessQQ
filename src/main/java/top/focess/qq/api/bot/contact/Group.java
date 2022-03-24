@@ -33,4 +33,11 @@ public interface Group extends Speaker {
     @NonNull
     List<Member> getMembers();
 
+
+    /**
+     * Get the bot self as a member
+     * @return the bot self as a member
+     */
+    Member getAsMember();
+
 }

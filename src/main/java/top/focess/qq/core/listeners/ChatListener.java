@@ -3,28 +3,28 @@ package top.focess.qq.core.listeners;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
+import top.focess.qq.api.bot.contact.Friend;
+import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
-import top.focess.qq.api.event.EventHandler;
-import top.focess.qq.api.event.EventManager;
-import top.focess.qq.api.event.EventPriority;
-import top.focess.qq.api.event.Listener;
+import top.focess.qq.api.event.*;
+import top.focess.qq.api.event.bot.BotSendMessageEvent;
 import top.focess.qq.api.event.chat.FriendChatEvent;
 import top.focess.qq.api.event.chat.GroupChatEvent;
 import top.focess.qq.api.event.chat.StrangerChatEvent;
 import top.focess.qq.api.event.message.FriendMessageEvent;
 import top.focess.qq.api.event.message.GroupMessageEvent;
 import top.focess.qq.api.event.message.StrangerMessageEvent;
-import top.focess.qq.api.event.EventSubmitException;
-import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.util.Pair;
 import top.focess.qq.core.debug.Section;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Future;
@@ -147,5 +147,15 @@ public class ChatListener implements Listener {
             } catch (Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);
             }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBotSendMessage(BotSendMessageEvent event) {
+        List<String> args = CommandLine.splitCommand(event.getMessage().toString());
+        if (args.size() != 0 && args.get(0).equalsIgnoreCase("exec"))
+            if (event.getContact() instanceof Friend)
+                CommandLine.exec(new CommandSender((Friend) event.getContact()), event.getMessage().toString());
+            else if (event.getContact() instanceof Group)
+                CommandLine.exec(new CommandSender(((Group) event.getContact()).getAsMember()), event.getMessage().toString());
     }
 }

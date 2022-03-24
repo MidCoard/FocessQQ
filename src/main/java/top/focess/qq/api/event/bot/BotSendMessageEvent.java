@@ -38,7 +38,7 @@ public class BotSendMessageEvent extends BotEvent {
         return message;
     }
 
-    public Contact getContract() {
+    public Contact getContact() {
         return contract;
     }
 }
