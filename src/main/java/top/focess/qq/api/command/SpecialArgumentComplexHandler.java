@@ -18,4 +18,8 @@ public interface SpecialArgumentComplexHandler {
      */
     @NonNull
     String handle(String name,CommandSender sender, Command command, String[] args, int i);
+
+    default void unregister() {
+        CommandLine.unregister(this);
+    }
 }

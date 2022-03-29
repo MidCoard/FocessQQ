@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
  */
 public class CommandLine {
 
-    private static final Map<String,SpecialArgumentComplexHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newHashMap();
+    private static final Map<String,SpecialArgumentComplexHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newConcurrentMap();
     private static final Map<Plugin,List<Pair<String,SpecialArgumentComplexHandler>>> PLUGIN_SPECIAL_ARGUMENT_MAP = Maps.newConcurrentMap();
 
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),7,false,"CommandLine");
@@ -183,10 +183,40 @@ public class CommandLine {
           if (v == null)
               v = Lists.newArrayList();
           String n = plugin == FocessQQ.getMainPlugin() ? name : plugin.getName() + ":" + name;
+          v.removeIf(i->i.getKey().equals(n));
           v.add(Pair.of(n,handler));
           SPECIAL_ARGUMENT_HANDLERS.put(n,handler);
           return v;
         });
+    }
+
+    /**
+     * Unregister the special argument handler
+     *
+     * @param handler the special argument handler
+     */
+    public static void unregister(SpecialArgumentComplexHandler handler) {
+        PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k,v)->{
+            v.removeIf(i->i.getRight() == handler);
+        });
+        SPECIAL_ARGUMENT_HANDLERS.forEach((k,v)-> {
+            if (v == handler)
+                SPECIAL_ARGUMENT_HANDLERS.remove(k);
+        });
+    }
+
+    /**
+     * Unregister the special argument handler
+     *
+     * @param plugin the plugin
+     * @param name the name of the special argument handler
+     */
+    public static void unregister(Plugin plugin,String name) {
+        PLUGIN_SPECIAL_ARGUMENT_MAP.computeIfPresent(plugin,(k,v)->{
+            v.removeIf(i->i.getLeft().equals(name));
+            return v;
+        });
+        SPECIAL_ARGUMENT_HANDLERS.remove(name);
     }
 
     /**
