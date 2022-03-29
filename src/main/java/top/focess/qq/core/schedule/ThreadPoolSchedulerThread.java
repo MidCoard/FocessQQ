@@ -20,6 +20,12 @@ public class ThreadPoolSchedulerThread extends Thread{
         super(name);
         this.scheduler = scheduler;
         this.name = name;
+        this.setUncaughtExceptionHandler((t, e) -> {
+            shouldStop = true;
+            isAvailable = false;
+            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught",e,t.getName());
+            scheduler.recreate(this.name);
+        });
         this.start();
     }
 

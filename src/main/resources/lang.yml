@@ -69,6 +69,7 @@ exception-load-main-plugin-lang-yml: Load MainPlugin lang.yml exception
 exception-load-lang-configuration: Load lang configuration exception
 exception-login-default-bot: Login default bot exception
 exception-command-execute: Command execute exception
+exception-thread-pool-scheduler-thread-uncaught: ThreadPoolSchedulerThread %s exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
