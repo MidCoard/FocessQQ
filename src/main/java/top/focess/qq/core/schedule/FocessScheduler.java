@@ -2,6 +2,7 @@ package top.focess.qq.core.schedule;
 
 import com.google.common.collect.Queues;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.plugin.Plugin;
@@ -94,10 +95,17 @@ public class FocessScheduler extends AScheduler {
 
     private class SchedulerThread extends Thread {
 
+        @Nullable
+        private ComparableTask task;
+
         public SchedulerThread(String name) {
             super(name);
             this.setUncaughtExceptionHandler((t,e)->{
                 close();
+                if (task != null) {
+                    task.getTask().setException(new ExecutionException(e));
+                    task.getTask().endRun();
+                }
                 FocessQQ.getLogger().thrLang("exception-focess-scheduler-uncaught",e,FocessScheduler.this.getName());
             });
         }
@@ -112,7 +120,7 @@ public class FocessScheduler extends AScheduler {
                         if (tasks.isEmpty())
                             FocessScheduler.this.wait();
                     }
-                    ComparableTask task = tasks.peek();
+                    task = tasks.peek();
                     if (task != null) {
                         synchronized (task.getTask()) {
                             if (task.isCancelled()) {
