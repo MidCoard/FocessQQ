@@ -96,6 +96,10 @@ public class FocessScheduler extends AScheduler {
 
         public SchedulerThread(String name) {
             super(name);
+            this.setUncaughtExceptionHandler((t,e)->{
+                close();
+                FocessQQ.getLogger().thrLang("exception-focess-scheduler-uncaught",e,FocessScheduler.this.getName());
+            });
         }
 
         @Override

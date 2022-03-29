@@ -137,6 +137,10 @@ public class ThreadPoolScheduler extends AScheduler {
 
         public SchedulerThread(String name) {
             super(name);
+            this.setUncaughtExceptionHandler((t,e)->{
+                close();
+                FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-uncaught",e,ThreadPoolScheduler.this.getName());
+            });
         }
 
         @Nullable
