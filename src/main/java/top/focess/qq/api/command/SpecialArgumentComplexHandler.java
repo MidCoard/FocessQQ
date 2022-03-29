@@ -5,10 +5,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * This class is used to handle special arguments, which start with "@"
  */
-public interface SpecialArgumentHandler extends SpecialArgumentComplexHandler {
+public interface SpecialArgumentComplexHandler {
 
     /**
      * Handle the special argument
+     * @param name the name of the special argument
      * @param sender the sender of the command
      * @param command the command
      * @param args the arguments
@@ -16,11 +17,5 @@ public interface SpecialArgumentHandler extends SpecialArgumentComplexHandler {
      * @return the argument after handle
      */
     @NonNull
-    String handle(CommandSender sender, Command command, String[] args, int i);
-
-    @Override
-    @NonNull
-    default String handle(String name, CommandSender sender, Command command, String[] args, int i) {
-        return handle(sender, command, args, i);
-    }
+    String handle(String name,CommandSender sender, Command command, String[] args, int i);
 }

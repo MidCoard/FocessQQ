@@ -23,8 +23,8 @@ import java.util.concurrent.Future;
  */
 public class CommandLine {
 
-    private static final Map<String,SpecialArgumentHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newHashMap();
-    private static final Map<Plugin,List<Pair<String,SpecialArgumentHandler>>> PLUGIN_SPECIAL_ARGUMENT_MAP = Maps.newConcurrentMap();
+    private static final Map<String,SpecialArgumentComplexHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newHashMap();
+    private static final Map<Plugin,List<Pair<String,SpecialArgumentComplexHandler>>> PLUGIN_SPECIAL_ARGUMENT_MAP = Maps.newConcurrentMap();
 
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),7,false,"CommandLine");
 
@@ -147,9 +147,9 @@ public class CommandLine {
                     if (args[i].startsWith("\"@")) {
                         String head = args[i].substring(2);
                         if (SPECIAL_ARGUMENT_HANDLERS.containsKey(head))
-                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(sender,com,args,i);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(head,sender,com,args,i);
                         else if (SPECIAL_ARGUMENT_HANDLERS.containsKey(com.getPlugin().getName() + ":" + head))
-                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(sender,com,args,i);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head,sender,com,args,i);
                         else args[i] = args[i].substring(1);
                     }
                 CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
@@ -178,7 +178,7 @@ public class CommandLine {
      * @param name the name of the special argument handler
      * @param handler the special argument handler
      */
-    public static void register(Plugin plugin, String name, SpecialArgumentHandler handler) {
+    public static void register(Plugin plugin, String name, SpecialArgumentComplexHandler handler) {
         PLUGIN_SPECIAL_ARGUMENT_MAP.compute(plugin,(k,v)->{
           if (v == null)
               v = Lists.newArrayList();
@@ -195,7 +195,7 @@ public class CommandLine {
      * @param plugin the plugin
      */
     public static void unregister(Plugin plugin) {
-        for (Pair<String,SpecialArgumentHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin,Lists.newArrayList()))
+        for (Pair<String,SpecialArgumentComplexHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin,Lists.newArrayList()))
             SPECIAL_ARGUMENT_HANDLERS.remove(pair.getLeft());
         PLUGIN_SPECIAL_ARGUMENT_MAP.remove(plugin);
     }

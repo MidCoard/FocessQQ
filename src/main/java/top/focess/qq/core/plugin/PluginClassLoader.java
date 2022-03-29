@@ -203,15 +203,15 @@ public class PluginClassLoader extends URLClassLoader {
 
         FIELD_ANNOTATION_HANDLERS.put(SpecialArgumentType.class,(field, annotation, classLoader) -> {
             SpecialArgumentType specialArgumentType = (SpecialArgumentType) annotation;
-            if (SpecialArgumentHandler.class.isAssignableFrom(field.getType())) {
+            if (SpecialArgumentComplexHandler.class.isAssignableFrom(field.getType())) {
                 try {
                     String name = specialArgumentType.name();
                     Plugin plugin = classLoader.plugin;
-                    plugin.registerSpecialArgumentHandler(name, (SpecialArgumentHandler) field.get(null));
+                    plugin.registerSpecialArgumentHandler(name, (SpecialArgumentComplexHandler) field.get(null));
                 } catch (Exception e) {
-                    throw new IllegalSpecialArgumentHandlerClassException((Class<? extends SpecialArgumentHandler>) field.getType(), e);
+                    throw new IllegalSpecialArgumentComplexHandlerClassException((Class<? extends SpecialArgumentComplexHandler>) field.getType(), e);
                 }
-            } else throw new IllegalSpecialArgumentHandlerClassException(field.getType());
+            } else throw new IllegalSpecialArgumentComplexHandlerClassException(field.getType());
         });
     }
 
