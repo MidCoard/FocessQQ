@@ -20,7 +20,7 @@ public interface SpecialArgumentHandler extends SpecialArgumentComplexHandler {
 
     @Override
     @NonNull
-    default String handle(String name, CommandSender sender, Command command, String[] args, int i) {
+    default String handle(String name, CommandSender sender, Command command, String[] args, int i,String... arguments) {
         return handle(sender, command, args, i);
     }
 }

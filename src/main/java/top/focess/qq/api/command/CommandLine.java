@@ -138,6 +138,15 @@ public class CommandLine {
         return args;
     }
 
+    private static Pair<String,String[]> splitSpecialArgument(String argument) {
+        int leftIndex = argument.indexOf('(');
+        if (leftIndex == -1 || !argument.endsWith(")"))
+            return new Pair<>(argument, new String[0]);
+        String name = argument.substring(0, leftIndex);
+        String[] args = argument.substring(leftIndex + 1,argument.length() - 1).split(",");
+        return new Pair<>(name, args);
+    }
+
     private static Future<CommandResult> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler, String rawCommand) {
         boolean flag = false;
         Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
@@ -145,11 +154,14 @@ public class CommandLine {
             if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
                 for (int i = 0;i<args.length;i++)
                     if (args[i].startsWith("\"@")) {
-                        String head = args[i].substring(2);
+                        String h = args[i].substring(2);
+                        Pair<String,String[]> pair = splitSpecialArgument(h);
+                        String head = pair.getKey();
+                        String[] values = pair.getValue();
                         if (SPECIAL_ARGUMENT_HANDLERS.containsKey(head))
-                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(head,sender,com,args,i);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(head,sender,com,args,i,values);
                         else if (SPECIAL_ARGUMENT_HANDLERS.containsKey(com.getPlugin().getName() + ":" + head))
-                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head,sender,com,args,i);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head,sender,com,args,i,values);
                         else args[i] = args[i].substring(1);
                     }
                 CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
