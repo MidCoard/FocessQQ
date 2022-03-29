@@ -51,7 +51,7 @@ public class DefaultConfig extends Config {
     }
 
     @Override
-    protected DefaultConfig getSection(String key) {
+    public DefaultConfig getSection(String key) {
         return new DefaultConfig(this.yaml.getSection(key));
     }
 }
