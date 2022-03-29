@@ -11,9 +11,9 @@ import java.util.Map;
 public abstract class Config {
 
     @Nullable
-    private final File file;
+    private File file;
 
-    protected YamlConfiguration yaml;
+    protected final YamlConfiguration yaml;
 
     protected Config(@Nullable File file) throws YamlLoadException {
         this.file = file;
@@ -23,6 +23,14 @@ public abstract class Config {
     protected Config(@Nullable InputStream stream) {
         this.file = null;
         this.yaml = YamlConfiguration.load(stream);
+    }
+
+    protected Config(@Nullable Map<String,Object> values) {
+        this.yaml = new YamlConfiguration(values);
+    }
+
+    protected Config(YamlConfiguration yaml) {
+        this.yaml = yaml;
     }
 
     @Nullable
@@ -56,4 +64,6 @@ public abstract class Config {
     protected void remove(String key) {
         this.yaml.remove(key);
     }
+
+    protected abstract Config getSection(String key);
 }

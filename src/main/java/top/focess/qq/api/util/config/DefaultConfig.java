@@ -1,5 +1,6 @@
 package top.focess.qq.api.util.config;
 
+import top.focess.qq.api.util.yaml.YamlConfiguration;
 import top.focess.qq.api.util.yaml.YamlLoadException;
 
 import java.io.File;
@@ -9,6 +10,10 @@ public class DefaultConfig extends Config {
 
     public DefaultConfig(File file) throws YamlLoadException {
         super(file);
+    }
+
+    public DefaultConfig(YamlConfiguration yamlConfiguration) {
+        super(yamlConfiguration);
     }
 
     @Override
@@ -43,5 +48,10 @@ public class DefaultConfig extends Config {
     @Override
     public void remove(String key) {
         super.remove(key);
+    }
+
+    @Override
+    protected DefaultConfig getSection(String key) {
+        return new DefaultConfig(this.yaml.getSection(key));
     }
 }

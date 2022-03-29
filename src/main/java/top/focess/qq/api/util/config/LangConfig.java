@@ -13,6 +13,11 @@ public class LangConfig extends Config {
         super(inputStream);
     }
 
+    @Override
+    protected Config getSection(String key) {
+        throw new UnsupportedOperationException();
+    }
+
     public LangConfig(File file) throws YamlLoadException {
         super(file);
     }
