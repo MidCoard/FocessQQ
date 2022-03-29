@@ -1,5 +1,6 @@
 package top.focess.qq.api.net;
 
+import com.google.common.primitives.Bytes;
 import top.focess.qq.FocessQQ;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -82,9 +83,9 @@ public class PacketPreCodec {
      * @param v the string
      */
     public void writeString(String v) {
-        writeInt(v.length());
-        for (byte b : v.getBytes(StandardCharsets.UTF_8))
-            data.add(b);
+        byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
+        writeInt(bytes.length);
+        data.addAll(Bytes.asList(bytes));
     }
 
     /**
@@ -178,10 +179,7 @@ public class PacketPreCodec {
      * @return all bytes of the packet
      */
     public byte[] getBytes() {
-        byte[] bytes = new byte[this.data.size()];
-        for (int i = 0; i < this.data.size(); i++)
-            bytes[i] = this.data.get(i);
-        return bytes;
+        return Bytes.toArray(this.data);
     }
 
     /**

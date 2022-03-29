@@ -83,9 +83,9 @@ public class SimpleFocessWriter extends FocessWriter {
     }
 
     private void writeString(String v) {
-        writeInt(v.length());
-        for (byte b : v.getBytes(StandardCharsets.UTF_8))
-            data.add(b);
+        byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
+        writeInt(bytes.length);
+        data.addAll(Bytes.asList(bytes));
     }
 
     private void writeFloat(float v) {
