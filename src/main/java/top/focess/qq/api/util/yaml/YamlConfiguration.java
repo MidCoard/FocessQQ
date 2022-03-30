@@ -18,10 +18,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -146,6 +143,18 @@ public class YamlConfiguration implements SectionMap {
                 return ret;
             }
         });
+
+        CLASS_RESERVED_HANDLER_MAP.put(HashMap.class, new ReservedHandler<HashMap>() {
+            @Override
+            public Object write(HashMap map) {
+                return map;
+            }
+
+            @Override
+            public HashMap read(Object value) {
+                return (HashMap) value;
+            }
+        });
     }
 
     /**
@@ -188,12 +197,12 @@ public class YamlConfiguration implements SectionMap {
     }
 
     @Override
-    public void set(String key, Object value) {
+    public void set(String key, @Nullable Object value) {
         values.put(key,write(value));
     }
 
     @Nullable
-    private static <T> Object write(Object value) {
+    private static <T> Object write(@Nullable Object value) {
         if (value == null)
             return null;
         if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)

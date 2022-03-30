@@ -1,5 +1,6 @@
 package top.focess.qq.api.util.config;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
 import top.focess.qq.api.util.yaml.YamlLoadException;
 
@@ -17,11 +18,12 @@ public class DefaultConfig extends Config {
     }
 
     @Override
-    public void set(String key,Object value) {
+    public void set(String key, @Nullable Object value) {
         super.set(key,value);
     }
 
     @Override
+    @Nullable
     public <T> T get(String key) {
         return super.get(key);
     }

@@ -2,14 +2,15 @@ package top.focess;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.qq.api.serialize.FocessSerializable;
+import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.yaml.YamlLoadException;
 
 import java.io.File;
 
 public class Test {
 
-    public static class A {
+    public static class A implements FocessSerializable {
 
 
         @Nullable
@@ -32,10 +33,16 @@ public class Test {
         B getB() {
             return this.b;
         }
+
+        @Override
+        public String toString() {
+            return "A{" +
+                    "b=" + b +
+                    '}';
+        }
     }
 
-    public static class B {
-
+    public static class B implements FocessSerializable {
 
         void c(){
             System.out.println("I am not null");
@@ -43,7 +50,11 @@ public class Test {
     }
 
     public static void main(String[] args) throws YamlLoadException {
-        YamlConfiguration yamlConfiguration = YamlConfiguration.loadFile(new File("config.yml"));
-        System.out.println(yamlConfiguration.get("user").toString());
+        DefaultConfig config = new DefaultConfig(new File("config.yml"));
+        DefaultConfig a = config.getSection("a");
+//        a.set("null0", null);
+//        a.set("null1", "null");
+        System.out.println(a.get("null0").toString());
+        config.save();
     }
 }

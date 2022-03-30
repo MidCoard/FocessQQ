@@ -43,7 +43,7 @@ public abstract class Config {
         return this.yaml.get(key);
     }
 
-    protected void set(String key,Object value) {
+    protected void set(String key, @Nullable Object value) {
         this.yaml.set(key, value);
     }
 
