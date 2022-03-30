@@ -196,6 +196,11 @@ public class YamlConfiguration implements SectionMap {
             return null;
         if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)
             return value;
+        if (value.getClass().isEnum()) {
+            final Map<String, Object> ret = Maps.newHashMap();
+            ret.put("class", "!!" + value.getClass().getName());
+            ret.put("value", ((Enum<?>)value).name());
+        }
         if (value.getClass().isArray()) {
             final Map<String, Object> ret = Maps.newHashMap();
             ret.put("class", "!!" + value.getClass().getComponentType().getName());
@@ -241,7 +246,7 @@ public class YamlConfiguration implements SectionMap {
     }
 
     @Nullable
-    private static <T> Object read(final Object value) {
+    private static <T,V extends Enum<V>> Object read(final Object value) {
         if (value == null)
             return null;
         if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)
@@ -253,6 +258,10 @@ public class YamlConfiguration implements SectionMap {
                 try {
                     final Class<?> cls = PluginCoreClassLoader.forName(className);
                     final Object v = map.get("value");
+                    if (cls.isEnum()) {
+                        Class<V> enumClass = (Class<V>) cls;
+                        return Enum.valueOf(enumClass, ((Enum<?>)v).name());
+                    }
                     if (v instanceof List && Boolean.parseBoolean(String.valueOf(map.get("array")))) {
                         final List list = (List) v;
                         final Object array = Array.newInstance(cls, list.size());

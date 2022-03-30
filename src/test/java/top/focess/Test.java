@@ -3,20 +3,22 @@ package top.focess;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.serialize.FocessSerializable;
-import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.yaml.YamlLoadException;
-
-import java.io.File;
+import top.focess.qq.core.serialize.SimpleFocessReader;
+import top.focess.qq.core.serialize.SimpleFocessWriter;
 
 public class Test {
 
+    public enum ABC {
+        AB,C;
+    }
+
     public static void main(String[] args) throws YamlLoadException {
-        DefaultConfig config = new DefaultConfig(new File("config.yml"));
-        DefaultConfig a = config.getSection("a");
-//        a.set("null0", null);
-//        a.set("null1", "null");
-        System.out.println(a.get("null0").toString());
-        config.save();
+        SimpleFocessWriter writer = new SimpleFocessWriter();
+        writer.write(ABC.AB);
+        SimpleFocessReader reader = new SimpleFocessReader(writer.toByteArray());
+        ABC abc = (ABC) reader.read();
+        System.out.println(abc);
     }
 
     public static class A implements FocessSerializable {

@@ -51,7 +51,7 @@ public class Message {
      * @param message the message to append
      * @return the new message
      */
-    public Message plus(final Message message) {
+    public Message plus(@NotNull final Message message) {
         return new Message(this.message.plus(message.message));
     }
 }

@@ -213,7 +213,7 @@ public class SimpleFocessReader extends FocessReader {
     }
 
     @Nullable
-    private <T> Object readObject() {
+    private <T,V extends Enum<V>> Object readObject() {
         final byte type = this.readByte();
         switch (type) {
             case C_NULL:
@@ -236,6 +236,14 @@ public class SimpleFocessReader extends FocessReader {
                 return this.readChar();
             case C_STRING:
                 return this.readString();
+            case C_ENUM: {
+                try {
+                    final Class<V> cls = (Class<V>) this.readClass();
+                    return Enum.valueOf(cls, this.readString());
+                } catch (final Exception e) {
+                    throw new SerializationParseException(e);
+                }
+            }
             case C_ARRAY: {
                 final Class<?> cls = this.readClass();
                 final int length = this.readInt();
