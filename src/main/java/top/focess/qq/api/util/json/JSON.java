@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * This class is used to define a JSON object as Map.
  */
-public class JSON implements SectionMap {
+public class JSON extends JSONObject implements SectionMap {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<Map<String,Object>> TYPE_REFERENCE =  new TypeReference<Map<String,Object>>(){};

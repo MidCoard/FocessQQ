@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to define a JSON object as List.
  */
-public class JSONList {
+public class JSONList extends JSONObject {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<List<Object>> TYPE_REFERENCE =  new TypeReference<List<Object>>(){};
@@ -27,6 +28,22 @@ public class JSONList {
 
     public JSONList(List<?> values) {
         this.values = values;
+    }
+
+    public <T> T get(int index) {
+        return (T) values.get(index);
+    }
+
+    public JSON getJSON(int index) {
+        if (values.get(index) instanceof Map)
+            return new JSON((Map<String,Object>) values.get(index));
+        throw new IllegalStateException("This element is not a valid map.");
+    }
+
+    public JSONList getList(int index) {
+        if (values.get(index) instanceof List)
+            return new JSONList((List<?>) values.get(index));
+        throw new IllegalStateException("This element is not a valid list.");
     }
 
     public List<?> getValues() {
