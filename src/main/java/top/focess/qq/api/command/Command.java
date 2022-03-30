@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * Represent a Plugin class that can execute. Just like we use the terminal, we could use it to executing some commands. This is an important way to interact with Mirai QQ Bot.
+ * Represent a Plugin class that can execute. Just like we use the terminal, we could use it to executing some commands. This is an important way to interact with FocessQQ Bot.
  * You should declare {@link CommandType} to this class ,or you should register it with your plugin manually.
  */
 public abstract class Command {
@@ -132,6 +132,7 @@ public abstract class Command {
      * @param plugin  the plugin the command belongs to
      * @param command the command that need to be registered
      * @throws CommandDuplicateException if the command name already exists in the registered commands
+     * @throws IllegalStateException    if the command is not initialized
      */
     public static void register(@NotNull final Plugin plugin, @NotNull final Command command) {
         if (command.name == null)
@@ -185,15 +186,15 @@ public abstract class Command {
 
     /**
      * Add default executor to define how to execute this command.
-     * <p>
+     *
      * for example :
      * <code>
-     * this.addExecutor(1, ... ,"example");
+     * this.addExecutor(... ,CommandArgument.ofString("example"),CommandArgument.ofString());
      * </code>
      * which means that it runs when you execute the command with "example" "xxx".
      *
      * <code>
-     * this.addExecutor(0, ...);
+     * this.addExecutor(...);
      * </code>
      * which means that it runs when you just execute the command without anything.
      *

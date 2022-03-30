@@ -270,6 +270,7 @@ public class FocessQQ {
      * Get all the loaded plugins
      *
      * @return all the loaded plugins
+     * @see Plugin#getPlugins()
      */
     @NonNull
     public static List<Plugin> getPlugins() {
@@ -281,6 +282,7 @@ public class FocessQQ {
      *
      * @param name the plugin name
      * @return the plugin
+     * @see Plugin#getPlugin(String)
      */
     @Nullable
     public static Plugin getPlugin(final String name) {
@@ -292,6 +294,7 @@ public class FocessQQ {
      *
      * @param cls the plugin class
      * @return the plugin
+     * @see Plugin#getPlugin(Class)
      */
     @Nullable
     public static Plugin getPlugin(final Class<? extends Plugin> cls) {

@@ -220,15 +220,6 @@ public class PluginClassLoader extends URLClassLoader {
         PluginCoreClassLoader.LOADERS.add(this);
     }
 
-    /**
-     * Used to enable plugin
-     *
-     * @param plugin the plugin need to be enabled
-     * @throws PluginLoaderException    if the classloader of the plugin is not {@link PluginClassLoader}
-     * @throws PluginDuplicateException if the plugin name already exists in the registered plugins
-     * @throws PluginLoadException      if there is an error while enabling the plugin
-     * @throws PluginUnloadException    if the plugin should be unloaded
-     */
     public static void enablePlugin(final Plugin plugin) {
         if (plugin.getClass() != FocessQQ.MainPlugin.class) {
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
@@ -263,12 +254,6 @@ public class PluginClassLoader extends URLClassLoader {
         }
     }
 
-    /**
-     * Used to disable plugin
-     *
-     * @param plugin the plugin need to be disabled
-     * @return the plugin jar file, or null if the plugin is MainPlugin
-     */
     @Nullable
     public static File disablePlugin(final Plugin plugin) {
         final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
@@ -339,36 +324,16 @@ public class PluginClassLoader extends URLClassLoader {
         return ret;
     }
 
-    /**
-     * Get Plugin instance by the class instance
-     *
-     * @param plugin the class instance of the plugin
-     * @param <T>    the plugin type
-     * @return the plugin instance
-     * @see Plugin#getPlugin(Class)
-     */
     @Nullable
     public static <T extends Plugin> T getPlugin(final Class<T> plugin) {
         return (T) CLASS_PLUGIN_MAP.get(plugin);
     }
 
-    /**
-     * Get all plugins registered
-     *
-     * @return a list of registered plugins
-     */
     @NotNull
     public static List<Plugin> getPlugins() {
         return Lists.newArrayList(NAME_PLUGIN_MAP.values());
     }
 
-    /**
-     * Get Plugin instance by the name
-     *
-     * @param name the name of the plugin
-     * @return the plugin instance
-     * @see Plugin#getPlugin(String)
-     */
     @Nullable
     public static Plugin getPlugin(final String name) {
         return NAME_PLUGIN_MAP.get(name);

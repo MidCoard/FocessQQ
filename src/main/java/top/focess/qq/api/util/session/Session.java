@@ -18,7 +18,7 @@ public class Session implements SectionMap {
     private final Map<String, Object> values;
 
     /**
-     * Initialize the YamlConfiguration with existed key-value pairs or not (usually not)
+     * Initializes the Session with existed key-value pairs (usually not)
      *
      * @param values the session key-value pairs
      */

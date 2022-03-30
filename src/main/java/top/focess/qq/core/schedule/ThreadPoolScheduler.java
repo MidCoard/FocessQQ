@@ -9,7 +9,7 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.schedule.Task;
-import top.focess.qq.api.schedule.TaskNotFoundException;
+import top.focess.qq.api.schedule.TaskNotFoundError;
 
 import java.time.Duration;
 import java.util.List;
@@ -110,7 +110,7 @@ public class ThreadPoolScheduler extends AScheduler {
         if (this.taskThreadMap.containsKey(task)) {
             this.taskThreadMap.get(task).cancel();
             this.taskThreadMap.remove(task);
-        } else throw new TaskNotFoundException(task);
+        } else throw new TaskNotFoundError(task);
     }
 
     public void recreate(final String name) {

@@ -4,6 +4,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
+/**
+ * Represents a group.
+ */
 public interface Group extends Speaker {
 
     /**

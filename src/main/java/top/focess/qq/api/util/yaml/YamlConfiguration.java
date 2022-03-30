@@ -159,7 +159,7 @@ public class YamlConfiguration implements SectionMap {
     private final Map<String, Object> values;
 
     /**
-     * Initialize the YamlConfiguration with existed key-value pairs or not
+     * Initializes the YamlConfiguration with existed key-value pairs
      *
      * @param values the YAML configuration key-value pairs
      */

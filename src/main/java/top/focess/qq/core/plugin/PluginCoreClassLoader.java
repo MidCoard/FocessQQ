@@ -21,12 +21,6 @@ public class PluginCoreClassLoader extends ClassLoader {
         return DEFAULT_CLASS_LOADER.loadClass(name, false);
     }
 
-    /**
-     * Get the plugin of the loaded class
-     *
-     * @param clazz the class
-     * @return the target plugin, @null if the class is loaded by default classloader
-     */
     @Nullable
     public static Plugin getClassLoadedBy(@Nullable final Class<?> clazz) {
         if (clazz == null)
@@ -38,12 +32,6 @@ public class PluginCoreClassLoader extends ClassLoader {
         return null;
     }
 
-    /**
-     * Get the plugin of the loaded class
-     *
-     * @param clazz the class
-     * @return the target plugin, {@code FocessQQ#getMainPlugin()} if the class is loaded by default classloader
-     */
     @NonNull
     public static Plugin getClassLoadedByOrDefault(@Nullable final Class<?> clazz) {
         final Plugin plugin = getClassLoadedBy(clazz);

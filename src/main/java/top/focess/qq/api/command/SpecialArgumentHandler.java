@@ -3,8 +3,10 @@ package top.focess.qq.api.command;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * This class is used to handle special arguments, which start with "@"
+ * This class is used to handle special arguments, which start with "@".
+ * This is a functional interface whose functional method is {@link SpecialArgumentHandler#handle(CommandSender, Command, String[], int)}.
  */
+@FunctionalInterface
 public interface SpecialArgumentHandler extends SpecialArgumentComplexHandler {
 
     /**

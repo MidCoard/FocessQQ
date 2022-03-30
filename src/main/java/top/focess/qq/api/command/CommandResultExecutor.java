@@ -2,7 +2,6 @@ package top.focess.qq.api.command;
 
 /**
  * Represents a CommandResult executor to define how to execute the CommandResult after executing a special CommandExecutor.
- * <p>
  * This is a functional interface whose functional method is {@link CommandResultExecutor#execute(CommandResult)}.
  */
 @FunctionalInterface

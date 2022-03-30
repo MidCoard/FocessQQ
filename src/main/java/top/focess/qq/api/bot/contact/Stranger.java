@@ -1,5 +1,8 @@
 package top.focess.qq.api.bot.contact;
 
+/**
+ * Represents a stranger.
+ */
 public interface Stranger extends Transmitter {
 
     /**

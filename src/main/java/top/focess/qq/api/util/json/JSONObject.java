@@ -22,7 +22,7 @@ public abstract class JSONObject {
     /**
      * Get the value at the given index
      * <p>
-     * Note: This is for JSONList only.
+     * Note: this is for JSONList only.
      *
      * @param index the index of the value
      * @param <T>   the type of the value
@@ -35,7 +35,7 @@ public abstract class JSONObject {
     /**
      * Get the value of the key-value pair
      * <p>
-     * Note: This is for JSON only.
+     * Note: this is for JSON only.
      *
      * @param key the key
      * @param <T> the type of the value
@@ -48,7 +48,7 @@ public abstract class JSONObject {
     /**
      * Get the list at the given index
      * <p>
-     * Note: This is for JSONList only.
+     * Note: this is for JSONList only.
      *
      * @param index the index of the list
      * @return the list at the given index
@@ -60,7 +60,7 @@ public abstract class JSONObject {
     /**
      * Get the list named key
      * <p>
-     * Note: This is for JSON only.
+     * Note: this is for JSON only.
      *
      * @param key the key of the list
      * @return a list named key
@@ -72,7 +72,7 @@ public abstract class JSONObject {
     /**
      * Get as JSON at the given index
      * <p>
-     * Note: This is for JSONList only.
+     * Note: this is for JSONList only.
      *
      * @param index the index of the JSON
      * @return the JSON at the given index

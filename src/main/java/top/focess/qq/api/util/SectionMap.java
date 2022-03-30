@@ -24,9 +24,9 @@ public interface SectionMap extends Serializable {
      * Get the value of the key-value pair
      *
      * @param key the key of the key-value pair
-     * @param <T> the desired type
-     * @return the desired value
-     * @throws ClassCastException if the desired T type is not equal to its original type
+     * @param <T> the value type
+     * @return the value
+     * @throws ClassCastException if the value is not the specified type
      */
     default <T> T get(final String key) {
         return (T) this.getValues().get(key);
@@ -53,7 +53,7 @@ public interface SectionMap extends Serializable {
 
     /**
      * Create the section named key
-     * <p>
+     *
      * Note: if the section named key already exists, it will be replaced by a new section
      *
      * @param key the key of the Section
@@ -79,7 +79,7 @@ public interface SectionMap extends Serializable {
 
     /**
      * Get the section named key
-     * <p>
+     *
      * Note: if the section named key does not exist, it will be created
      *
      * @param key the key of the Section
@@ -101,8 +101,8 @@ public interface SectionMap extends Serializable {
      *
      * @param key          the key of the key-value pair
      * @param defaultValue the default value
-     * @param <T>          the desired type
-     * @return the desired value or defaultValue if there is no value
+     * @param <T>          the value type
+     * @return the value or defaultValue if there is no value
      */
     default <T> T getOrDefault(final String key, final T defaultValue) {
         return this.getValues().containsKey(key) ? this.get(key) : defaultValue;

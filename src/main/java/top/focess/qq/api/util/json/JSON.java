@@ -21,6 +21,10 @@ public class JSON extends JSONObject implements SectionMap {
 
     private final Map<String, Object> values;
 
+    /**
+     * Constructs a JSON object from a JSON string
+     * @param json the JSON string
+     */
     public JSON(final String json) {
         try {
             this.values = OBJECT_MAPPER.readValue(json, TYPE_REFERENCE);
@@ -29,6 +33,10 @@ public class JSON extends JSONObject implements SectionMap {
         }
     }
 
+    /**
+     * Initializes the JSON with existed key-value pairs (usually not)
+     * @param values the JSON key-value pairs
+     */
     public JSON(final Map<String, Object> values) {
         this.values = values;
     }

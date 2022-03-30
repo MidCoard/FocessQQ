@@ -7,6 +7,9 @@ import top.focess.qq.api.util.yaml.YamlLoadException;
 import java.io.File;
 import java.util.Map;
 
+/**
+ * Represents a default config named "config.yml" in the plugin folder.
+ */
 public class DefaultConfig extends Config {
 
     public DefaultConfig(final File file) throws YamlLoadException {

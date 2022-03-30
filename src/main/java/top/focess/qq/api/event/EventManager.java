@@ -53,14 +53,6 @@ public class EventManager {
         section.stop();
     }
 
-    /**
-     * Submit the event to cls and all of cls 's implemented super event class
-     *
-     * @param cls   the submitting chain start event
-     * @param event the event need to be submitted
-     * @param <T>   the event type
-     * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
-     */
     private static <T extends Event> void submit(final Class<T> cls, final T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
@@ -83,25 +75,10 @@ public class EventManager {
         } else throw new EventSubmitException(event, "This event is an abstract class.");
     }
 
-    /**
-     * Submit the event only to itself and no exception throws
-     *
-     * @param cls   the submitting chain start event
-     * @param event the event need to be submitted
-     * @param <T>   the event type
-     */
     private static <T extends Event> void trySubmitOnce(final Class<T> cls, final T event) throws EventSubmitException {
         submitOnce(cls, event);
     }
 
-    /**
-     * Submit the event only to cls event class
-     *
-     * @param cls   the event class the event submits to
-     * @param event the event need to be submitted
-     * @param <T>   the event type
-     * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
-     */
     private static <T extends Event> void submitOnce(final Class<T> cls, final T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;

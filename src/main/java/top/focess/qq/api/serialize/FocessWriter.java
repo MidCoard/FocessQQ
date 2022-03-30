@@ -5,8 +5,18 @@ import top.focess.qq.core.serialize.SimpleFocessWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * This class is used to serialize FocessSerializable-Object.
+ */
 public abstract class FocessWriter {
 
+    /**
+     * New a FocessWriter with given output stream
+     * @param outputStream the given output stream
+     * @return the FocessWriter with given output stream
+     *
+     * @throws IllegalStateException if the given output stream is not valid
+     */
     public static FocessWriter newFocessWriter(final OutputStream outputStream) {
         return new SimpleFocessWriter() {
 
@@ -24,5 +34,11 @@ public abstract class FocessWriter {
         };
     }
 
+    /**
+     * Write object by this writer
+     * @param o the object need to be written
+     *
+     * @throws NotFocessSerializableException if the object is not FocessSerializable
+     */
     public abstract void write(Object o);
 }

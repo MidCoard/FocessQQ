@@ -2,6 +2,9 @@ package top.focess.qq.api.bot.contact;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents a friend.
+ */
 public interface Friend extends Speaker {
 
     /**

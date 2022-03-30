@@ -19,6 +19,10 @@ public class JSONList extends JSONObject {
     private final List<?> values;
 
 
+    /**
+     * Constructs a JSONList from a JSON string
+     * @param json the JSON string
+     */
     public JSONList(final String json) {
         try {
             this.values = OBJECT_MAPPER.readValue(json, TYPE_REFERENCE);
@@ -27,6 +31,10 @@ public class JSONList extends JSONObject {
         }
     }
 
+    /**
+     * Initializes the JSONList with existed values
+     * @param values the JSON list values
+     */
     public JSONList(final List<?> values) {
         this.values = values;
     }

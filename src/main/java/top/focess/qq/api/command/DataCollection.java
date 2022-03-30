@@ -239,7 +239,7 @@ public class DataCollection {
 
     /**
      * Represents a getter for buffer.
-     * <p>
+     *
      * This is a functional interface whose functional method is {@link BufferGetter#newBuffer(int)}.
      */
     @FunctionalInterface

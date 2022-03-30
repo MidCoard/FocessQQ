@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -63,7 +64,7 @@ public abstract class Plugin {
     private PluginDescription pluginDescription;
 
     /**
-     * Whether the plugin is enabled or not
+     * Indicate the plugin is enabled or not
      */
     private boolean isEnabled;
 
@@ -75,6 +76,8 @@ public abstract class Plugin {
      * @param author  the plugin author
      * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
+     * @throws PluginDuplicateException if the plugin is already loaded
+     * @throws IllegalStateException if the plugin is newed in runtime
      */
     public Plugin(final String name, final String author, final Version version) {
         this.name = name;
@@ -91,11 +94,19 @@ public abstract class Plugin {
     }
 
     /**
+     * Get all the loaded plugins
+     *
+     * @return all the loaded plugins
+     */
+    public static List<Plugin> getPlugins() {
+        return PluginClassLoader.getPlugins();
+    }
+
+    /**
      * Get Plugin instance by the class instance
      *
      * @param plugin the class instance of the plugin
      * @return the plugin instance
-     * @see PluginClassLoader#getPlugin(Class)
      */
     @Nullable
     public static Plugin getPlugin(final Class<? extends Plugin> plugin) {
@@ -107,16 +118,33 @@ public abstract class Plugin {
      *
      * @param name the name of the plugin
      * @return the plugin instance
-     * @see PluginClassLoader#getPlugin(String)
      */
     @Nullable
     public static Plugin getPlugin(final String name) {
         return PluginClassLoader.getPlugin(name);
     }
 
+    /**
+     * Get the plugin by its caller class
+     *
+     * @return the plugin or null if not found
+     */
     @Nullable
     public static Plugin thisPlugin() {
         return PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    }
+
+    /**
+     * Get the plugin by its caller class
+     *
+     * Note: this method will not return null. If the {@link Plugin#thisPlugin()} is null, it will return {@link FocessQQ#getMainPlugin()}
+     *
+     * @return the plugin
+     */
+    @NonNull
+    public static Plugin plugin() {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        return plugin == null ? FocessQQ.getMainPlugin() : plugin;
     }
 
     private void init() {
@@ -267,6 +295,11 @@ public abstract class Plugin {
         return this.pluginDescription;
     }
 
+    /**
+     * Get the resource of the plugin
+     * @param path the path of the resource
+     * @return the resource or null if not found
+     */
     @Nullable
     public final InputStream loadResource(final String path) {
         return this.getClass().getClassLoader().getResourceAsStream(path);
@@ -278,8 +311,10 @@ public abstract class Plugin {
 
     /**
      * Used to unload this plugin during enabling process
-     * <p>
+     *
      * This should be called in the {@link #enable()} method
+     *
+     * @throws PluginUnloadException to indicate that the plugin should be unloaded
      */
     public final void unload() {
         throw new PluginUnloadException();

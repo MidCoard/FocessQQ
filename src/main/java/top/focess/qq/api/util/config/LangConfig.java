@@ -7,6 +7,9 @@ import top.focess.qq.api.util.yaml.YamlLoadException;
 import java.io.File;
 import java.io.InputStream;
 
+/**
+ * Represents a language config named "lang.yml" in the plugin jar file.
+ */
 public class LangConfig extends Config {
 
     public LangConfig(@Nullable final InputStream inputStream) {

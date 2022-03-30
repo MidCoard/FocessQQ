@@ -2,10 +2,21 @@ package top.focess.qq.api.plugin;
 
 import top.focess.qq.api.util.yaml.YamlConfiguration;
 
+/**
+ * The description of plugin.
+ */
 public class PluginDescription {
 
+    /**
+     * The plugin class path
+     */
     private final String main;
 
+    /**
+     * Constructs a new PluginDescription from the plugin config
+     *
+     * @param pluginConfig the plugin config named "plugin.yml"
+     */
     public PluginDescription(final YamlConfiguration pluginConfig) {
         this.main = pluginConfig.get("main");
     }

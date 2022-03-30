@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.*;
 
 /**
- * The warped task. You can use this to handle callable processing
+ * The wrapped callback. You can use this to handle callable processing
  *
  * @param <V> the target value type
  */

@@ -15,6 +15,10 @@ public class IllegalSpecialArgumentComplexHandlerClassException extends IllegalA
         super("The class " + c.getName() + " is an illegal SpecialArgumentComplexHandler class.", e);
     }
 
+    /**
+     * Constructs a new IllegalSpecialArgumentHandlerClassException
+     * @param c the illegal special argument handler class
+     */
     public IllegalSpecialArgumentComplexHandlerClassException(final Class<?> c) {
         super("The class " + c.getName() + " is an illegal SpecialArgumentComplexHandler class.");
     }

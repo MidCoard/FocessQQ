@@ -2,6 +2,9 @@ package top.focess.qq.api.bot.contact;
 
 import top.focess.qq.api.command.CommandPermission;
 
+/**
+ * Represents a member in a group.
+ */
 public interface Member extends Contact {
 
     /**

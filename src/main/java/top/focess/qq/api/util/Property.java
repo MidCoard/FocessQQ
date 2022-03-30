@@ -34,9 +34,9 @@ public class Property {
      * Get the value of the key in the properties
      *
      * @param key the FocessQQ framework properties' key
-     * @param <T> the desired T type
-     * @return the desired value
-     * @throws ClassCastException if the desired T type is not equal to its original type
+     * @param <T> the value type
+     * @return the value
+     * @throws ClassCastException if the value is not the specified type
      */
     public static <T> T get(final String key) {
         return (T) FocessQQ.MainPlugin.getProperties().get(key);
@@ -47,8 +47,9 @@ public class Property {
      *
      * @param key the FocessQQ framework properties' key
      * @param t   the default value
-     * @param <T> the desired T type
-     * @return the desired value, or the default value
+     * @param <T> the value type
+     * @return the value, or the default value if there is no value
+     *
      */
     public static <T> T getOrDefault(final String key, final T t) {
         return (T) FocessQQ.MainPlugin.getProperties().getOrDefault(key, t);

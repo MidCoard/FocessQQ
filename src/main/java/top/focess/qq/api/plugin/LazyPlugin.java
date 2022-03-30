@@ -20,6 +20,8 @@ public abstract class LazyPlugin extends Plugin {
      * @param author  the plugin author
      * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
+     * @throws PluginDuplicateException if the plugin is already loaded
+     * @throws IllegalStateException if the plugin is newed in runtime
      */
     public LazyPlugin(final String name, final String author, final Version version) {
         super(name, author, version);

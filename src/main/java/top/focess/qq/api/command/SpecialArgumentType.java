@@ -12,5 +12,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SpecialArgumentType {
 
+    /**
+     * The name of the special argument
+     * @return the name of the special argument
+     */
     String name();
 }
