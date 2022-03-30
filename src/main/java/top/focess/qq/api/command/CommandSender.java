@@ -17,7 +17,6 @@ import top.focess.qq.core.listeners.ChatListener;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * This class present an executor to execute command. We can use it to distinguish different permissions.
@@ -60,7 +59,7 @@ public class CommandSender {
         this.member = null;
         this.stranger = null;
         this.friend = friend;
-        this.bot = FocessQQ.getBotManager().getBot(friend.getBot().getId());
+        this.bot = friend.getBot();
         this.isFriend = true;
         this.isMember = false;
         this.isStranger = false;
@@ -76,7 +75,7 @@ public class CommandSender {
         this.member = member;
         this.stranger = null;
         this.friend = null;
-        this.bot = FocessQQ.getBotManager().getBot(member.getBot().getId());
+        this.bot = member.getBot();
         this.isMember = true;
         this.isFriend = false;
         this.isStranger = false;
@@ -92,7 +91,7 @@ public class CommandSender {
         this.member = null;
         this.friend = null;
         this.stranger = stranger;
-        this.bot = FocessQQ.getBotManager().getBot(this.stranger.getBot().getId());
+        this.bot = stranger.getBot();
         this.isMember = false;
         this.isFriend = false;
         this.isStranger = true;
@@ -196,19 +195,20 @@ public class CommandSender {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
         final CommandSender sender = (CommandSender) o;
-        if (this.getBot().getId() == sender.getBot().getId()) {
-            if (this.isMember() && sender.isMember()) {
-                return sender.getMember().getGroup().getId() == this.getMember().getGroup().getId() && sender.getMember().getId() == this.getMember().getId();
-            } else if (this.isFriend() && sender.isFriend()) {
-                return sender.getFriend().getId() == this.getFriend().getId();
-            }
-            return false;
+        if (this.isMember() && sender.isMember()) {
+            return sender.getMember() == this.getMember();
+        } else if (this.isFriend() && sender.isFriend()) {
+            return sender.getFriend() == this.getFriend();
         } else return this.isConsole() && sender.isConsole();
     }
 
+
     @Override
     public int hashCode() {
-        return Objects.hash(this.member == null ? null : this.member.getId(), this.friend == null ? null : this.friend.getId(), this.isMember, this.isFriend);
+        int result = member != null ? member.hashCode() : 0;
+        result = 31 * result + (friend != null ? friend.hashCode() : 0);
+        result = 31 * result + (stranger != null ? stranger.hashCode() : 0);
+        return result;
     }
 
     /**

@@ -15,4 +15,11 @@ public interface Listener {
     default Plugin getPlugin() {
         return ListenerHandler.LISTENER_PLUGIN_MAP.get(this);
     }
+
+    /**
+     * Unregister this listener
+     */
+    default void unregister() {
+    	ListenerHandler.unregister(this.getPlugin(),this);
+    }
 }

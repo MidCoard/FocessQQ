@@ -532,6 +532,8 @@ public class FocessQQ {
     public static final class MainPlugin extends Plugin {
 
         private static Map<String, Object> properties;
+        private ChatListener chatListener;
+        private ConsoleListener consoleListener;
 
         public MainPlugin() {
             super("MainPlugin", "MidCoard", FocessQQ.getVersion());
@@ -553,8 +555,8 @@ public class FocessQQ {
             if (properties == null)
                 properties = Maps.newHashMap();
             getLogger().debugLang("load-default-properties");
-            this.registerListener(new ConsoleListener());
-            this.registerListener(new ChatListener());
+            this.registerListener(consoleListener = new ConsoleListener());
+            this.registerListener(chatListener = new ChatListener());
             this.registerListener(new PluginListener());
             getLogger().debugLang("register-default-listeners");
             this.registerBuffer(DataConverter.DEFAULT_DATA_CONVERTER, StringBuffer::allocate);
@@ -627,6 +629,27 @@ public class FocessQQ {
             } catch (final EventSubmitException e) {
                 getLogger().thrLang("exception-submit-server-stop-event", e);
             }
+            // first unregister listener then clear all input requests, because the listener may influence the input requests, especially ConsoleListener and ChatListener
+            if (consoleListener != null)
+                consoleListener.unregister();
+            if (chatListener != null)
+                chatListener.unregister();
+            Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
+            while (consoleElement != null) {
+                consoleElement.getKey().input(null);
+                consoleElement = ConsoleListener.QUESTS.poll();
+            }
+            for (final CommandSender sender : ChatListener.QUESTS.keySet())
+                ChatListener.QUESTS.compute(sender, (k, v) -> {
+                    if (v != null) {
+                        Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
+                        while (element != null) {
+                            element.getKey().input(null);
+                            element = v.poll();
+                        }
+                    }
+                    return v;
+                });
             for (final Plugin plugin : getPlugins())
                 if (!plugin.equals(this))
                     try {

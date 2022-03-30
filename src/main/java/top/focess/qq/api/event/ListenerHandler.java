@@ -43,6 +43,22 @@ public class ListenerHandler {
     }
 
     /**
+     * Unregister the listener by the plugin
+     *
+     * @param plugin the plugin of the listener
+     * @param listener the listener need to be unregistered
+     */
+    public static void unregister(final Plugin plugin, final Listener listener) {
+        PLUGIN_LISTENER_MAP.computeIfPresent(plugin, (k, v) -> {
+            v.remove(listener);
+            return v;
+        });
+        for (final ListenerHandler handler : LISTENER_HANDLER_LIST)
+            handler.unregister(listener);
+        LISTENER_PLUGIN_MAP.remove(listener);
+    }
+
+    /**
      * Add the listener and bundle to the plugin
      *
      * @param plugin   the plugin
