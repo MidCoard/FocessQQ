@@ -16,10 +16,9 @@ public abstract class FocessReader {
         byte[] bytes = new byte[1024];
         int len;
         try {
-            while ((len = inputStream.read(bytes)) != -1) {
+            while ((len = inputStream.read(bytes)) != -1)
                 for (int i = 0; i < len; i++)
                     byteList.add(bytes[i]);
-            }
             inputStream.close();
         } catch (Exception e) {
             throw new IllegalStateException(e);

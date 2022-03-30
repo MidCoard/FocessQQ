@@ -35,7 +35,7 @@ public class JSON implements SectionMap {
     @Override
     public JSONSection createSection(String key) {
         Map<String,Object> values = Maps.newHashMap();
-        this.values.put(key,values);
+        this.set(key,values);
         return new JSONSection(this,values);
     }
 
@@ -46,9 +46,17 @@ public class JSON implements SectionMap {
 
     @Override
     public JSONSection getSection(String key) {
-        if (get(key) instanceof Map)
-            return new JSONSection(this,get(key));
-        else throw new IllegalStateException("This " + key + " is not a valid section.");
+        Object value = get(key);
+        if (value == null)
+            createSection(key);
+        if (value instanceof Map)
+            return new JSONSection(this, (Map<String, Object>) value);
+        throw new IllegalStateException("This " + key + " is not a valid section.");
+    }
+
+    @Override
+    public boolean containsSection(String key) {
+        return get(key) instanceof Map;
     }
 
     /**

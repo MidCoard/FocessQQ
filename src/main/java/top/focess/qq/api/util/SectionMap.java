@@ -53,6 +53,8 @@ public interface SectionMap extends Serializable {
     /**
      * Create the section named key
      *
+     * Note: if the section named key already exists, it will be replaced by a new section
+     *
      * @param key the key of the Section
      * @return a section named key
      */
@@ -77,11 +79,21 @@ public interface SectionMap extends Serializable {
     /**
      * Get the section named key
      *
+     * Note: if the section named key does not exist, it will be created
+     *
      * @param key the key of the Section
      * @return the section named key
      * @throws UnsupportedOperationException if there is no section named key
      */
     SectionMap getSection(String key);
+
+    /**
+     * Indicate there is a section named key
+     *
+     * @param key the key of the Section
+     * @return true there is a section named key, false otherwise
+     */
+    boolean containsSection(String key);
 
     /**
      * Get the value of the key-value pair

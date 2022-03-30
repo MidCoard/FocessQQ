@@ -40,9 +40,17 @@ public class Session implements SectionMap {
 
     @Override
     public SectionMap getSection(String key) {
-        if (get(key) instanceof  Map)
-            return new SessionSection(this,get(key));
-        else throw new IllegalStateException("This " + key + " is not a valid section.");
+        Object value = get(key);
+        if (value == null)
+            containsSection(key);
+        if (value instanceof Map)
+            return new SessionSection(this, (Map<String, Object>) value);
+        throw new IllegalStateException("This " + key + " is not a valid section.");
+    }
+
+    @Override
+    public boolean containsSection(String key) {
+        return get(key) instanceof Map;
     }
 
     @Override

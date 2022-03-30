@@ -183,11 +183,9 @@ public class YamlConfiguration implements SectionMap {
     @Override
     public YamlConfigurationSection createSection(String key) {
         Map<String,Object> values = Maps.newHashMap();
-        this.values.put(key,values);
+        this.set(key,values);
         return new YamlConfigurationSection(this,values);
     }
-
-
 
     @Override
     public void set(String key, Object value) {
@@ -317,9 +315,17 @@ public class YamlConfiguration implements SectionMap {
 
     @Override
     public YamlConfigurationSection getSection(String key) {
-        if (get(key) instanceof Map)
-            return new YamlConfigurationSection(this, get(key));
-        else throw new IllegalStateException("This " + key + " is not a valid section.");
+        Object value = get(key);
+        if (value == null)
+            return createSection(key);
+        if (value instanceof Map)
+            return new YamlConfigurationSection(this, (Map<String, Object>) value);
+        throw new IllegalStateException("This " + key + " is not a valid section.");
+    }
+
+    @Override
+    public boolean containsSection(String key) {
+        return get(key) instanceof Map;
     }
 
     @Override
