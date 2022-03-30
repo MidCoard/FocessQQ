@@ -85,6 +85,11 @@ public class JSON extends JSONObject implements SectionMap {
     }
 
     @Override
+    public <T> T get(String key) {
+        return SectionMap.super.get(key);
+    }
+
+    @Override
     public String toString() {
         return values.toString();
     }
