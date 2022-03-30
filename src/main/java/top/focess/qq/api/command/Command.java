@@ -136,8 +136,12 @@ public abstract class Command {
     public static void register(@NotNull final Plugin plugin, @NotNull final Command command) {
         if (command.name == null)
             throw new IllegalStateException("CommandType does not contain name or the constructor does not super name");
-        if (COMMANDS_MAP.containsKey(command.getName()))
-            throw new CommandDuplicateException(command.getName());
+        List<String> commandNames = Lists.newArrayList(command.getName());
+        commandNames.addAll(command.getAliases());
+        for (final String commandName : commandNames)
+            for (Map.Entry<String,Command> entry : COMMANDS_MAP.entrySet())
+                if (entry.getKey().equalsIgnoreCase(commandName) || entry.getValue().getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(commandName)))
+                    throw new CommandDuplicateException(commandName);
         command.registered = true;
         command.plugin = plugin;
         COMMANDS_MAP.put(command.getName(), command);

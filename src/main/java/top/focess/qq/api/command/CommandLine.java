@@ -61,6 +61,7 @@ public class CommandLine {
      */
     @NotNull
     public static Future<CommandResult> exec(final CommandSender sender, final String command, final IOHandler ioHandler) {
+        // not check sender's bot
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
         final List<String> args = splitCommand(command);
@@ -170,6 +171,7 @@ public class CommandLine {
                 } catch (final EventSubmitException e) {
                     FocessQQ.getLogger().thrLang("exception-submit-command-prepost-event", e);
                 }
+                // if not want to execute, it should be cancelled
                 if (event.isCancelled())
                     continue;
                 sender.getSession().set("@previous_command", rawCommand);
@@ -177,6 +179,7 @@ public class CommandLine {
                     IOHandler.getConsoleIoHandler().outputLang("command-exec", sender.toString(), rawCommand);
                 flag = true;
                 ret = EXECUTOR.submit(() -> com.execute(sender, args, ioHandler));
+                break;
             }
         if (!flag && sender == CommandSender.CONSOLE)
             ioHandler.outputLang("unknown-command", command);

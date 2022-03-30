@@ -196,10 +196,13 @@ public class CommandSender {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
         final CommandSender sender = (CommandSender) o;
-        if (this.isMember() && sender.isMember()) {
-            return sender.getMember().getGroup().getId() == this.getMember().getGroup().getId() && sender.getMember().getId() == this.getMember().getId();
-        } else if (this.isFriend() && sender.isFriend()) {
-            return sender.getFriend().getId() == this.getFriend().getId();
+        if (this.getBot().getId() == sender.getBot().getId()) {
+            if (this.isMember() && sender.isMember()) {
+                return sender.getMember().getGroup().getId() == this.getMember().getGroup().getId() && sender.getMember().getId() == this.getMember().getId();
+            } else if (this.isFriend() && sender.isFriend()) {
+                return sender.getFriend().getId() == this.getFriend().getId();
+            }
+            return false;
         } else return this.isConsole() && sender.isConsole();
     }
 

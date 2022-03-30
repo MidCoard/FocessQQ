@@ -387,7 +387,6 @@ public class SimpleBotManager implements BotManager {
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class, event -> {
-                System.out.println(event.getBot().getId() + " " + event.getMessage());
                 final BotSendMessageEvent e = new BotSendMessageEvent(b, new Message(event.getMessage()), Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
                 try {
                     EventManager.submit(e);
