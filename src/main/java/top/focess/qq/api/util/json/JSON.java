@@ -59,23 +59,12 @@ public class JSON extends JSONObject implements SectionMap {
         return get(key) instanceof Map;
     }
 
-    /**
-     * Get the list named key
-     *
-     * @param key the key of the list
-     * @return a list named key
-     */
     public JSONList getList(String key) {
         if (get(key) instanceof List)
             return new JSONList(this.<List<?>>get(key));
         else throw new IllegalStateException("This " + key + " is not a valid list.");
     }
 
-    /**
-     * Translate this JSON instance into json String
-     *
-     * @return json String translated from this JSON instance
-     */
     public String toJson() {
         try {
             return OBJECT_MAPPER.writeValueAsString(this.values);

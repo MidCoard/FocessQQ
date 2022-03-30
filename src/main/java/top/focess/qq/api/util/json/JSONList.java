@@ -50,11 +50,6 @@ public class JSONList extends JSONObject {
         return this.values;
     }
 
-    /**
-     * Translate this JSON instance into json String
-     *
-     * @return json String translated from this JSON instance
-     */
     public String toJson() {
         try {
             return OBJECT_MAPPER.writeValueAsString(this.values);

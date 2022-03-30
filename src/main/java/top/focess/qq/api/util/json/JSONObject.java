@@ -1,10 +1,16 @@
 package top.focess.qq.api.util.json;
 
 /**
- * Represents a JSON object. It includes JSON and JSONList.
+ * Represents a JSON object. It represents JSON or JSONList.
  */
 public abstract class JSONObject {
 
+    /**
+     * Parse the given string into a JSON object.
+     *
+     * @param json the string to parse
+     * @return the JSON object
+     */
     public static JSONObject parse(String json) {
         try {
             return new JSON(json);
@@ -13,24 +19,73 @@ public abstract class JSONObject {
         }
     }
 
+    /**
+     * Get the value at the given index
+     *
+     * Note: This is for JSONList only.
+     *
+     * @param index the index of the value
+     * @param <T> the type of the value
+     * @return the value at the given index
+     */
     public <T> T get(int index) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Get the value of the key-value pair
+     *
+     * Note: This is for JSON only.
+     *
+     * @param key the key
+     * @param <T> the type of the value
+     * @return the value
+     */
     public <T> T get(String key) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Get the list at the given index
+     *
+     * Note: This is for JSONList only.
+     *
+     * @param index the index of the list
+     * @return the list at the given index
+     */
     public JSONObject getList(int index) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Get the list named key
+     *
+     * Note: This is for JSON only.
+     *
+     * @param key the key of the list
+     * @return a list named key
+     */
     public JSONObject getList(String key) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Get as JSON at the given index
+     *
+     * Note: This is for JSONList only.
+     *
+     * @param index the index of the JSON
+     * @return the JSON at the given index
+     */
     public JSONObject getJSON(int index) {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * Translate this JSON instance into json String
+     *
+     * @return json String translated from this JSON instance
+     */
+    public abstract String toJson();
 
 }
