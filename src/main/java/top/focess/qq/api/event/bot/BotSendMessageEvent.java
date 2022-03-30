@@ -24,8 +24,8 @@ public class BotSendMessageEvent extends BotEvent {
     /**
      * Constructs a BotEvent
      *
-     * @param bot the bot
-     * @param message the message
+     * @param bot      the bot
+     * @param message  the message
      * @param contract the target contact
      */
     public BotSendMessageEvent(final Bot bot, final Message message, final Contact contract) {

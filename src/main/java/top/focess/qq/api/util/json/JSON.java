@@ -3,8 +3,8 @@ package top.focess.qq.api.util.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import top.focess.qq.api.util.SectionMap;
 import com.google.common.collect.Maps;
+import top.focess.qq.api.util.SectionMap;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,13 +16,14 @@ import java.util.Map;
 public class JSON extends JSONObject implements SectionMap {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final TypeReference<Map<String,Object>> TYPE_REFERENCE =  new TypeReference<Map<String,Object>>(){};
+    private static final TypeReference<Map<String, Object>> TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
+    };
 
-    private final Map<String,Object> values;
+    private final Map<String, Object> values;
 
     public JSON(final String json) {
         try {
-            this.values = OBJECT_MAPPER.readValue(json,TYPE_REFERENCE);
+            this.values = OBJECT_MAPPER.readValue(json, TYPE_REFERENCE);
         } catch (final IOException e) {
             throw new JSONParseException(json);
         }
@@ -34,9 +35,9 @@ public class JSON extends JSONObject implements SectionMap {
 
     @Override
     public JSONSection createSection(final String key) {
-        final Map<String,Object> values = Maps.newHashMap();
-        this.set(key,values);
-        return new JSONSection(this,values);
+        final Map<String, Object> values = Maps.newHashMap();
+        this.set(key, values);
+        return new JSONSection(this, values);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package top.focess.qq.api.event.chat;
 
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when Console input a String

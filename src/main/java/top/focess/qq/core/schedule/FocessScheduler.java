@@ -4,9 +4,9 @@ import com.google.common.collect.Queues;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
+import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
@@ -31,7 +31,7 @@ public class FocessScheduler extends AScheduler {
     }
 
     public FocessScheduler(@NotNull final Plugin plugin) {
-        this(plugin, plugin.getName() + "-FocessScheduler-" + UUID.randomUUID().toString().substring(0,8));
+        this(plugin, plugin.getName() + "-FocessScheduler-" + UUID.randomUUID().toString().substring(0, 8));
     }
 
     @Override
@@ -93,6 +93,11 @@ public class FocessScheduler extends AScheduler {
         this.thread.stop();
     }
 
+    @Override
+    public String toString() {
+        return this.getName();
+    }
+
     private class SchedulerThread extends Thread {
 
         @Nullable
@@ -100,13 +105,13 @@ public class FocessScheduler extends AScheduler {
 
         public SchedulerThread(final String name) {
             super(name);
-            this.setUncaughtExceptionHandler((t,e)->{
+            this.setUncaughtExceptionHandler((t, e) -> {
                 FocessScheduler.this.close();
                 if (this.task != null) {
                     this.task.getTask().setException(new ExecutionException(e));
                     this.task.getTask().endRun();
                 }
-                FocessQQ.getLogger().thrLang("exception-focess-scheduler-uncaught",e,FocessScheduler.this.getName());
+                FocessQQ.getLogger().thrLang("exception-focess-scheduler-uncaught", e, FocessScheduler.this.getName());
             });
         }
 
@@ -135,7 +140,7 @@ public class FocessScheduler extends AScheduler {
                         if (this.task.getTask().isRunning()) {
                             try {
                                 this.task.getTask().run();
-                            } catch(final Exception e) {
+                            } catch (final Exception e) {
                                 this.task.getTask().setException(new ExecutionException(e));
                             }
                             this.task.getTask().endRun();
@@ -144,15 +149,9 @@ public class FocessScheduler extends AScheduler {
                         }
                     }
                 } catch (final Exception e) {
-                    FocessQQ.getLogger().thrLang("exception-focess-scheduler",e);
+                    FocessQQ.getLogger().thrLang("exception-focess-scheduler", e);
                 }
             }
         }
-    }
-
-
-    @Override
-    public String toString() {
-        return this.getName();
     }
 }

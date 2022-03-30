@@ -5,7 +5,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A buffer which stores data
  *
- * @param <T>  the elements' type in the buffer
+ * @param <T> the elements' type in the buffer
  */
 public abstract class DataBuffer<T> {
 
@@ -31,6 +31,7 @@ public abstract class DataBuffer<T> {
 
     /**
      * Get element in the buffer by index
+     *
      * @param index the element index
      * @return element in the index of the buffer
      */

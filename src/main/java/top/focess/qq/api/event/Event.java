@@ -13,11 +13,11 @@ public abstract class Event implements Serializable {
      */
     private boolean prevent;
 
-    public void setPrevent(final boolean prevent) {
-        this.prevent = prevent;
-    }
-
     public boolean isPrevent() {
         return this.prevent;
+    }
+
+    public void setPrevent(final boolean prevent) {
+        this.prevent = prevent;
     }
 }

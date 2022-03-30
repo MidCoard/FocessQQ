@@ -17,10 +17,29 @@ import java.util.Random;
 public abstract class AServerReceiver implements ServerReceiver {
 
 
-    protected final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
-    protected int defaultClientId;
+    protected final Map<Integer, Long> lastHeart = Maps.newConcurrentMap();
     protected final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
-    protected final Map<Plugin,Map<String, Map<Class<?>, List<PackHandler>>>> packHandlers = Maps.newConcurrentMap();
+    protected final Map<Plugin, Map<String, Map<Class<?>, List<PackHandler>>>> packHandlers = Maps.newConcurrentMap();
+    protected int defaultClientId;
+
+    protected static String generateToken() {
+        final StringBuilder stringBuilder = new StringBuilder();
+        final Random random = new Random(System.currentTimeMillis());
+        for (int i = 0; i < 64; i++) {
+            switch (random.nextInt(3)) {
+                case 0:
+                    stringBuilder.append((char) ('0' + random.nextInt(10)));
+                    break;
+                case 1:
+                    stringBuilder.append((char) ('a' + random.nextInt(26)));
+                    break;
+                case 2:
+                    stringBuilder.append((char) ('A' + random.nextInt(26)));
+                    break;
+            }
+        }
+        return stringBuilder.toString();
+    }
 
     @Override
     public boolean isConnected(final String client) {
@@ -29,28 +48,8 @@ public abstract class AServerReceiver implements ServerReceiver {
 
     @Override
     @Nullable
-    public
-    Client getClient(final String name) {
+    public Client getClient(final String name) {
         return this.clientInfos.values().stream().filter(simpleClient -> simpleClient.getName().equals(name)).findFirst().orElse(null);
-    }
-
-    protected static String generateToken() {
-        final StringBuilder stringBuilder = new StringBuilder();
-        final Random random = new Random(System.currentTimeMillis());
-        for (int i = 0;i<64;i++) {
-            switch (random.nextInt(3)) {
-                case 0:
-                    stringBuilder.append((char) ('0' + random.nextInt(10)));
-                    break;
-                case 1:
-                    stringBuilder.append((char)('a' + random.nextInt(26)));
-                    break;
-                case 2:
-                    stringBuilder.append((char)('A' + random.nextInt(26)));
-                    break;
-            }
-        }
-        return stringBuilder.toString();
     }
 
     @Override
@@ -70,7 +69,7 @@ public abstract class AServerReceiver implements ServerReceiver {
     }
 
     @Override
-    public <T extends Packet> void register(final Plugin plugin, final String name, final Class<T> c, final PackHandler<T> packHandler){
+    public <T extends Packet> void register(final Plugin plugin, final String name, final Class<T> c, final PackHandler<T> packHandler) {
         this.packHandlers.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Maps.newHashMap();

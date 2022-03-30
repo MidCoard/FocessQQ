@@ -26,7 +26,7 @@ public class HttpResponse {
     /**
      * Unknown request type HttpResponse
      */
-    private static final Function<Plugin,HttpResponse> UNKNOWN_REQUEST_TYPE = HttpResponse::new;
+    private static final Function<Plugin, HttpResponse> UNKNOWN_REQUEST_TYPE = HttpResponse::new;
 
     /**
      * The response code
@@ -54,7 +54,7 @@ public class HttpResponse {
      * Initialize a HttpResponse with code
      *
      * @param plugin the request plugin
-     * @param code the response code
+     * @param code   the response code
      */
     private HttpResponse(final Plugin plugin, final int code) {
         this.code = code;
@@ -62,30 +62,30 @@ public class HttpResponse {
     }
 
     private HttpResponse(final Plugin plugin) {
-        this(plugin,UNKNOWN_REQUEST);
+        this(plugin, UNKNOWN_REQUEST);
     }
 
     /**
      * Initialize an exception thrown HttpResponse with e
      *
      * @param plugin the request plugin
-     * @param e the thrown exception in this http-request processing
+     * @param e      the thrown exception in this http-request processing
      */
     public HttpResponse(final Plugin plugin, final Exception e) {
-        this(plugin,EXCEPTION);
+        this(plugin, EXCEPTION);
         this.exception = e;
     }
 
     /**
      * Initialize a HttpResponse without exceptions
      *
-     * @param plugin the request plugin
-     * @param code the response code
+     * @param plugin  the request plugin
+     * @param code    the response code
      * @param headers the response header
-     * @param value the response data
+     * @param value   the response data
      */
     public HttpResponse(final Plugin plugin, final int code, final Headers headers, final String value) {
-        this(plugin,code);
+        this(plugin, code);
         this.value = value;
         this.headers = headers;
     }

@@ -9,8 +9,6 @@ import java.util.List;
 
 public abstract class FocessReader {
 
-    public abstract Object read();
-
     public static FocessReader newFocessReader(final InputStream inputStream) {
         final List<Byte> byteList = Lists.newArrayList();
         final byte[] bytes = new byte[1024];
@@ -25,4 +23,6 @@ public abstract class FocessReader {
         }
         return new SimpleFocessReader(Bytes.toArray(byteList));
     }
+
+    public abstract Object read();
 }

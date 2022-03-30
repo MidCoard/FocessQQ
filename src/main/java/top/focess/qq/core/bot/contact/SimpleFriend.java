@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class SimpleFriend extends SimpleSpeaker implements Friend {
 
-    private static final Map<Long, Map<Long,SimpleFriend>> FRIEND_MAP = Maps.newConcurrentMap();
+    private static final Map<Long, Map<Long, SimpleFriend>> FRIEND_MAP = Maps.newConcurrentMap();
     private final net.mamoe.mirai.contact.Friend nativeFriend;
 
     private SimpleFriend(final Bot bot, final net.mamoe.mirai.contact.Friend nativeFriend) {
-        super(bot,nativeFriend);
+        super(bot, nativeFriend);
         this.nativeFriend = nativeFriend;
     }
 

@@ -21,13 +21,13 @@ public class FocessSidedReceiver extends AServerReceiver {
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessSidedReceiver");
 
     public FocessSidedReceiver() {
-        this.scheduler.runTimer(()->{
+        this.scheduler.runTimer(() -> {
             for (final SimpleClient simpleClient : this.clientInfos.values()) {
-                final long time = this.lastHeart.getOrDefault(simpleClient.getId(),0L);
+                final long time = this.lastHeart.getOrDefault(simpleClient.getId(), 0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
                     this.clientInfos.remove(simpleClient.getId());
             }
-        }, Duration.ZERO,Duration.ofSeconds(1));
+        }, Duration.ZERO, Duration.ofSeconds(1));
     }
 
     @Nullable
@@ -36,8 +36,8 @@ public class FocessSidedReceiver extends AServerReceiver {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(packet.getName()))
                 return null;
-        final SimpleClient simpleClient = new SimpleClient(this.defaultClientId++,packet.getName(),generateToken());
-        this.lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+        final SimpleClient simpleClient = new SimpleClient(this.defaultClientId++, packet.getName(), generateToken());
+        this.lastHeart.put(simpleClient.getId(), System.currentTimeMillis());
         this.clientInfos.put(simpleClient.getId(), simpleClient);
         return new ConnectedPacket(simpleClient.getId(), simpleClient.getToken());
     }
@@ -93,7 +93,7 @@ public class FocessSidedReceiver extends AServerReceiver {
     }
 
     public void sendPacket(final String client, final Packet packet) {
-        this.packets.compute(client,(k, v)->{
+        this.packets.compute(client, (k, v) -> {
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
             v.offer(new ServerPackPacket(packet));

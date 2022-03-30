@@ -7,12 +7,12 @@ public class CommandBuffer extends DataBuffer<Command> {
 
     private final StringBuffer stringBuffer;
 
-    public static CommandBuffer allocate(final int size) {
-        return new CommandBuffer(size);
-    }
-
     public CommandBuffer(final int size) {
         this.stringBuffer = StringBuffer.allocate(size);
+    }
+
+    public static CommandBuffer allocate(final int size) {
+        return new CommandBuffer(size);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CommandBuffer extends DataBuffer<Command> {
     @Override
     public Command get() {
         final String name = this.stringBuffer.get();
-        for (final Command command:Command.getCommands())
+        for (final Command command : Command.getCommands())
             if (command.getName().equals(name))
                 return command;
         return null;
@@ -39,7 +39,7 @@ public class CommandBuffer extends DataBuffer<Command> {
     @Override
     public Command get(final int index) {
         final String name = this.stringBuffer.get(index);
-        for (final Command command:Command.getCommands())
+        for (final Command command : Command.getCommands())
             if (command.getName().equals(name))
                 return command;
         return null;

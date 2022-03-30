@@ -13,6 +13,7 @@ public class DisconnectedPacket extends ServerPacket {
     public DisconnectedPacket() {
 
     }
+
     @Override
     public int getId() {
         return PACKET_ID;

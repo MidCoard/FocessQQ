@@ -3,10 +3,6 @@ package top.focess.qq.core.util.option.type;
 
 public abstract class OptionType<T> {
 
-    public abstract T parse(String v);
-
-    public abstract boolean accept(String v);
-
     public static final OptionType<String> DEFAULT_OPTION_TYPE = new OptionType<String>() {
         @Override
         public String parse(final String v) {
@@ -23,4 +19,8 @@ public abstract class OptionType<T> {
             return "DEFAULT_OPTION_TYPE";
         }
     };
+
+    public abstract T parse(String v);
+
+    public abstract boolean accept(String v);
 }

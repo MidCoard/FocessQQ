@@ -25,9 +25,10 @@ public class ChatEvent extends BotEvent {
 
     /**
      * Constructs a ChatEvent
-     *  @param bot the bot
+     *
+     * @param bot     the bot
      * @param message the chat message
-     * @param source the source of the message
+     * @param source  the source of the message
      */
     public ChatEvent(final Bot bot, final MessageChain message, final MessageSource source) {
         super(bot);

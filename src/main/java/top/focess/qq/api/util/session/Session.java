@@ -22,15 +22,15 @@ public class Session implements SectionMap {
      *
      * @param values the session key-value pairs
      */
-    public Session(@Nullable final Map<String,Object> values) {
+    public Session(@Nullable final Map<String, Object> values) {
         this.values = values == null ? Maps.newHashMap() : values;
     }
 
     @Override
     public SessionSection createSection(final String key) {
-        final Map<String,Object> values = Maps.newHashMap();
-        this.set(key,values);
-        return new SessionSection(this,values);
+        final Map<String, Object> values = Maps.newHashMap();
+        this.set(key, values);
+        return new SessionSection(this, values);
     }
 
     @Override

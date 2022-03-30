@@ -35,6 +35,10 @@ public class SimpleBot implements Bot {
         return this.nativeBot;
     }
 
+    public void setNativeBot(final net.mamoe.mirai.Bot nativeBot) {
+        this.nativeBot = nativeBot;
+    }
+
     @Override
     public boolean relogin() throws BotLoginException {
         return FocessQQ.getBotManager().relogin(this);
@@ -50,8 +54,6 @@ public class SimpleBot implements Bot {
         return FocessQQ.getBotManager().logout(this);
     }
 
-
-
     @Override
     public @NonNull Friend getFriendOrFail(final long id) {
         return Objects.requireNonNull(SimpleFriend.get(this, this.nativeBot.getFriendOrFail(id)));
@@ -64,12 +66,12 @@ public class SimpleBot implements Bot {
 
     @Override
     public @Nullable Group getGroup(final long id) {
-        return SimpleGroup.get(this,this.nativeBot.getGroup(id));
+        return SimpleGroup.get(this, this.nativeBot.getGroup(id));
     }
 
     @Override
     public @Nullable Friend getFriend(final long id) {
-        return SimpleFriend.get(this,this.nativeBot.getFriend(id));
+        return SimpleFriend.get(this, this.nativeBot.getFriend(id));
     }
 
     @Override
@@ -111,10 +113,6 @@ public class SimpleBot implements Bot {
 
     public String getPassword() {
         return this.password;
-    }
-
-    public void setNativeBot(final net.mamoe.mirai.Bot nativeBot) {
-        this.nativeBot = nativeBot;
     }
 
     @Override

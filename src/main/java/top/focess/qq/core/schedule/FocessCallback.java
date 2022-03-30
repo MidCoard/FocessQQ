@@ -2,11 +2,7 @@ package top.focess.qq.core.schedule;
 
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.TaskNotFinishedException;
-import top.focess.qq.api.schedule.Callback;
-import top.focess.qq.api.schedule.Scheduler;
-import top.focess.qq.api.schedule.Schedulers;
-import top.focess.qq.api.schedule.Task;
+import top.focess.qq.api.schedule.*;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -14,13 +10,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FocessCallback<V> extends FocessTask implements Callback<V> {
 
-    private static final Scheduler DEFAULT_SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),7,false,"FocessCallback");
+    private static final Scheduler DEFAULT_SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 7, false, "FocessCallback");
 
     private final Callable<V> callback;
     private V value;
 
     FocessCallback(final Callable<V> callback, final Scheduler scheduler) {
-        super(null,scheduler);
+        super(null, scheduler);
         this.callback = callback;
     }
 

@@ -9,6 +9,7 @@ public class YamlLoadException extends IOException {
 
     /**
      * Constructs a YamlLoadException
+     *
      * @param e the exception
      */
     public YamlLoadException(final Exception e) {

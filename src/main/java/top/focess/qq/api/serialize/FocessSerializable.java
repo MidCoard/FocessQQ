@@ -7,9 +7,8 @@ import java.util.Map;
 
 /**
  * Represents this class is a serializable class
- *
+ * <p>
  * You should implement the deserialize method if you have implemented the serialize method (not return null).
- *
  */
 public interface FocessSerializable extends Serializable {
 
@@ -19,7 +18,7 @@ public interface FocessSerializable extends Serializable {
      * @return the serialized object, null if it should serialize all fields in the object.
      */
     @Nullable
-    default Map<String,Object> serialize() {
+    default Map<String, Object> serialize() {
         return null;
     }
 }

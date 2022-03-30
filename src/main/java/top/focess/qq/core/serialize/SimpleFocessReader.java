@@ -26,7 +26,7 @@ public class SimpleFocessReader extends FocessReader {
         CLASS_READER_MAP.put(ArrayList.class, (Reader<ArrayList>) (t, reader) -> {
             final ArrayList list = new ArrayList();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
+            for (int i = 0; i < length; i++)
                 list.add(reader.readObject());
             return list;
         });
@@ -34,7 +34,7 @@ public class SimpleFocessReader extends FocessReader {
         CLASS_READER_MAP.put(LinkedList.class, (Reader<LinkedList>) (t, reader) -> {
             final LinkedList list = new LinkedList();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
+            for (int i = 0; i < length; i++)
                 list.offer(reader.readObject());
             return list;
         });
@@ -42,23 +42,23 @@ public class SimpleFocessReader extends FocessReader {
         CLASS_READER_MAP.put(HashMap.class, (Reader<HashMap>) (t, reader) -> {
             final HashMap hashMap = new HashMap();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
-                hashMap.put(reader.readObject(),reader.readObject());
+            for (int i = 0; i < length; i++)
+                hashMap.put(reader.readObject(), reader.readObject());
             return hashMap;
         });
 
         CLASS_READER_MAP.put(TreeMap.class, (Reader<TreeMap>) (t, reader) -> {
             final TreeMap treeMap = new TreeMap();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
-                treeMap.put(reader.readObject(),reader.readObject());
+            for (int i = 0; i < length; i++)
+                treeMap.put(reader.readObject(), reader.readObject());
             return treeMap;
         });
 
         CLASS_READER_MAP.put(HashSet.class, (Reader<HashSet>) (t, reader) -> {
             final HashSet hashSet = new HashSet();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
+            for (int i = 0; i < length; i++)
                 hashSet.add(reader.readObject());
             return hashSet;
         });
@@ -66,7 +66,7 @@ public class SimpleFocessReader extends FocessReader {
         CLASS_READER_MAP.put(TreeSet.class, (Reader<TreeSet>) (t, reader) -> {
             final TreeSet treeSet = new TreeSet();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
+            for (int i = 0; i < length; i++)
                 treeSet.add(reader.readObject());
             return treeSet;
         });
@@ -101,10 +101,10 @@ public class SimpleFocessReader extends FocessReader {
             }
         });
 
-        CLASS_READER_MAP.put(ConcurrentHashMap.KeySetView.class,(Reader<ConcurrentHashMap.KeySetView>) (t, reader)->{
+        CLASS_READER_MAP.put(ConcurrentHashMap.KeySetView.class, (Reader<ConcurrentHashMap.KeySetView>) (t, reader) -> {
             final ConcurrentHashMap.KeySetView keySetView = ConcurrentHashMap.newKeySet();
             final int length = reader.readInt();
-            for (int i = 0;i<length;i++)
+            for (int i = 0; i < length; i++)
                 keySetView.add(reader.readObject());
             return keySetView;
         });
@@ -160,11 +160,11 @@ public class SimpleFocessReader extends FocessReader {
         return r;
     }
 
-    private char readChar(){
+    private char readChar() {
         return (char) this.readShort();
     }
 
-    private boolean readBoolean(){
+    private boolean readBoolean() {
         return this.readByte() == 1;
     }
 

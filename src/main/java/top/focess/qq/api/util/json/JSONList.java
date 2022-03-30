@@ -14,13 +14,14 @@ import java.util.Map;
 public class JSONList extends JSONObject {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final TypeReference<List<Object>> TYPE_REFERENCE =  new TypeReference<List<Object>>(){};
+    private static final TypeReference<List<Object>> TYPE_REFERENCE = new TypeReference<List<Object>>() {
+    };
     private final List<?> values;
 
 
     public JSONList(final String json) {
         try {
-            this.values = OBJECT_MAPPER.readValue(json,TYPE_REFERENCE);
+            this.values = OBJECT_MAPPER.readValue(json, TYPE_REFERENCE);
         } catch (final IOException e) {
             throw new JSONParseException(json);
         }
@@ -36,7 +37,7 @@ public class JSONList extends JSONObject {
 
     public JSON getJSON(final int index) {
         if (this.values.get(index) instanceof Map)
-            return new JSON((Map<String,Object>) this.values.get(index));
+            return new JSON((Map<String, Object>) this.values.get(index));
         throw new IllegalStateException("This element is not a valid map.");
     }
 

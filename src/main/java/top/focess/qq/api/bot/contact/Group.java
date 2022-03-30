@@ -13,6 +13,7 @@ public interface Group extends Speaker {
 
     /**
      * Get the group's member
+     *
      * @param id the member's id
      * @return the member or null if not found
      */
@@ -20,6 +21,7 @@ public interface Group extends Speaker {
 
     /**
      * Get the group's member
+     *
      * @param id the member's id
      * @return the member
      * @throws NullPointerException if not found
@@ -28,6 +30,7 @@ public interface Group extends Speaker {
 
     /**
      * Get the group's all members
+     *
      * @return the all members
      */
     @NonNull
@@ -36,6 +39,7 @@ public interface Group extends Speaker {
 
     /**
      * Get the bot self as a member
+     *
      * @return the bot self as a member
      */
     Member getAsMember();

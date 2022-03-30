@@ -21,18 +21,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetworkHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
-
     /**
      * Used to indicate this http-request accepts JSON
      */
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
     /**
      * Used to indicate this http-request accepts normal String
      */
     public static final MediaType TEXT = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
     private static final OkHttpClient CLIENT;
 
     static {
@@ -57,11 +54,11 @@ public class NetworkHandler {
         final SSLContext sslContext;
         try {
             sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null,managers,new SecureRandom());
+            sslContext.init(null, managers, new SecureRandom());
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-        CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
+        CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(), managers[0]).hostnameVerifier((hostname, session) -> true).build();
     }
 
     private final Plugin plugin;
@@ -73,121 +70,121 @@ public class NetworkHandler {
     /**
      * Send a http-request
      *
-     * @param url the request url
-     * @param data the request data
+     * @param url         the request url
+     * @param data        the request data
      * @param requestType the request type
      * @return the response of this request
      */
-    public HttpResponse request(final String url, final Map<String,Object> data, final RequestType requestType) {
-        return this.request(url,data,Maps.newHashMap(),TEXT,requestType);
+    public HttpResponse request(final String url, final Map<String, Object> data, final RequestType requestType) {
+        return this.request(url, data, Maps.newHashMap(), TEXT, requestType);
     }
 
     /**
      * Send a http-request
      *
-     * @see NetworkHandler#request(String, Map, RequestType)
-     * @param url the request url
+     * @param url         the request url
      * @param requestType the request type
      * @return the response of this request
+     * @see NetworkHandler#request(String, Map, RequestType)
      */
     public HttpResponse request(final String url, final RequestType requestType) {
-        return this.request(url, Maps.newHashMap(),requestType);
+        return this.request(url, Maps.newHashMap(), requestType);
     }
 
     /**
      * Send a http-request
      *
-     * @param url the request url
-     * @param data the request data
-     * @param header the request header
-     * @param mediaType the request acceptable type
+     * @param url         the request url
+     * @param data        the request data
+     * @param header      the request header
+     * @param mediaType   the request acceptable type
      * @param requestType the request type
      * @return the response of this request
      */
-    public HttpResponse request(final String url, final Map<String,Object> data, final Map<String,String> header, final MediaType mediaType, final RequestType requestType) {
+    public HttpResponse request(final String url, final Map<String, Object> data, final Map<String, String> header, final MediaType mediaType, final RequestType requestType) {
         if (requestType == RequestType.GET)
-            return this.get(url,data,header);
+            return this.get(url, data, header);
         else if (requestType == RequestType.POST)
-            return this.post(url,data,header,mediaType);
+            return this.post(url, data, header, mediaType);
         else if (requestType == RequestType.PUT)
-            return this.put(url,data,header,mediaType);
+            return this.put(url, data, header, mediaType);
         return HttpResponse.ofNull(this.plugin);
     }
 
-    private String process(final Map<String,Object> data) {
+    private String process(final Map<String, Object> data) {
         final StringBuilder stringBuilder = new StringBuilder();
         for (final String key : data.keySet())
             stringBuilder.append(key).append('=').append(data.get(key)).append('&');
         if (stringBuilder.length() != 0)
-            return stringBuilder.substring(0,stringBuilder.length() - 1);
+            return stringBuilder.substring(0, stringBuilder.length() - 1);
         return "";
     }
 
     /**
      * Send a PUT http-request
      *
-     * @param url the request url
-     * @param data the request data
-     * @param header the request header
+     * @param url       the request url
+     * @param data      the request data
+     * @param header    the request header
      * @param mediaType the request acceptable type
      * @return the response of this request
      */
-    public HttpResponse put(final String url, final Map<String, Object> data, final Map<String,String> header, final MediaType mediaType) {
+    public HttpResponse put(final String url, final Map<String, Object> data, final Map<String, String> header, final MediaType mediaType) {
         final String value;
         if (mediaType.equals(JSON))
             value = new JSON(data).toJson();
         else value = this.process(data);
-        final RequestBody requestBody = RequestBody.create(value,mediaType);
+        final RequestBody requestBody = RequestBody.create(value, mediaType);
         final Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
         try {
             final Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             final String body = response.body().string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Response: " + body);
-            return new HttpResponse(this.plugin,response.code(),response.headers(),body);
+            return new HttpResponse(this.plugin, response.code(), response.headers(), body);
         } catch (final Exception e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
-            return new HttpResponse(this.plugin,e);
+            return new HttpResponse(this.plugin, e);
         }
     }
 
     /**
      * Send a POST http-request
      *
-     * @param url the request url
-     * @param data the request data
-     * @param header the request header
+     * @param url       the request url
+     * @param data      the request data
+     * @param header    the request header
      * @param mediaType the request acceptable type
      * @return the response of this request
      */
-    public HttpResponse post(final String url, final Map<String, Object> data, final Map<String,String> header, final MediaType mediaType) {
+    public HttpResponse post(final String url, final Map<String, Object> data, final Map<String, String> header, final MediaType mediaType) {
         final String value;
         if (mediaType.equals(JSON))
             value = new JSON(data).toJson();
         else value = this.process(data);
-        final RequestBody requestBody = RequestBody.create(value,mediaType);
+        final RequestBody requestBody = RequestBody.create(value, mediaType);
         final Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
         try {
             final Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             final String body = response.body().string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Response: " + body);
-            return new HttpResponse(this.plugin,response.code(),response.headers(),body);
+            return new HttpResponse(this.plugin, response.code(), response.headers(), body);
         } catch (final IOException e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
-            return new HttpResponse(this.plugin,e);
+            return new HttpResponse(this.plugin, e);
         }
     }
 
     /**
      * Send a GET http-request
      *
-     * @param url the request url
-     * @param data the request data
+     * @param url    the request url
+     * @param data   the request data
      * @param header the request header
      * @return the response of this request
      */
-    public HttpResponse get(final String url, final Map<String,Object> data, final Map<String,String> header) {
+    public HttpResponse get(final String url, final Map<String, Object> data, final Map<String, String> header) {
         final Request request;
         if (data.size() != 0)
             request = new Request.Builder().url(url + "?" + this.process(data)).get().headers(Headers.of(header)).build();
@@ -198,10 +195,10 @@ public class NetworkHandler {
             // Call#execute() returns a non-null Response object
             final String body = response.body().string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
-            return new HttpResponse(this.plugin,response.code(),response.headers(),body);
+            return new HttpResponse(this.plugin, response.code(), response.headers(), body);
         } catch (final IOException e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
-            return new HttpResponse(this.plugin,e);
+            return new HttpResponse(this.plugin, e);
         }
     }
 

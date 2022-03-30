@@ -5,11 +5,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.SchedulerClosedException;
-import top.focess.qq.api.schedule.TaskNotFoundException;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Callback;
+import top.focess.qq.api.schedule.SchedulerClosedException;
 import top.focess.qq.api.schedule.Task;
+import top.focess.qq.api.schedule.TaskNotFoundException;
 
 import java.time.Duration;
 import java.util.List;
@@ -20,30 +20,25 @@ import java.util.concurrent.Callable;
 
 public class ThreadPoolScheduler extends AScheduler {
 
+    final Map<ITask, ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
     private final Queue<ComparableTask> tasks = Queues.newPriorityBlockingQueue();
-
-    final Map<ITask,ThreadPoolSchedulerThread> taskThreadMap = Maps.newConcurrentMap();
-
     private final List<ThreadPoolSchedulerThread> threads = Lists.newArrayList();
     private final boolean immediate;
-
-    private volatile boolean shouldStop;
-
-    private int currentThread;
-
     private final String name;
+    private volatile boolean shouldStop;
+    private int currentThread;
 
     public ThreadPoolScheduler(final Plugin plugin, final int poolSize, final boolean isImmediate, final String name) {
         super(plugin);
         this.name = name;
         for (int i = 0; i < poolSize; i++)
-            this.threads.add(new ThreadPoolSchedulerThread(this,this.getName() + "-" + i));
+            this.threads.add(new ThreadPoolSchedulerThread(this, this.getName() + "-" + i));
         new SchedulerThread(this.getName()).start();
         this.immediate = isImmediate;
     }
 
     public ThreadPoolScheduler(final Plugin plugin, final int poolSize) {
-        this(plugin, poolSize, false,plugin.getName() + "-ThreadPoolScheduler-" + UUID.randomUUID().toString().substring(0,8));
+        this(plugin, poolSize, false, plugin.getName() + "-ThreadPoolScheduler-" + UUID.randomUUID().toString().substring(0, 8));
     }
 
     @Override
@@ -115,12 +110,11 @@ public class ThreadPoolScheduler extends AScheduler {
         if (this.taskThreadMap.containsKey(task)) {
             this.taskThreadMap.get(task).cancel();
             this.taskThreadMap.remove(task);
-        }
-        else throw new TaskNotFoundException(task);
+        } else throw new TaskNotFoundException(task);
     }
 
     public void recreate(final String name) {
-        for (int i = 0; i< this.threads.size(); i++)
+        for (int i = 0; i < this.threads.size(); i++)
             if (this.threads.get(i).getName().equals(name)) {
                 this.threads.set(i, new ThreadPoolSchedulerThread(this, name));
                 break;
@@ -133,13 +127,18 @@ public class ThreadPoolScheduler extends AScheduler {
         this.tasks.add(new ComparableTask(System.currentTimeMillis() + task.getPeriod().toMillis(), task));
     }
 
+    @Override
+    public String toString() {
+        return this.getName();
+    }
+
     private class SchedulerThread extends Thread {
 
         public SchedulerThread(final String name) {
             super(name);
-            this.setUncaughtExceptionHandler((t,e)->{
+            this.setUncaughtExceptionHandler((t, e) -> {
                 ThreadPoolScheduler.this.close();
-                FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-uncaught",e,ThreadPoolScheduler.this.getName());
+                FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-uncaught", e, ThreadPoolScheduler.this.getName());
             });
         }
 
@@ -187,14 +186,9 @@ public class ThreadPoolScheduler extends AScheduler {
                             }
                         }
                 } catch (final Exception e) {
-                    FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler",e);
+                    FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler", e);
                 }
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return this.getName();
     }
 }

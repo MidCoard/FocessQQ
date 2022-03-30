@@ -9,7 +9,7 @@ import top.focess.qq.api.event.ListenerHandler;
 /**
  * Called when a stranger chat with bot (this does not execute any commands)
  */
-public class StrangerMessageEvent extends MessageEvent{
+public class StrangerMessageEvent extends MessageEvent {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
 
@@ -21,10 +21,10 @@ public class StrangerMessageEvent extends MessageEvent{
     /**
      * Constructs a StrangerMessageEvent
      *
-     * @param bot     the bot
-     * @param message the chat message
+     * @param bot      the bot
+     * @param message  the chat message
      * @param stranger the stranger who chats with bot
-     * @param source  the message source
+     * @param source   the message source
      */
     public StrangerMessageEvent(final Bot bot, final MessageChain message, final Stranger stranger, final MessageSource source) {
         super(bot, message, source);

@@ -7,7 +7,7 @@ import top.focess.qq.api.plugin.Plugin;
 /**
  * The socket receiver for server.
  */
-public interface ServerReceiver extends Receiver{
+public interface ServerReceiver extends Receiver {
 
     /**
      * Send packet to the special client
@@ -20,11 +20,11 @@ public interface ServerReceiver extends Receiver{
     /**
      * Register packet handler for special client
      *
-     * @param client the client name
-     * @param c the packet class
+     * @param client      the client name
+     * @param c           the packet class
      * @param packHandler the packet handler
-     * @param plugin the plugin
-     * @param <T> the packet type
+     * @param plugin      the plugin
+     * @param <T>         the packet type
      */
     <T extends Packet> void register(Plugin plugin, String client, Class<T> c, PackHandler<T> packHandler);
 

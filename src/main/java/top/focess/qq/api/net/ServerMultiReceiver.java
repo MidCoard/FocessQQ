@@ -7,11 +7,12 @@ import java.util.List;
 /**
  * The socket multi receiver for server.
  */
-public interface ServerMultiReceiver extends ServerReceiver{
+public interface ServerMultiReceiver extends ServerReceiver {
 
     /**
      * Send packet to the special client
-     * @param id the client id
+     *
+     * @param id     the client id
      * @param packet the packet
      */
     void sendPacket(int id, Packet packet);

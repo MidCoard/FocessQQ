@@ -5,7 +5,7 @@ import top.focess.qq.api.net.PacketPreCodec;
 /**
  * Codec for SidedConnectPacket.
  */
-public class SidedConnectPacketCodec extends PacketCodec<SidedConnectPacket>{
+public class SidedConnectPacketCodec extends PacketCodec<SidedConnectPacket> {
 
     @Override
     public SidedConnectPacket readPacket(final PacketPreCodec packetPreCodec) {

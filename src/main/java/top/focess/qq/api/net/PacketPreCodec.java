@@ -1,10 +1,10 @@
 package top.focess.qq.api.net;
 
-import com.google.common.primitives.Bytes;
-import top.focess.qq.FocessQQ;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Bytes;
 import org.jetbrains.annotations.Nullable;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.packet.*;
 
 import java.nio.charset.StandardCharsets;
@@ -17,17 +17,18 @@ import java.util.Map;
 public class PacketPreCodec {
 
     private static final Map<Integer, PacketCodec<? extends Packet>> PACKET_CODECS = Maps.newHashMap();
-    static{
-        registerPacketCodec(MessagePacket.PACKET_ID,new MessagePacketCodec());
-        registerPacketCodec(HeartPacket.PACKET_ID,new HeartPacketCodec());
-        registerPacketCodec(ConnectPacket.PACKET_ID,new ConnectPacketCodec());
-        registerPacketCodec(ConnectedPacket.PACKET_ID,new ConnectedPacketCodec());
-        registerPacketCodec(DisconnectPacket.PACKET_ID,new DisconnectPacketCodec());
-        registerPacketCodec(DisconnectedPacket.PACKET_ID,new DisconnectedPacketCodec());
-        registerPacketCodec(ClientPackPacket.PACKET_ID,new ClientPackPacketCodec());
-        registerPacketCodec(ServerPackPacket.PACKET_ID,new ServerPackPacketCodec());
-        registerPacketCodec(SidedConnectPacket.PACKET_ID,new SidedConnectPacketCodec());
-        registerPacketCodec(WaitPacket.PACKET_ID,new WaitPacketCodec());
+
+    static {
+        registerPacketCodec(MessagePacket.PACKET_ID, new MessagePacketCodec());
+        registerPacketCodec(HeartPacket.PACKET_ID, new HeartPacketCodec());
+        registerPacketCodec(ConnectPacket.PACKET_ID, new ConnectPacketCodec());
+        registerPacketCodec(ConnectedPacket.PACKET_ID, new ConnectedPacketCodec());
+        registerPacketCodec(DisconnectPacket.PACKET_ID, new DisconnectPacketCodec());
+        registerPacketCodec(DisconnectedPacket.PACKET_ID, new DisconnectedPacketCodec());
+        registerPacketCodec(ClientPackPacket.PACKET_ID, new ClientPackPacketCodec());
+        registerPacketCodec(ServerPackPacket.PACKET_ID, new ServerPackPacketCodec());
+        registerPacketCodec(SidedConnectPacket.PACKET_ID, new SidedConnectPacketCodec());
+        registerPacketCodec(WaitPacket.PACKET_ID, new WaitPacketCodec());
     }
 
     private final List<Byte> data = Lists.newArrayList();
@@ -35,7 +36,19 @@ public class PacketPreCodec {
     private int pointer;
 
     /**
+     * Register the packet codec for the special packet id
+     *
+     * @param packetId    the packet id
+     * @param packetCodec the packet codec
+     * @param <T>         the packet type
+     */
+    public static <T extends Packet> void registerPacketCodec(final int packetId, final PacketCodec<T> packetCodec) {
+        PACKET_CODECS.put(packetId, packetCodec);
+    }
+
+    /**
      * Read a integer
+     *
      * @return the integer read from precodec
      */
     public int readInt() {
@@ -47,6 +60,7 @@ public class PacketPreCodec {
 
     /**
      * Read a long
+     *
      * @return the long read from precodec
      */
     public long readLong() {
@@ -58,6 +72,7 @@ public class PacketPreCodec {
 
     /**
      * Write a integer
+     *
      * @param v the integer
      */
     public void writeInt(int v) {
@@ -69,6 +84,7 @@ public class PacketPreCodec {
 
     /**
      * Write a long
+     *
      * @param v the long
      */
     public void writeLong(long v) {
@@ -80,6 +96,7 @@ public class PacketPreCodec {
 
     /**
      * Write a string
+     *
      * @param v the string
      */
     public void writeString(final String v) {
@@ -90,6 +107,7 @@ public class PacketPreCodec {
 
     /**
      * Read a string
+     *
      * @return the string read from precodec
      */
     public String readString() {
@@ -111,6 +129,7 @@ public class PacketPreCodec {
 
     /**
      * Read a float
+     *
      * @return the float read from precodec
      */
     public float readFloat() {
@@ -119,6 +138,7 @@ public class PacketPreCodec {
 
     /**
      * Write a double
+     *
      * @param v the double
      */
     public void writeDouble(final double v) {
@@ -145,6 +165,7 @@ public class PacketPreCodec {
 
     /**
      * Write a byte
+     *
      * @param b the byte
      */
     public void writeByte(final byte b) {
@@ -153,6 +174,7 @@ public class PacketPreCodec {
 
     /**
      * Read a short
+     *
      * @return the short read from precodec
      */
     public short readShort() {
@@ -176,6 +198,7 @@ public class PacketPreCodec {
 
     /**
      * Get all bytes of the packet
+     *
      * @return all bytes of the packet
      */
     public byte[] getBytes() {
@@ -184,6 +207,7 @@ public class PacketPreCodec {
 
     /**
      * Read a packet
+     *
      * @return the packet read from precodec
      */
     @Nullable
@@ -205,7 +229,7 @@ public class PacketPreCodec {
      * Write a packet
      *
      * @param packet the packet
-     * @param <T> the packet type
+     * @param <T>    the packet type
      * @return true if the packet has been written successfully, false otherwise
      */
     public <T extends Packet> boolean writePacket(final T packet) {
@@ -217,17 +241,6 @@ public class PacketPreCodec {
             return true;
         } else FocessQQ.getLogger().debugLang("unknown-packet", packetId);
         return false;
-    }
-
-    /**
-     * Register the packet codec for the special packet id
-     *
-     * @param packetId the packet id
-     * @param packetCodec the packet codec
-     * @param <T>  the packet type
-     */
-    public static <T extends Packet> void registerPacketCodec(final int packetId, final PacketCodec<T> packetCodec) {
-        PACKET_CODECS.put(packetId, packetCodec);
     }
 
     /**
@@ -251,6 +264,6 @@ public class PacketPreCodec {
      * @see #push(byte[], int, int)
      */
     public void push(final byte[] buffer, final int length) {
-        this.push(buffer,0,length);
+        this.push(buffer, 0, length);
     }
 }

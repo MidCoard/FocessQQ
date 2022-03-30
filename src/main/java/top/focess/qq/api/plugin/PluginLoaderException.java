@@ -6,6 +6,7 @@ package top.focess.qq.api.plugin;
 public class PluginLoaderException extends IllegalStateException {
     /**
      * Constructs a PluginLoaderException
+     *
      * @param name the name of the plugin
      */
     public PluginLoaderException(final String name) {

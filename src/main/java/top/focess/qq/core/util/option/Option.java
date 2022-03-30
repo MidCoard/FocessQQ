@@ -1,8 +1,8 @@
 package top.focess.qq.core.util.option;
 
-import top.focess.qq.core.util.option.type.OptionType;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import top.focess.qq.core.util.option.type.OptionType;
 
 import java.util.Map;
 import java.util.Queue;
@@ -22,7 +22,7 @@ public class Option {
     }
 
     public void put(final OptionType<?> optionType, final String value) {
-        this.optionTypes.compute(optionType,(k, v)->{
+        this.optionTypes.compute(optionType, (k, v) -> {
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
             v.offer(value);
@@ -31,10 +31,10 @@ public class Option {
     }
 
     public <T> T get(final OptionType<T> optionType) {
-        final Queue<String> options = this.optionTypes.getOrDefault(optionType,Queues.newConcurrentLinkedQueue());
+        final Queue<String> options = this.optionTypes.getOrDefault(optionType, Queues.newConcurrentLinkedQueue());
         final String v = options.poll();
         final T t = optionType.parse(v == null ? "" : v);
-        this.optionTypes.put(optionType,options);
+        this.optionTypes.put(optionType, options);
         return t;
     }
 

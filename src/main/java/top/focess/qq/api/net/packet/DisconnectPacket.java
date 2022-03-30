@@ -9,8 +9,9 @@ public class DisconnectPacket extends ClientPacket {
 
     /**
      * Constructs a DisconnectedPacket
+     *
      * @param clientId the client id
-     * @param token the client token
+     * @param token    the client token
      */
     public DisconnectPacket(final int clientId, final String token) {
         super(clientId, token);

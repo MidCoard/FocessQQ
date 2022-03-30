@@ -28,10 +28,13 @@ public abstract class IOHandler {
         @Override
         public boolean hasInput(final boolean flag) {
             ConsoleListener.registerInputListener(this);
-            while (!this.flag);
+            while (!this.flag) ;
             return true;
         }
     };
+    @Nullable
+    protected volatile String value;
+    protected volatile boolean flag;
 
     public static IOHandler getConsoleIoHandler() {
         return CONSOLE_IO_HANDLER;
@@ -40,11 +43,6 @@ public abstract class IOHandler {
     public static void setConsoleIoHandler(final IOHandler consoleIoHandler) {
         CONSOLE_IO_HANDLER = consoleIoHandler;
     }
-
-    @Nullable
-    protected volatile String value;
-
-    protected volatile boolean flag;
 
     /**
      * Used to output String
@@ -56,7 +54,7 @@ public abstract class IOHandler {
     /**
      * Used to output formatted language key
      *
-     * @param key the language key
+     * @param key     the language key
      * @param objects the objects need to replace
      */
     public void outputLang(final String key, final Object... objects) {
@@ -91,8 +89,8 @@ public abstract class IOHandler {
     /**
      * Indicate there needs the MiraiCode of this input if it is a Mirai Message, or the string value of this input.
      *
-     * @see #hasInput(boolean)
      * @return true if there is an input String, false otherwise
+     * @see #hasInput(boolean)
      */
     public boolean hasInput() {
         return this.hasInput(false);

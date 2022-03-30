@@ -5,7 +5,7 @@ import top.focess.qq.FocessQQ;
 
 import java.util.concurrent.ExecutionException;
 
-public class ThreadPoolSchedulerThread extends Thread{
+public class ThreadPoolSchedulerThread extends Thread {
 
     private final Object lock = new Object();
     private final ThreadPoolScheduler scheduler;
@@ -28,7 +28,7 @@ public class ThreadPoolSchedulerThread extends Thread{
                 this.task.endRun();
                 scheduler.taskThreadMap.remove(this.task);
             }
-            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught",e,t.getName());
+            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName());
             scheduler.recreate(this.name);
         });
         this.start();
@@ -59,7 +59,7 @@ public class ThreadPoolSchedulerThread extends Thread{
                 }
                 this.isAvailable = true;
             } catch (final Exception e) {
-                FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread",e);
+                FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e);
             }
         }
     }

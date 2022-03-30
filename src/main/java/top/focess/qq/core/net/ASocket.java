@@ -16,7 +16,7 @@ import java.util.Map;
 public abstract class ASocket implements Socket {
 
 
-    protected final Map<Class<? extends Packet>, List<Pair<Receiver,Method>>> packetMethods = Maps.newHashMap();
+    protected final Map<Class<? extends Packet>, List<Pair<Receiver, Method>>> packetMethods = Maps.newHashMap();
     protected final List<Receiver> receivers = Lists.newArrayList();
 
     @Override
@@ -28,10 +28,10 @@ public abstract class ASocket implements Socket {
                     final Class<?> packetClass = method.getParameterTypes()[0];
                     if (Packet.class.isAssignableFrom(packetClass) && !Modifier.isAbstract(packetClass.getModifiers())) {
                         try {
-                            this.packetMethods.compute((Class<? extends Packet>) packetClass,(k, v)->{
+                            this.packetMethods.compute((Class<? extends Packet>) packetClass, (k, v) -> {
                                 if (v == null)
                                     v = Lists.newArrayList();
-                                v.add(Pair.of(receiver,method));
+                                v.add(Pair.of(receiver, method));
                                 return v;
                             });
                         } catch (final Exception ignored) {

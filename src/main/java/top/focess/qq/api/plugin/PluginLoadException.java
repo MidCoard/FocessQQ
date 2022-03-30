@@ -7,10 +7,11 @@ public class PluginLoadException extends RuntimeException {
 
     /**
      * Constructs a PluginLoadException
+     *
      * @param c the class of the plugin
      * @param e the exception
      */
     public PluginLoadException(final Class<? extends Plugin> c, final Exception e) {
-        super("Something wrong in loading Plugin " + c.getName() + ".",e);
+        super("Something wrong in loading Plugin " + c.getName() + ".", e);
     }
 }

@@ -27,7 +27,7 @@ public enum CommandResult {
     /**
      * It includes all negative CommandResult
      */
-    NEGATIVE(REFUSE, COMMAND_REFUSED,ARGS),
+    NEGATIVE(REFUSE, COMMAND_REFUSED, ARGS),
     /**
      * No signal
      */

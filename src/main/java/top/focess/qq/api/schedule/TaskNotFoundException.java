@@ -7,6 +7,7 @@ public class TaskNotFoundException extends IllegalStateException {
 
     /**
      * Constructs a TaskNotFoundException
+     *
      * @param task the task
      */
     public TaskNotFoundException(final Task task) {

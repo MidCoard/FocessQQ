@@ -46,6 +46,13 @@ import java.util.jar.JarFile;
 public class PluginClassLoader extends URLClassLoader {
     private static final Map<Class<? extends Plugin>, Plugin> CLASS_PLUGIN_MAP = Maps.newConcurrentMap();
     private static final Map<String, Plugin> NAME_PLUGIN_MAP = Maps.newConcurrentMap();
+    private static final Object LOCK = new Object();
+    private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
+    private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
+    private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
+    private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 2, false, "PluginLoader");
+    private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "GC");
     private static Field PLUGIN_NAME_FIELD,
             PLUGIN_VERSION_FIELD,
             PLUGIN_AUTHOR_FIELD,
@@ -53,14 +60,6 @@ public class PluginClassLoader extends URLClassLoader {
             COMMAND_ALIASES_FIELD,
             COMMAND_INITIALIZE_FIELD;
     private static Method PLUGIN_INIT_METHOD;
-
-    private static final Object LOCK = new Object();
-    private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
-    private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
-    private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
-
-    private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
-
     private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c, annotation, classLoader) -> {
         PluginType pluginType = (PluginType) annotation;
         if (pluginType.depend().length != 0) {
@@ -83,9 +82,9 @@ public class PluginClassLoader extends URLClassLoader {
                 Plugin plugin = (Plugin) c.newInstance();
                 if (!((PluginType) annotation).name().isEmpty()) {
                     String name = ((PluginType) annotation).name();
-                    PLUGIN_NAME_FIELD.set(plugin,name);
-                    PLUGIN_AUTHOR_FIELD.set(plugin,((PluginType) annotation).author());
-                    PLUGIN_VERSION_FIELD.set(plugin,new Version(((PluginType) annotation).version()));
+                    PLUGIN_NAME_FIELD.set(plugin, name);
+                    PLUGIN_AUTHOR_FIELD.set(plugin, ((PluginType) annotation).author());
+                    PLUGIN_VERSION_FIELD.set(plugin, new Version(((PluginType) annotation).version()));
                 }
                 PLUGIN_INIT_METHOD.invoke(plugin);
                 classLoader.plugin = plugin;
@@ -95,13 +94,6 @@ public class PluginClassLoader extends URLClassLoader {
             }
         } else throw new IllegalPluginClassException(c);
     };
-    private final JarFile jarFile;
-
-    public PluginDescription getPluginDescription() {
-        return this.pluginDescription;
-    }
-
-    private PluginDescription pluginDescription;
 
     static {
         try {
@@ -128,7 +120,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     pluginClassLoader.loadedClasses.add(pluginClassLoader.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
                 } catch (final ClassNotFoundException e) {
-                    FocessQQ.getLogger().thrLang("exception-load-class",e);
+                    FocessQQ.getLogger().thrLang("exception-load-class", e);
                 }
         });
 
@@ -143,25 +135,25 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     final Plugin plugin = classLoader.plugin;
                     final Command command = (Command) c.newInstance();
-                    if (!commandType.name().isEmpty()){
-                        COMMAND_NAME_FIELD.set(command,commandType.name());
-                        COMMAND_ALIASES_FIELD.set(command,Lists.newArrayList(commandType.aliases()));
+                    if (!commandType.name().isEmpty()) {
+                        COMMAND_NAME_FIELD.set(command, commandType.name());
+                        COMMAND_ALIASES_FIELD.set(command, Lists.newArrayList(commandType.aliases()));
                         if (!COMMAND_INITIALIZE_FIELD.getBoolean(command)) {
                             try {
                                 command.init();
                             } catch (final Exception e) {
                                 throw new CommandLoadException((Class<? extends Command>) c, e);
                             }
-                            COMMAND_INITIALIZE_FIELD.set(command,true);
+                            COMMAND_INITIALIZE_FIELD.set(command, true);
                         }
                     }
                     plugin.registerCommand(command);
                     return true;
                 } catch (final Exception e) {
                     if (e instanceof CommandDuplicateException)
-                        throw (CommandDuplicateException)e;
+                        throw (CommandDuplicateException) e;
                     else if (e instanceof CommandLoadException)
-                        throw (CommandLoadException)e;
+                        throw (CommandLoadException) e;
                     throw new CommandLoadException((Class<? extends Command>) c, e);
                 }
             } else throw new IllegalCommandClassException(c);
@@ -180,7 +172,7 @@ public class PluginClassLoader extends URLClassLoader {
             } else throw new IllegalListenerClassException(c);
         });
 
-        FIELD_ANNOTATION_HANDLERS.put(DataConverterType.class,(field, annotation, classLoader) -> {
+        FIELD_ANNOTATION_HANDLERS.put(DataConverterType.class, (field, annotation, classLoader) -> {
             final DataConverterType dataConverterType = (DataConverterType) annotation;
             if (DataConverter.class.isAssignableFrom(field.getType())) {
                 try {
@@ -201,7 +193,7 @@ public class PluginClassLoader extends URLClassLoader {
             } else throw new IllegalDataConverterClassException(field.getType());
         });
 
-        FIELD_ANNOTATION_HANDLERS.put(SpecialArgumentType.class,(field, annotation, classLoader) -> {
+        FIELD_ANNOTATION_HANDLERS.put(SpecialArgumentType.class, (field, annotation, classLoader) -> {
             final SpecialArgumentType specialArgumentType = (SpecialArgumentType) annotation;
             if (SpecialArgumentComplexHandler.class.isAssignableFrom(field.getType())) {
                 try {
@@ -215,8 +207,18 @@ public class PluginClassLoader extends URLClassLoader {
         });
     }
 
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),2,false,"PluginLoader");
-    private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(),"GC");
+    private final JarFile jarFile;
+    private final File file;
+    private final Set<Class<?>> loadedClasses = Sets.newHashSet();
+    private PluginDescription pluginDescription;
+    private Plugin plugin;
+
+    public PluginClassLoader(@NotNull final File file) throws IOException {
+        super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
+        this.file = file;
+        this.jarFile = new JarFile(file);
+        PluginCoreClassLoader.LOADERS.add(this);
+    }
 
     /**
      * Used to enable plugin
@@ -248,12 +250,12 @@ public class PluginClassLoader extends URLClassLoader {
 
     private static void enablePlugin0(final Plugin plugin) {
         try {
-            FocessQQ.getLogger().debugLang("start-enable-plugin",plugin.getName());
+            FocessQQ.getLogger().debugLang("start-enable-plugin", plugin.getName());
             // no try-catch because it should be noticed by the Plugin User
             plugin.onEnable();
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
             NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
-            FocessQQ.getLogger().debugLang("end-enable-plugin",plugin.getName());
+            FocessQQ.getLogger().debugLang("end-enable-plugin", plugin.getName());
         } catch (final Exception e) {
             if (e instanceof PluginDuplicateException)
                 throw (PluginDuplicateException) e;
@@ -273,19 +275,19 @@ public class PluginClassLoader extends URLClassLoader {
         final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
         File file = null;
         try {
-          file = callback.waitCall();
+            file = callback.waitCall();
         } catch (final InterruptedException | ExecutionException | CancellationException e) {
             FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
         }
         section.stop();
         if (!GC_SCHEDULER.isClosed())
-        GC_SCHEDULER.run(System::gc,Duration.ofSeconds(1));
+            GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1));
         return file;
     }
 
     @Nullable
     public static File disablePlugin0(final Plugin plugin) {
-        FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
+        FocessQQ.getLogger().debugLang("start-disable-plugin", plugin.getName());
         // try-catch because it should take over the process
         try {
             plugin.onDisable();
@@ -311,7 +313,7 @@ public class PluginClassLoader extends URLClassLoader {
                 FocessQQ.getUdpSocket().unregister(plugin);
         }
         CommandSender.clear(plugin);
-        FocessQQ.getLogger().debugLang("clear-command-sender-session",plugin.getName());
+        FocessQQ.getLogger().debugLang("clear-command-sender-session", plugin.getName());
         CLASS_PLUGIN_MAP.remove(plugin.getClass());
         NAME_PLUGIN_MAP.remove(plugin.getName());
         File ret = null;
@@ -327,12 +329,12 @@ public class PluginClassLoader extends URLClassLoader {
                 FocessQQ.getLogger().thrLang("exception-remove-plugin-loader", e);
             }
         FocessQQ.getLogger().debugLang("remove-plugin-loader");
-        FocessQQ.getLogger().debugLang("end-disable-plugin",plugin.getName());
+        FocessQQ.getLogger().debugLang("end-disable-plugin", plugin.getName());
         final PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
         try {
             EventManager.submit(pluginUnloadEvent);
         } catch (final EventSubmitException e) {
-            FocessQQ.getLogger().thrLang("exception-submit-plugin-unload-event",e);
+            FocessQQ.getLogger().thrLang("exception-submit-plugin-unload-event", e);
         }
         return ret;
     }
@@ -372,29 +374,20 @@ public class PluginClassLoader extends URLClassLoader {
         return NAME_PLUGIN_MAP.get(name);
     }
 
+    public PluginDescription getPluginDescription() {
+        return this.pluginDescription;
+    }
+
     public File getFile() {
         return this.file;
     }
-
-    private final File file;
 
     public Plugin getPlugin() {
         return this.plugin;
     }
 
-    private Plugin plugin;
-
     public Set<Class<?>> getLoadedClasses() {
         return this.loadedClasses;
-    }
-
-    private final Set<Class<?>> loadedClasses = Sets.newHashSet();
-
-    public PluginClassLoader(@NotNull final File file) throws IOException {
-        super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
-        this.file = file;
-        this.jarFile = new JarFile(file);
-        PluginCoreClassLoader.LOADERS.add(this);
     }
 
     @Override
@@ -414,7 +407,7 @@ public class PluginClassLoader extends URLClassLoader {
                     final JarEntry jarEntry = entries.nextElement();
                     final String name = jarEntry.getName();
                     for (final ResourceHandler resourceHandler : RESOURCE_HANDLERS)
-                        resourceHandler.handle(name, this.jarFile.getInputStream(jarEntry),this);
+                        resourceHandler.handle(name, this.jarFile.getInputStream(jarEntry), this);
                 }
                 FocessQQ.getLogger().debugLang("load-plugin-classes", this.loadedClasses.size());
                 if (this.pluginDescription == null) {
@@ -422,7 +415,7 @@ public class PluginClassLoader extends URLClassLoader {
                     PluginCoreClassLoader.LOADERS.remove(this);
                     return false;
                 }
-                final Class<?> pluginClass = this.findClass(this.pluginDescription.getMain(),false);
+                final Class<?> pluginClass = this.findClass(this.pluginDescription.getMain(), false);
                 final Annotation annotation = pluginClass.getAnnotation(PluginType.class);
                 if (annotation != null) {
                     if (!PLUGIN_TYPE_HANDLER.handle(pluginClass, annotation, this)) {
@@ -456,7 +449,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     EventManager.submit(pluginLoadEvent);
                 } catch (final EventSubmitException e) {
-                    FocessQQ.getLogger().thrLang("exception-submit-plugin-load-event",e);
+                    FocessQQ.getLogger().thrLang("exception-submit-plugin-load-event", e);
                 }
             } catch (final Exception e) {
                 if (e instanceof IllegalStateException)

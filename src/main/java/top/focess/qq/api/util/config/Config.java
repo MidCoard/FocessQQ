@@ -10,10 +10,9 @@ import java.util.Map;
 
 public abstract class Config {
 
+    protected final YamlConfiguration yaml;
     @Nullable
     private File file;
-
-    protected final YamlConfiguration yaml;
 
     protected Config(@Nullable final File file) throws YamlLoadException {
         this.file = file;
@@ -25,7 +24,7 @@ public abstract class Config {
         this.yaml = YamlConfiguration.load(stream);
     }
 
-    protected Config(@Nullable final Map<String,Object> values) {
+    protected Config(@Nullable final Map<String, Object> values) {
         this.yaml = new YamlConfiguration(values);
     }
 
@@ -53,7 +52,7 @@ public abstract class Config {
         this.yaml.save(this.file);
     }
 
-    protected Map<String,Object> getValues() {
+    protected Map<String, Object> getValues() {
         return this.yaml.getValues();
     }
 

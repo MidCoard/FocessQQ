@@ -3,7 +3,7 @@ package top.focess.qq.api.net.packet;
 /**
  * Used to connect to the server.
  */
-public class SidedConnectPacket extends Packet{
+public class SidedConnectPacket extends Packet {
 
     public static final int PACKET_ID = 9;
     /**
@@ -13,6 +13,7 @@ public class SidedConnectPacket extends Packet{
 
     /**
      * Constructs a SidedConnectPacket
+     *
      * @param name the client name
      */
     public SidedConnectPacket(final String name) {

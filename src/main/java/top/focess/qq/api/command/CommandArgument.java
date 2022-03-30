@@ -22,15 +22,34 @@ public class CommandArgument<V> {
     }
 
     public static CommandArgument<String> ofString() {
-        return new CommandArgument<>(DataConverter.DEFAULT_DATA_CONVERTER,null);
+        return new CommandArgument<>(DataConverter.DEFAULT_DATA_CONVERTER, null);
     }
 
     public static CommandArgument<Long> ofLong() {
-        return new CommandArgument<>(DataConverter.LONG_DATA_CONVERTER,null);
+        return new CommandArgument<>(DataConverter.LONG_DATA_CONVERTER, null);
     }
 
     public static CommandArgument<Integer> ofInt() {
-        return new CommandArgument<>(DataConverter.INTEGER_DATA_CONVERTER,null);
+        return new CommandArgument<>(DataConverter.INTEGER_DATA_CONVERTER, null);
+    }
+
+    public static <V> CommandArgument<V> of(final DataConverter<V> defaultDataConverter) {
+        return new CommandArgument<>(defaultDataConverter, null);
+    }
+
+    @NotNull
+    public static CommandArgument<String> of(@NotNull final String value) {
+        return new CommandArgument<>(DataConverter.DEFAULT_DATA_CONVERTER, value);
+    }
+
+    @NotNull
+    public static <V> CommandArgument<V> of(@NotNull final DataConverter<V> dataConverter, @NotNull final V value) {
+        return new CommandArgument<>(dataConverter, value);
+    }
+
+    @NotNull
+    public static <V> CommandArgument<V> ofNullable(@NotNull final DataConverter<V> dataConverter) {
+        return new CommandArgument<>(dataConverter, true);
     }
 
     public boolean isNullable() {
@@ -47,25 +66,6 @@ public class CommandArgument<V> {
 
     public DataConverter<V> getDataConverter() {
         return this.dataConverter;
-    }
-
-    public static <V> CommandArgument<V> of(final DataConverter<V> defaultDataConverter) {
-        return new CommandArgument<>(defaultDataConverter,null);
-    }
-
-    @NotNull
-    public static CommandArgument<String> of(@NotNull final String value) {
-        return new CommandArgument<>(DataConverter.DEFAULT_DATA_CONVERTER, value);
-    }
-
-    @NotNull
-    public static <V> CommandArgument<V> of(@NotNull final DataConverter<V> dataConverter, @NotNull final V value) {
-        return new CommandArgument<>(dataConverter,value);
-    }
-
-    @NotNull
-    public static <V> CommandArgument<V> ofNullable(@NotNull final DataConverter<V> dataConverter) {
-        return new CommandArgument<>(dataConverter,true);
     }
 
     public boolean accept(final String arg) {

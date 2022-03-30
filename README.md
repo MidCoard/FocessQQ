@@ -1,4 +1,5 @@
 # FocessQQ - 轻量级QQ机器人框架
+
 这是一个基于mirai的机器人框架，是一个面向开发者的框架。
 
 ## 命令行
@@ -23,7 +24,6 @@
 --multi 设置可以多个同名客户端链接 详情见通信
 ```
 
-
 ## 通信
 
 本框架实现了一个简单的通信模块，可以通过网络在运行本框架的不同终端之间进行通信。
@@ -38,11 +38,10 @@
 
 如果在启动时加上启动参数 **--sided** 则**客户端**或者**服务端**都会只含有**链接服务端**或者**链接客户端**的功能。没有 --sided 启动参数时既**可以链接服务端也可以链接客户端**
 
-
-
 ## 开发
 
 Maven 依赖
+
 ```xml
 <dependency>
     <groupId>top.focess</groupId>
@@ -52,6 +51,7 @@ Maven 依赖
 ```
 
 Gradle 依赖
+
 ```gradle
 implementation 'top.focess:focess-qq:4.1.0.2000'
 ```
@@ -61,9 +61,11 @@ implementation 'top.focess:focess-qq:4.1.0.2000'
 示例插件 [FocessQQ-SendPlugin](https://github.com/MidCoard/FocessQQ-SendPlugin)
 
 ## 许可证
+
 本项目使用 [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) 许可证
 
 ## 注意事项
+
 本框架运行需要指定一个默认机器人。
 
 

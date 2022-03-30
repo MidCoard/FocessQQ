@@ -5,13 +5,13 @@ import top.focess.qq.api.net.PacketPreCodec;
 /**
  * Codec for WaitPacket.
  */
-public class WaitPacketCodec extends PacketCodec<WaitPacket>{
+public class WaitPacketCodec extends PacketCodec<WaitPacket> {
 
     @Override
     public WaitPacket readPacket(final PacketPreCodec packetPreCodec) {
         final int clientId = packetPreCodec.readInt();
         final String token = packetPreCodec.readString();
-        return new WaitPacket(clientId,token);
+        return new WaitPacket(clientId, token);
     }
 
     @Override

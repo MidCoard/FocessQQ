@@ -18,10 +18,10 @@ public interface ClientReceiver extends Receiver {
     /**
      * Register packet handler for server
      *
-     * @param c the packet class
+     * @param c           the packet class
      * @param packHandler the packet handler
-     * @param plugin the plugin
-     * @param <T> the packet type
+     * @param plugin      the plugin
+     * @param <T>         the packet type
      */
     <T extends Packet> void register(Plugin plugin, Class<T> c, PackHandler<T> packHandler);
 
@@ -49,6 +49,7 @@ public interface ClientReceiver extends Receiver {
 
     /**
      * Indicate this client has connected to a server
+     *
      * @return true if the client has connected to a server, false otherwise
      */
     boolean isConnected();

@@ -11,7 +11,8 @@ import top.focess.qq.core.schedule.ThreadPoolScheduler;
  */
 public class Schedulers {
 
-    private Schedulers() {}
+    private Schedulers() {
+    }
 
     /**
      * New a FocessScheduler, the scheduler will run all tasks in time order.
@@ -19,8 +20,8 @@ public class Schedulers {
      * As a result, the task running in this scheduler cannot be cancelled if it is already running.
      *
      * @param plugin the plugin
-     * @see Schedulers#newFocessScheduler(Plugin)
      * @return a FocessScheduler
+     * @see Schedulers#newFocessScheduler(Plugin)
      */
     public static Scheduler newFocessScheduler(@NotNull final Plugin plugin) {
         return new FocessScheduler(plugin);
@@ -32,9 +33,9 @@ public class Schedulers {
      * As a result, the task running in this scheduler cannot be cancelled if it is already running.
      *
      * @param plugin the plugin
-     * @param name the scheduler name
-     * @see Schedulers#newFocessScheduler(Plugin)
+     * @param name   the scheduler name
      * @return a FocessScheduler
+     * @see Schedulers#newFocessScheduler(Plugin)
      */
     public static Scheduler newFocessScheduler(@NotNull final Plugin plugin, @NotNull final String name) {
         return new FocessScheduler(plugin, name);
@@ -45,13 +46,13 @@ public class Schedulers {
      * The next task will be executed when there is an available thread.
      * As a result, the task running in this scheduler can be cancelled if it is already running.
      *
-     * @param plugin the plugin
+     * @param plugin   the plugin
      * @param poolSize the thread pool size
-     * @see Schedulers#newThreadPoolScheduler(Plugin, int, boolean, String)
      * @return a ThreadPoolScheduler
+     * @see Schedulers#newThreadPoolScheduler(Plugin, int, boolean, String)
      */
-    public static Scheduler  newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize) {
-        return new ThreadPoolScheduler(plugin,poolSize);
+    public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize) {
+        return new ThreadPoolScheduler(plugin, poolSize);
     }
 
     /**
@@ -59,15 +60,15 @@ public class Schedulers {
      * The next task will be executed immediately if the immediate is true, otherwise the next task will be executed when there is an available thread.
      * As a result, the task running in this scheduler can be cancelled if it is already running.
      *
-     * @param plugin the plugin
-     * @param poolSize the thread pool size
+     * @param plugin    the plugin
+     * @param poolSize  the thread pool size
      * @param immediate true if the scheduler should run immediately, false otherwise
-     * @param name the scheduler name
-     * @see Schedulers#newThreadPoolScheduler(Plugin, int)
+     * @param name      the scheduler name
      * @return a ThreadPoolScheduler
+     * @see Schedulers#newThreadPoolScheduler(Plugin, int)
      */
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize, final boolean immediate, @NotNull final String name) {
-        return new ThreadPoolScheduler(plugin,poolSize,immediate,name);
+        return new ThreadPoolScheduler(plugin, poolSize, immediate, name);
     }
 
     /**

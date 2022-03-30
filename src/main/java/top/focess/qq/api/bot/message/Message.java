@@ -8,6 +8,10 @@ public class Message {
         this.message = message;
     }
 
+    public static Message of(final net.mamoe.mirai.message.data.Message message) {
+        return new Message(message);
+    }
+
     public net.mamoe.mirai.message.data.Message getNativeMessage() {
         return this.message;
     }
@@ -15,10 +19,6 @@ public class Message {
     @Override
     public String toString() {
         return this.message.contentToString();
-    }
-
-    public static Message of(final net.mamoe.mirai.message.data.Message message) {
-        return new Message(message);
     }
 
     public Message plus(final Message message) {

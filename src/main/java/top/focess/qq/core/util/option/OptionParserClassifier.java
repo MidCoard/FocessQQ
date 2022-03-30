@@ -26,9 +26,9 @@ public class OptionParserClassifier {
         if (args.length != this.optionTypes.length)
             return null;
         final Option option = new Option(this);
-        for (int i = 0;i<args.length;i++)
+        for (int i = 0; i < args.length; i++)
             if (this.optionTypes[i].accept(args[i]))
-                option.put(this.optionTypes[i],args[i]);
+                option.put(this.optionTypes[i], args[i]);
             else return null;
         return option;
     }

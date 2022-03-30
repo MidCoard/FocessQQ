@@ -8,6 +8,7 @@ import java.io.IOException;
 public class IllegalPortException extends IOException {
     /**
      * Constructs a IllegalPortException
+     *
      * @param port the unavailable port
      */
     public IllegalPortException(final int port) {

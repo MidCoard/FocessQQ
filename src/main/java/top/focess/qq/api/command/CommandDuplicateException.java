@@ -6,6 +6,7 @@ package top.focess.qq.api.command;
 public class CommandDuplicateException extends IllegalStateException {
     /**
      * Constructs a CommandDuplicateException
+     *
      * @param name the name of the duplicated command
      */
     public CommandDuplicateException(final String name) {

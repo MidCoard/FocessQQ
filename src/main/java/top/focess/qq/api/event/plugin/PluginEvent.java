@@ -1,8 +1,8 @@
 package top.focess.qq.api.event.plugin;
 
-import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
+import top.focess.qq.api.plugin.Plugin;
 
 /**
  * Called when a plugin triggers a special action

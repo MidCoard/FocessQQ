@@ -23,7 +23,7 @@ public class Version {
      * Represents a default release version of a plugin.
      */
     public static final Version DEFAULT_VERSION = new Version("1.0.0");
-
+    private final int length;
     /**
      * The major version
      */
@@ -36,23 +36,20 @@ public class Version {
      * The revision version
      */
     private int revision;
-
     /**
      * The build version
      */
     private String build;
 
-    private final int length;
-
     /**
      * Constructs a new version with the specified version numbers and build.
      *
-     * @param major the major version number
-     * @param minor the minor version number
+     * @param major    the major version number
+     * @param minor    the minor version number
      * @param revision the revision version number
-     * @param build the build version
+     * @param build    the build version
      */
-    public Version(final int major, final int minor, final int revision, final String build){
+    public Version(final int major, final int minor, final int revision, final String build) {
         this.major = major;
         this.minor = minor;
         this.revision = revision;
@@ -63,8 +60,8 @@ public class Version {
     /**
      * Constructs a new version with the specified version numbers.
      *
-     * @param major the major version number
-     * @param minor the minor version number
+     * @param major    the major version number
+     * @param minor    the minor version number
      * @param revision the revision version number
      */
     public Version(final int major, final int minor, final int revision) {

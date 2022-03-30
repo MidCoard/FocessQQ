@@ -19,6 +19,7 @@ public class ObjectBuffer extends DataBuffer<Object> {
         this.pos = 0;
         this.limit = size;
     }
+
     /**
      * Allocate a ObjectBuffer with fixed size
      *

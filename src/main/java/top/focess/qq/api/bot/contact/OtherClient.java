@@ -1,6 +1,6 @@
 package top.focess.qq.api.bot.contact;
 
-public interface OtherClient extends Contact{
+public interface OtherClient extends Contact {
 
     String getDeviceKind();
 

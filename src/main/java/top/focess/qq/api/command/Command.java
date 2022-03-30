@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventManager;
-import top.focess.qq.api.event.command.CommandExecutedEvent;
 import top.focess.qq.api.event.EventSubmitException;
+import top.focess.qq.api.event.command.CommandExecutedEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginType;
 import top.focess.qq.api.util.IOHandler;
@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 public abstract class Command {
 
 
-    private static final Map<String,Command> COMMANDS_MAP = Maps.newConcurrentMap();
+    private static final Map<String, Command> COMMANDS_MAP = Maps.newConcurrentMap();
 
     private final List<Executor> executors = Lists.newCopyOnWriteArrayList();
 
@@ -65,7 +65,7 @@ public abstract class Command {
     /**
      * Instance a <code>Command</code> Class with special name and aliases.
      *
-     * @param name the name of the command
+     * @param name    the name of the command
      * @param aliases the aliases of the command
      * @throws CommandLoadException if there is any exception thrown in the initializing process
      */
@@ -77,7 +77,7 @@ public abstract class Command {
         try {
             this.init();
         } catch (final Exception e) {
-            throw new CommandLoadException(this.getClass(),e);
+            throw new CommandLoadException(this.getClass(), e);
         }
         this.initialize = true;
     }
@@ -89,10 +89,6 @@ public abstract class Command {
     protected Command() {
         this.permission = CommandPermission.MEMBER;
         this.executorPermission = i -> true;
-    }
-
-    public void setExecutorPermission(@NotNull final Predicate<CommandSender> executorPermission) {
-        this.executorPermission = executorPermission;
     }
 
     /**
@@ -130,11 +126,10 @@ public abstract class Command {
         return Lists.newArrayList(COMMANDS_MAP.values());
     }
 
-
     /**
      * Register the command
      *
-     * @param plugin the plugin the command belongs to
+     * @param plugin  the plugin the command belongs to
      * @param command the command that need to be registered
      * @throws CommandDuplicateException if the command name already exists in the registered commands
      */
@@ -145,7 +140,7 @@ public abstract class Command {
             throw new CommandDuplicateException(command.getName());
         command.registered = true;
         command.plugin = plugin;
-        COMMANDS_MAP.put(command.getName(),command);
+        COMMANDS_MAP.put(command.getName(), command);
     }
 
     public boolean isRegistered() {
@@ -180,41 +175,45 @@ public abstract class Command {
         return this.executorPermission;
     }
 
+    public void setExecutorPermission(@NotNull final Predicate<CommandSender> executorPermission) {
+        this.executorPermission = executorPermission;
+    }
+
     /**
      * Add default executor to define how to execute this command.
-     *
+     * <p>
      * for example :
      * <code>
-     *     this.addExecutor(1, ... ,"example");
+     * this.addExecutor(1, ... ,"example");
      * </code>
      * which means that it runs when you execute the command with "example" "xxx".
      *
      * <code>
-     *     this.addExecutor(0, ...);
+     * this.addExecutor(0, ...);
      * </code>
      * which means that it runs when you just execute the command without anything.
      *
-     * @param executor the executor to define this command
+     * @param executor         the executor to define this command
      * @param commandArguments the defined arguments for this executor
      * @return the Executor to define other proprieties
      */
     @NotNull
     public final Executor addExecutor(@NotNull final CommandExecutor executor, @NotNull final CommandArgument<?>... commandArguments) {
-        final Executor executor1 = new Executor(executor,this.executorPermission,this,commandArguments);
+        final Executor executor1 = new Executor(executor, this.executorPermission, this, commandArguments);
         this.executors.add(executor1);
         return executor1;
     }
 
     /**
      * Execute the command with special arguments
-     * @see CommandLine#exec(CommandSender, String, IOHandler)
      *
-     * @param sender the executor
-     * @param args the arguments that command spilt by spaces
+     * @param sender    the executor
+     * @param args      the arguments that command spilt by spaces
      * @param ioHandler the receiver
      * @return the command result
+     * @see CommandLine#exec(CommandSender, String, IOHandler)
      */
-    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args,@NotNull final IOHandler ioHandler) {
+    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler) {
         if (!this.isRegistered())
             return CommandResult.COMMAND_REFUSED;
         if (!sender.hasPermission(this.getPermission()))
@@ -230,7 +229,7 @@ public abstract class Command {
                     } catch (final Exception e) {
                         result = CommandResult.REFUSE;
                         FocessQQ.getLogger().thrLang("exception-command-execute", e);
-                        ioHandler.outputLang("command-execute-exception",e.getMessage());
+                        ioHandler.outputLang("command-execute-exception", e.getMessage());
                     }
                     for (final CommandResult r : executor.results.keySet())
                         if ((r.getValue() & result.getValue()) != 0)
@@ -258,11 +257,18 @@ public abstract class Command {
     }
 
     /**
-     * Used to initialize the command (the primary goal is to define the default executors)
+     * Set the default permission
      *
+     * @param permission the target permission the command need
+     */
+    public void setPermission(final CommandPermission permission) {
+        this.permission = permission;
+    }
+
+    /**
+     * Used to initialize the command (the primary goal is to define the default executors)
      */
     public abstract void init();
-
 
     /**
      * Used to get help information when execute this command with wrong arguments or the executor returns {@link CommandResult#ARGS}
@@ -295,27 +301,17 @@ public abstract class Command {
     }
 
     /**
-     * Set the default permission
-     *
-     * @param permission the target permission the command need
-     */
-    public void setPermission(final CommandPermission permission) {
-        this.permission = permission;
-    }
-
-    /**
      * This class is used to help define the executor of certain command.
      * There is some special methods used to give more details of this executor.
-     *
      */
     public static class Executor {
         private final Map<CommandResult, CommandResultExecutor> results = Maps.newHashMap();
         private final CommandExecutor executor;
         private final CommandArgument<?>[] commandArguments;
-        private CommandPermission permission = CommandPermission.MEMBER;
-        private Predicate<CommandSender> executorPermission;
         private final Command command;
         private final int nullableCommandArguments;
+        private CommandPermission permission = CommandPermission.MEMBER;
+        private Predicate<CommandSender> executorPermission;
 
         private Executor(final CommandExecutor executor, final Predicate<CommandSender> executorPermission, final Command command, final CommandArgument<?>[] commandArguments) {
             this.executor = executor;
@@ -349,7 +345,7 @@ public abstract class Command {
         /**
          * Set the executor of the special CommandResult after executing this Executor
          *
-         * @param result the target CommandResult
+         * @param result   the target CommandResult
          * @param executor the executor of the special CommandResult
          * @return the Executor itself
          */
@@ -412,7 +408,7 @@ public abstract class Command {
             if (args.length < this.commandArguments.length - this.nullableCommandArguments)
                 return null;
             final List<CommandArgument<?>> commandArgumentList = Lists.newArrayList();
-            final boolean ret = this.dfsCheck(args,0,0,this.commandArguments.length - args.length,commandArgumentList);
+            final boolean ret = this.dfsCheck(args, 0, 0, this.commandArguments.length - args.length, commandArgumentList);
             if (!ret)
                 return null;
             final DataCollection dataCollection = new DataCollection(Arrays.stream(this.commandArguments).map(CommandArgument::getDataConverter).toArray(DataConverter[]::new));
@@ -432,7 +428,7 @@ public abstract class Command {
             }
             if (this.commandArguments[index].accept(args[indexOfArgs])) {
                 commandArgumentList.add(this.commandArguments[index]);
-                final boolean ret = this.dfsCheck(args,indexOfArgs + 1,index + 1,nullableCommandArguments,commandArgumentList);
+                final boolean ret = this.dfsCheck(args, indexOfArgs + 1, index + 1, nullableCommandArguments, commandArgumentList);
                 if (ret)
                     return true;
                 commandArgumentList.remove(commandArgumentList.size() - 1);

@@ -19,7 +19,7 @@ public class DefaultConfig extends Config {
 
     @Override
     public void set(final String key, @Nullable final Object value) {
-        super.set(key,value);
+        super.set(key, value);
     }
 
     @Override

@@ -16,12 +16,14 @@ public interface Receiver {
 
     /**
      * Unregister the packet handlers of the plugin
+     *
      * @param plugin the plugin
      */
     void unregister(Plugin plugin);
 
     /**
      * Unregister all the packet handlers
+     *
      * @return true if there are some packet-handlers not belonging to MainPlugin not been unregistered, false otherwise
      */
     boolean unregisterAll();

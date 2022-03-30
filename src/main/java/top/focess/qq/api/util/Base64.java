@@ -14,7 +14,7 @@ public class Base64 {
      * @return the encoded data with base64
      */
     public static String base64Encode(final byte[] bytes) {
-        return new String(java.util.Base64.getEncoder().encode(bytes),StandardCharsets.ISO_8859_1);
+        return new String(java.util.Base64.getEncoder().encode(bytes), StandardCharsets.ISO_8859_1);
     }
 
     /**

@@ -4,7 +4,9 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import top.focess.qq.api.bot.*;
+import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.command.*;
@@ -31,7 +33,6 @@ import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
 import top.focess.qq.core.commands.special.*;
-import top.focess.qq.core.commands.ExecCommand;
 import top.focess.qq.core.listeners.ChatListener;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
@@ -44,7 +45,10 @@ import top.focess.qq.core.util.option.type.IntegerOptionType;
 import top.focess.qq.core.util.option.type.LongOptionType;
 import top.focess.qq.core.util.option.type.OptionType;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -57,6 +61,101 @@ public class FocessQQ {
      * Version of Focess
      */
     private static final Version VERSION;
+    /**
+     * The Focess Logger
+     */
+    private static final FocessLogger LOGGER = new FocessLogger();
+    /**
+     * The Main Plugin Instance
+     */
+    private static final MainPlugin MAIN_PLUGIN = new MainPlugin();
+    /**
+     * The Bot Manager
+     */
+    private static final BotManager BOT_MANAGER = new SimpleBotManager();
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN, "FocessQQ");
+    /**
+     * The lang config
+     */
+    private static final LangConfig LANG_CONFIG = MAIN_PLUGIN.getLangConfig();
+    private static final Thread CONSOLE_INPUT_THREAD = new Thread(() -> {
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine();
+            try {
+                EventManager.submit(new ConsoleChatEvent(input));
+            } catch (EventSubmitException e) {
+                getLogger().thrLang("exception-submit-console-chat-event", e);
+            }
+        }
+    });
+    private static final Object STOP_LOCK = new Object();
+    /**
+     * The administrator QQ number
+     */
+    @Nullable
+    private static Long administratorId;
+    /**
+     * Indicate MainPlugin is running. True after MainPlugin is loaded.
+     */
+    private static boolean running;
+    /**
+     * The default socket
+     */
+    @Nullable
+    private static Socket socket;
+    /**
+     * The default udp socket
+     */
+    @Nullable
+    private static Socket udpSocket;
+    /**
+     * The default udp server receiver
+     */
+    @Nullable
+    private static ServerReceiver udpServerReceiver;
+    /**
+     * The default server receiver
+     */
+    @Nullable
+    private static ServerReceiver serverReceiver;
+    /**
+     * The default client receiver
+     */
+    @Nullable
+    private static ClientReceiver clientReceiver;
+    /**
+     * The default server multi receiver
+     */
+    @Nullable
+    private static ServerMultiReceiver udpServerMultiReceiver;
+    /**
+     * The Mirai Bot user or we call it QQ number
+     */
+    private static Long username;
+    /**
+     * The Mirai Bot password
+     */
+    private static String password;
+    /**
+     * The default Bot
+     */
+    private static Bot bot;
+    private static boolean saved;
+    private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
+        @Override
+        public void run() {
+            if (running) {
+                getLogger().fatalLang("fatal-save-data");
+                getLogger().debugLang("save-log");
+                saveLogFile();
+                saved = true;
+                PluginClassLoader.disablePlugin(MAIN_PLUGIN);
+            }
+        }
+    };
+    private static Options options;
+    private static Boolean isStopped = false;
 
     static {
         Version version;
@@ -70,126 +169,13 @@ public class FocessQQ {
         VERSION = version;
     }
 
-
-    /**
-     * The Focess Logger
-     */
-    private static final FocessLogger LOGGER = new FocessLogger();
-
-    /**
-     * The administrator QQ number
-     */
-    @Nullable
-    private static Long administratorId;
-
-    /**
-     * The Main Plugin Instance
-     */
-    private static final MainPlugin MAIN_PLUGIN = new MainPlugin();
-
-    /**
-     * The Bot Manager
-     */
-    private static final BotManager BOT_MANAGER = new SimpleBotManager();
-
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN,"FocessQQ");
-
-    /**
-     * Indicate MainPlugin is running. True after MainPlugin is loaded.
-     */
-    private static boolean running;
-
-    /**
-     * The default socket
-     */
-    @Nullable
-    private static Socket socket;
-
-    /**
-     * The default udp socket
-     */
-    @Nullable
-    private static Socket udpSocket;
-
-    /**
-     * The default udp server receiver
-     */
-    @Nullable
-    private static ServerReceiver udpServerReceiver;
-
-    /**
-     * The default server receiver
-     */
-    @Nullable
-    private static ServerReceiver serverReceiver;
-
-
-    /**
-     * The lang config
-     */
-    private static final LangConfig LANG_CONFIG = MAIN_PLUGIN.getLangConfig();
-
-    /**
-     * The default client receiver
-     */
-    @Nullable
-    private static ClientReceiver clientReceiver;
-
-    /**
-     * The default server multi receiver
-     */
-    @Nullable
-    private static ServerMultiReceiver udpServerMultiReceiver;
-
-    private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
-        @Override
-        public void run() {
-            if (running) {
-                getLogger().fatalLang("fatal-save-data");
-                getLogger().debugLang("save-log");
-                saveLogFile();
-                saved = true;
-                PluginClassLoader.disablePlugin(MAIN_PLUGIN);
-            }
-        }
-    };
-
-    private static final Thread CONSOLE_INPUT_THREAD = new Thread(() -> {
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine();
-            try {
-                EventManager.submit(new ConsoleChatEvent(input));
-            } catch (EventSubmitException e) {
-                getLogger().thrLang("exception-submit-console-chat-event",e);
-            }
-        }
-    });
-
-    /**
-     * The Mirai Bot user or we call it QQ number
-     */
-    private static Long username;
-
-    /**
-     * The Mirai Bot password
-     */
-    private static String password;
-
-    /**
-     * The default Bot
-     */
-    private static Bot bot;
-
-    private static boolean saved;
-
     /**
      * Get the Friend Mirai instance by its id
      *
-     * @see FocessQQ#getBot()
-     * @see Bot#getFriend(long)
      * @param id the friend id
      * @return the Friend Mirai instance
+     * @see FocessQQ#getBot()
+     * @see Bot#getFriend(long)
      */
     @Nullable
     public static Friend getFriend(final long id) {
@@ -199,10 +185,10 @@ public class FocessQQ {
     /**
      * Get the Group Mirai instance by its id
      *
-     * @see FocessQQ#getBot()
-     * @see Bot#getGroup(long)
      * @param id the group id
      * @return the Group Mirai instance
+     * @see FocessQQ#getBot()
+     * @see Bot#getGroup(long)
      */
     @Nullable
     public static Group getGroup(final long id) {
@@ -262,7 +248,7 @@ public class FocessQQ {
     }
 
     @Nullable
-    public static  ServerReceiver getUdpServerReceiver() {
+    public static ServerReceiver getUdpServerReceiver() {
         return udpServerReceiver;
     }
 
@@ -341,11 +327,9 @@ public class FocessQQ {
         }
     }
 
-    private static Options options;
-
     public static void main(final String[] args) {
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
-            getLogger().thrLang("exception-uncaught-exception",e);
+            getLogger().thrLang("exception-uncaught-exception", e);
             getLogger().fatalLang("fatal-uncaught-exception");
             exit();
         });
@@ -357,7 +341,7 @@ public class FocessQQ {
             System.exit(0);
         }
 
-        SCHEDULER.runTimer(()->{
+        SCHEDULER.runTimer(() -> {
             Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
             while (consoleElement != null && System.currentTimeMillis() - consoleElement.getValue() > 60 * 5 * 1000) {
                 consoleElement.getKey().input(null);
@@ -374,7 +358,7 @@ public class FocessQQ {
                     }
                     return v;
                 });
-        }, Duration.ZERO,Duration.ofSeconds(10));
+        }, Duration.ZERO, Duration.ofSeconds(10));
 
         CONSOLE_INPUT_THREAD.start();
         getLogger().debugLang("start-console-input-thread");
@@ -383,12 +367,12 @@ public class FocessQQ {
                 new OptionParserClassifier("help"),
                 new OptionParserClassifier("user", LongOptionType.LONG_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("server", IntegerOptionType.INTEGER_OPTION_TYPE),
-                new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
+                new OptionParserClassifier("client", OptionType.DEFAULT_OPTION_TYPE, IntegerOptionType.INTEGER_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE, IntegerOptionType.INTEGER_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE),
                 new OptionParserClassifier("sided"),
-                new OptionParserClassifier("client",OptionType.DEFAULT_OPTION_TYPE,IntegerOptionType.INTEGER_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE),
-                new OptionParserClassifier("udp",IntegerOptionType.INTEGER_OPTION_TYPE),
+                new OptionParserClassifier("client", OptionType.DEFAULT_OPTION_TYPE, IntegerOptionType.INTEGER_OPTION_TYPE, OptionType.DEFAULT_OPTION_TYPE),
+                new OptionParserClassifier("udp", IntegerOptionType.INTEGER_OPTION_TYPE),
                 new OptionParserClassifier("multi"),
-                new OptionParserClassifier("admin",LongOptionType.LONG_OPTION_TYPE),
+                new OptionParserClassifier("admin", LongOptionType.LONG_OPTION_TYPE),
                 new OptionParserClassifier("noDefaultPluginLoad")
         );
         Option option = options.get("help");
@@ -427,7 +411,7 @@ public class FocessQQ {
                     socket = focessSocket;
                     getLogger().infoLang("create-focess-socket-server");
                 } catch (final Exception e) {
-                    getLogger().thrLang("exception-create-focess-socket-server",e);
+                    getLogger().thrLang("exception-create-focess-socket-server", e);
                 }
             else {
                 try {
@@ -436,7 +420,7 @@ public class FocessQQ {
                     socket = focessSidedSocket;
                     getLogger().infoLang("create-focess-sided-socket-server");
                 } catch (final Exception e) {
-                    getLogger().thrLang("exception-create-focess-sided-socket-server",e);
+                    getLogger().thrLang("exception-create-focess-sided-socket-server", e);
                 }
             }
         }
@@ -449,11 +433,11 @@ public class FocessQQ {
                     final String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     final int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     final String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
-                    focessSocket.registerReceiver(clientReceiver = new FocessClientReceiver(focessSocket,localhost,host,port,name));
+                    focessSocket.registerReceiver(clientReceiver = new FocessClientReceiver(focessSocket, localhost, host, port, name));
                     socket = focessSocket;
                     getLogger().infoLang("create-focess-socket-client");
                 } catch (final Exception e) {
-                    getLogger().thrLang("exception-create-focess-socket-client",e);
+                    getLogger().thrLang("exception-create-focess-socket-client", e);
                 }
             else {
                 try {
@@ -465,7 +449,7 @@ public class FocessQQ {
                     socket = focessSidedClientSocket;
                     getLogger().infoLang("create-focess-sided-socket-client");
                 } catch (final Exception e) {
-                    getLogger().thrLang("exception-create-focess-sided-socket-client",e);
+                    getLogger().thrLang("exception-create-focess-sided-socket-client", e);
                 }
             }
         }
@@ -480,7 +464,7 @@ public class FocessQQ {
                 udpSocket = focessUDPSocket;
                 getLogger().infoLang("create-focess-udp-socket-client");
             } catch (final IllegalPortException e) {
-                getLogger().thrLang("exception-create-focess-udp-socket-client",e);
+                getLogger().thrLang("exception-create-focess-udp-socket-client", e);
             }
         }
         try {
@@ -488,16 +472,12 @@ public class FocessQQ {
             getLogger().debugLang("load-main-plugin");
         } catch (final Exception e) {
             if (e instanceof PluginLoadException && e.getCause() != null && e.getCause() instanceof BotLoginException) {
-                getLogger().fatalLang("fatal-default-bot-login-failed",getUsername());
-                getLogger().thrLang("exception-default-bot-login-failed",e.getCause());
-            } else getLogger().thrLang("exception-load-main-plugin",e);
+                getLogger().fatalLang("fatal-default-bot-login-failed", getUsername());
+                getLogger().thrLang("exception-default-bot-login-failed", e.getCause());
+            } else getLogger().thrLang("exception-load-main-plugin", e);
             exit();
         }
     }
-
-    private static final Object STOP_LOCK = new Object();
-
-    private static Boolean isStopped = false;
 
     /**
      * Exit Bot
@@ -512,7 +492,7 @@ public class FocessQQ {
             getLogger().fatalLang("fatal-exit-failed");
             Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
             System.exit(0);
-        }, Duration.ofSeconds(5) );
+        }, Duration.ofSeconds(5));
         if (MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);
     }
@@ -537,7 +517,7 @@ public class FocessQQ {
                     getLogger().fatalLang("fatal-delete-log-file-failed", target.getName());
             }
         } catch (final IOException e) {
-            getLogger().thrLang("exception-save-log",e);
+            getLogger().thrLang("exception-save-log", e);
         }
     }
 
@@ -546,17 +526,15 @@ public class FocessQQ {
     }
 
     /**
-     *
      * The MainPlugin Plugin is a core plugin in Bot. It will initialize all default settings and make the Bot login.
      * Never instance it! It will be instanced when bot bootstraps automatically.
-     *
      */
     public static final class MainPlugin extends Plugin {
 
         private static Map<String, Object> properties;
 
         public MainPlugin() {
-            super("MainPlugin","MidCoard", FocessQQ.getVersion());
+            super("MainPlugin", "MidCoard", FocessQQ.getVersion());
             if (running) {
                 getLogger().fatalLang("fatal-main-plugin-already-running");
                 exit();
@@ -605,7 +583,7 @@ public class FocessQQ {
             this.registerSpecialArgumentHandler("random_double", new RandomDoubleArgumentHandler());
             this.registerSpecialArgumentHandler("self", new SelfIdArgumentHandler());
             this.registerSpecialArgumentHandler("target", new TargetIdArgumentHandler());
-            this.registerSpecialArgumentHandler("previous_command",new PreviousCommandArgumentHandler());
+            this.registerSpecialArgumentHandler("previous_command", new PreviousCommandArgumentHandler());
             getLogger().debugLang("register-default-special-argument-handlers");
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {
@@ -613,9 +591,9 @@ public class FocessQQ {
                 getLogger().debugLang("request-account-information");
             }
             try {
-                bot = getBotManager().loginDirectly(username,password,this);
+                bot = getBotManager().loginDirectly(username, password, this);
             } catch (final BotLoginException e) {
-                getLogger().thrLang("exception-login-default-bot",e);
+                getLogger().thrLang("exception-login-default-bot", e);
                 exit();
             }
             getLogger().debugLang("login-default-bot");
@@ -623,7 +601,7 @@ public class FocessQQ {
             if (plugins.exists() && plugins.isDirectory() && options.get("noDefaultPluginLoad") == null) {
                 final File[] files = plugins.listFiles(file -> file.getName().endsWith(".jar"));
                 if (files != null)
-                    for (final File file :files)
+                    for (final File file : files)
                         try {
                             final Future<CommandResult> future = CommandLine.exec("load plugins/" + file.getName());
                             future.get();
@@ -655,7 +633,7 @@ public class FocessQQ {
                         final Future<CommandResult> future = CommandLine.exec("unload " + plugin.getName());
                         future.get();
                     } catch (final Exception e) {
-                        getLogger().thrLang("exception-unload-default-plugin",e);
+                        getLogger().thrLang("exception-unload-default-plugin", e);
                     }
             getLogger().debugLang("unload-all-plugins-except-main-plugin");
             if (Command.unregisterAll())

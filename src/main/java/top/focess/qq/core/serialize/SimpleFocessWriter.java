@@ -4,9 +4,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.serialize.NotFocessSerializableException;
 import top.focess.qq.api.serialize.FocessSerializable;
 import top.focess.qq.api.serialize.FocessWriter;
+import top.focess.qq.api.serialize.NotFocessSerializableException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -21,9 +21,7 @@ import static top.focess.qq.core.serialize.Opcodes.*;
 
 public class SimpleFocessWriter extends FocessWriter {
 
-    private final List<Byte> data = Lists.newArrayList();
-
-    private static final Map<Class<?>,Writer<?>> CLASS_WRITER_MAP = Maps.newHashMap();
+    private static final Map<Class<?>, Writer<?>> CLASS_WRITER_MAP = Maps.newHashMap();
 
     static {
         CLASS_WRITER_MAP.put(ArrayList.class, (Writer<ArrayList>) (list, writer) -> {
@@ -61,12 +59,14 @@ public class SimpleFocessWriter extends FocessWriter {
             }
         });
         CLASS_WRITER_MAP.put(Class.class, (Writer<Class>) (clazz, writer) -> writer.writeString(clazz.getName()));
-        CLASS_WRITER_MAP.put(ConcurrentHashMap.KeySetView.class,(Writer<ConcurrentHashMap.KeySetView>) (set, writer)->{
+        CLASS_WRITER_MAP.put(ConcurrentHashMap.KeySetView.class, (Writer<ConcurrentHashMap.KeySetView>) (set, writer) -> {
             writer.writeInt(set.size());
-            for(final Object o:set)
+            for (final Object o : set)
                 writer.writeObject(o);
         });
     }
+
+    private final List<Byte> data = Lists.newArrayList();
 
     private void writeInt(int v) {
         for (int i = 0; i < 4; i++) {
@@ -140,8 +140,7 @@ public class SimpleFocessWriter extends FocessWriter {
         } else if (CLASS_WRITER_MAP.containsKey(cls)) {
             this.writeByte(C_RESERVED);
             this.writeString(cls.getName());
-        }
-        else throw new NotFocessSerializableException(cls.getName());
+        } else throw new NotFocessSerializableException(cls.getName());
     }
 
     private <T> void writeObject(final Object o) {
@@ -150,8 +149,8 @@ public class SimpleFocessWriter extends FocessWriter {
             return;
         }
         final boolean isSerializable = o instanceof FocessSerializable;
-        final Map<String,Object> data = isSerializable ? ((FocessSerializable) o).serialize() : null;
-        this.writeClass(o.getClass(),data != null);
+        final Map<String, Object> data = isSerializable ? ((FocessSerializable) o).serialize() : null;
+        this.writeClass(o.getClass(), data != null);
         if (o instanceof Byte)
             this.writeByte((Byte) o);
         else if (o instanceof Short)
@@ -170,18 +169,18 @@ public class SimpleFocessWriter extends FocessWriter {
             this.writeString((String) o);
         else if (o instanceof Character)
             this.writeChar((Character) o);
-        else if (o instanceof FocessSerializable){
+        else if (o instanceof FocessSerializable) {
             if (data != null)
                 this.writeObject(data);
             else {
                 final List<Field> fields = Stream.of(o.getClass().getDeclaredFields()).filter(f -> (f.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0).collect(Collectors.toList());
                 this.writeInt(fields.size());
-                fields.forEach(f ->{
+                fields.forEach(f -> {
                     f.setAccessible(true);
                     try {
                         this.writeField(f.getName(), f.get(o));
                     } catch (final IllegalAccessException e) {
-                        FocessQQ.getLogger().thrLang("exception-serialize-field", e,f.getName(),o.getClass().getName());
+                        FocessQQ.getLogger().thrLang("exception-serialize-field", e, f.getName(), o.getClass().getName());
                     }
                 });
             }
@@ -194,9 +193,8 @@ public class SimpleFocessWriter extends FocessWriter {
         } else if (CLASS_WRITER_MAP.containsKey(o.getClass())) {
             final T t = (T) o;
             final Writer<T> writer = (Writer<T>) CLASS_WRITER_MAP.get(o.getClass());
-            writer.write(t,this);
-        }
-        else
+            writer.write(t, this);
+        } else
             throw new NotFocessSerializableException(o.getClass().getName());
     }
 

@@ -7,8 +7,8 @@ import top.focess.qq.api.bot.contact.Contact;
 
 public abstract class SimpleContact implements Contact {
 
-    private final Bot bot;
     protected final net.mamoe.mirai.contact.Contact contact;
+    private final Bot bot;
 
     public SimpleContact(final Bot bot, final net.mamoe.mirai.contact.Contact contact) {
         this.bot = bot;
@@ -22,7 +22,7 @@ public abstract class SimpleContact implements Contact {
         if (contact.getBot().getId() != bot.getId())
             return null;
         if (contact instanceof Stranger)
-            return SimpleStranger.get(bot,(Stranger) contact);
+            return SimpleStranger.get(bot, (Stranger) contact);
         if (contact instanceof Member)
             return SimpleMember.get(bot, (Member) contact);
         if (contact instanceof Friend)

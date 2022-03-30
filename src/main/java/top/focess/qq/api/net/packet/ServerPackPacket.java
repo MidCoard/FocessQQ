@@ -11,17 +11,18 @@ public class ServerPackPacket extends ServerPacket {
      */
     private final Packet packet;
 
-    @Override
-    public int getId() {
-        return PACKET_ID;
-    }
-
     /**
      * Constructs a ServerPackPacket
+     *
      * @param packet the packet sent by server
      */
     public ServerPackPacket(final Packet packet) {
         this.packet = packet;
+    }
+
+    @Override
+    public int getId() {
+        return PACKET_ID;
     }
 
     public Packet getPacket() {

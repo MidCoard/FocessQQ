@@ -3,7 +3,7 @@ package top.focess.qq.api.schedule;
 /**
  * Thrown to indicate a scheduler is closed
  */
-public class SchedulerClosedException extends IllegalStateException{
+public class SchedulerClosedException extends IllegalStateException {
 
     /**
      * Constructs a SchedulerClosedException

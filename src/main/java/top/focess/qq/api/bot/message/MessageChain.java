@@ -14,22 +14,22 @@ public class MessageChain extends Message implements Iterable<Message> {
     @NotNull
     @Override
     public Iterator<Message> iterator() {
-        return ((net.mamoe.mirai.message.data.MessageChain)this.message).stream().map(Message::new).iterator();
+        return ((net.mamoe.mirai.message.data.MessageChain) this.message).stream().map(Message::new).iterator();
     }
 
     public Stream<Message> stream() {
-        return ((net.mamoe.mirai.message.data.MessageChain)this.message).stream().map(Message::new);
+        return ((net.mamoe.mirai.message.data.MessageChain) this.message).stream().map(Message::new);
     }
 
     public String toMiraiCode() {
-        return ((net.mamoe.mirai.message.data.MessageChain)this.message).serializeToMiraiCode();
+        return ((net.mamoe.mirai.message.data.MessageChain) this.message).serializeToMiraiCode();
     }
 
     public Message get(final int index) {
-        return new Message(((net.mamoe.mirai.message.data.MessageChain)this.message).get(index));
+        return new Message(((net.mamoe.mirai.message.data.MessageChain) this.message).get(index));
     }
 
     public int size() {
-        return ((net.mamoe.mirai.message.data.MessageChain)this.message).size();
+        return ((net.mamoe.mirai.message.data.MessageChain) this.message).size();
     }
 }

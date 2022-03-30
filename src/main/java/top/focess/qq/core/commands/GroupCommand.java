@@ -24,7 +24,7 @@ public class GroupCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor( (sender, dataCollection, ioHandler) -> {
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
             final long id = dataCollection.getLong();
             final Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
@@ -38,7 +38,7 @@ public class GroupCommand extends Command {
                 ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             } else ioHandler.outputLang("group-command-no-group");
             return CommandResult.ALLOW;
-        }, CommandArgument.of("list"),CommandArgument.ofLong());
+        }, CommandArgument.of("list"), CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             final long id = dataCollection.getLong();
             final Bot bot = FocessQQ.getBotManager().getBot(id);
@@ -61,7 +61,7 @@ public class GroupCommand extends Command {
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;
-        },CommandArgument.of("send"),CommandArgument.ofLong(),CommandArgument.ofLong());
+        }, CommandArgument.of("send"), CommandArgument.ofLong(), CommandArgument.ofLong());
     }
 
     @NotNull

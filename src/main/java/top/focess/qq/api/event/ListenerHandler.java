@@ -1,10 +1,10 @@
 package top.focess.qq.api.event;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.Pair;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import java.lang.reflect.Method;
 import java.util.Comparator;
@@ -16,11 +16,10 @@ import java.util.Map;
  */
 public class ListenerHandler {
 
+    static final Map<Listener, Plugin> LISTENER_PLUGIN_MAP = Maps.newConcurrentMap();
     //only access in classloader, classloader is in lock process
     private static final List<ListenerHandler> LISTENER_HANDLER_LIST = Lists.newArrayList();
     private static final Map<Plugin, List<Listener>> PLUGIN_LISTENER_MAP = Maps.newConcurrentMap();
-    static final Map<Listener,Plugin> LISTENER_PLUGIN_MAP = Maps.newConcurrentMap();
-
     //listeners only in one ListenerHandler, and one ListenerHandler only access by synchronized
     private final Map<Listener, List<Pair<Method, EventHandler>>> listeners = Maps.newHashMap();
 
@@ -29,12 +28,12 @@ public class ListenerHandler {
     }
 
     /**
-     *  Unregister all listeners bundle to the plugin
+     * Unregister all listeners bundle to the plugin
      *
      * @param plugin the plugin which need to unregister all its listeners
      */
     public static void unregister(final Plugin plugin) {
-        final List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
+        final List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin, Lists.newArrayList());
         for (final ListenerHandler handler : LISTENER_HANDLER_LIST)
             for (final Listener listener : listeners) {
                 LISTENER_PLUGIN_MAP.remove(listener);
@@ -46,7 +45,7 @@ public class ListenerHandler {
     /**
      * Add the listener and bundle to the plugin
      *
-     * @param plugin the plugin
+     * @param plugin   the plugin
      * @param listener the listener
      */
     public static void register(final Plugin plugin, final Listener listener) {
@@ -56,16 +55,7 @@ public class ListenerHandler {
             v.add(listener);
             return v;
         });
-        LISTENER_PLUGIN_MAP.put(listener,plugin);
-    }
-
-    /**
-     * Unregister the listener
-     *
-     * @param listener the listener need to be unregistered
-     */
-    public void unregister(final Listener listener) {
-        this.listeners.remove(listener);
+        LISTENER_PLUGIN_MAP.put(listener, plugin);
     }
 
     /**
@@ -84,15 +74,22 @@ public class ListenerHandler {
         return ret;
     }
 
-
+    /**
+     * Unregister the listener
+     *
+     * @param listener the listener need to be unregistered
+     */
+    public void unregister(final Listener listener) {
+        this.listeners.remove(listener);
+    }
 
     /**
      * Register the listener
      *
      * @param listener the listener
-     * @param method the listener method to this Event listener handler
-     * @param handler the event handler
-     * @param <T> the event type
+     * @param method   the listener method to this Event listener handler
+     * @param handler  the event handler
+     * @param <T>      the event type
      */
     public <T extends Event> void register(final Listener listener, final Method method, final EventHandler handler) {
         this.listeners.compute(listener, (k, v) -> {
@@ -107,7 +104,7 @@ public class ListenerHandler {
      * Submit the event to this listener handler
      *
      * @param event the event need to be submitted
-     * @param <T> the event type
+     * @param <T>   the event type
      */
     public <T extends Event> void submit(final T event) {
         for (final Listener listener : this.listeners.keySet()) {
@@ -122,7 +119,7 @@ public class ListenerHandler {
                             method.setAccessible(true);
                             method.invoke(listener, event);
                         } catch (final Exception e) {
-                            FocessQQ.getLogger().thrLang("exception-handle-event",e);
+                            FocessQQ.getLogger().thrLang("exception-handle-event", e);
                         }
                     }
             );

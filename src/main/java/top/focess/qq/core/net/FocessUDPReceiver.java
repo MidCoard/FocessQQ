@@ -11,26 +11,26 @@ import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
 
-public class FocessUDPReceiver extends AServerReceiver{
+public class FocessUDPReceiver extends AServerReceiver {
 
     private final FocessUDPSocket focessUDPSocket;
-    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(),"FocessUDPReceiver");
+    private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessUDPReceiver");
 
     public FocessUDPReceiver(final FocessUDPSocket focessUDPSocket) {
         this.focessUDPSocket = focessUDPSocket;
-        this.scheduler.runTimer(()->{
+        this.scheduler.runTimer(() -> {
             for (final SimpleClient simpleClient : this.clientInfos.values()) {
-                final long time = this.lastHeart.getOrDefault(simpleClient.getId(),0L);
+                final long time = this.lastHeart.getOrDefault(simpleClient.getId(), 0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
                     this.clientInfos.remove(simpleClient.getId());
             }
-        }, Duration.ZERO,Duration.ofSeconds(1));
+        }, Duration.ZERO, Duration.ofSeconds(1));
     }
 
     private void disconnect(final int clientId) {
         final SimpleClient simpleClient = this.clientInfos.remove(clientId);
         if (simpleClient != null)
-            this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new DisconnectedPacket());
+            this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new DisconnectedPacket());
     }
 
     @Override
@@ -46,10 +46,10 @@ public class FocessUDPReceiver extends AServerReceiver{
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(packet.getName()))
                 return;
-        final SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), this.defaultClientId++,packet.getName(),generateToken());
-        this.lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+        final SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), this.defaultClientId++, packet.getName(), generateToken());
+        this.lastHeart.put(simpleClient.getId(), System.currentTimeMillis());
         this.clientInfos.put(simpleClient.getId(), simpleClient);
-        this.focessUDPSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
+        this.focessUDPSocket.sendPacket(packet.getHost(), packet.getPort(), new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
     }
 
     @PacketHandler
@@ -66,7 +66,7 @@ public class FocessUDPReceiver extends AServerReceiver{
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
-                this.lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+                this.lastHeart.put(simpleClient.getId(), System.currentTimeMillis());
         }
     }
 
@@ -76,7 +76,7 @@ public class FocessUDPReceiver extends AServerReceiver{
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
                 for (final Plugin plugin : this.packHandlers.keySet())
-                    for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
+                    for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
                         packHandler.handle(packet.getPacket());
         }
     }
@@ -85,7 +85,7 @@ public class FocessUDPReceiver extends AServerReceiver{
     public void sendPacket(final String client, final Packet packet) {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(client))
-                this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new ServerPackPacket(packet));
+                this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new ServerPackPacket(packet));
     }
 
 }

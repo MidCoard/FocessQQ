@@ -9,7 +9,7 @@ public class TaskNotFinishedException extends IllegalStateException {
      * Constructs a TaskNotFinishedException
      *
      * @param callback the task
-     * @param <V> the task return type
+     * @param <V>      the task return type
      */
     public <V> TaskNotFinishedException(final Callback<V> callback) {
         super("Task " + callback.getName() + " is not finished.");

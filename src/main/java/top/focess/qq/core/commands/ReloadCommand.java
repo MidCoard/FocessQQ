@@ -47,7 +47,7 @@ public class ReloadCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor( (sender, data, ioHandler) -> {
+        this.addExecutor((sender, data, ioHandler) -> {
             final Plugin plugin = data.getPlugin();
             if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("reload-command-reload-main-plugin");

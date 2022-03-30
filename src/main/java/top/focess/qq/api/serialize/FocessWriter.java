@@ -7,10 +7,8 @@ import java.io.OutputStream;
 
 public abstract class FocessWriter {
 
-    public abstract void write(Object o);
-
     public static FocessWriter newFocessWriter(final OutputStream outputStream) {
-        return new SimpleFocessWriter(){
+        return new SimpleFocessWriter() {
 
             @Override
             public void write(final Object o) {
@@ -25,4 +23,6 @@ public abstract class FocessWriter {
             }
         };
     }
+
+    public abstract void write(Object o);
 }

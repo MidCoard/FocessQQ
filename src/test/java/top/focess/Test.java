@@ -10,6 +10,15 @@ import java.io.File;
 
 public class Test {
 
+    public static void main(String[] args) throws YamlLoadException {
+        DefaultConfig config = new DefaultConfig(new File("config.yml"));
+        DefaultConfig a = config.getSection("a");
+//        a.set("null0", null);
+//        a.set("null1", "null");
+        System.out.println(a.get("null0").toString());
+        config.save();
+    }
+
     public static class A implements FocessSerializable {
 
 
@@ -44,17 +53,8 @@ public class Test {
 
     public static class B implements FocessSerializable {
 
-        void c(){
+        void c() {
             System.out.println("I am not null");
         }
-    }
-
-    public static void main(String[] args) throws YamlLoadException {
-        DefaultConfig config = new DefaultConfig(new File("config.yml"));
-        DefaultConfig a = config.getSection("a");
-//        a.set("null0", null);
-//        a.set("null1", "null");
-        System.out.println(a.get("null0").toString());
-        config.save();
     }
 }

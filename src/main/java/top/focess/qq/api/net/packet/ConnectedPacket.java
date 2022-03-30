@@ -19,7 +19,7 @@ public class ConnectedPacket extends ServerPacket {
      * Constructs a ConnectedPacket
      *
      * @param clientId the client id
-     * @param token the token
+     * @param token    the token
      */
     public ConnectedPacket(final int clientId, final String token) {
         this.clientId = clientId;

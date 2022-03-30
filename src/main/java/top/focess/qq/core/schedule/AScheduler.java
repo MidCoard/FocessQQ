@@ -11,30 +11,15 @@ import java.util.Map;
 
 public abstract class AScheduler implements Scheduler {
 
+    private static final Map<Plugin, List<Scheduler>> PLUGIN_SCHEDULER_MAP = Maps.newConcurrentMap();
     private final Plugin plugin;
 
-    private static final Map<Plugin, List<Scheduler>> PLUGIN_SCHEDULER_MAP = Maps.newConcurrentMap();
-
-    public AScheduler(final Plugin plugin){
+    public AScheduler(final Plugin plugin) {
         this.plugin = plugin;
-        PLUGIN_SCHEDULER_MAP.compute(plugin,(k,v)->{
+        PLUGIN_SCHEDULER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newCopyOnWriteArrayList();
             v.add(this);
-            return v;
-        });
-    }
-
-    @Override
-    public Plugin getPlugin() {
-        return this.plugin;
-    }
-
-    @Override
-    public void close() {
-        PLUGIN_SCHEDULER_MAP.compute(this.plugin,(k, v)->{
-            if (v != null)
-                v.remove(this);
             return v;
         });
     }
@@ -63,5 +48,19 @@ public abstract class AScheduler implements Scheduler {
             close(plugin);
         }
         return ret;
+    }
+
+    @Override
+    public Plugin getPlugin() {
+        return this.plugin;
+    }
+
+    @Override
+    public void close() {
+        PLUGIN_SCHEDULER_MAP.compute(this.plugin, (k, v) -> {
+            if (v != null)
+                v.remove(this);
+            return v;
+        });
     }
 }

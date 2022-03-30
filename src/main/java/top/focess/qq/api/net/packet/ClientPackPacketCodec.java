@@ -6,7 +6,7 @@ import top.focess.qq.api.net.PacketPreCodec;
 /**
  * Codec for ClientPackPacket.
  */
-public class ClientPackPacketCodec extends PacketCodec<ClientPackPacket>{
+public class ClientPackPacketCodec extends PacketCodec<ClientPackPacket> {
 
     @Nullable
     @Override
@@ -16,7 +16,7 @@ public class ClientPackPacketCodec extends PacketCodec<ClientPackPacket>{
         final Packet packet = packetPreCodec.readPacket();
         if (packet == null)
             return null;
-        return new ClientPackPacket(clientId,token,packet);
+        return new ClientPackPacket(clientId, token, packet);
     }
 
     @Override

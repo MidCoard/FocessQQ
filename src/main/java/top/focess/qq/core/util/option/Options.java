@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Options {
 
-    private final Map<String,Option> options = Maps.newHashMap();
+    private final Map<String, Option> options = Maps.newHashMap();
 
     public static Options parse(final String[] args, final OptionParserClassifier... classifiers) {
         final List<String> temp = Lists.newArrayList();
@@ -35,7 +35,7 @@ public class Options {
     private void add(@Nullable final Option option) {
         if (option == null)
             return;
-        this.options.put(option.getName(),option);
+        this.options.put(option.getName(), option);
     }
 
     @Nullable

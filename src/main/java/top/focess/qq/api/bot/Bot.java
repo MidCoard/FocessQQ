@@ -55,6 +55,7 @@ public interface Bot {
 
     /**
      * Get the group with special id
+     *
      * @param id the group id
      * @return the group with special id
      * @throws NullPointerException throw if the group with special id does not exist
@@ -64,6 +65,7 @@ public interface Bot {
 
     /**
      * Get the group with special id
+     *
      * @param id the group id
      * @return the group with special id
      */
@@ -72,6 +74,7 @@ public interface Bot {
 
     /**
      * Get the friend with special id
+     *
      * @param id the friend id
      * @return the friend with special id
      */
@@ -80,6 +83,7 @@ public interface Bot {
 
     /**
      * Get all the friends
+     *
      * @return all the friends
      */
     @NonNull
@@ -87,6 +91,7 @@ public interface Bot {
 
     /**
      * Get all the groups
+     *
      * @return all the groups
      */
     @NonNull
@@ -130,6 +135,7 @@ public interface Bot {
 
     /**
      * Indicate this is the Administrator
+     *
      * @return true if this is the Administrator, false otherwise
      */
     boolean isAdministrator();

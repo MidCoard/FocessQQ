@@ -9,10 +9,11 @@ public interface SpecialArgumentHandler extends SpecialArgumentComplexHandler {
 
     /**
      * Handle the special argument
-     * @param sender the sender of the command
+     *
+     * @param sender  the sender of the command
      * @param command the command
-     * @param args the arguments
-     * @param i the index of the argument
+     * @param args    the arguments
+     * @param i       the index of the argument
      * @return the argument after handle
      */
     @NonNull

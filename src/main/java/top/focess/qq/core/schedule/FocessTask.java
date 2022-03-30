@@ -2,7 +2,6 @@ package top.focess.qq.core.schedule;
 
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
-import top.focess.qq.api.schedule.Task;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -14,21 +13,21 @@ public class FocessTask implements ITask {
     private final Runnable runnable;
     private final Scheduler scheduler;
     private final String name;
-    private Duration period;
     protected boolean isRunning;
-    private boolean isPeriod;
     protected boolean isFinished;
-    private ComparableTask nativeTask;
     protected ExecutionException exception;
+    private Duration period;
+    private boolean isPeriod;
+    private ComparableTask nativeTask;
 
     FocessTask(final Runnable runnable, final Scheduler scheduler) {
         this.runnable = runnable;
         this.scheduler = scheduler;
-        this.name = scheduler.getName() + "-" + UUID.randomUUID().toString().substring(0,8);
+        this.name = scheduler.getName() + "-" + UUID.randomUUID().toString().substring(0, 8);
     }
 
     FocessTask(final Runnable runnable, final Duration period, final Scheduler scheduler) {
-        this(runnable,scheduler);
+        this(runnable, scheduler);
         this.isPeriod = true;
         this.period = period;
     }

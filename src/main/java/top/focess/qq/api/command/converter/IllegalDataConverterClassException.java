@@ -9,6 +9,7 @@ public class IllegalDataConverterClassException extends IllegalArgumentException
 
     /**
      * Constructs a IllegalDataConverterClassException
+     *
      * @param c the illegal DataConverter class
      * @param e the cause
      */

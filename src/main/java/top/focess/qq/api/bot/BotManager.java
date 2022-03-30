@@ -15,22 +15,23 @@ public interface BotManager {
     /**
      * Login and get the bot with id and password
      *
-     * @param id the id of the bot
+     * @param id       the id of the bot
      * @param password the password of the bot
-     * @param plugin the plugin
+     * @param plugin   the plugin
      * @return the bot
      */
-    @NotNull Future<Bot> login(long id,String password,Plugin plugin);
+    @NotNull
+    Future<Bot> login(long id, String password, Plugin plugin);
 
     /**
      * Login and get the bot with id and password
      * This is a blocking method
      *
-     * @param id the id of the bot
+     * @param id       the id of the bot
      * @param password the password of the bot
-     * @param plugin the plugin
-     * @throws BotLoginException if the bot login failed
+     * @param plugin   the plugin
      * @return the bot
+     * @throws BotLoginException if the bot login failed
      */
     @NotNull
     Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException;
@@ -46,6 +47,7 @@ public interface BotManager {
 
     /**
      * Logout the bot
+     *
      * @param bot the bot need to log out
      * @return true if the bot is online, false otherwise
      */
@@ -78,6 +80,7 @@ public interface BotManager {
 
     /**
      * Remove the bot
+     *
      * @param id the bot id
      * @return the previous bot
      */

@@ -8,7 +8,7 @@ import top.focess.qq.api.net.PacketPreCodec;
  *
  * @param <T> the packet type
  */
-public abstract class PacketCodec<T extends Packet>{
+public abstract class PacketCodec<T extends Packet> {
 
     /**
      * Read the special packet from precodec
@@ -22,7 +22,7 @@ public abstract class PacketCodec<T extends Packet>{
     /**
      * Write the packet to the precodec
      *
-     * @param packet the packet
+     * @param packet         the packet
      * @param packetPreCodec the precodec
      */
     public abstract void writePacket(T packet, PacketPreCodec packetPreCodec);

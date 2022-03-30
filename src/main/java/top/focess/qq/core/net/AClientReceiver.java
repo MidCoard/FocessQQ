@@ -16,12 +16,10 @@ public abstract class AClientReceiver implements ClientReceiver {
     protected final String host;
     protected final int port;
     protected final String name;
+    protected final Map<Plugin, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newConcurrentMap();
     protected String token;
     protected int id;
     protected volatile boolean connected;
-
-
-    protected final Map<Plugin, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newConcurrentMap();
 
     public AClientReceiver(final String host, final int port, final String name) {
         this.host = host;

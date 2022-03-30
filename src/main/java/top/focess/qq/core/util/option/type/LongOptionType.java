@@ -1,6 +1,6 @@
 package top.focess.qq.core.util.option.type;
 
-public class LongOptionType extends ExceptionOptionType<Long>{
+public class LongOptionType extends ExceptionOptionType<Long> {
 
     public static final LongOptionType LONG_OPTION_TYPE = new LongOptionType();
 

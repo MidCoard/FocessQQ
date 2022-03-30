@@ -8,7 +8,7 @@ import java.util.Map;
 public class JSONSection extends JSON {
     private final JSON parent;
 
-    public JSONSection(final JSON parent, final Map<String,Object> values) {
+    public JSONSection(final JSON parent, final Map<String, Object> values) {
         super(values);
         this.parent = parent;
     }

@@ -7,6 +7,7 @@ public class EventSubmitException extends Exception {
 
     /**
      * Constructs a EventSubmitException
+     *
      * @param event the event
      */
     public EventSubmitException(final Event event) {
@@ -16,7 +17,7 @@ public class EventSubmitException extends Exception {
     /**
      * Constructs a EventSubmitException
      *
-     * @param event the event
+     * @param event   the event
      * @param message the detail message
      */
     public EventSubmitException(final Event event, final String message) {

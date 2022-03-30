@@ -71,8 +71,8 @@ public abstract class Plugin {
      * Initialize a Plugin instance by its name.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
-     * @param name the plugin name
-     * @param author the plugin author
+     * @param name    the plugin name
+     * @param author  the plugin author
      * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
@@ -87,17 +87,46 @@ public abstract class Plugin {
      * Provide a constructor to help {@link PluginType} design.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      */
-    protected Plugin() {}
+    protected Plugin() {
+    }
+
+    /**
+     * Get Plugin instance by the class instance
+     *
+     * @param plugin the class instance of the plugin
+     * @return the plugin instance
+     * @see PluginClassLoader#getPlugin(Class)
+     */
+    @Nullable
+    public static Plugin getPlugin(final Class<? extends Plugin> plugin) {
+        return PluginClassLoader.getPlugin(plugin);
+    }
+
+    /**
+     * Get Plugin instance by the name
+     *
+     * @param name the name of the plugin
+     * @return the plugin instance
+     * @see PluginClassLoader#getPlugin(String)
+     */
+    @Nullable
+    public static Plugin getPlugin(final String name) {
+        return PluginClassLoader.getPlugin(name);
+    }
+
+    @Nullable
+    public static Plugin thisPlugin() {
+        return PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    }
 
     private void init() {
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(this.name);
         if (this.getClass() != FocessQQ.MainPlugin.class || FocessQQ.isRunning()) {
             if (getPlugin(this.getClass()) != null)
-                throw new PluginDuplicateException(this.name,"Cannot new a plugin at runtime");
+                throw new PluginDuplicateException(this.name, "Cannot new a plugin at runtime");
             this.pluginDescription = new PluginDescription(YamlConfiguration.load(this.loadResource("plugin.yml")));
-        }
-        else this.pluginDescription = new PluginDescription();
+        } else this.pluginDescription = new PluginDescription();
         if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
             throw new IllegalStateException("Cannot new a plugin at runtime");
         if (!this.getDefaultFolder().exists())
@@ -113,44 +142,15 @@ public abstract class Plugin {
                 } else if (!config.createNewFile())
                     FocessQQ.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
             } catch (final IOException e) {
-                FocessQQ.getLogger().thrLang("exception-create-config-file",e);
+                FocessQQ.getLogger().thrLang("exception-create-config-file", e);
             }
         }
         try {
             this.defaultConfig = new DefaultConfig(config);
         } catch (final YamlLoadException e) {
-            FocessQQ.getLogger().thrLang("exception-load-default-configuration",e);
+            FocessQQ.getLogger().thrLang("exception-load-default-configuration", e);
         }
         this.langConfig = new LangConfig(this.loadResource("lang.yml"));
-    }
-
-    /**
-     * Get Plugin instance by the class instance
-     *
-     * @see PluginClassLoader#getPlugin(Class)
-     * @param plugin the class instance of the plugin
-     * @return the plugin instance
-     */
-    @Nullable
-    public static Plugin getPlugin(final Class<? extends Plugin> plugin) {
-        return PluginClassLoader.getPlugin(plugin);
-    }
-
-    /**
-     * Get Plugin instance by the name
-     *
-     * @see PluginClassLoader#getPlugin(String)
-     * @param name the name of the plugin
-     * @return the plugin instance
-     */
-    @Nullable
-    public static Plugin getPlugin(final String name) {
-        return PluginClassLoader.getPlugin(name);
-    }
-
-    @Nullable
-    public static Plugin thisPlugin() {
-        return PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
     }
 
     @NonNull
@@ -228,22 +228,23 @@ public abstract class Plugin {
 
     /**
      * Register the command
+     *
      * @param command the command need to be registered
      * @see Command#register(Plugin, Command)
      */
     public final void registerCommand(final Command command) {
-        Command.register(this,command);
+        Command.register(this, command);
     }
 
     /**
      * Register the getter of the buffer
      *
      * @param dataConverter the buffer data converter
-     * @param bufferGetter the getter of the buffer
+     * @param bufferGetter  the getter of the buffer
      * @see DataCollection#register(Plugin, DataConverter, DataCollection.BufferGetter)
      */
     public final void registerBuffer(final DataConverter<?> dataConverter, final DataCollection.BufferGetter bufferGetter) {
-        DataCollection.register(this,dataConverter,bufferGetter);
+        DataCollection.register(this, dataConverter, bufferGetter);
     }
 
     public final String getAuthor() {
@@ -277,7 +278,7 @@ public abstract class Plugin {
 
     /**
      * Used to unload this plugin during enabling process
-     *
+     * <p>
      * This should be called in the {@link #enable()} method
      */
     public final void unload() {
@@ -287,11 +288,11 @@ public abstract class Plugin {
     /**
      * Register the special argument handler
      *
-     * @param name the name of the special argument handler
+     * @param name    the name of the special argument handler
      * @param handler the special argument handler
      * @see CommandLine#register(Plugin, String, SpecialArgumentComplexHandler)
      */
     public final void registerSpecialArgumentHandler(final String name, final SpecialArgumentComplexHandler handler) {
-        CommandLine.register(this,name,handler);
+        CommandLine.register(this, name, handler);
     }
 }

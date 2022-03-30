@@ -3,7 +3,7 @@ package top.focess.qq.api.net.packet;
 /**
  * The class indicates that this packet is for client side.
  */
-public abstract class ClientPacket extends Packet{
+public abstract class ClientPacket extends Packet {
 
     /**
      * The client id
@@ -19,7 +19,7 @@ public abstract class ClientPacket extends Packet{
      * Constructs a ClientPacket
      *
      * @param clientId the client id
-     * @param token the client token
+     * @param token    the client token
      */
     public ClientPacket(final int clientId, final String token) {
         this.clientId = clientId;

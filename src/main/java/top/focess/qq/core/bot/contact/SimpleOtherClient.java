@@ -7,20 +7,15 @@ import top.focess.qq.api.bot.contact.OtherClient;
 
 import java.util.Map;
 
-public class SimpleOtherClient extends SimpleContact implements OtherClient{
+public class SimpleOtherClient extends SimpleContact implements OtherClient {
 
 
-    private static final Map<Long, Map<Long,SimpleOtherClient>> OTHER_CLIENT_MAP = Maps.newConcurrentMap();
+    private static final Map<Long, Map<Long, SimpleOtherClient>> OTHER_CLIENT_MAP = Maps.newConcurrentMap();
     private final net.mamoe.mirai.contact.OtherClient nativeOtherClient;
 
     public SimpleOtherClient(final Bot bot, final net.mamoe.mirai.contact.OtherClient contact) {
         super(bot, contact);
         this.nativeOtherClient = contact;
-    }
-
-    @Override
-    public String getName() {
-        return this.nativeOtherClient.getInfo().getDeviceName();
     }
 
     @Nullable
@@ -30,6 +25,11 @@ public class SimpleOtherClient extends SimpleContact implements OtherClient{
         if (otherClient.getBot().getId() != bot.getId())
             return null;
         return OTHER_CLIENT_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(otherClient.getId(), k -> new SimpleOtherClient(bot, otherClient));
+    }
+
+    @Override
+    public String getName() {
+        return this.nativeOtherClient.getInfo().getDeviceName();
     }
 
     @Override

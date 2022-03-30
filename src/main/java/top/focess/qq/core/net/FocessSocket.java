@@ -2,11 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.net.IllegalPortException;
-import top.focess.qq.api.net.ClientReceiver;
-import top.focess.qq.api.net.PacketPreCodec;
-import top.focess.qq.api.net.Receiver;
-import top.focess.qq.api.net.ServerReceiver;
+import top.focess.qq.api.net.*;
 import top.focess.qq.api.net.packet.Packet;
 import top.focess.qq.api.util.Pair;
 
@@ -20,8 +16,9 @@ public class FocessSocket extends ASocket {
 
     private final ServerSocket server;
     private final int localPort;
-
-    public FocessSocket(final int localPort) throws IllegalPortException{
+    private boolean serverSide;
+    private boolean clientSide;
+    public FocessSocket(final int localPort) throws IllegalPortException {
         this.localPort = localPort;
         try {
             this.server = new ServerSocket(localPort);
@@ -60,9 +57,6 @@ public class FocessSocket extends ASocket {
         thread.start();
     }
 
-    private boolean serverSide;
-    private boolean clientSide;
-
     public void registerReceiver(final Receiver receiver) {
         if (receiver instanceof ServerReceiver)
             this.serverSide = true;
@@ -92,7 +86,7 @@ public class FocessSocket extends ASocket {
                 outputStream.close();
                 return true;
             } catch (final IOException e) {
-                FocessQQ.getLogger().thrLang("exception-send-packet",e);
+                FocessQQ.getLogger().thrLang("exception-send-packet", e);
                 return false;
             }
         return false;

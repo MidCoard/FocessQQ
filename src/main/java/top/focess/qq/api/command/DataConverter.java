@@ -171,7 +171,7 @@ public abstract class DataConverter<T> {
     }
 
     void connect(final DataCollection dataCollection, final T arg) {
-        dataCollection.write(this.getTargetClass(),arg);
+        dataCollection.write(this.getTargetClass(), arg);
     }
 
     protected abstract Class<T> getTargetClass();

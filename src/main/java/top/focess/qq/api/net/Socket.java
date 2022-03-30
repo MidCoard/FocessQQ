@@ -9,6 +9,7 @@ public interface Socket {
 
     /**
      * Register packet receiver for this socket
+     *
      * @param receiver the packet receiver for this socket
      */
     void registerReceiver(Receiver receiver);
@@ -36,6 +37,7 @@ public interface Socket {
 
     /**
      * Unregister the packet-handlers of the plugin
+     *
      * @param plugin the plugin
      */
     void unregister(Plugin plugin);

@@ -15,28 +15,28 @@ public class Section {
     private final String name;
     private final Task task;
 
-    public static Section startSection(final String name, final Future<?> task, final Duration timeout) {
-        final Task t = SCHEDULER.run(()->{
-            task.cancel(true);
-            FocessQQ.getLogger().debugLang("debug-section-timeout",name);
-        },timeout);
-        return new Section(name,t);
-    }
-
-    public static Section startSection(final String name, final Task task, final Duration timeout) {
-        final Task t = SCHEDULER.run(()->{
-            task.cancel(true);
-            FocessQQ.getLogger().debugLang("debug-section-timeout",name);
-        },timeout);
-        return new Section(name,t);
-    }
-
     private Section(final String name, final Task task) {
         this.name = name;
         this.task = task;
     }
 
-    public void stop(){
+    public static Section startSection(final String name, final Future<?> task, final Duration timeout) {
+        final Task t = SCHEDULER.run(() -> {
+            task.cancel(true);
+            FocessQQ.getLogger().debugLang("debug-section-timeout", name);
+        }, timeout);
+        return new Section(name, t);
+    }
+
+    public static Section startSection(final String name, final Task task, final Duration timeout) {
+        final Task t = SCHEDULER.run(() -> {
+            task.cancel(true);
+            FocessQQ.getLogger().debugLang("debug-section-timeout", name);
+        }, timeout);
+        return new Section(name, t);
+    }
+
+    public void stop() {
         this.task.cancel();
     }
 

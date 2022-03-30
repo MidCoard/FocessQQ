@@ -13,15 +13,16 @@ public interface SectionMap extends Serializable {
     /**
      * Store the key-value pair
      *
-     * @param key the key of the key-value pair
+     * @param key   the key of the key-value pair
      * @param value the value of the key-value pair
      */
     default void set(final String key, final Object value) {
-        this.getValues().put(key,value);
+        this.getValues().put(key, value);
     }
 
     /**
      * Get the value of the key-value pair
+     *
      * @param key the key of the key-value pair
      * @param <T> the desired type
      * @return the desired value
@@ -52,7 +53,7 @@ public interface SectionMap extends Serializable {
 
     /**
      * Create the section named key
-     *
+     * <p>
      * Note: if the section named key already exists, it will be replaced by a new section
      *
      * @param key the key of the Section
@@ -65,7 +66,7 @@ public interface SectionMap extends Serializable {
      *
      * @return all the key-value pairs
      */
-    Map<String,Object> getValues();
+    Map<String, Object> getValues();
 
     /**
      * Get all the keys in set
@@ -78,7 +79,7 @@ public interface SectionMap extends Serializable {
 
     /**
      * Get the section named key
-     *
+     * <p>
      * Note: if the section named key does not exist, it will be created
      *
      * @param key the key of the Section
@@ -97,9 +98,10 @@ public interface SectionMap extends Serializable {
 
     /**
      * Get the value of the key-value pair
-     * @param key the key of the key-value pair
+     *
+     * @param key          the key of the key-value pair
      * @param defaultValue the default value
-     * @param <T> the desired type
+     * @param <T>          the desired type
      * @return the desired value or defaultValue if there is no value
      */
     default <T> T getOrDefault(final String key, final T defaultValue) {
@@ -109,7 +111,7 @@ public interface SectionMap extends Serializable {
     /**
      * compute the value of the key-value pair
      *
-     * @param key the key of the key-value pair
+     * @param key               the key of the key-value pair
      * @param remappingFunction the remapping function
      */
     default void compute(final String key, final BiFunction<? super String, ? super Object, ?> remappingFunction) {

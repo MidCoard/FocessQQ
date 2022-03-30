@@ -13,12 +13,14 @@ public interface Contact {
 
     /**
      * Get the contact name
+     *
      * @return the contact name
      */
     String getName();
 
     /**
      * Get the contact bot
+     *
      * @return the contact bot
      */
     Bot getBot();

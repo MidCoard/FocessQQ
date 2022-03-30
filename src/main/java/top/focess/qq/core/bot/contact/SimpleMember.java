@@ -14,7 +14,7 @@ import static top.focess.qq.api.command.CommandPermission.*;
 
 public class SimpleMember extends SimpleContact implements Member {
 
-    private static final Map<Long, Map<Long,SimpleMember>> GROUP_MEMBER_MAP = Maps.newConcurrentMap();
+    private static final Map<Long, Map<Long, SimpleMember>> GROUP_MEMBER_MAP = Maps.newConcurrentMap();
     private final net.mamoe.mirai.contact.Member nativeMember;
     private final Group simpleGroup;
 

@@ -4,9 +4,9 @@ import net.mamoe.mirai.contact.MemberPermission;
 
 public enum CommandPermission {
 
-    ADMINISTRATOR(MemberPermission.ADMINISTRATOR,3),
-    OWNER(MemberPermission.OWNER,5),
-    MEMBER(MemberPermission.MEMBER,0),
+    ADMINISTRATOR(MemberPermission.ADMINISTRATOR, 3),
+    OWNER(MemberPermission.OWNER, 5),
+    MEMBER(MemberPermission.MEMBER, 0),
     FRIEND(OWNER);
 
     final MemberPermission permission;

@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * The warped task. You can use this to handle runnable processing
  */
-public interface Task{
+public interface Task {
 
     /**
      * Cancel this task
@@ -80,9 +80,8 @@ public interface Task{
     /**
      * wait until this task is finished
      *
-     *
-     * @throws ExecutionException if there is any exception in the execution processing
-     * @throws InterruptedException if the task is interrupted
+     * @throws ExecutionException    if there is any exception in the execution processing
+     * @throws InterruptedException  if the task is interrupted
      * @throws CancellationException if the task is cancelled
      */
     void join() throws ExecutionException, InterruptedException, CancellationException;

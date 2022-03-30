@@ -40,10 +40,10 @@ public class FriendRequestEvent extends BotEvent {
     /**
      * Constructs a FriendRequestEvent
      *
-     * @param bot the bot
-     * @param id the id of the stranger
-     * @param nick the nickname of the stranger
-     * @param group the group of the stranger where the application comes from
+     * @param bot     the bot
+     * @param id      the id of the stranger
+     * @param nick    the nickname of the stranger
+     * @param group   the group of the stranger where the application comes from
      * @param message the message of the application
      */
     public FriendRequestEvent(final Bot bot, final long id, final String nick, @Nullable final Group group, final String message) {

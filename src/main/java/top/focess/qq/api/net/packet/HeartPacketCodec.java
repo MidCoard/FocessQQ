@@ -5,14 +5,14 @@ import top.focess.qq.api.net.PacketPreCodec;
 /**
  * Codec for HeartPacket.
  */
-public class HeartPacketCodec extends PacketCodec<HeartPacket>{
+public class HeartPacketCodec extends PacketCodec<HeartPacket> {
 
     @Override
     public HeartPacket readPacket(final PacketPreCodec packetPreCodec) {
         final int clientId = packetPreCodec.readInt();
         final String token = packetPreCodec.readString();
         final long time = packetPreCodec.readLong();
-        return new HeartPacket(clientId,token,time);
+        return new HeartPacket(clientId, token, time);
     }
 
     @Override

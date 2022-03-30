@@ -28,10 +28,10 @@ public class Pair<K, V> implements Serializable {
     /**
      * Constructs a new Pair with static method
      *
-     * @param key the first element
+     * @param key   the first element
      * @param value the second element
-     * @param <K> the first element type
-     * @param <V> the second element type
+     * @param <K>   the first element type
+     * @param <V>   the second element type
      * @return the pair
      */
     public static <K, V> Pair<K, V> of(final K key, final V value) {

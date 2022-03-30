@@ -24,13 +24,11 @@ import java.util.Objects;
  */
 public class CommandSender {
 
-    private static final Map<CommandSender, Session> SESSIONS = Maps.newHashMap();
-
     /**
      * Present CONSOLE or we call it Terminate
      */
     public static final CommandSender CONSOLE = new CommandSender();
-
+    private static final Map<CommandSender, Session> SESSIONS = Maps.newHashMap();
     private final Member member;
     private final Friend friend;
     private final Stranger stranger;
@@ -101,6 +99,17 @@ public class CommandSender {
         this.permission = CommandPermission.OWNER;
     }
 
+    public static void clear(final Plugin plugin) {
+        SESSIONS.values().stream().map(Session::getValues).forEach(map -> {
+            final List<String> keys = Lists.newArrayList();
+            map.forEach((key, value) -> {
+                if (key.startsWith(plugin.getName() + ":"))
+                    keys.add(key);
+            });
+            keys.forEach(map::remove);
+        });
+    }
+
     /**
      * Get the Mirai Friend instance, or null if this CommandSender does not present a Mirai Friend instance.
      *
@@ -121,7 +130,6 @@ public class CommandSender {
         return this.isFriend;
     }
 
-
     /**
      * Indicate whether this CommandSender owns the permission
      *
@@ -133,7 +141,6 @@ public class CommandSender {
             return true;
         return this.permission.hasPermission(permission);
     }
-
 
     /**
      * Get the Mirai Member instance, or null if this CommandSender does not present a Mirai Member instance.
@@ -168,6 +175,7 @@ public class CommandSender {
 
     /**
      * Get permission
+     *
      * @return permission of this sender
      */
     @NonNull
@@ -240,8 +248,8 @@ public class CommandSender {
     /**
      * Execute command with this CommandSender
      *
-     * @see CommandLine#exec(CommandSender, String)
      * @param command the command CommandSender execute
+     * @see CommandLine#exec(CommandSender, String)
      */
     public void exec(final String command) {
         CommandLine.exec(this, command);
@@ -258,7 +266,7 @@ public class CommandSender {
             return SESSIONS.get(this);
         else {
             final Session session = new Session(null);
-            SESSIONS.put(this,session);
+            SESSIONS.put(this, session);
             return session;
         }
     }
@@ -280,16 +288,5 @@ public class CommandSender {
      */
     public boolean isStranger() {
         return this.isStranger;
-    }
-
-    public static void clear(final Plugin plugin) {
-        SESSIONS.values().stream().map(Session::getValues).forEach(map ->{
-            final List<String> keys = Lists.newArrayList();
-            map.forEach((key,value) -> {
-               if (key.startsWith(plugin.getName() + ":"))
-                   keys.add(key);
-            });
-            keys.forEach(map::remove);
-        });
     }
 }

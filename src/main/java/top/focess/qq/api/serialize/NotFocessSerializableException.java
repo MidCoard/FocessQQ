@@ -7,6 +7,7 @@ public class NotFocessSerializableException extends RuntimeException {
 
     /**
      * Constructs a NotFocessSerializableException
+     *
      * @param cls the class that is not serializable
      */
     public NotFocessSerializableException(final String cls) {

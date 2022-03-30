@@ -25,8 +25,8 @@ public class FriendRecallEvent extends BotEvent {
     /**
      * Constructs a FriendRecallEvent
      *
-     * @param bot the bot
-     * @param friend the friend who send the message
+     * @param bot        the bot
+     * @param friend     the friend who send the message
      * @param messageIds the message ids
      */
     public FriendRecallEvent(final Bot bot, final Friend friend, final int[] messageIds) {

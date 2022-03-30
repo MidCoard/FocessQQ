@@ -44,7 +44,7 @@ public class ComparableTask implements Comparable<ComparableTask> {
         }
     }
 
-    long getTime(){
+    long getTime() {
         return this.time;
     }
 

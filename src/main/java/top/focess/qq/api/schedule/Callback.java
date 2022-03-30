@@ -13,20 +13,23 @@ public interface Callback<V> extends Task, Future<V> {
 
     /**
      * Call the target value
-     * @throws CancellationException if the task is cancelled
-     * @throws TaskNotFinishedException if the task is not finished
-     * @throws ExecutionException if there is any exception in the execution processing
+     *
      * @return the target value
+     * @throws CancellationException    if the task is cancelled
+     * @throws TaskNotFinishedException if the task is not finished
+     * @throws ExecutionException       if there is any exception in the execution processing
      */
     V call() throws ExecutionException, CancellationException, TaskNotFinishedException;
 
     /**
      * Wait for this task finished and call the target value
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException if there is any exception in the execution processing
+     *
      * @return the target value
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if there is any exception in the execution processing
      */
     V waitCall() throws InterruptedException, ExecutionException;
+
     /**
      * Indicate whether this task is done or not
      *
@@ -41,13 +44,13 @@ public interface Callback<V> extends Task, Future<V> {
     /**
      * Wait for this task finished and call the target value
      *
-     * @see #waitCall()
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException if there is any exception in the execution processing
      * @return the target value
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if there is any exception in the execution processing
+     * @see #waitCall()
      */
     @Override
-    default  V get() throws InterruptedException, ExecutionException {
+    default V get() throws InterruptedException, ExecutionException {
         return this.waitCall();
     }
 
@@ -55,15 +58,15 @@ public interface Callback<V> extends Task, Future<V> {
      * Wait for the time and call the target value
      *
      * @param timeout the timeout
-     * @param unit the time unit
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException if there is any exception in the execution processing
-     * @throws TimeoutException if the time is out
-     * @throws CancellationException if the task is cancelled
+     * @param unit    the time unit
      * @return the target value
+     * @throws InterruptedException  if the current thread was interrupted while waiting
+     * @throws ExecutionException    if there is any exception in the execution processing
+     * @throws TimeoutException      if the time is out
+     * @throws CancellationException if the task is cancelled
      */
     @Override
-    V get(long timeout,@NotNull TimeUnit unit)
+    V get(long timeout, @NotNull TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException, CancellationException;
 
     @Override

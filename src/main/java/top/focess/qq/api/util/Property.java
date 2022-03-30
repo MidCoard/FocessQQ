@@ -7,7 +7,8 @@ import top.focess.qq.FocessQQ;
  */
 public class Property {
 
-    private Property(){}
+    private Property() {
+    }
 
     /**
      * Indicate whether it has the key or not
@@ -22,7 +23,7 @@ public class Property {
     /**
      * Set the property
      *
-     * @param key the FocessQQ framework properties' key
+     * @param key   the FocessQQ framework properties' key
      * @param value the FocessQQ framework properties' value
      */
     public static void put(final String key, final Object value) {
@@ -34,8 +35,8 @@ public class Property {
      *
      * @param key the FocessQQ framework properties' key
      * @param <T> the desired T type
-     * @throws ClassCastException if the desired T type is not equal to its original type
      * @return the desired value
+     * @throws ClassCastException if the desired T type is not equal to its original type
      */
     public static <T> T get(final String key) {
         return (T) FocessQQ.MainPlugin.getProperties().get(key);
@@ -43,14 +44,14 @@ public class Property {
 
     /**
      * Get the value of the key in the properties or default value if the key is not existed
-     * 
+     *
      * @param key the FocessQQ framework properties' key
-     * @param t the default value
+     * @param t   the default value
      * @param <T> the desired T type
      * @return the desired value, or the default value
      */
-    public static <T> T getOrDefault(final String key , final T t) {
-        return (T) FocessQQ.MainPlugin.getProperties().getOrDefault(key,t);
+    public static <T> T getOrDefault(final String key, final T t) {
+        return (T) FocessQQ.MainPlugin.getProperties().getOrDefault(key, t);
     }
 
     /**

@@ -18,13 +18,13 @@ public class FocessReceiver extends AServerReceiver {
 
     public FocessReceiver(final FocessSocket focessSocket) {
         this.focessSocket = focessSocket;
-        this.scheduler.runTimer(()->{
+        this.scheduler.runTimer(() -> {
             for (final SimpleClient simpleClient : this.clientInfos.values()) {
-                final long time = this.lastHeart.getOrDefault(simpleClient.getId(),0L);
+                final long time = this.lastHeart.getOrDefault(simpleClient.getId(), 0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
                     this.clientInfos.remove(simpleClient.getId());
             }
-        }, Duration.ZERO,Duration.ofSeconds(1));
+        }, Duration.ZERO, Duration.ofSeconds(1));
     }
 
     @PacketHandler
@@ -32,10 +32,10 @@ public class FocessReceiver extends AServerReceiver {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(packet.getName()))
                 return;
-        final SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), this.defaultClientId++,packet.getName(),generateToken());
-        this.lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+        final SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), this.defaultClientId++, packet.getName(), generateToken());
+        this.lastHeart.put(simpleClient.getId(), System.currentTimeMillis());
         this.clientInfos.put(simpleClient.getId(), simpleClient);
-        this.focessSocket.sendPacket(packet.getHost(),packet.getPort(),new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
+        this.focessSocket.sendPacket(packet.getHost(), packet.getPort(), new ConnectedPacket(simpleClient.getId(), simpleClient.getToken()));
     }
 
     @PacketHandler
@@ -51,8 +51,8 @@ public class FocessReceiver extends AServerReceiver {
     public void onHeart(final HeartPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
-            if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000> packet.getTime())
-                this.lastHeart.put(simpleClient.getId(),packet.getTime());
+            if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000 > packet.getTime())
+                this.lastHeart.put(simpleClient.getId(), packet.getTime());
         }
     }
 
@@ -62,7 +62,7 @@ public class FocessReceiver extends AServerReceiver {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
                 for (final Plugin plugin : this.packHandlers.keySet())
-                    for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
+                    for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
                         packHandler.handle(packet.getPacket());
         }
     }
@@ -70,14 +70,14 @@ public class FocessReceiver extends AServerReceiver {
     private void disconnect(final int clientId) {
         final SimpleClient simpleClient = this.clientInfos.remove(clientId);
         if (simpleClient != null)
-            this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new DisconnectedPacket());
+            this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new DisconnectedPacket());
     }
 
     @Override
     public void sendPacket(final String client, final Packet packet) {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(client))
-                this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(),new ServerPackPacket(packet));
+                this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new ServerPackPacket(packet));
     }
 
     @Override

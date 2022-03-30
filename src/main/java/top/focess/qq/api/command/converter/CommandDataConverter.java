@@ -16,7 +16,7 @@ public class CommandDataConverter extends NullDataConverter<Command> {
     @Nullable
     @Override
     public Command convert(final String s) {
-        for (final Command command:Command.getCommands())
+        for (final Command command : Command.getCommands())
             if (command.getName().equals(s))
                 return command;
         return null;

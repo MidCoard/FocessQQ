@@ -5,7 +5,7 @@ import top.focess.qq.api.net.PacketPreCodec;
 /**
  * Codec for MessagePacket.
  */
-public class MessagePacketCodec extends PacketCodec<MessagePacket>{
+public class MessagePacketCodec extends PacketCodec<MessagePacket> {
 
     @Override
     public MessagePacket readPacket(final PacketPreCodec packetPreCodec) {

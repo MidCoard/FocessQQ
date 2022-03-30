@@ -1,12 +1,12 @@
 package top.focess.qq.api.event.command;
 
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.IOHandler;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after command executed
@@ -43,11 +43,12 @@ public class CommandExecutedEvent extends Event {
 
     /**
      * Constructs a CommandExecutedEvent
-     * @param executor the Executor
-     * @param args the args of the executor
+     *
+     * @param executor  the Executor
+     * @param args      the args of the executor
      * @param ioHandler the input and output handler
-     * @param sender the executor
-     * @param result the result
+     * @param sender    the executor
+     * @param result    the result
      */
     public CommandExecutedEvent(final Command.Executor executor, @NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
         this.executor = executor;

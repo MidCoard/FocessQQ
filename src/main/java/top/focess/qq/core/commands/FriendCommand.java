@@ -35,7 +35,7 @@ public class FriendCommand extends Command {
                 stringBuilder.append(friend.getRawName()).append("(").append(friend.getId()).append("),");
             ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             return CommandResult.ALLOW;
-        }, CommandArgument.of("list"),CommandArgument.ofLong());
+        }, CommandArgument.of("list"), CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             final long id = dataCollection.getLong();
             final Bot bot = FocessQQ.getBotManager().getBot(id);
@@ -58,7 +58,7 @@ public class FriendCommand extends Command {
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;
-        },CommandArgument.of("send"),CommandArgument.ofLong(),CommandArgument.ofLong());
+        }, CommandArgument.of("send"), CommandArgument.ofLong(), CommandArgument.ofLong());
     }
 
     @Override

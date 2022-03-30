@@ -14,8 +14,8 @@ import java.util.Map;
  */
 public class DataCollection {
 
-    private static final Map<Plugin,List<DataConverter<?>>> PLUGIN_DATA_CONVERTER_MAP = Maps.newConcurrentMap();
-    private static final Map<DataConverter<?>,BufferGetter> DATA_CONVERTER_BUFFER_MAP = Maps.newConcurrentMap();
+    private static final Map<Plugin, List<DataConverter<?>>> PLUGIN_DATA_CONVERTER_MAP = Maps.newConcurrentMap();
+    private static final Map<DataConverter<?>, BufferGetter> DATA_CONVERTER_BUFFER_MAP = Maps.newConcurrentMap();
     private final Map<Class<?>, DataBuffer> buffers = Maps.newHashMap();
 
     /**
@@ -24,13 +24,13 @@ public class DataCollection {
      * @param dataConverters the data converters
      */
     public DataCollection(final DataConverter<?>[] dataConverters) {
-        final Map<DataConverter<?>,Integer> map = Maps.newHashMap();
+        final Map<DataConverter<?>, Integer> map = Maps.newHashMap();
         for (final DataConverter<?> dataConverter : dataConverters)
             map.compute(dataConverter, (k, v) -> {
-              if (v == null)
-                  v = 0;
-              v++;
-              return v;
+                if (v == null)
+                    v = 0;
+                v++;
+                return v;
             });
         for (final DataConverter<?> dataConverter : map.keySet())
             this.buffers.put(dataConverter.getTargetClass(), DATA_CONVERTER_BUFFER_MAP.get(dataConverter).newBuffer(map.get(dataConverter)));
@@ -39,22 +39,23 @@ public class DataCollection {
     /**
      * Register the getter of the buffer
      *
-     * @param plugin the plugin
+     * @param plugin        the plugin
      * @param dataConverter the buffer data converter
-     * @param bufferGetter the getter of the buffer
+     * @param bufferGetter  the getter of the buffer
      */
     public static void register(final Plugin plugin, final DataConverter<?> dataConverter, final BufferGetter bufferGetter) {
         PLUGIN_DATA_CONVERTER_MAP.compute(plugin, (k, v) -> {
-           if (v == null)
-               v = Lists.newArrayList();
-           v.add(dataConverter);
-           return v;
+            if (v == null)
+                v = Lists.newArrayList();
+            v.add(dataConverter);
+            return v;
         });
-        DATA_CONVERTER_BUFFER_MAP.put(dataConverter,bufferGetter);
+        DATA_CONVERTER_BUFFER_MAP.put(dataConverter, bufferGetter);
     }
 
     /**
      * Unregister the getter of the buffers by plugin
+     *
      * @param plugin the plugin
      */
     public static void unregister(final Plugin plugin) {
@@ -144,6 +145,7 @@ public class DataCollection {
 
     /**
      * Get Command argument in order
+     *
      * @return the Command argument in order
      */
     public Command getCommand() {
@@ -154,10 +156,10 @@ public class DataCollection {
      * Get buffer element
      *
      * @param cls the buffer elements' class
-     * @param t the default value
+     * @param t   the default value
      * @param <T> the buffer elements' type
-     * @throws UnsupportedOperationException if the buffer is not registered
      * @return the buffer element
+     * @throws UnsupportedOperationException if the buffer is not registered
      */
     public <T> T getOrDefault(final Class<T> cls, final T t) {
         try {
@@ -170,15 +172,14 @@ public class DataCollection {
     }
 
     /**
-     *
      * Get buffer element
      *
-     * @param cls the buffer elements' class
-     * @param t the default value
+     * @param cls   the buffer elements' class
+     * @param t     the default value
      * @param index the buffer element index
-     * @param <T> the buffer elements' type
-     * @throws UnsupportedOperationException if the buffer is not registered
+     * @param <T>   the buffer elements' type
      * @return the buffer element
+     * @throws UnsupportedOperationException if the buffer is not registered
      */
     public <T> T getOrDefault(final Class<T> cls, final int index, final T t) {
         try {
@@ -194,7 +195,7 @@ public class DataCollection {
      * Write buffer element
      *
      * @param cls the buffer elements' class
-     * @param t the buffer element
+     * @param t   the buffer element
      * @param <T> the buffer elements' type
      * @throws UnsupportedOperationException if the buffer is not registered
      */
@@ -210,10 +211,10 @@ public class DataCollection {
     /**
      * Get buffer element
      *
-     * @param c the buffer elements' class
+     * @param c   the buffer elements' class
      * @param <T> the buffer elements' type
-     * @throws UnsupportedOperationException if the buffer is not registered
      * @return the buffer element
+     * @throws UnsupportedOperationException if the buffer is not registered
      */
     public <T> T get(final Class<T> c) {
         if (this.buffers.get(c) == null)
@@ -222,14 +223,13 @@ public class DataCollection {
     }
 
     /**
-     *
      * Get buffer element
      *
      * @param index the buffer element index
-     * @param c the buffer elements' class
-     * @param <T> the buffer elements' type
-     * @throws UnsupportedOperationException if the buffer is not registered
+     * @param c     the buffer elements' class
+     * @param <T>   the buffer elements' type
      * @return the buffer element
+     * @throws UnsupportedOperationException if the buffer is not registered
      */
     public <T> T get(final Class<T> c, final int index) {
         if (this.buffers.get(c) == null)
@@ -239,7 +239,7 @@ public class DataCollection {
 
     /**
      * Represents a getter for buffer.
-     *
+     * <p>
      * This is a functional interface whose functional method is {@link BufferGetter#newBuffer(int)}.
      */
     @FunctionalInterface

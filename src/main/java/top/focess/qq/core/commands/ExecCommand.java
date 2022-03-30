@@ -14,7 +14,7 @@ public class ExecCommand extends Command {
 
     @Override
     public void init() {
-        this.addExecutor((sender,dataCollection,ioHandler)->{
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
             final String command = dataCollection.get();
             final List<String> args = CommandLine.splitCommand(command);
             if (args.size() == 0) {

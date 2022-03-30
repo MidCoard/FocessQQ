@@ -25,7 +25,7 @@ public class FocessLogger {
     /**
      * Log a message with INFO level
      *
-     * @param key the language key
+     * @param key     the language key
      * @param objects the objects need to replace
      */
     public void infoLang(final String key, final Object... objects) {
@@ -45,20 +45,21 @@ public class FocessLogger {
      * Log a message and a throwable (or exception) with ERROR level
      *
      * @param message the message need to error
-     * @param e a throwable (or exception) with this message
+     * @param e       a throwable (or exception) with this message
      */
     public void thr(final String message, final Throwable e) {
-        LOG.error(message,e);
+        LOG.error(message, e);
     }
 
     /**
      * Log a message and a throwable (or exception) with ERROR level
-     * @param key the language key
-     * @param e a throwable (or exception) with this message
+     *
+     * @param key     the language key
+     * @param e       a throwable (or exception) with this message
      * @param objects the objects need to replace
      */
     public void thrLang(final String key, final Throwable e, final Object... objects) {
-        this.thr(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects),e);
+        this.thr(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects), e);
     }
 
 
@@ -67,13 +68,15 @@ public class FocessLogger {
      *
      * @param message the message need to fatal
      */
-    public void fatal(final String message) {LOG.error(ChatConstants.CONSOLE_FATAL_HEADER + message);}
+    public void fatal(final String message) {
+        LOG.error(ChatConstants.CONSOLE_FATAL_HEADER + message);
+    }
 
 
     /**
      * Log a message with ERROR level
      *
-     * @param key the language key
+     * @param key     the language key
      * @param objects the objects need to replace
      */
     public void fatalLang(final String key, final Object... objects) {
@@ -92,7 +95,7 @@ public class FocessLogger {
     /**
      * Log a message with DEBUG level
      *
-     * @param key the language key
+     * @param key     the language key
      * @param objects the objects need to replace
      */
     public void debugLang(final String key, final Object... objects) {
@@ -103,9 +106,9 @@ public class FocessLogger {
      * Log a message and a throwable (or exception) with TRACE level
      *
      * @param message the message need to trace
-     * @param e a throwable (or exception) with this message
+     * @param e       a throwable (or exception) with this message
      */
     public void trace(final String message, final Throwable e) {
-        LOG.trace(message,e);
+        LOG.trace(message, e);
     }
 }

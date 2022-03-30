@@ -11,10 +11,10 @@ import top.focess.qq.api.event.EventPriority;
 import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.message.ConsoleMessageEvent;
-import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.util.Pair;
 import top.focess.qq.core.debug.Section;
 
@@ -24,8 +24,17 @@ import java.util.concurrent.Future;
 
 public class ConsoleListener implements Listener {
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),5,true,"ConsoleListener");
-    public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingQueue();
+    public static final Queue<Pair<IOHandler, Long>> QUESTS = Queues.newLinkedBlockingQueue();
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 5, true, "ConsoleListener");
+
+    /**
+     * Register input String listener. (Used to communicate with CommandSender with ioHandler)
+     *
+     * @param ioHandler the {@link CommandSender#CONSOLE} CommandSender
+     */
+    public static void registerInputListener(final IOHandler ioHandler) {
+        QUESTS.offer(Pair.of(ioHandler, System.currentTimeMillis()));
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onConsoleChat(final ConsoleChatEvent event) {
@@ -42,8 +51,8 @@ public class ConsoleListener implements Listener {
         }
         try {
             final Future<CommandResult> ret = CommandLine.exec(event.getMessage());
-            EXECUTOR.run(()->{
-                final Section section = Section.startSection("command-console-exec",ret, Duration.ofMinutes(10));
+            EXECUTOR.run(() -> {
+                final Section section = Section.startSection("command-console-exec", ret, Duration.ofMinutes(10));
                 try {
                     if (ret.get() == CommandResult.NONE) {
                         final ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
@@ -55,22 +64,13 @@ public class ConsoleListener implements Listener {
                     }
                 } catch (final Exception e) {
                     if (!(e.getCause() instanceof InputTimeoutException))
-                        FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
+                        FocessQQ.getLogger().thrLang("exception-exec-console-command", e);
                 }
                 section.stop();
             });
         } catch (final Exception e) {
-            FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
+            FocessQQ.getLogger().thrLang("exception-exec-console-command", e);
         }
-    }
-
-    /**
-     * Register input String listener. (Used to communicate with CommandSender with ioHandler)
-     *
-     * @param ioHandler the {@link CommandSender#CONSOLE} CommandSender
-     */
-    public static void registerInputListener(final IOHandler ioHandler) {
-        QUESTS.offer(Pair.of(ioHandler,System.currentTimeMillis()));
     }
 
 

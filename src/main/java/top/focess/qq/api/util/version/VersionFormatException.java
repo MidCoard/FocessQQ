@@ -4,7 +4,7 @@ package top.focess.qq.api.util.version;
 /**
  * Thrown to indicate that a version string is not in the correct format.
  */
-public class VersionFormatException extends RuntimeException{
+public class VersionFormatException extends RuntimeException {
 
     /**
      * Constructs a VersionFormatException

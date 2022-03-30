@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Section of Session.
  */
-public class SessionSection extends Session{
+public class SessionSection extends Session {
     private final Session parent;
 
     public SessionSection(final Session session, final Map<String, Object> values) {

@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class YamlConfiguration implements SectionMap {
 
     private static final Yaml YAML = new Yaml();
-    private final Map<String, Object> values;
     private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
     private static final Map<Class<?>, ReservedHandler<?>> CLASS_RESERVED_HANDLER_MAP = Maps.newHashMap();
 
@@ -157,6 +156,8 @@ public class YamlConfiguration implements SectionMap {
         });
     }
 
+    private final Map<String, Object> values;
+
     /**
      * Initialize the YamlConfiguration with existed key-value pairs or not
      *
@@ -189,18 +190,6 @@ public class YamlConfiguration implements SectionMap {
         return new YamlConfiguration(YAML.load(inputStream));
     }
 
-    @Override
-    public YamlConfigurationSection createSection(final String key) {
-        final Map<String,Object> values = Maps.newHashMap();
-        this.set(key,values);
-        return new YamlConfigurationSection(this,values);
-    }
-
-    @Override
-    public void set(final String key, @Nullable final Object value) {
-        this.values.put(key,write(value));
-    }
-
     @Nullable
     private static <T> Object write(@Nullable final Object value) {
         if (value == null)
@@ -208,54 +197,47 @@ public class YamlConfiguration implements SectionMap {
         if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)
             return value;
         if (value.getClass().isArray()) {
-            final Map<String,Object> ret = Maps.newHashMap();
-            ret.put("class","!!" + value.getClass().getComponentType().getName());
+            final Map<String, Object> ret = Maps.newHashMap();
+            ret.put("class", "!!" + value.getClass().getComponentType().getName());
             final List list = Lists.newArrayList();
             for (int i = 0; i < Array.getLength(value); i++)
                 list.add(write(Array.get(value, i)));
-            ret.put("value",list);
-            ret.put("array",true);
+            ret.put("value", list);
+            ret.put("array", true);
             return ret;
         }
         if (value instanceof FocessSerializable) {
-            final Map<String,Object> ret = Maps.newHashMap();
-            ret.put("class","!!" + value.getClass().getName());
-            Map<String,Object> data = ((FocessSerializable) value).serialize();
+            final Map<String, Object> ret = Maps.newHashMap();
+            ret.put("class", "!!" + value.getClass().getName());
+            Map<String, Object> data = ((FocessSerializable) value).serialize();
             if (data != null) {
-                ret.put("value",data);
-                ret.put("serialize",true);
+                ret.put("value", data);
+                ret.put("serialize", true);
                 return ret;
             }
             data = Maps.newHashMap();
             for (final Field field : value.getClass().getDeclaredFields()) {
-                if ((field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) == 0){
+                if ((field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) == 0) {
                     field.setAccessible(true);
                     try {
-                        data.put(field.getName(),write(field.get(value)));
+                        data.put(field.getName(), write(field.get(value)));
                     } catch (final IllegalAccessException e) {
                         throw new NotFocessSerializableException(value.getClass().getName());
                     }
                 }
             }
-            ret.put("value",data);
+            ret.put("value", data);
             return ret;
         }
         if (CLASS_RESERVED_HANDLER_MAP.containsKey(value.getClass())) {
-            final Map<String,Object> ret = Maps.newHashMap();
+            final Map<String, Object> ret = Maps.newHashMap();
             final T t = (T) value;
             final ReservedHandler<T> handler = (ReservedHandler<T>) CLASS_RESERVED_HANDLER_MAP.get(value.getClass());
-            ret.put("value",handler.write(t));
-            ret.put("class","!!" + value.getClass().getName());
+            ret.put("value", handler.write(t));
+            ret.put("class", "!!" + value.getClass().getName());
             return ret;
         }
         throw new NotFocessSerializableException(value.getClass().getName());
-    }
-
-    @Nullable
-    @Override
-    public <T> T get(final String key) {
-        final Object value = SectionMap.super.get(key);
-        return (T) read(value);
     }
 
     @Nullable
@@ -265,7 +247,7 @@ public class YamlConfiguration implements SectionMap {
         if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof Boolean || value instanceof String)
             return value;
         if (value instanceof Map) {
-            final Map<String,Object> map = (Map<String,Object>) value;
+            final Map<String, Object> map = (Map<String, Object>) value;
             if (map.containsKey("class") && map.containsKey("value")) {
                 final String className = map.get("class").toString().substring(2);
                 try {
@@ -273,13 +255,13 @@ public class YamlConfiguration implements SectionMap {
                     final Object v = map.get("value");
                     if (v instanceof List && Boolean.parseBoolean(String.valueOf(map.get("array")))) {
                         final List list = (List) v;
-                        final Object array = Array.newInstance(cls,list.size());
+                        final Object array = Array.newInstance(cls, list.size());
                         for (int i = 0; i < list.size(); i++)
-                            Array.set(array,i,read(list.get(i)));
+                            Array.set(array, i, read(list.get(i)));
                         return array;
                     }
                     if (v instanceof Map && FocessSerializable.class.isAssignableFrom(cls)) {
-                        final Map<String,Object> data = (Map<String,Object>) v;
+                        final Map<String, Object> data = (Map<String, Object>) v;
                         if (Boolean.parseBoolean(String.valueOf(map.get("serialize")))) {
                             final Method method = cls.getMethod("deserialize", Map.class);
                             return method.invoke(null, data);
@@ -305,6 +287,25 @@ public class YamlConfiguration implements SectionMap {
     }
 
     @Override
+    public YamlConfigurationSection createSection(final String key) {
+        final Map<String, Object> values = Maps.newHashMap();
+        this.set(key, values);
+        return new YamlConfigurationSection(this, values);
+    }
+
+    @Override
+    public void set(final String key, @Nullable final Object value) {
+        this.values.put(key, write(value));
+    }
+
+    @Nullable
+    @Override
+    public <T> T get(final String key) {
+        final Object value = SectionMap.super.get(key);
+        return (T) read(value);
+    }
+
+    @Override
     public Map<String, Object> getValues() {
         return this.values;
     }
@@ -318,7 +319,7 @@ public class YamlConfiguration implements SectionMap {
         try {
             YAML.dump(this.values, new FileWriter(file));
         } catch (final IOException e) {
-            FocessQQ.getLogger().thrLang("exception-save-file",e);
+            FocessQQ.getLogger().thrLang("exception-save-file", e);
         }
     }
 

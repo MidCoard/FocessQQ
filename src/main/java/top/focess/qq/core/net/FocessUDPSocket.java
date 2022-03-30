@@ -29,7 +29,7 @@ public class FocessUDPSocket extends ASocket {
         } catch (final SocketException e) {
             throw new IllegalPortException(port);
         }
-        this.packet = new DatagramPacket(new byte[1024*1024],1024*1024);
+        this.packet = new DatagramPacket(new byte[1024 * 1024], 1024 * 1024);
         final Thread thread = new Thread(() -> {
             FocessQQ.getLogger().debugLang("start-focess-udp-socket", port);
             while (!this.socket.isClosed()) {
@@ -87,7 +87,7 @@ public class FocessUDPSocket extends ASocket {
     @Override
     public boolean close() {
         boolean ret = false;
-        for (final Receiver receiver: this.receivers)
+        for (final Receiver receiver : this.receivers)
             ret = ret || receiver.close();
         this.socket.close();
         return ret;
@@ -96,11 +96,11 @@ public class FocessUDPSocket extends ASocket {
     public void sendPacket(final String host, final int port, final Packet packet) {
         final PacketPreCodec handler = new PacketPreCodec();
         handler.writePacket(packet);
-        final DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(),handler.getBytes().length,new InetSocketAddress(host,port));
+        final DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(), handler.getBytes().length, new InetSocketAddress(host, port));
         try {
             this.socket.send(sendPacket);
         } catch (final IOException e) {
-            FocessQQ.getLogger().thrLang("exception-send-packet",e);
+            FocessQQ.getLogger().thrLang("exception-send-packet", e);
         }
     }
 }

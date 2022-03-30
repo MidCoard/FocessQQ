@@ -20,7 +20,7 @@ public class PluginCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor((sender,data,ioHandler)->{
+        this.addExecutor((sender, data, ioHandler) -> {
             if (FocessQQ.getPlugins().size() != 0) {
                 final StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("plugin-command-list"));
                 for (final Plugin plugin : FocessQQ.getPlugins())

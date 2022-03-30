@@ -21,8 +21,8 @@ public class CommandCommand extends Command {
     @Override
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
-        this.addExecutor((sender,data,ioHandler)->{
-            if (Command.getCommands().size() != 0 ) {
+        this.addExecutor((sender, data, ioHandler) -> {
+            if (Command.getCommands().size() != 0) {
                 final StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("command-command-list"));
                 for (final Command command : Command.getCommands())
                     stringBuilder.append(' ').append(command.getName());
@@ -30,16 +30,16 @@ public class CommandCommand extends Command {
             } else ioHandler.outputLang("command-command-no-command");
             return CommandResult.ALLOW;
         }, CommandArgument.of("list"));
-        this.addExecutor((sender,data,ioHandler) ->{
+        this.addExecutor((sender, data, ioHandler) -> {
             final Command command = data.getCommand();
             if (command.getPlugin() == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("command-command-unload-main-plugin-command", command.getName());
                 return CommandResult.REFUSE;
             }
             command.unregister();
-            ioHandler.outputLang("command-command-unload",command.getName());
+            ioHandler.outputLang("command-command-unload", command.getName());
             return CommandResult.ALLOW;
-        },CommandArgument.of("unload"),CommandArgument.of(CommandDataConverter.COMMAND_DATA_CONVERTER));
+        }, CommandArgument.of("unload"), CommandArgument.of(CommandDataConverter.COMMAND_DATA_CONVERTER));
     }
 
     @Override

@@ -23,10 +23,10 @@ import java.util.concurrent.Future;
  */
 public class CommandLine {
 
-    private static final Map<String,SpecialArgumentComplexHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newConcurrentMap();
-    private static final Map<Plugin,List<Pair<String,SpecialArgumentComplexHandler>>> PLUGIN_SPECIAL_ARGUMENT_MAP = Maps.newConcurrentMap();
+    private static final Map<String, SpecialArgumentComplexHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newConcurrentMap();
+    private static final Map<Plugin, List<Pair<String, SpecialArgumentComplexHandler>>> PLUGIN_SPECIAL_ARGUMENT_MAP = Maps.newConcurrentMap();
 
-    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),7,false,"CommandLine");
+    private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 7, false, "CommandLine");
 
     /**
      * Execute command using {@link CommandSender#CONSOLE}
@@ -73,6 +73,7 @@ public class CommandLine {
 
     /**
      * Split the command into arguments
+     *
      * @param command the command needed to be split
      * @return the split arguments
      */
@@ -129,8 +130,7 @@ public class CommandLine {
             else if (c == '@' && !stack && last != null && last == ' ') {
                 stringBuilder.append('"');
                 stringBuilder.append('@');
-            }
-            else stringBuilder.append(c);
+            } else stringBuilder.append(c);
             last = c;
         }
         if (stringBuilder.length() != 0)
@@ -138,12 +138,12 @@ public class CommandLine {
         return args;
     }
 
-    private static Pair<String,String[]> splitSpecialArgument(final String argument) {
+    private static Pair<String, String[]> splitSpecialArgument(final String argument) {
         final int leftIndex = argument.indexOf('(');
         if (leftIndex == -1 || !argument.endsWith(")"))
             return new Pair<>(argument, new String[0]);
         final String name = argument.substring(0, leftIndex);
-        final String[] args = argument.substring(leftIndex + 1,argument.length() - 1).split(",");
+        final String[] args = argument.substring(leftIndex + 1, argument.length() - 1).split(",");
         return new Pair<>(name, args);
     }
 
@@ -152,16 +152,16 @@ public class CommandLine {
         Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
         for (final Command com : Command.getCommands())
             if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
-                for (int i = 0;i<args.length;i++)
+                for (int i = 0; i < args.length; i++)
                     if (args[i].startsWith("\"@")) {
                         final String h = args[i].substring(2);
-                        final Pair<String,String[]> pair = splitSpecialArgument(h);
+                        final Pair<String, String[]> pair = splitSpecialArgument(h);
                         final String head = pair.getKey();
                         final String[] values = pair.getValue();
                         if (SPECIAL_ARGUMENT_HANDLERS.containsKey(head))
-                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(head,sender,com,args,i,values);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(head, sender, com, args, i, values);
                         else if (SPECIAL_ARGUMENT_HANDLERS.containsKey(com.getPlugin().getName() + ":" + head))
-                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head,sender,com,args,i,values);
+                            args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head, sender, com, args, i, values);
                         else args[i] = args[i].substring(1);
                     }
                 final CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
@@ -186,19 +186,19 @@ public class CommandLine {
     /**
      * Register the special argument handler
      *
-     * @param plugin the plugin
-     * @param name the name of the special argument handler
+     * @param plugin  the plugin
+     * @param name    the name of the special argument handler
      * @param handler the special argument handler
      */
     public static void register(final Plugin plugin, final String name, final SpecialArgumentComplexHandler handler) {
-        PLUGIN_SPECIAL_ARGUMENT_MAP.compute(plugin,(k,v)->{
-          if (v == null)
-              v = Lists.newArrayList();
-          final String n = plugin == FocessQQ.getMainPlugin() ? name : plugin.getName() + ":" + name;
-          v.removeIf(i->i.getKey().equals(n));
-          v.add(Pair.of(n,handler));
-          SPECIAL_ARGUMENT_HANDLERS.put(n,handler);
-          return v;
+        PLUGIN_SPECIAL_ARGUMENT_MAP.compute(plugin, (k, v) -> {
+            if (v == null)
+                v = Lists.newArrayList();
+            final String n = plugin == FocessQQ.getMainPlugin() ? name : plugin.getName() + ":" + name;
+            v.removeIf(i -> i.getKey().equals(n));
+            v.add(Pair.of(n, handler));
+            SPECIAL_ARGUMENT_HANDLERS.put(n, handler);
+            return v;
         });
     }
 
@@ -208,10 +208,10 @@ public class CommandLine {
      * @param handler the special argument handler
      */
     public static void unregister(final SpecialArgumentComplexHandler handler) {
-        PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k,v)->{
-            v.removeIf(i->i.getRight() == handler);
+        PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k, v) -> {
+            v.removeIf(i -> i.getRight() == handler);
         });
-        SPECIAL_ARGUMENT_HANDLERS.forEach((k,v)-> {
+        SPECIAL_ARGUMENT_HANDLERS.forEach((k, v) -> {
             if (v == handler)
                 SPECIAL_ARGUMENT_HANDLERS.remove(k);
         });
@@ -221,11 +221,11 @@ public class CommandLine {
      * Unregister the special argument handler
      *
      * @param plugin the plugin
-     * @param name the name of the special argument handler
+     * @param name   the name of the special argument handler
      */
     public static void unregister(final Plugin plugin, final String name) {
-        PLUGIN_SPECIAL_ARGUMENT_MAP.computeIfPresent(plugin,(k,v)->{
-            v.removeIf(i->i.getLeft().equals(name));
+        PLUGIN_SPECIAL_ARGUMENT_MAP.computeIfPresent(plugin, (k, v) -> {
+            v.removeIf(i -> i.getLeft().equals(name));
             return v;
         });
         SPECIAL_ARGUMENT_HANDLERS.remove(name);
@@ -237,13 +237,14 @@ public class CommandLine {
      * @param plugin the plugin
      */
     public static void unregister(final Plugin plugin) {
-        for (final Pair<String,SpecialArgumentComplexHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin,Lists.newArrayList()))
+        for (final Pair<String, SpecialArgumentComplexHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin, Lists.newArrayList()))
             SPECIAL_ARGUMENT_HANDLERS.remove(pair.getLeft());
         PLUGIN_SPECIAL_ARGUMENT_MAP.remove(plugin);
     }
 
     /**
      * Unregister all the special argument handlers
+     *
      * @return true if there are some special argument handlers not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {

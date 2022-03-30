@@ -5,13 +5,13 @@ import top.focess.qq.api.net.PacketPreCodec;
 /**
  * Codec for ConnectPacket.
  */
-public class ConnectPacketCodec extends PacketCodec<ConnectPacket>{
+public class ConnectPacketCodec extends PacketCodec<ConnectPacket> {
     @Override
     public ConnectPacket readPacket(final PacketPreCodec packetPreCodec) {
         final String host = packetPreCodec.readString();
         final int port = packetPreCodec.readInt();
         final String name = packetPreCodec.readString();
-        return new ConnectPacket(host,port,name);
+        return new ConnectPacket(host, port, name);
     }
 
     @Override

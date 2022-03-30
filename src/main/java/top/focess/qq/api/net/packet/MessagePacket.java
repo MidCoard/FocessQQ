@@ -3,7 +3,7 @@ package top.focess.qq.api.net.packet;
 /**
  * Used to send String message.
  */
-public class MessagePacket extends Packet{
+public class MessagePacket extends Packet {
 
 
     public static final int PACKET_ID = 1;
@@ -17,7 +17,7 @@ public class MessagePacket extends Packet{
      *
      * @param message the message
      */
-    public MessagePacket(final String message){
+    public MessagePacket(final String message) {
         this.message = message;
     }
 

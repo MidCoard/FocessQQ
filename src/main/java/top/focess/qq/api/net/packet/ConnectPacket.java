@@ -3,7 +3,7 @@ package top.focess.qq.api.net.packet;
 /**
  * Used to connect to the server.
  */
-public class ConnectPacket extends Packet{
+public class ConnectPacket extends Packet {
 
     public static final int PACKET_ID = 3;
     /**
