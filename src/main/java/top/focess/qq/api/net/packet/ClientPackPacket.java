@@ -17,7 +17,7 @@ public class ClientPackPacket extends ClientPacket{
      * @param token the client token
      * @param packet the packet sent by client
      */
-    public ClientPackPacket(int clientId, String token,Packet packet) {
+    public ClientPackPacket(final int clientId, final String token, final Packet packet) {
         super(clientId, token);
         this.packet = packet;
     }
@@ -28,6 +28,6 @@ public class ClientPackPacket extends ClientPacket{
     }
 
     public Packet getPacket() {
-        return packet;
+        return this.packet;
     }
 }

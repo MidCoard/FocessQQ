@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Represent this class is a Command. It means that this class must extend Command class.
  */
-@Target(value = ElementType.TYPE)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandType {
 

@@ -9,7 +9,7 @@ public class NotFocessSerializableException extends RuntimeException {
      * Constructs a NotFocessSerializableException
      * @param cls the class that is not serializable
      */
-    public NotFocessSerializableException(String cls) {
+    public NotFocessSerializableException(final String cls) {
         super("The class " + cls + " is not FocessSerializable");
     }
 }

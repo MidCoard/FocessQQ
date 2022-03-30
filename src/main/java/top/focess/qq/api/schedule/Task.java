@@ -25,7 +25,7 @@ public interface Task{
      * @see #cancel(boolean)
      */
     default boolean cancel() {
-        return cancel(false);
+        return this.cancel(false);
     }
 
     /**

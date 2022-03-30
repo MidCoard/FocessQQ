@@ -10,7 +10,7 @@ public class IllegalPortException extends IOException {
      * Constructs a IllegalPortException
      * @param port the unavailable port
      */
-    public IllegalPortException(int port) {
+    public IllegalPortException(final int port) {
         super("The " + port + " is not available.");
     }
 }

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Represent an event listener method. It means this method mush own one argument whose class is an implemented Event.
  */
-@Target(value = ElementType.METHOD)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EventHandler {
 

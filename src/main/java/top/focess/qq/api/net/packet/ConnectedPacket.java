@@ -21,7 +21,7 @@ public class ConnectedPacket extends ServerPacket {
      * @param clientId the client id
      * @param token the token
      */
-    public ConnectedPacket(int clientId,String token) {
+    public ConnectedPacket(final int clientId, final String token) {
         this.clientId = clientId;
         this.token = token;
     }
@@ -32,10 +32,10 @@ public class ConnectedPacket extends ServerPacket {
     }
 
     public int getClientId() {
-        return clientId;
+        return this.clientId;
     }
 
     public String getToken() {
-        return token;
+        return this.token;
     }
 }

@@ -11,7 +11,7 @@ public class PluginDuplicateException extends IllegalStateException {
      * @param name the name of the duplicated plugin
      * @param message the message
      */
-    public PluginDuplicateException(String name,String message) {
+    public PluginDuplicateException(final String name, final String message) {
         super("Plugin " + name + " is duplicated. " + message);
     }
 }

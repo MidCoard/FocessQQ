@@ -8,12 +8,12 @@ import top.focess.qq.api.net.PacketPreCodec;
 public class MessagePacketCodec extends PacketCodec<MessagePacket>{
 
     @Override
-    public MessagePacket readPacket(PacketPreCodec packetPreCodec) {
+    public MessagePacket readPacket(final PacketPreCodec packetPreCodec) {
         return new MessagePacket(packetPreCodec.readString());
     }
 
     @Override
-    public void writePacket(MessagePacket packet, PacketPreCodec packetPreCodec) {
+    public void writePacket(final MessagePacket packet, final PacketPreCodec packetPreCodec) {
         packetPreCodec.writeString(packet.getMessage());
     }
 }

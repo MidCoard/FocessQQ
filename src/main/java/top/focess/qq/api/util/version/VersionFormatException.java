@@ -11,7 +11,7 @@ public class VersionFormatException extends RuntimeException{
      *
      * @param version the version that is not in correct format
      */
-    public VersionFormatException(String version) {
+    public VersionFormatException(final String version) {
         super("The format of " + version + " is wrong.");
     }
 }

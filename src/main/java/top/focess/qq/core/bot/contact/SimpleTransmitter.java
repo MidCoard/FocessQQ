@@ -10,23 +10,23 @@ import top.focess.qq.api.bot.message.Message;
 public abstract class SimpleTransmitter extends SimpleContact implements Transmitter {
 
 
-    public SimpleTransmitter(Bot bot, Contact contact) {
+    public SimpleTransmitter(final Bot bot, final Contact contact) {
         super(bot, contact);
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(final String message) {
         this.contact.sendMessage(message);
     }
 
     @Override
-    public void sendMessage(Message message) {
+    public void sendMessage(final Message message) {
         this.contact.sendMessage(message.getNativeMessage());
     }
 
 
     @Override
-    public Image uploadImage(ExternalResource resource) {
+    public Image uploadImage(final ExternalResource resource) {
         return this.contact.uploadImage(resource);
     }
 }

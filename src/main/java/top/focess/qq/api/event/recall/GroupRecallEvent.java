@@ -37,7 +37,7 @@ public class GroupRecallEvent extends BotEvent {
      * @param messageIds the message ids
      * @param operator the member who recalls the message
      */
-    public GroupRecallEvent(Bot bot, Member member, int[] messageIds, @Nullable Member operator) {
+    public GroupRecallEvent(final Bot bot, final Member member, final int[] messageIds, @Nullable final Member operator) {
         super(bot);
         this.member = member;
         this.messageIds = messageIds;
@@ -46,11 +46,11 @@ public class GroupRecallEvent extends BotEvent {
 
     @NonNull
     public Member getMember() {
-        return member;
+        return this.member;
     }
 
     public int[] getMessageIds() {
-        return messageIds;
+        return this.messageIds;
     }
 
     /**
@@ -65,6 +65,6 @@ public class GroupRecallEvent extends BotEvent {
 
     @Nullable
     public Member getOperator() {
-        return operator;
+        return this.operator;
     }
 }

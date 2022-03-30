@@ -23,7 +23,7 @@ public class EventManager {
 
     private static final Map<Class<? extends Event>, ListenerHandler> LISTENER_HANDLER_MAP = Maps.newHashMap();
 
-    private static <T> T cast(Object t) {
+    private static <T> T cast(final Object t) {
         return (T) t;
     }
 
@@ -34,18 +34,18 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    public static <T extends Event> void submit(T event) throws EventSubmitException {
-        Task task = SCHEDULER.run(() -> {
+    public static <T extends Event> void submit(final T event) throws EventSubmitException {
+        final Task task = SCHEDULER.run(() -> {
             try {
                 submit(cast(event.getClass()), event);
-            } catch (EventSubmitException e) {
+            } catch (final EventSubmitException e) {
                 throw new EventSubmitRuntimeException(e);
             }
         });
-        Section section = Section.startSection("event-submit", task, Duration.ofSeconds(10));
+        final Section section = Section.startSection("event-submit", task, Duration.ofSeconds(10));
         try {
             task.join();
-        } catch (ExecutionException | InterruptedException | CancellationException e) {
+        } catch (final ExecutionException | InterruptedException | CancellationException e) {
             if (e.getCause() instanceof EventSubmitRuntimeException)
                 throw (EventSubmitException) e.getCause().getCause();
             else FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
@@ -61,18 +61,18 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    private static <T extends Event> void submit(Class<T> cls,T event) throws EventSubmitException {
+    private static <T extends Event> void submit(final Class<T> cls, final T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
                 try {
-                    Field field = cls.getDeclaredField("LISTENER_HANDLER");
-                    boolean flag = field.isAccessible();
+                    final Field field = cls.getDeclaredField("LISTENER_HANDLER");
+                    final boolean flag = field.isAccessible();
                     field.setAccessible(true);
                     listenerHandler = (ListenerHandler) field.get(null);
                     field.setAccessible(flag);
                     LISTENER_HANDLER_MAP.put(cls, listenerHandler);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new EventSubmitException(event, "This event doesn't contain a LISTENER_HANDLER field.");
                 }
             }
@@ -90,7 +90,7 @@ public class EventManager {
      * @param event the event need to be submitted
      * @param <T> the event type
      */
-    private static <T extends Event> void trySubmitOnce(Class<T> cls,T event) throws EventSubmitException {
+    private static <T extends Event> void trySubmitOnce(final Class<T> cls, final T event) throws EventSubmitException {
         submitOnce(cls,event);
     }
 
@@ -102,18 +102,18 @@ public class EventManager {
      * @param <T> the event type
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
-    private static <T extends Event> void submitOnce(Class<T> cls,T event) throws EventSubmitException {
+    private static <T extends Event> void submitOnce(final Class<T> cls, final T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
                 try {
-                    Field field = cls.getDeclaredField("LISTENER_HANDLER");
-                    boolean flag = field.isAccessible();
+                    final Field field = cls.getDeclaredField("LISTENER_HANDLER");
+                    final boolean flag = field.isAccessible();
                     field.setAccessible(true);
                     listenerHandler = (ListenerHandler) field.get(null);
                     field.setAccessible(flag);
                     LISTENER_HANDLER_MAP.put(cls, listenerHandler);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new EventSubmitException(event, "This event doesn't contain a LISTENER_HANDLER field.");
                 }
             }
@@ -123,7 +123,7 @@ public class EventManager {
 
     private static class EventSubmitRuntimeException extends RuntimeException {
 
-        public EventSubmitRuntimeException(EventSubmitException e) {
+        public EventSubmitRuntimeException(final EventSubmitException e) {
             super(e);
         }
     }

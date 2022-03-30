@@ -10,7 +10,7 @@ public class SchedulerClosedException extends IllegalStateException{
      *
      * @param scheduler the closed scheduler
      */
-    public SchedulerClosedException(Scheduler scheduler) {
+    public SchedulerClosedException(final Scheduler scheduler) {
         super("Scheduler " + scheduler.getName() + " is closed.");
     }
 }

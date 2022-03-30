@@ -11,11 +11,11 @@ import top.focess.qq.api.command.DataConverter;
 public abstract class ExceptionDataConverter<T> extends DataConverter<T>{
 
     @Override
-    protected boolean accept(String arg) {
+    protected boolean accept(final String arg) {
         try {
-            convert(arg);
+            this.convert(arg);
             return true;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return false;
         }
     }

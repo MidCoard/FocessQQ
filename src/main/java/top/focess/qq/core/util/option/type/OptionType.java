@@ -9,12 +9,12 @@ public abstract class OptionType<T> {
 
     public static final OptionType<String> DEFAULT_OPTION_TYPE = new OptionType<String>() {
         @Override
-        public String parse(String v) {
+        public String parse(final String v) {
             return v;
         }
 
         @Override
-        public boolean accept(String v) {
+        public boolean accept(final String v) {
             return true;
         }
 

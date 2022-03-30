@@ -11,7 +11,7 @@ public class YamlLoadException extends IOException {
      * Constructs a YamlLoadException
      * @param e the exception
      */
-    public YamlLoadException(Exception e) {
+    public YamlLoadException(final Exception e) {
         super(e);
     }
 }

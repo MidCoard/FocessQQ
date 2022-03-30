@@ -7,15 +7,15 @@ import java.io.ObjectStreamClass;
 
 public class ObjectInputCoreStream extends ObjectInputStream {
 
-    public ObjectInputCoreStream(InputStream inputStream) throws IOException {
+    public ObjectInputCoreStream(final InputStream inputStream) throws IOException {
         super(inputStream);
     }
 
     @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+    protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
         try {
             return super.resolveClass(desc);
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             return PluginCoreClassLoader.forName(desc.getName());
         }
     }

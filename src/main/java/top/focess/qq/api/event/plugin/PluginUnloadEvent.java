@@ -17,7 +17,7 @@ public class PluginUnloadEvent extends PluginEvent{
      *
      * @param plugin the plugin
      */
-    public PluginUnloadEvent(Plugin plugin) {
+    public PluginUnloadEvent(final Plugin plugin) {
         super(plugin);
     }
 

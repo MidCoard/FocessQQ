@@ -22,7 +22,7 @@ public class Schedulers {
      * @see Schedulers#newFocessScheduler(Plugin)
      * @return a FocessScheduler
      */
-    public static Scheduler newFocessScheduler(@NotNull Plugin plugin) {
+    public static Scheduler newFocessScheduler(@NotNull final Plugin plugin) {
         return new FocessScheduler(plugin);
     }
 
@@ -36,7 +36,7 @@ public class Schedulers {
      * @see Schedulers#newFocessScheduler(Plugin)
      * @return a FocessScheduler
      */
-    public static Scheduler newFocessScheduler(@NotNull Plugin plugin, @NotNull String name) {
+    public static Scheduler newFocessScheduler(@NotNull final Plugin plugin, @NotNull final String name) {
         return new FocessScheduler(plugin, name);
     }
 
@@ -50,7 +50,7 @@ public class Schedulers {
      * @see Schedulers#newThreadPoolScheduler(Plugin, int, boolean, String)
      * @return a ThreadPoolScheduler
      */
-    public static Scheduler  newThreadPoolScheduler(@NotNull Plugin plugin,int poolSize) {
+    public static Scheduler  newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize) {
         return new ThreadPoolScheduler(plugin,poolSize);
     }
 
@@ -66,7 +66,7 @@ public class Schedulers {
      * @see Schedulers#newThreadPoolScheduler(Plugin, int)
      * @return a ThreadPoolScheduler
      */
-    public static Scheduler newThreadPoolScheduler(@NotNull Plugin plugin,int poolSize,boolean immediate,@NotNull String name) {
+    public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize, final boolean immediate, @NotNull final String name) {
         return new ThreadPoolScheduler(plugin,poolSize,immediate,name);
     }
 
@@ -75,7 +75,7 @@ public class Schedulers {
      *
      * @param plugin the plugin
      */
-    public static void close(Plugin plugin) {
+    public static void close(final Plugin plugin) {
         AScheduler.close(plugin);
     }
 

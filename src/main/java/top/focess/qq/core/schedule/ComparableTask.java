@@ -6,20 +6,20 @@ public class ComparableTask implements Comparable<ComparableTask> {
 
     private final long time;
     private final ITask task;
-    private boolean isCancelled = false;
+    private boolean isCancelled;
 
-    public ComparableTask(long time, ITask task) {
+    public ComparableTask(final long time, final ITask task) {
         this.time = time;
         this.task = task;
         this.task.setNativeTask(this);
     }
 
     @Override
-    public int compareTo(@NotNull ComparableTask o) {
+    public int compareTo(@NotNull final ComparableTask o) {
         return Long.compare(this.time, o.time);
     }
 
-    public boolean cancel(boolean mayInterruptIfRunning) {
+    public boolean cancel(final boolean mayInterruptIfRunning) {
         synchronized (this.task) {
             if (this.isCancelled)
                 return false;

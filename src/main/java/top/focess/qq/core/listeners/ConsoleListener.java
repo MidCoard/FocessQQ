@@ -28,7 +28,7 @@ public class ConsoleListener implements Listener {
     public static final Queue<Pair<IOHandler,Long>> QUESTS = Queues.newLinkedBlockingQueue();
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onConsoleChat(ConsoleChatEvent event) {
+    public void onConsoleChat(final ConsoleChatEvent event) {
         Pair<IOHandler, Long> element;
         if ((element = QUESTS.poll()) != null) {
             while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 5 * 1000) {
@@ -41,25 +41,25 @@ public class ConsoleListener implements Listener {
             return;
         }
         try {
-            Future<CommandResult> ret = CommandLine.exec(event.getMessage());
+            final Future<CommandResult> ret = CommandLine.exec(event.getMessage());
             EXECUTOR.run(()->{
-                Section section = Section.startSection("command-console-exec",ret, Duration.ofMinutes(10));
+                final Section section = Section.startSection("command-console-exec",ret, Duration.ofMinutes(10));
                 try {
                     if (ret.get() == CommandResult.NONE) {
-                        ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
+                        final ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
                         try {
                             EventManager.submit(consoleMessageEvent);
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             FocessQQ.getLogger().thrLang("exception-submit-console-message-event", e);
                         }
                     }
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     if (!(e.getCause() instanceof InputTimeoutException))
                         FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
                 }
                 section.stop();
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-exec-console-command",e);
         }
     }
@@ -69,7 +69,7 @@ public class ConsoleListener implements Listener {
      *
      * @param ioHandler the {@link CommandSender#CONSOLE} CommandSender
      */
-    public static void registerInputListener(IOHandler ioHandler) {
+    public static void registerInputListener(final IOHandler ioHandler) {
         QUESTS.offer(Pair.of(ioHandler,System.currentTimeMillis()));
     }
 

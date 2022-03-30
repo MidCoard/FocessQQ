@@ -28,17 +28,17 @@ public class BotSendMessageEvent extends BotEvent {
      * @param message the message
      * @param contract the target contact
      */
-    public BotSendMessageEvent(Bot bot, Message message, Contact contract) {
+    public BotSendMessageEvent(final Bot bot, final Message message, final Contact contract) {
         super(bot);
         this.message = message;
         this.contract = contract;
     }
 
     public Message getMessage() {
-        return message;
+        return this.message;
     }
 
     public Contact getContact() {
-        return contract;
+        return this.contract;
     }
 }

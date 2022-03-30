@@ -18,24 +18,25 @@ public abstract class AServerReceiver implements ServerReceiver {
 
 
     protected final Map<Integer,Long> lastHeart = Maps.newConcurrentMap();
-    protected int defaultClientId = 0;
+    protected int defaultClientId;
     protected final Map<Integer, SimpleClient> clientInfos = Maps.newConcurrentMap();
     protected final Map<Plugin,Map<String, Map<Class<?>, List<PackHandler>>>> packHandlers = Maps.newConcurrentMap();
 
     @Override
-    public boolean isConnected(String client) {
-        return clientInfos.values().stream().anyMatch(simpleClient -> simpleClient.getName().equals(client));
+    public boolean isConnected(final String client) {
+        return this.clientInfos.values().stream().anyMatch(simpleClient -> simpleClient.getName().equals(client));
     }
 
     @Override
-    public @Nullable
-    Client getClient(String name) {
-        return clientInfos.values().stream().filter(simpleClient -> simpleClient.getName().equals(name)).findFirst().orElse(null);
+    @Nullable
+    public
+    Client getClient(final String name) {
+        return this.clientInfos.values().stream().filter(simpleClient -> simpleClient.getName().equals(name)).findFirst().orElse(null);
     }
 
     protected static String generateToken() {
-        StringBuilder stringBuilder = new StringBuilder();
-        Random random = new Random(System.currentTimeMillis());
+        final StringBuilder stringBuilder = new StringBuilder();
+        final Random random = new Random(System.currentTimeMillis());
         for (int i = 0;i<64;i++) {
             switch (random.nextInt(3)) {
                 case 0:
@@ -55,22 +56,22 @@ public abstract class AServerReceiver implements ServerReceiver {
     @Override
     public boolean unregisterAll() {
         boolean ret = false;
-        for (Plugin plugin : this.packHandlers.keySet()) {
+        for (final Plugin plugin : this.packHandlers.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
-            unregister(plugin);
+            this.unregister(plugin);
         }
         return ret;
     }
 
     @Override
-    public void unregister(Plugin plugin) {
+    public void unregister(final Plugin plugin) {
         this.packHandlers.remove(plugin);
     }
 
     @Override
-    public <T extends Packet> void register(Plugin plugin, String name, Class<T> c, PackHandler<T> packHandler){
-        packHandlers.compute(plugin, (k, v) -> {
+    public <T extends Packet> void register(final Plugin plugin, final String name, final Class<T> c, final PackHandler<T> packHandler){
+        this.packHandlers.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Maps.newHashMap();
             v.compute(name, (k1, v1) -> {

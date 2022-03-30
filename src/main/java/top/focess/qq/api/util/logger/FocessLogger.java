@@ -18,7 +18,7 @@ public class FocessLogger {
      *
      * @param message the message need to info
      */
-    public void info(String message) {
+    public void info(final String message) {
         LOG.info(ChatConstants.CONSOLE_OUTPUT_HEADER + message);
     }
 
@@ -28,8 +28,8 @@ public class FocessLogger {
      * @param key the language key
      * @param objects the objects need to replace
      */
-    public void infoLang(String key,Object... objects) {
-        info(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+    public void infoLang(final String key, final Object... objects) {
+        this.info(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -37,7 +37,7 @@ public class FocessLogger {
      *
      * @param message the message need to reshow
      */
-    public void consoleInput(String message) {
+    public void consoleInput(final String message) {
         LOG.debug(ChatConstants.CONSOLE_INPUT_HEADER + message);
     }
 
@@ -47,7 +47,7 @@ public class FocessLogger {
      * @param message the message need to error
      * @param e a throwable (or exception) with this message
      */
-    public void thr(String message,Throwable e) {
+    public void thr(final String message, final Throwable e) {
         LOG.error(message,e);
     }
 
@@ -57,8 +57,8 @@ public class FocessLogger {
      * @param e a throwable (or exception) with this message
      * @param objects the objects need to replace
      */
-    public void thrLang(String key,Throwable e,Object... objects) {
-        thr(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects),e);
+    public void thrLang(final String key, final Throwable e, final Object... objects) {
+        this.thr(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects),e);
     }
 
 
@@ -67,7 +67,7 @@ public class FocessLogger {
      *
      * @param message the message need to fatal
      */
-    public void fatal(String message) {LOG.error(ChatConstants.CONSOLE_FATAL_HEADER + message);}
+    public void fatal(final String message) {LOG.error(ChatConstants.CONSOLE_FATAL_HEADER + message);}
 
 
     /**
@@ -76,8 +76,8 @@ public class FocessLogger {
      * @param key the language key
      * @param objects the objects need to replace
      */
-    public void fatalLang(String key,Object... objects) {
-        fatal(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+    public void fatalLang(final String key, final Object... objects) {
+        this.fatal(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -85,7 +85,7 @@ public class FocessLogger {
      *
      * @param message the message need to debug
      */
-    public void debug(String message) {
+    public void debug(final String message) {
         LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
     }
 
@@ -95,8 +95,8 @@ public class FocessLogger {
      * @param key the language key
      * @param objects the objects need to replace
      */
-    public void debugLang(String key,Object... objects) {
-        debug(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+    public void debugLang(final String key, final Object... objects) {
+        this.debug(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -105,7 +105,7 @@ public class FocessLogger {
      * @param message the message need to trace
      * @param e a throwable (or exception) with this message
      */
-    public void trace(String message,Throwable e) {
+    public void trace(final String message, final Throwable e) {
         LOG.trace(message,e);
     }
 }

@@ -10,7 +10,7 @@ public class SimpleClient implements Client {
     private final String name;
     private final String token;
 
-    public SimpleClient(String host, int port, int id, String name, String token) {
+    public SimpleClient(final String host, final int port, final int id, final String name, final String token) {
         this.host = host;
         this.port = port;
         this.id = id;
@@ -18,7 +18,7 @@ public class SimpleClient implements Client {
         this.token = token;
     }
 
-    public SimpleClient(int id, String name, String token) {
+    public SimpleClient(final int id, final String name, final String token) {
         this.host = null;
         this.port = -1;
         this.id = id;
@@ -27,22 +27,22 @@ public class SimpleClient implements Client {
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public int getPort() {
-        return port;
+        return this.port;
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public String getToken() {
-        return token;
+        return this.token;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 }

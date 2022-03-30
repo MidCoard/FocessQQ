@@ -12,7 +12,7 @@ public class WaitPacket extends ClientPacket{
      * @param clientId the client id
      * @param token the client token
      */
-    public WaitPacket(int clientId, String token) {
+    public WaitPacket(final int clientId, final String token) {
         super(clientId, token);
     }
 

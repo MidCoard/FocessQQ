@@ -25,38 +25,38 @@ public class GroupCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor( (sender, dataCollection, ioHandler) -> {
-            long id = dataCollection.getLong();
-            Bot bot = FocessQQ.getBotManager().getBot(id);
+            final long id = dataCollection.getLong();
+            final Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("group-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
             if (!bot.getGroups().isEmpty()) {
-                StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("group-command-list"));
-                for (Group group : bot.getGroups())
+                final StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("group-command-list"));
+                for (final Group group : bot.getGroups())
                     stringBuilder.append(group.getName()).append("(").append(group.getId()).append("),");
                 ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
             } else ioHandler.outputLang("group-command-no-group");
             return CommandResult.ALLOW;
         }, CommandArgument.of("list"),CommandArgument.ofLong());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
-            long id = dataCollection.getLong();
-            Bot bot = FocessQQ.getBotManager().getBot(id);
+            final long id = dataCollection.getLong();
+            final Bot bot = FocessQQ.getBotManager().getBot(id);
             if (bot == null) {
                 ioHandler.outputLang("group-command-bot-not-found", id);
                 return CommandResult.REFUSE;
             }
-            long groupId = dataCollection.getLong();
+            final long groupId = dataCollection.getLong();
             try {
                 ioHandler.outputLang("group-command-input-one-message");
-                String message = ioHandler.input();
-                Group group = bot.getGroup(groupId);
+                final String message = ioHandler.input();
+                final Group group = bot.getGroup(groupId);
                 if (group == null) {
                     ioHandler.outputLang("group-command-group-not-found", groupId);
                     return CommandResult.REFUSE;
                 }
                 group.sendMessage(new Message(MiraiCode.deserializeMiraiCode(message)));
-            } catch (InputTimeoutException exception) {
+            } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("group-command-input-timeout");
                 return CommandResult.REFUSE;
             }
@@ -66,7 +66,7 @@ public class GroupCommand extends Command {
 
     @NotNull
     @Override
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: group list <bot-id>",
                 "Use: group send <bot-id> <group-id>");
     }

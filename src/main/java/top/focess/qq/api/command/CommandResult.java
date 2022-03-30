@@ -38,22 +38,22 @@ public enum CommandResult {
      */
     private final int value;
 
-    CommandResult(CommandResult result, CommandResult... results) {
+    CommandResult(final CommandResult result, final CommandResult... results) {
         this(toInt(result, results));
     }
 
-    CommandResult(int value) {
+    CommandResult(final int value) {
         this.value = value;
     }
 
-    private static int toInt(CommandResult result, CommandResult[] results) {
+    private static int toInt(final CommandResult result, final CommandResult[] results) {
         int ret = result.getValue();
-        for (CommandResult r : results)
+        for (final CommandResult r : results)
             ret |= r.getValue();
         return ret;
     }
 
     public int getValue() {
-        return value;
+        return this.value;
     }
 }

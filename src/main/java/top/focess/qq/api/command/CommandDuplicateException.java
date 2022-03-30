@@ -8,7 +8,7 @@ public class CommandDuplicateException extends IllegalStateException {
      * Constructs a CommandDuplicateException
      * @param name the name of the duplicated command
      */
-    public CommandDuplicateException(String name) {
+    public CommandDuplicateException(final String name) {
         super("Command " + name + " is duplicated.");
     }
 }

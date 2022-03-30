@@ -7,7 +7,7 @@ public class DoubleBuffer extends DataBuffer<Double> {
 
     private final java.nio.DoubleBuffer buffer;
 
-    private DoubleBuffer(int size) {
+    private DoubleBuffer(final int size) {
         this.buffer = java.nio.DoubleBuffer.allocate(size);
     }
 
@@ -17,7 +17,7 @@ public class DoubleBuffer extends DataBuffer<Double> {
      * @param size the target buffer size
      * @return a DoubleBuffer with fixed size
      */
-    public static DoubleBuffer allocate(int size) {
+    public static DoubleBuffer allocate(final int size) {
         return new DoubleBuffer(size);
     }
 
@@ -27,7 +27,7 @@ public class DoubleBuffer extends DataBuffer<Double> {
     }
 
     @Override
-    public void put(Double d) {
+    public void put(final Double d) {
         this.buffer.put(d);
     }
 
@@ -37,7 +37,7 @@ public class DoubleBuffer extends DataBuffer<Double> {
     }
 
     @Override
-    public Double get(int index) {
+    public Double get(final int index) {
         return this.buffer.get(index);
     }
 }

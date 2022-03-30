@@ -15,7 +15,7 @@ public class Property {
      * @param key the FocessQQ framework properties' key
      * @return true if it has the key, false otherwise
      */
-    public static boolean hasKey(String key) {
+    public static boolean hasKey(final String key) {
         return FocessQQ.MainPlugin.getProperties().containsKey(key);
     }
 
@@ -25,7 +25,7 @@ public class Property {
      * @param key the FocessQQ framework properties' key
      * @param value the FocessQQ framework properties' value
      */
-    public static void put(String key, Object value) {
+    public static void put(final String key, final Object value) {
         FocessQQ.MainPlugin.getProperties().put(key, value);
     }
 
@@ -37,7 +37,7 @@ public class Property {
      * @throws ClassCastException if the desired T type is not equal to its original type
      * @return the desired value
      */
-    public static <T> T get(String key) {
+    public static <T> T get(final String key) {
         return (T) FocessQQ.MainPlugin.getProperties().get(key);
     }
 
@@ -49,7 +49,7 @@ public class Property {
      * @param <T> the desired T type
      * @return the desired value, or the default value
      */
-    public static <T> T getOrDefault(String key ,T t) {
+    public static <T> T getOrDefault(final String key , final T t) {
         return (T) FocessQQ.MainPlugin.getProperties().getOrDefault(key,t);
     }
 
@@ -58,7 +58,7 @@ public class Property {
      *
      * @param key the FocessQQ framework properties' key
      */
-    public static void remove(String key) {
+    public static void remove(final String key) {
         FocessQQ.MainPlugin.getProperties().remove(key);
     }
 }

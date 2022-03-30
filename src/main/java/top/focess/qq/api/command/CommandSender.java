@@ -58,7 +58,7 @@ public class CommandSender {
      *
      * @param friend the Mirai Friend instance
      */
-    public CommandSender(@NonNull Friend friend) {
+    public CommandSender(@NonNull final Friend friend) {
         this.member = null;
         this.stranger = null;
         this.friend = friend;
@@ -74,7 +74,7 @@ public class CommandSender {
      *
      * @param member The Mirai Member Instance
      */
-    public CommandSender(@NonNull Member member) {
+    public CommandSender(@NonNull final Member member) {
         this.member = member;
         this.stranger = null;
         this.friend = null;
@@ -90,7 +90,7 @@ public class CommandSender {
      *
      * @param stranger The Mirai Stranger Instance
      */
-    public CommandSender(@NonNull Stranger stranger) {
+    public CommandSender(@NonNull final Stranger stranger) {
         this.member = null;
         this.friend = null;
         this.stranger = stranger;
@@ -108,7 +108,7 @@ public class CommandSender {
      */
     @Nullable
     public Friend getFriend() {
-        return friend;
+        return this.friend;
     }
 
     /**
@@ -118,7 +118,7 @@ public class CommandSender {
      */
     @EnsuresNonNullIf(expression = "getFriend()", result = true)
     public boolean isFriend() {
-        return isFriend;
+        return this.isFriend;
     }
 
 
@@ -128,8 +128,8 @@ public class CommandSender {
      * @param permission the compared permission
      * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
      */
-    public boolean hasPermission(CommandPermission permission) {
-        if (isAdministrator())
+    public boolean hasPermission(final CommandPermission permission) {
+        if (this.isAdministrator())
             return true;
         return this.permission.hasPermission(permission);
     }
@@ -142,7 +142,7 @@ public class CommandSender {
      */
     @Nullable
     public Member getMember() {
-        return member;
+        return this.member;
     }
 
     /**
@@ -152,7 +152,7 @@ public class CommandSender {
      */
     @EnsuresNonNullIf(expression = "getMember()", result = true)
     public boolean isMember() {
-        return isMember;
+        return this.isMember;
     }
 
     /**
@@ -163,7 +163,7 @@ public class CommandSender {
     public boolean isAdministrator() {
         if (FocessQQ.getAdministratorId() == null)
             return false;
-        return this.isFriend ? this.friend.getId() == FocessQQ.getAdministratorId() : isMember && this.member.getId() == FocessQQ.getAdministratorId();
+        return this.isFriend ? this.friend.getId() == FocessQQ.getAdministratorId() : this.isMember && this.member.getId() == FocessQQ.getAdministratorId();
     }
 
     /**
@@ -172,22 +172,22 @@ public class CommandSender {
      */
     @NonNull
     public CommandPermission getPermission() {
-        return permission;
+        return this.permission;
     }
 
     public String toString() {
         if (this.isFriend())
-            return friend.getRawName() + "(" + this.friend.getId() + ")";
+            return this.friend.getRawName() + "(" + this.friend.getId() + ")";
         else if (this.isMember)
-            return member.getCardName() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "]";
+            return this.member.getCardName() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "]";
         else return "CONSOLE";
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CommandSender sender = (CommandSender) o;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        final CommandSender sender = (CommandSender) o;
         if (this.isMember() && sender.isMember()) {
             return sender.getMember().getGroup().getId() == this.getMember().getGroup().getId() && sender.getMember().getId() == this.getMember().getId();
         } else if (this.isFriend() && sender.isFriend()) {
@@ -197,7 +197,7 @@ public class CommandSender {
 
     @Override
     public int hashCode() {
-        return Objects.hash(member == null ? null : member.getId(), friend == null ? null : friend.getId(), isMember, isFriend);
+        return Objects.hash(this.member == null ? null : this.member.getId(), this.friend == null ? null : this.friend.getId(), this.isMember, this.isFriend);
     }
 
     /**
@@ -220,15 +220,15 @@ public class CommandSender {
         return new IOHandler() {
 
             @Override
-            public void output(String output) {
-                if (isMember())
-                    getMember().getGroup().sendMessage(output);
-                else if (isFriend())
-                    getFriend().sendMessage(output);
+            public void output(final String output) {
+                if (CommandSender.this.isMember())
+                    CommandSender.this.getMember().getGroup().sendMessage(output);
+                else if (CommandSender.this.isFriend())
+                    CommandSender.this.getFriend().sendMessage(output);
             }
 
             @Override
-            public boolean hasInput(boolean flag) {
+            public boolean hasInput(final boolean flag) {
                 ChatListener.registerInputListener(this, CommandSender.this, flag);
                 while (!this.flag) ;
                 return true;
@@ -243,7 +243,7 @@ public class CommandSender {
      * @see CommandLine#exec(CommandSender, String)
      * @param command the command CommandSender execute
      */
-    public void exec(String command) {
+    public void exec(final String command) {
         CommandLine.exec(this, command);
     }
 
@@ -257,7 +257,7 @@ public class CommandSender {
         if (SESSIONS.containsKey(this))
             return SESSIONS.get(this);
         else {
-            Session session = new Session(null);
+            final Session session = new Session(null);
             SESSIONS.put(this,session);
             return session;
         }
@@ -270,7 +270,7 @@ public class CommandSender {
      */
     @Nullable
     public Bot getBot() {
-        return bot;
+        return this.bot;
     }
 
     /**
@@ -279,12 +279,12 @@ public class CommandSender {
      * @return true if this CommandSender presents a Mirai Stranger instance, false otherwise
      */
     public boolean isStranger() {
-        return isStranger;
+        return this.isStranger;
     }
 
-    public static void clear(Plugin plugin) {
+    public static void clear(final Plugin plugin) {
         SESSIONS.values().stream().map(Session::getValues).forEach(map ->{
-            List<String> keys = Lists.newArrayList();
+            final List<String> keys = Lists.newArrayList();
             map.forEach((key,value) -> {
                if (key.startsWith(plugin.getName() + ":"))
                    keys.add(key);

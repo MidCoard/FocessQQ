@@ -14,12 +14,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FocessCallback<V> extends FocessTask implements Callback<V> {
 
-    private final static Scheduler DEFAULT_SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),7,false,"FocessCallback");
+    private static final Scheduler DEFAULT_SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(),7,false,"FocessCallback");
 
     private final Callable<V> callback;
     private V value;
 
-    FocessCallback(Callable<V> callback, Scheduler scheduler) {
+    FocessCallback(final Callable<V> callback, final Scheduler scheduler) {
         super(null,scheduler);
         this.callback = callback;
     }
@@ -32,23 +32,23 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
             throw new TaskNotFinishedException(this);
         if (this.exception != null)
             throw this.exception;
-        return value;
+        return this.value;
     }
 
     @Override
     public V waitCall() throws InterruptedException, ExecutionException {
-        super.join();
+        join();
         return this.call();
     }
 
     @Override
-    public synchronized V get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
+    public synchronized V get(final long timeout, @NotNull final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
         if (this.isFinished())
-            return value;
+            return this.value;
         if (this.isCancelled())
             throw new CancellationException();
-        AtomicBoolean out = new AtomicBoolean(false);
-        Task task = DEFAULT_SCHEDULER.run(() -> {
+        final AtomicBoolean out = new AtomicBoolean(false);
+        final Task task = DEFAULT_SCHEDULER.run(() -> {
             out.set(true);
             synchronized (FocessCallback.this) {
                 FocessCallback.this.notifyAll();
@@ -68,8 +68,8 @@ public class FocessCallback<V> extends FocessTask implements Callback<V> {
     @Override
     public void run() throws ExecutionException {
         try {
-            value = this.callback.call();
-        } catch (Exception e) {
+            this.value = this.callback.call();
+        } catch (final Exception e) {
             throw new ExecutionException(e);
         }
     }

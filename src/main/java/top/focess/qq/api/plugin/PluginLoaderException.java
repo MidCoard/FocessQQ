@@ -8,7 +8,7 @@ public class PluginLoaderException extends IllegalStateException {
      * Constructs a PluginLoaderException
      * @param name the name of the plugin
      */
-    public PluginLoaderException(String name) {
+    public PluginLoaderException(final String name) {
         super("Plugin " + name + " is not loaded by PluginClassLoader.");
     }
 }

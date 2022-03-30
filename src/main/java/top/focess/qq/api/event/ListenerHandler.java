@@ -33,10 +33,10 @@ public class ListenerHandler {
      *
      * @param plugin the plugin which need to unregister all its listeners
      */
-    public static void unregister(Plugin plugin) {
-        List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
-        for (ListenerHandler handler : LISTENER_HANDLER_LIST)
-            for (Listener listener : listeners) {
+    public static void unregister(final Plugin plugin) {
+        final List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin,Lists.newArrayList());
+        for (final ListenerHandler handler : LISTENER_HANDLER_LIST)
+            for (final Listener listener : listeners) {
                 LISTENER_PLUGIN_MAP.remove(listener);
                 handler.unregister(listener);
             }
@@ -49,7 +49,7 @@ public class ListenerHandler {
      * @param plugin the plugin
      * @param listener the listener
      */
-    public static void register(Plugin plugin, Listener listener) {
+    public static void register(final Plugin plugin, final Listener listener) {
         PLUGIN_LISTENER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
@@ -64,8 +64,8 @@ public class ListenerHandler {
      *
      * @param listener the listener need to be unregistered
      */
-    public void unregister(Listener listener) {
-        listeners.remove(listener);
+    public void unregister(final Listener listener) {
+        this.listeners.remove(listener);
     }
 
     /**
@@ -75,7 +75,7 @@ public class ListenerHandler {
      */
     public static boolean unregisterAll() {
         boolean ret = false;
-        for (Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
+        for (final Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
             unregister(plugin);
@@ -94,8 +94,8 @@ public class ListenerHandler {
      * @param handler the event handler
      * @param <T> the event type
      */
-    public <T extends Event> void register(Listener listener, Method method, EventHandler handler) {
-        listeners.compute(listener, (k, v) -> {
+    public <T extends Event> void register(final Listener listener, final Method method, final EventHandler handler) {
+        this.listeners.compute(listener, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
             v.add(Pair.of(method, handler));
@@ -109,19 +109,19 @@ public class ListenerHandler {
      * @param event the event need to be submitted
      * @param <T> the event type
      */
-    public <T extends Event> void submit(T event) {
-        for (Listener listener : this.listeners.keySet()) {
+    public <T extends Event> void submit(final T event) {
+        for (final Listener listener : this.listeners.keySet()) {
             this.listeners.get(listener).stream().sorted(Comparator.comparing(pair -> pair.getValue().priority().getPriority())).forEachOrdered(
                     i -> {
                         if (event.isPrevent() && i.getValue().notCallIfPrevented())
                             return;
                         if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
                             return;
-                        Method method = i.getKey();
+                        final Method method = i.getKey();
                         try {
                             method.setAccessible(true);
                             method.invoke(listener, event);
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             FocessQQ.getLogger().thrLang("exception-handle-event",e);
                         }
                     }

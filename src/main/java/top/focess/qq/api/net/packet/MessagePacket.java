@@ -17,7 +17,7 @@ public class MessagePacket extends Packet{
      *
      * @param message the message
      */
-    public MessagePacket(String message){
+    public MessagePacket(final String message){
         this.message = message;
     }
 
@@ -27,6 +27,6 @@ public class MessagePacket extends Packet{
     }
 
     public String getMessage() {
-        return message;
+        return this.message;
     }
 }

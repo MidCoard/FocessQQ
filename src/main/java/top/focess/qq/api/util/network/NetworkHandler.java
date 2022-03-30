@@ -36,15 +36,15 @@ public class NetworkHandler {
     private static final OkHttpClient CLIENT;
 
     static {
-        X509TrustManager[] managers = new X509TrustManager[]{
+        final X509TrustManager[] managers = {
                 new X509TrustManager() {
                     @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
+                    public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) {
 
                     }
 
                     @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
+                    public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {
 
                     }
 
@@ -54,11 +54,11 @@ public class NetworkHandler {
                     }
                 }
         };
-        SSLContext sslContext;
+        final SSLContext sslContext;
         try {
             sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null,managers,new SecureRandom());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
         CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(),managers[0]).hostnameVerifier((hostname, session)->true).build();
@@ -66,7 +66,7 @@ public class NetworkHandler {
 
     private final Plugin plugin;
 
-    public NetworkHandler(Plugin plugin) {
+    public NetworkHandler(final Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -78,7 +78,7 @@ public class NetworkHandler {
      * @param requestType the request type
      * @return the response of this request
      */
-    public HttpResponse request(String url,Map<String,Object> data,RequestType requestType) {
+    public HttpResponse request(final String url, final Map<String,Object> data, final RequestType requestType) {
         return this.request(url,data,Maps.newHashMap(),TEXT,requestType);
     }
 
@@ -90,7 +90,7 @@ public class NetworkHandler {
      * @param requestType the request type
      * @return the response of this request
      */
-    public HttpResponse request(String url,RequestType requestType) {
+    public HttpResponse request(final String url, final RequestType requestType) {
         return this.request(url, Maps.newHashMap(),requestType);
     }
 
@@ -104,19 +104,19 @@ public class NetworkHandler {
      * @param requestType the request type
      * @return the response of this request
      */
-    public HttpResponse request(String url, Map<String,Object> data,Map<String,String> header,MediaType mediaType, RequestType requestType) {
+    public HttpResponse request(final String url, final Map<String,Object> data, final Map<String,String> header, final MediaType mediaType, final RequestType requestType) {
         if (requestType == RequestType.GET)
-            return get(url,data,header);
+            return this.get(url,data,header);
         else if (requestType == RequestType.POST)
-            return post(url,data,header,mediaType);
+            return this.post(url,data,header,mediaType);
         else if (requestType == RequestType.PUT)
-            return put(url,data,header,mediaType);
+            return this.put(url,data,header,mediaType);
         return HttpResponse.ofNull(this.plugin);
     }
 
-    private String process(Map<String,Object> data) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String key : data.keySet())
+    private String process(final Map<String,Object> data) {
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (final String key : data.keySet())
             stringBuilder.append(key).append('=').append(data.get(key)).append('&');
         if (stringBuilder.length() != 0)
             return stringBuilder.substring(0,stringBuilder.length() - 1);
@@ -132,20 +132,20 @@ public class NetworkHandler {
      * @param mediaType the request acceptable type
      * @return the response of this request
      */
-    public HttpResponse put(String url, Map<String, Object> data,Map<String,String> header,MediaType mediaType) {
-        String value;
+    public HttpResponse put(final String url, final Map<String, Object> data, final Map<String,String> header, final MediaType mediaType) {
+        final String value;
         if (mediaType.equals(JSON))
             value = new JSON(data).toJson();
-        else value = process(data);
-        RequestBody requestBody = RequestBody.create(value,mediaType);
-        Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
+        else value = this.process(data);
+        final RequestBody requestBody = RequestBody.create(value,mediaType);
+        final Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
         try {
-            Response response = CLIENT.newCall(request).execute();
+            final Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
-            String body = response.body().string();
+            final String body = response.body().string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Response: " + body);
             return new HttpResponse(this.plugin,response.code(),response.headers(),body);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
@@ -160,20 +160,20 @@ public class NetworkHandler {
      * @param mediaType the request acceptable type
      * @return the response of this request
      */
-    public HttpResponse post(String url, Map<String, Object> data,Map<String,String> header,MediaType mediaType) {
-        String value;
+    public HttpResponse post(final String url, final Map<String, Object> data, final Map<String,String> header, final MediaType mediaType) {
+        final String value;
         if (mediaType.equals(JSON))
             value = new JSON(data).toJson();
-        else value = process(data);
-        RequestBody requestBody = RequestBody.create(value,mediaType);
-        Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
+        else value = this.process(data);
+        final RequestBody requestBody = RequestBody.create(value,mediaType);
+        final Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
         try {
-            Response response = CLIENT.newCall(request).execute();
+            final Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
-            String body = response.body().string();
+            final String body = response.body().string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Response: " + body);
             return new HttpResponse(this.plugin,response.code(),response.headers(),body);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
@@ -187,26 +187,26 @@ public class NetworkHandler {
      * @param header the request header
      * @return the response of this request
      */
-    public HttpResponse get(String url, Map<String,Object> data,Map<String,String> header) {
-        Request request;
+    public HttpResponse get(final String url, final Map<String,Object> data, final Map<String,String> header) {
+        final Request request;
         if (data.size() != 0)
-            request = new Request.Builder().url(url + "?" + process(data)).get().headers(Headers.of(header)).build();
+            request = new Request.Builder().url(url + "?" + this.process(data)).get().headers(Headers.of(header)).build();
         else
             request = new Request.Builder().url(url).get().headers(Headers.of(header)).build();
         try {
-            Response response = CLIENT.newCall(request).execute();
+            final Response response = CLIENT.newCall(request).execute();
             // Call#execute() returns a non-null Response object
-            String body = response.body().string();
+            final String body = response.body().string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
             return new HttpResponse(this.plugin,response.code(),response.headers(),body);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             return new HttpResponse(this.plugin,e);
         }
     }
 
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 
     public enum RequestType {

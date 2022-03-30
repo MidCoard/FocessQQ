@@ -20,29 +20,29 @@ public abstract class ASocket implements Socket {
     protected final List<Receiver> receivers = Lists.newArrayList();
 
     @Override
-    public void registerReceiver(Receiver receiver) {
-        receivers.add(receiver);
-        for (Method method : receiver.getClass().getDeclaredMethods())
+    public void registerReceiver(final Receiver receiver) {
+        this.receivers.add(receiver);
+        for (final Method method : receiver.getClass().getDeclaredMethods())
             if (method.getAnnotation(PacketHandler.class) != null)
                 if (method.getParameterTypes().length == 1 && (method.getReturnType().equals(Void.TYPE) || Packet.class.isAssignableFrom(method.getReturnType()))) {
-                    Class<?> packetClass = method.getParameterTypes()[0];
+                    final Class<?> packetClass = method.getParameterTypes()[0];
                     if (Packet.class.isAssignableFrom(packetClass) && !Modifier.isAbstract(packetClass.getModifiers())) {
                         try {
-                            packetMethods.compute((Class<? extends Packet>) packetClass,(k, v)->{
+                            this.packetMethods.compute((Class<? extends Packet>) packetClass,(k, v)->{
                                 if (v == null)
                                     v = Lists.newArrayList();
                                 v.add(Pair.of(receiver,method));
                                 return v;
                             });
-                        } catch (Exception ignored) {
+                        } catch (final Exception ignored) {
                         }
                     }
                 }
     }
 
     @Override
-    public void unregister(Plugin plugin) {
-        for (Receiver receiver : receivers)
+    public void unregister(final Plugin plugin) {
+        for (final Receiver receiver : this.receivers)
             receiver.unregister(plugin);
     }
 }

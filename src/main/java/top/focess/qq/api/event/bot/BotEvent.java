@@ -21,11 +21,11 @@ public class BotEvent extends Event {
      *
      * @param bot the bot
      */
-    public BotEvent(Bot bot) {
+    public BotEvent(final Bot bot) {
         this.bot = bot;
     }
 
     public Bot getBot() {
-        return bot;
+        return this.bot;
     }
 }

@@ -24,48 +24,48 @@ public class SimpleFocessReader extends FocessReader {
 
     static {
         CLASS_READER_MAP.put(ArrayList.class, (Reader<ArrayList>) (t, reader) -> {
-            ArrayList list = new ArrayList();
-            int length = reader.readInt();
+            final ArrayList list = new ArrayList();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 list.add(reader.readObject());
             return list;
         });
 
         CLASS_READER_MAP.put(LinkedList.class, (Reader<LinkedList>) (t, reader) -> {
-            LinkedList list = new LinkedList();
-            int length = reader.readInt();
+            final LinkedList list = new LinkedList();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 list.offer(reader.readObject());
             return list;
         });
 
         CLASS_READER_MAP.put(HashMap.class, (Reader<HashMap>) (t, reader) -> {
-            HashMap hashMap = new HashMap();
-            int length = reader.readInt();
+            final HashMap hashMap = new HashMap();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 hashMap.put(reader.readObject(),reader.readObject());
             return hashMap;
         });
 
         CLASS_READER_MAP.put(TreeMap.class, (Reader<TreeMap>) (t, reader) -> {
-            TreeMap treeMap = new TreeMap();
-            int length = reader.readInt();
+            final TreeMap treeMap = new TreeMap();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 treeMap.put(reader.readObject(),reader.readObject());
             return treeMap;
         });
 
         CLASS_READER_MAP.put(HashSet.class, (Reader<HashSet>) (t, reader) -> {
-            HashSet hashSet = new HashSet();
-            int length = reader.readInt();
+            final HashSet hashSet = new HashSet();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 hashSet.add(reader.readObject());
             return hashSet;
         });
 
         CLASS_READER_MAP.put(TreeSet.class, (Reader<TreeSet>) (t, reader) -> {
-            TreeSet treeSet = new TreeSet();
-            int length = reader.readInt();
+            final TreeSet treeSet = new TreeSet();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 treeSet.add(reader.readObject());
             return treeSet;
@@ -73,7 +73,7 @@ public class SimpleFocessReader extends FocessReader {
 
         CLASS_READER_MAP.put(Class.class, (Reader<Class>) (t, reader) -> {
             try {
-                String cls = reader.readString();
+                final String cls = reader.readString();
                 switch (cls) {
                     case "byte":
                         return byte.class;
@@ -96,14 +96,14 @@ public class SimpleFocessReader extends FocessReader {
                     default:
                         return PluginCoreClassLoader.forName(cls);
                 }
-            } catch (ClassNotFoundException e) {
+            } catch (final ClassNotFoundException e) {
                 throw new SerializationParseException(e);
             }
         });
 
         CLASS_READER_MAP.put(ConcurrentHashMap.KeySetView.class,(Reader<ConcurrentHashMap.KeySetView>) (t, reader)->{
-            ConcurrentHashMap.KeySetView keySetView = ConcurrentHashMap.newKeySet();
-            int length = reader.readInt();
+            final ConcurrentHashMap.KeySetView keySetView = ConcurrentHashMap.newKeySet();
+            final int length = reader.readInt();
             for (int i = 0;i<length;i++)
                 keySetView.add(reader.readObject());
             return keySetView;
@@ -114,7 +114,7 @@ public class SimpleFocessReader extends FocessReader {
 
     private int pointer;
 
-    public SimpleFocessReader(byte[] bytes) {
+    public SimpleFocessReader(final byte[] bytes) {
         this.bytes = bytes;
         this.pointer = 0;
     }
@@ -122,68 +122,68 @@ public class SimpleFocessReader extends FocessReader {
     private int readInt() {
         int r = 0;
         for (int i = 0; i < 4; i++)
-            r += Byte.toUnsignedInt(bytes[pointer++]) << (i * 8);
+            r += Byte.toUnsignedInt(this.bytes[this.pointer++]) << (i * 8);
         return r;
     }
 
     private long readLong() {
         long r = 0L;
         for (int i = 0; i < 8; i++)
-            r += Byte.toUnsignedLong(bytes[pointer++]) << (i * 8L);
+            r += Byte.toUnsignedLong(this.bytes[this.pointer++]) << (i * 8L);
         return r;
     }
 
     private String readString() {
-        int length = readInt();
-        byte[] bytes = new byte[length];
+        final int length = this.readInt();
+        final byte[] bytes = new byte[length];
         for (int i = 0; i < length; i++)
-            bytes[i] = this.bytes[pointer++];
+            bytes[i] = this.bytes[this.pointer++];
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
     private float readFloat() {
-        return Float.intBitsToFloat(readInt());
+        return Float.intBitsToFloat(this.readInt());
     }
 
     private double readDouble() {
-        return Double.longBitsToDouble(readLong());
+        return Double.longBitsToDouble(this.readLong());
     }
 
     private byte readByte() {
-        return this.bytes[pointer++];
+        return this.bytes[this.pointer++];
     }
 
     private short readShort() {
         short r = 0;
         for (int i = 0; i < 2; i++)
-            r += (short) Byte.toUnsignedInt(bytes[pointer++]) << (i * 8);
+            r += (short) Byte.toUnsignedInt(this.bytes[this.pointer++]) << (i * 8);
         return r;
     }
 
     private char readChar(){
-        return (char) readShort();
+        return (char) this.readShort();
     }
 
     private boolean readBoolean(){
-        return readByte() == 1;
+        return this.readByte() == 1;
     }
 
     @Nullable
     public Object read() {
         if (this.pointer >= this.bytes.length)
             throw new SerializationParseException("Read over");
-        byte start = readByte();
+        final byte start = this.readByte();
         if (start != C_START)
             throw new SerializationParseException("Start code is not correct");
-        Object o = readObject();
-        byte end = readByte();
+        final Object o = this.readObject();
+        final byte end = this.readByte();
         if (end != C_END)
             throw new SerializationParseException("End code is not correct");
         return o;
     }
 
     private Class<?> readClass() {
-        String cls = readString();
+        final String cls = this.readString();
         switch (cls) {
             case "byte":
                 return byte.class;
@@ -206,7 +206,7 @@ public class SimpleFocessReader extends FocessReader {
             default:
                 try {
                     return PluginCoreClassLoader.forName(cls);
-                } catch (ClassNotFoundException e) {
+                } catch (final ClassNotFoundException e) {
                     throw new SerializationParseException(e);
                 }
         }
@@ -214,75 +214,75 @@ public class SimpleFocessReader extends FocessReader {
 
     @Nullable
     private <T> Object readObject() {
-        byte type = readByte();
+        final byte type = this.readByte();
         switch (type) {
             case C_NULL:
                 return null;
             case C_BYTE:
-                return readByte();
+                return this.readByte();
             case C_SHORT:
-                return readShort();
+                return this.readShort();
             case C_INT:
-                return readInt();
+                return this.readInt();
             case C_LONG:
-                return readLong();
+                return this.readLong();
             case C_FLOAT:
-                return readFloat();
+                return this.readFloat();
             case C_DOUBLE:
-                return readDouble();
+                return this.readDouble();
             case C_BOOLEAN:
-                return readBoolean();
+                return this.readBoolean();
             case C_CHAR:
-                return readChar();
+                return this.readChar();
             case C_STRING:
-                return readString();
+                return this.readString();
             case C_ARRAY: {
-                Class<?> cls = readClass();
-                int length = readInt();
-                Object array = Array.newInstance(cls, length);
+                final Class<?> cls = this.readClass();
+                final int length = this.readInt();
+                final Object array = Array.newInstance(cls, length);
                 for (int i = 0; i < length; i++)
-                    Array.set(array, i, readObject());
+                    Array.set(array, i, this.readObject());
                 return array;
             }
             case C_SERIALIZABLE: {
-                String className = readString();
-                Object o = readObject();
+                final String className = this.readString();
+                final Object o = this.readObject();
                 try {
-                    Class<?> cls = PluginCoreClassLoader.forName(className);
-                    Method method = cls.getMethod("deserialize", Map.class);
+                    final Class<?> cls = PluginCoreClassLoader.forName(className);
+                    final Method method = cls.getMethod("deserialize", Map.class);
                     return method.invoke(null, o);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new SerializationParseException(e);
                 }
             }
             case C_OBJECT: {
-                String className = readString();
-                int length = readInt();
+                final String className = this.readString();
+                final int length = this.readInt();
                 try {
-                    Class<?> cls = PluginCoreClassLoader.forName(className);
-                    Object o = PROVIDER.newInstance(cls);
+                    final Class<?> cls = PluginCoreClassLoader.forName(className);
+                    final Object o = PROVIDER.newInstance(cls);
                     for (int i = 0; i < length; i++) {
-                        byte field = readByte();
+                        final byte field = this.readByte();
                         if (field != C_FIELD)
                             throw new SerializationParseException("Field code is not correct");
-                        String fieldName = readString();
-                        Field f = cls.getDeclaredField(fieldName);
+                        final String fieldName = this.readString();
+                        final Field f = cls.getDeclaredField(fieldName);
                         f.setAccessible(true);
-                        f.set(o, readObject());
+                        f.set(o, this.readObject());
                     }
                     return o;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new SerializationParseException(e);
                 }
             }
             case C_RESERVED: {
-                String className = readString();
+                final String className = this.readString();
                 try {
-                    Class<T> cls = (Class<T>) PluginCoreClassLoader.forName(className);
-                    Reader<T> reader;
+                    final Class<T> cls = (Class<T>) PluginCoreClassLoader.forName(className);
+                    final Reader<T> reader;
                     if ((reader = (Reader<T>) CLASS_READER_MAP.get(cls)) != null)
                         return reader.read(cls, this);
-                } catch (ClassNotFoundException e) {
+                } catch (final ClassNotFoundException e) {
                     throw new SerializationParseException(e);
                 }
             }

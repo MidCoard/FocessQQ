@@ -15,12 +15,12 @@ public class SidedConnectPacket extends Packet{
      * Constructs a SidedConnectPacket
      * @param name the client name
      */
-    public SidedConnectPacket(String name) {
+    public SidedConnectPacket(final String name) {
         this.name = name;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override

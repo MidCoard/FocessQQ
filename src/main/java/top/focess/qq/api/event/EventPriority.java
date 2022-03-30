@@ -12,12 +12,12 @@ public enum EventPriority {
      */
     private final int priority;
 
-    EventPriority(int priority) {
+    EventPriority(final int priority) {
         this.priority = priority;
     }
 
     public int getPriority() {
-        return priority;
+        return this.priority;
     }
 
 }

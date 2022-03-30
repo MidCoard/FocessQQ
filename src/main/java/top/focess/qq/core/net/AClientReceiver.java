@@ -18,19 +18,19 @@ public abstract class AClientReceiver implements ClientReceiver {
     protected final String name;
     protected String token;
     protected int id;
-    protected volatile boolean connected = false;
+    protected volatile boolean connected;
 
 
     protected final Map<Plugin, Map<Class<?>, List<PackHandler>>> packHandlers = Maps.newConcurrentMap();
 
-    public AClientReceiver(String host, int port, String name) {
+    public AClientReceiver(final String host, final int port, final String name) {
         this.host = host;
         this.port = port;
         this.name = name;
     }
 
     @Override
-    public <T extends Packet> void register(Plugin plugin, Class<T> c, PackHandler<T> packHandler) {
+    public <T extends Packet> void register(final Plugin plugin, final Class<T> c, final PackHandler<T> packHandler) {
         this.packHandlers.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Maps.newHashMap();
@@ -45,32 +45,32 @@ public abstract class AClientReceiver implements ClientReceiver {
     }
 
     @Override
-    public void unregister(Plugin plugin) {
+    public void unregister(final Plugin plugin) {
         this.packHandlers.remove(plugin);
     }
 
     @Override
     public boolean unregisterAll() {
         boolean ret = false;
-        for (Plugin plugin : this.packHandlers.keySet()) {
+        for (final Plugin plugin : this.packHandlers.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
-            unregister(plugin);
+            this.unregister(plugin);
         }
         return ret;
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public int getPort() {
-        return port;
+        return this.port;
     }
 
     @Override
     public boolean isConnected() {
-        return connected;
+        return this.connected;
     }
 
     @Override
@@ -84,7 +84,7 @@ public abstract class AClientReceiver implements ClientReceiver {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
 }

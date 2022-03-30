@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Represent this class is a Listener. It means that this class must implement Listener class.
  */
-@Target(value = ElementType.TYPE)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ListenerType {
 }

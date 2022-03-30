@@ -14,19 +14,19 @@ public class ThreadPoolSchedulerThread extends Thread{
     private boolean isAvailable = true;
     @Nullable
     private ITask task;
-    private boolean shouldStop = false;
+    private boolean shouldStop;
 
-    public ThreadPoolSchedulerThread(ThreadPoolScheduler scheduler, String name) {
+    public ThreadPoolSchedulerThread(final ThreadPoolScheduler scheduler, final String name) {
         super(name);
         this.scheduler = scheduler;
         this.name = name;
         this.setUncaughtExceptionHandler((t, e) -> {
-            shouldStop = true;
-            isAvailable = false;
-            if (task != null) {
-                task.setException(new ExecutionException(e));
-                task.endRun();
-                scheduler.taskThreadMap.remove(task);
+            this.shouldStop = true;
+            this.isAvailable = false;
+            if (this.task != null) {
+                this.task.setException(new ExecutionException(e));
+                this.task.endRun();
+                scheduler.taskThreadMap.remove(this.task);
             }
             FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught",e,t.getName());
             scheduler.recreate(this.name);
@@ -38,17 +38,17 @@ public class ThreadPoolSchedulerThread extends Thread{
     public void run() {
         while (true) {
             try {
-                if (isAvailable)
-                    synchronized (lock) {
-                        lock.wait();
+                if (this.isAvailable)
+                    synchronized (this.lock) {
+                        this.lock.wait();
                     }
-                if (shouldStop)
+                if (this.shouldStop)
                     break;
                 if (this.task != null) {
                     this.task.startRun();
                     try {
                         this.task.run();
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         this.task.setException(new ExecutionException(e));
                     }
                     this.task.endRun();
@@ -58,28 +58,28 @@ public class ThreadPoolSchedulerThread extends Thread{
                     this.task = null;
                 }
                 this.isAvailable = true;
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread",e);
             }
         }
     }
 
     public boolean isAvailable() {
-        return isAvailable;
+        return this.isAvailable;
     }
 
-    public void startTask(ITask task) {
+    public void startTask(final ITask task) {
         this.isAvailable = false;
         this.task = task;
-        synchronized (lock) {
-            lock.notify();
+        synchronized (this.lock) {
+            this.lock.notify();
         }
     }
 
     public void close() {
         this.shouldStop = true;
-        synchronized (lock) {
-            lock.notify();
+        synchronized (this.lock) {
+            this.lock.notify();
         }
     }
 

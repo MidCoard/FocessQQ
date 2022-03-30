@@ -13,11 +13,11 @@ public class PluginCoreClassLoader extends ClassLoader {
     public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(PluginCoreClassLoader.class.getClassLoader());
     public static final List<PluginClassLoader> LOADERS = Lists.newCopyOnWriteArrayList();
 
-    public PluginCoreClassLoader(ClassLoader parent) {
+    public PluginCoreClassLoader(final ClassLoader parent) {
         super(parent);
     }
 
-    public static Class<?> forName(String name) throws ClassNotFoundException {
+    public static Class<?> forName(final String name) throws ClassNotFoundException {
         return DEFAULT_CLASS_LOADER.loadClass(name, false);
     }
 
@@ -28,11 +28,11 @@ public class PluginCoreClassLoader extends ClassLoader {
      * @return the target plugin, @null if the class is loaded by default classloader
      */
     @Nullable
-    public static Plugin getClassLoadedBy(@Nullable Class<?> clazz) {
+    public static Plugin getClassLoadedBy(@Nullable final Class<?> clazz) {
         if (clazz == null)
             return null;
         if (clazz.getClassLoader() instanceof PluginClassLoader)
-            for (PluginClassLoader pluginClassLoader : LOADERS)
+            for (final PluginClassLoader pluginClassLoader : LOADERS)
                 if (pluginClassLoader.getLoadedClasses().contains(clazz))
                     return pluginClassLoader.getPlugin();
         return null;
@@ -45,22 +45,22 @@ public class PluginCoreClassLoader extends ClassLoader {
      * @return the target plugin, {@code FocessQQ#getMainPlugin()} if the class is loaded by default classloader
      */
     @NonNull
-    public static Plugin getClassLoadedByOrDefault(@Nullable  Class<?> clazz) {
-        Plugin plugin = getClassLoadedBy(clazz);
+    public static Plugin getClassLoadedByOrDefault(@Nullable final Class<?> clazz) {
+        final Plugin plugin = getClassLoadedBy(clazz);
         if (plugin == null)
             return FocessQQ.getMainPlugin();
         return plugin;
     }
 
     @Override
-    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    public Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
         try {
             return super.loadClass(name, resolve);
-        } catch (ClassNotFoundException e) {
-            for (PluginClassLoader classLoader : LOADERS)
+        } catch (final ClassNotFoundException e) {
+            for (final PluginClassLoader classLoader : LOADERS)
                 try {
                     return classLoader.findClass(name, resolve);
-                } catch (ClassNotFoundException ignored) {
+                } catch (final ClassNotFoundException ignored) {
                 }
         }
         throw new ClassNotFoundException(name);

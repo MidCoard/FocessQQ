@@ -27,51 +27,51 @@ public class ThreadPoolScheduler extends AScheduler {
     private final List<ThreadPoolSchedulerThread> threads = Lists.newArrayList();
     private final boolean immediate;
 
-    private volatile boolean shouldStop = false;
+    private volatile boolean shouldStop;
 
-    private int currentThread = 0;
+    private int currentThread;
 
     private final String name;
 
-    public ThreadPoolScheduler(Plugin plugin, int poolSize, boolean isImmediate,String name) {
+    public ThreadPoolScheduler(final Plugin plugin, final int poolSize, final boolean isImmediate, final String name) {
         super(plugin);
         this.name = name;
         for (int i = 0; i < poolSize; i++)
-            threads.add(new ThreadPoolSchedulerThread(this,this.getName() + "-" + i));
+            this.threads.add(new ThreadPoolSchedulerThread(this,this.getName() + "-" + i));
         new SchedulerThread(this.getName()).start();
         this.immediate = isImmediate;
     }
 
-    public ThreadPoolScheduler(Plugin plugin, int poolSize) {
+    public ThreadPoolScheduler(final Plugin plugin, final int poolSize) {
         this(plugin, poolSize, false,plugin.getName() + "-ThreadPoolScheduler-" + UUID.randomUUID().toString().substring(0,8));
     }
 
     @Override
-    public synchronized Task run(Runnable runnable, Duration delay) {
+    public synchronized Task run(final Runnable runnable, final Duration delay) {
         if (this.shouldStop)
             throw new SchedulerClosedException(this);
-        FocessTask task = new FocessTask(runnable, this);
-        tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
+        final FocessTask task = new FocessTask(runnable, this);
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
         this.notify();
         return task;
     }
 
     @Override
-    public synchronized Task runTimer(Runnable runnable, Duration delay, Duration period) {
+    public synchronized Task runTimer(final Runnable runnable, final Duration delay, final Duration period) {
         if (this.shouldStop)
             throw new SchedulerClosedException(this);
-        FocessTask task = new FocessTask(runnable, period, this);
-        tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
+        final FocessTask task = new FocessTask(runnable, period, this);
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
         this.notify();
         return task;
     }
 
     @Override
-    public synchronized <V> Callback<V> submit(Callable<V> callable, Duration delay) {
+    public synchronized <V> Callback<V> submit(final Callable<V> callable, final Duration delay) {
         if (this.shouldStop)
             throw new SchedulerClosedException(this);
-        FocessCallback<V> callback = new FocessCallback<>(callable, this);
-        tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), callback));
+        final FocessCallback<V> callback = new FocessCallback<>(callable, this);
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), callback));
         this.notify();
         return callback;
     }
@@ -90,8 +90,8 @@ public class ThreadPoolScheduler extends AScheduler {
     public synchronized void close() {
         super.close();
         this.shouldStop = true;
-        cancelAll();
-        for (ThreadPoolSchedulerThread thread : this.threads)
+        this.cancelAll();
+        for (final ThreadPoolSchedulerThread thread : this.threads)
             thread.close();
         this.notify();
     }
@@ -105,56 +105,56 @@ public class ThreadPoolScheduler extends AScheduler {
     public void closeNow() {
         super.close();
         this.shouldStop = true;
-        cancelAll();
-        for (ThreadPoolSchedulerThread thread : this.threads)
+        this.cancelAll();
+        for (final ThreadPoolSchedulerThread thread : this.threads)
             thread.closeNow();
         this.notify();
     }
 
-    public void cancel(ITask task) {
-        if (taskThreadMap.containsKey(task)) {
-            taskThreadMap.get(task).cancel();
-            taskThreadMap.remove(task);
+    public void cancel(final ITask task) {
+        if (this.taskThreadMap.containsKey(task)) {
+            this.taskThreadMap.get(task).cancel();
+            this.taskThreadMap.remove(task);
         }
         else throw new TaskNotFoundException(task);
     }
 
-    public void recreate(String name) {
-        for (int i = 0;i<threads.size();i++)
-            if (threads.get(i).getName().equals(name)) {
-                threads.set(i, new ThreadPoolSchedulerThread(this, name));
+    public void recreate(final String name) {
+        for (int i = 0; i< this.threads.size(); i++)
+            if (this.threads.get(i).getName().equals(name)) {
+                this.threads.set(i, new ThreadPoolSchedulerThread(this, name));
                 break;
             }
     }
 
-    public void rerun(ITask task) {
+    public void rerun(final ITask task) {
         if (this.shouldStop)
             return;
-        tasks.add(new ComparableTask(System.currentTimeMillis() + task.getPeriod().toMillis(), task));
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + task.getPeriod().toMillis(), task));
     }
 
     private class SchedulerThread extends Thread {
 
-        public SchedulerThread(String name) {
+        public SchedulerThread(final String name) {
             super(name);
             this.setUncaughtExceptionHandler((t,e)->{
-                close();
+                ThreadPoolScheduler.this.close();
                 FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-uncaught",e,ThreadPoolScheduler.this.getName());
             });
         }
 
         @Nullable
         private ThreadPoolSchedulerThread getAvailableThread() {
-            for (int i = 1;i <= threads.size();i++) {
-                int next = (currentThread + i) % threads.size();
-                if (threads.get(next).isAvailable()) {
-                    currentThread = next;
-                    return threads.get(next);
+            for (int i = 1; i <= ThreadPoolScheduler.this.threads.size(); i++) {
+                final int next = (ThreadPoolScheduler.this.currentThread + i) % ThreadPoolScheduler.this.threads.size();
+                if (ThreadPoolScheduler.this.threads.get(next).isAvailable()) {
+                    ThreadPoolScheduler.this.currentThread = next;
+                    return ThreadPoolScheduler.this.threads.get(next);
                 }
             }
-            if (immediate) {
-                ThreadPoolSchedulerThread thread = new ThreadPoolSchedulerThread(ThreadPoolScheduler.this, ThreadPoolScheduler.this.getName() + "-" + threads.size());
-                threads.add(thread);
+            if (ThreadPoolScheduler.this.immediate) {
+                final ThreadPoolSchedulerThread thread = new ThreadPoolSchedulerThread(ThreadPoolScheduler.this, ThreadPoolScheduler.this.getName() + "-" + ThreadPoolScheduler.this.threads.size());
+                ThreadPoolScheduler.this.threads.add(thread);
                 return thread;
             }
             return null;
@@ -165,28 +165,28 @@ public class ThreadPoolScheduler extends AScheduler {
             while (true) {
                 try {
                     synchronized (ThreadPoolScheduler.this) {
-                        if (shouldStop)
+                        if (ThreadPoolScheduler.this.shouldStop)
                             break;
-                        if (tasks.isEmpty())
+                        if (ThreadPoolScheduler.this.tasks.isEmpty())
                             ThreadPoolScheduler.this.wait();
                     }
-                    ComparableTask task = tasks.peek();
+                    final ComparableTask task = ThreadPoolScheduler.this.tasks.peek();
                     if (task != null)
                         synchronized (task.getTask()) {
                             if (task.isCancelled()) {
-                                tasks.poll();
+                                ThreadPoolScheduler.this.tasks.poll();
                                 continue;
                             }
                             if (task.getTime() <= System.currentTimeMillis()) {
-                                ThreadPoolSchedulerThread thread = getAvailableThread();
+                                final ThreadPoolSchedulerThread thread = this.getAvailableThread();
                                 if (thread == null)
                                     continue;
-                                tasks.poll();
-                                taskThreadMap.put(task.getTask(), thread);
+                                ThreadPoolScheduler.this.tasks.poll();
+                                ThreadPoolScheduler.this.taskThreadMap.put(task.getTask(), thread);
                                 thread.startTask(task.getTask());
                             }
                         }
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler",e);
                 }
             }

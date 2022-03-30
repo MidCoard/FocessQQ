@@ -28,34 +28,34 @@ public class SimpleFocessWriter extends FocessWriter {
     static {
         CLASS_WRITER_MAP.put(ArrayList.class, (Writer<ArrayList>) (list, writer) -> {
             writer.writeInt(list.size());
-            for (Object o : list)
+            for (final Object o : list)
                 writer.writeObject(o);
         });
         CLASS_WRITER_MAP.put(LinkedList.class, (Writer<LinkedList>) (linkedList, writer) -> {
             writer.writeInt(linkedList.size());
-            for (Object o : linkedList)
+            for (final Object o : linkedList)
                 writer.writeObject(o);
         });
         CLASS_WRITER_MAP.put(HashMap.class, (Writer<HashMap>) (hashMap, writer) -> {
             writer.writeInt(hashMap.size());
-            for (Object o : hashMap.keySet()) {
+            for (final Object o : hashMap.keySet()) {
                 writer.writeObject(o);
                 writer.writeObject(hashMap.get(o));
             }
         });
         CLASS_WRITER_MAP.put(TreeSet.class, (Writer<TreeSet>) (set, writer) -> {
             writer.writeInt(set.size());
-            for (Object o : set)
+            for (final Object o : set)
                 writer.writeObject(o);
         });
         CLASS_WRITER_MAP.put(HashSet.class, (Writer<HashSet>) (set, writer) -> {
             writer.writeInt(set.size());
-            for (Object o : set)
+            for (final Object o : set)
                 writer.writeObject(o);
         });
         CLASS_WRITER_MAP.put(TreeMap.class, (Writer<TreeMap>) (map, writer) -> {
             writer.writeInt(map.size());
-            for (Object o : map.keySet()) {
+            for (final Object o : map.keySet()) {
                 writer.writeObject(o);
                 writer.writeObject(map.get(o));
             }
@@ -63,157 +63,157 @@ public class SimpleFocessWriter extends FocessWriter {
         CLASS_WRITER_MAP.put(Class.class, (Writer<Class>) (clazz, writer) -> writer.writeString(clazz.getName()));
         CLASS_WRITER_MAP.put(ConcurrentHashMap.KeySetView.class,(Writer<ConcurrentHashMap.KeySetView>) (set, writer)->{
             writer.writeInt(set.size());
-            for(Object o:set)
+            for(final Object o:set)
                 writer.writeObject(o);
         });
     }
 
     private void writeInt(int v) {
         for (int i = 0; i < 4; i++) {
-            data.add((byte) (v & 0xFF));
+            this.data.add((byte) (v & 0xFF));
             v >>>= 8;
         }
     }
 
     private void writeLong(long v) {
         for (int i = 0; i < 8; i++) {
-            data.add((byte) (v & 0xFFL));
+            this.data.add((byte) (v & 0xFFL));
             v >>>= 8;
         }
     }
 
-    private void writeString(String v) {
-        byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
-        writeInt(bytes.length);
-        data.addAll(Bytes.asList(bytes));
+    private void writeString(final String v) {
+        final byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
+        this.writeInt(bytes.length);
+        this.data.addAll(Bytes.asList(bytes));
     }
 
-    private void writeFloat(float v) {
-        writeInt(Float.floatToIntBits(v));
+    private void writeFloat(final float v) {
+        this.writeInt(Float.floatToIntBits(v));
     }
 
-    private void writeDouble(double v) {
-        writeLong(Double.doubleToLongBits(v));
+    private void writeDouble(final double v) {
+        this.writeLong(Double.doubleToLongBits(v));
     }
 
     private void writeShort(short v) {
         for (int i = 0; i < 2; i++) {
-            data.add((byte) (v & 0xFF));
+            this.data.add((byte) (v & 0xFF));
             v >>>= 8;
         }
     }
 
-    private void writeBoolean(boolean v) {
-        data.add((byte) (v ? 1 : 0));
+    private void writeBoolean(final boolean v) {
+        this.data.add((byte) (v ? 1 : 0));
     }
 
-    private void writeChar(char v) {
-        writeShort((short) v);
+    private void writeChar(final char v) {
+        this.writeShort((short) v);
     }
 
-    private void writeClass(Class<?> cls,boolean isSerializable) {
+    private void writeClass(final Class<?> cls, final boolean isSerializable) {
         if (cls.equals(Byte.class))
-            writeByte(C_BYTE);
+            this.writeByte(C_BYTE);
         else if (cls.equals(Short.class))
-            writeByte(C_SHORT);
+            this.writeByte(C_SHORT);
         else if (cls.equals(Integer.class))
-            writeByte(C_INT);
+            this.writeByte(C_INT);
         else if (cls.equals(Long.class))
-            writeByte(C_LONG);
+            this.writeByte(C_LONG);
         else if (cls.equals(Float.class))
-            writeByte(C_FLOAT);
+            this.writeByte(C_FLOAT);
         else if (cls.equals(Double.class))
-            writeByte(C_DOUBLE);
+            this.writeByte(C_DOUBLE);
         else if (cls.equals(Boolean.class))
-            writeByte(C_BOOLEAN);
+            this.writeByte(C_BOOLEAN);
         else if (cls.equals(Character.class))
-            writeByte(C_CHAR);
+            this.writeByte(C_CHAR);
         else if (cls.equals(String.class))
-            writeByte(C_STRING);
+            this.writeByte(C_STRING);
         else if (cls.isArray())
-            writeByte(C_ARRAY);
+            this.writeByte(C_ARRAY);
         else if (FocessSerializable.class.isAssignableFrom(cls)) {
             if (isSerializable)
-                writeByte(C_SERIALIZABLE);
-            else writeByte(C_OBJECT);
-            writeString(cls.getName());
+                this.writeByte(C_SERIALIZABLE);
+            else this.writeByte(C_OBJECT);
+            this.writeString(cls.getName());
         } else if (CLASS_WRITER_MAP.containsKey(cls)) {
-            writeByte(C_RESERVED);
-            writeString(cls.getName());
+            this.writeByte(C_RESERVED);
+            this.writeString(cls.getName());
         }
         else throw new NotFocessSerializableException(cls.getName());
     }
 
-    private <T> void writeObject(Object o) {
+    private <T> void writeObject(final Object o) {
         if (o == null) {
-            writeByte(C_NULL);
+            this.writeByte(C_NULL);
             return;
         }
-        boolean isSerializable = o instanceof FocessSerializable;
-        Map<String,Object> data = isSerializable ? ((FocessSerializable) o).serialize() : null;
-        writeClass(o.getClass(),data != null);
+        final boolean isSerializable = o instanceof FocessSerializable;
+        final Map<String,Object> data = isSerializable ? ((FocessSerializable) o).serialize() : null;
+        this.writeClass(o.getClass(),data != null);
         if (o instanceof Byte)
-            writeByte((Byte) o);
+            this.writeByte((Byte) o);
         else if (o instanceof Short)
-            writeShort((Short) o);
+            this.writeShort((Short) o);
         else if (o instanceof Integer)
-            writeInt((Integer) o);
+            this.writeInt((Integer) o);
         else if (o instanceof Long)
-            writeLong((Long) o);
+            this.writeLong((Long) o);
         else if (o instanceof Float)
-            writeFloat((Float) o);
+            this.writeFloat((Float) o);
         else if (o instanceof Double)
-            writeDouble((Double) o);
+            this.writeDouble((Double) o);
         else if (o instanceof Boolean)
-            writeBoolean((Boolean) o);
+            this.writeBoolean((Boolean) o);
         else if (o instanceof String)
-            writeString((String) o);
+            this.writeString((String) o);
         else if (o instanceof Character)
-            writeChar((Character) o);
+            this.writeChar((Character) o);
         else if (o instanceof FocessSerializable){
             if (data != null)
-                writeObject(data);
+                this.writeObject(data);
             else {
-                List<Field> fields = Stream.of(o.getClass().getDeclaredFields()).filter(f -> (f.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0).collect(Collectors.toList());
-                writeInt(fields.size());
+                final List<Field> fields = Stream.of(o.getClass().getDeclaredFields()).filter(f -> (f.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0).collect(Collectors.toList());
+                this.writeInt(fields.size());
                 fields.forEach(f ->{
                     f.setAccessible(true);
                     try {
-                        writeField(f.getName(), f.get(o));
-                    } catch (IllegalAccessException e) {
+                        this.writeField(f.getName(), f.get(o));
+                    } catch (final IllegalAccessException e) {
                         FocessQQ.getLogger().thrLang("exception-serialize-field", e,f.getName(),o.getClass().getName());
                     }
                 });
             }
         } else if (o.getClass().isArray()) {
-            writeString(o.getClass().getComponentType().getName());
-            int length;
-            writeInt(length = Array.getLength(o));
+            this.writeString(o.getClass().getComponentType().getName());
+            final int length;
+            this.writeInt(length = Array.getLength(o));
             for (int i = 0; i < length; i++)
-                writeObject(Array.get(o, i));
+                this.writeObject(Array.get(o, i));
         } else if (CLASS_WRITER_MAP.containsKey(o.getClass())) {
-            T t = (T) o;
-            Writer<T> writer = (Writer<T>) CLASS_WRITER_MAP.get(o.getClass());
+            final T t = (T) o;
+            final Writer<T> writer = (Writer<T>) CLASS_WRITER_MAP.get(o.getClass());
             writer.write(t,this);
         }
         else
             throw new NotFocessSerializableException(o.getClass().getName());
     }
 
-    private void writeField(String name, Object o) {
+    private void writeField(final String name, final Object o) {
         this.writeByte(C_FIELD);
         this.writeString(name);
         this.writeObject(o);
     }
 
-    public void write(Object o) {
-        writeByte(C_START);
-        writeObject(o);
-        writeByte(C_END);
+    public void write(final Object o) {
+        this.writeByte(C_START);
+        this.writeObject(o);
+        this.writeByte(C_END);
     }
 
-    private void writeByte(Byte o) {
-        data.add(o);
+    private void writeByte(final Byte o) {
+        this.data.add(o);
     }
 
     public byte[] toByteArray() {

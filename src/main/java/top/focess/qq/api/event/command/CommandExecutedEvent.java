@@ -23,7 +23,8 @@ public class CommandExecutedEvent extends Event {
     /**
      * The args of this executor
      */
-    private final @NotNull String[] args;
+    @NotNull
+    private final String[] args;
 
     /**
      * The input and output handler
@@ -48,7 +49,7 @@ public class CommandExecutedEvent extends Event {
      * @param sender the executor
      * @param result the result
      */
-    public CommandExecutedEvent(Command.Executor executor, @NotNull String[] args, IOHandler ioHandler, CommandSender sender, CommandResult result) {
+    public CommandExecutedEvent(final Command.Executor executor, @NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
         this.executor = executor;
         this.args = args;
         this.ioHandler = ioHandler;
@@ -57,22 +58,23 @@ public class CommandExecutedEvent extends Event {
     }
 
     public CommandResult getResult() {
-        return result;
+        return this.result;
     }
 
     public CommandSender getSender() {
-        return sender;
+        return this.sender;
     }
 
     public Command.Executor getExecutor() {
-        return executor;
+        return this.executor;
     }
 
-    public @NotNull String[] getArgs() {
-        return args;
+    @NotNull
+    public String[] getArgs() {
+        return this.args;
     }
 
     public IOHandler getIoHandler() {
-        return ioHandler;
+        return this.ioHandler;
     }
 }

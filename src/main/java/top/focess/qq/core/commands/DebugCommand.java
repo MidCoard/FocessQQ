@@ -22,7 +22,7 @@ public class DebugCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor((sender, dataCollection, ioHandler) -> {
-            for (Plugin plugin : PluginClassLoader.getPlugins()) {
+            for (final Plugin plugin : PluginClassLoader.getPlugins()) {
                 if (plugin != FocessQQ.getMainPlugin())
                     CommandLine.exec("unload " + plugin.getName());
             }
@@ -32,7 +32,7 @@ public class DebugCommand extends Command {
 
     @Override
     @NotNull
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: debug");
     }
 }

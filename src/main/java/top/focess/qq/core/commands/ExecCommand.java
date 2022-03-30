@@ -15,8 +15,8 @@ public class ExecCommand extends Command {
     @Override
     public void init() {
         this.addExecutor((sender,dataCollection,ioHandler)->{
-            String command = dataCollection.get();
-            List<String> args = CommandLine.splitCommand(command);
+            final String command = dataCollection.get();
+            final List<String> args = CommandLine.splitCommand(command);
             if (args.size() == 0) {
                 ioHandler.outputLang("exec-command-empty-command");
                 return CommandResult.REFUSE;
@@ -32,7 +32,7 @@ public class ExecCommand extends Command {
 
     @NotNull
     @Override
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: exec <command>");
     }
 }

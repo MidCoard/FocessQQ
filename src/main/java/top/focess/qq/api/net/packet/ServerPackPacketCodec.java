@@ -9,15 +9,15 @@ import top.focess.qq.api.net.PacketPreCodec;
 public class ServerPackPacketCodec extends PacketCodec<ServerPackPacket>{
     @Nullable
     @Override
-    public ServerPackPacket readPacket(PacketPreCodec packetPreCodec) {
-        Packet packet = packetPreCodec.readPacket();
+    public ServerPackPacket readPacket(final PacketPreCodec packetPreCodec) {
+        final Packet packet = packetPreCodec.readPacket();
         if (packet == null)
             return null;
         return new ServerPackPacket(packet);
     }
 
     @Override
-    public void writePacket(ServerPackPacket packet, PacketPreCodec packetPreCodec) {
+    public void writePacket(final ServerPackPacket packet, final PacketPreCodec packetPreCodec) {
         packetPreCodec.writePacket(packet.getPacket());
     }
 }

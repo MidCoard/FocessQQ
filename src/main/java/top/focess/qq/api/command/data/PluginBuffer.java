@@ -10,7 +10,7 @@ public class PluginBuffer extends DataBuffer<Plugin> {
 
     private final StringBuffer stringBuffer;
 
-    private PluginBuffer(int size) {
+    private PluginBuffer(final int size) {
         this.stringBuffer = StringBuffer.allocate(size);
     }
 
@@ -20,29 +20,29 @@ public class PluginBuffer extends DataBuffer<Plugin> {
      * @param size the target buffer size
      * @return a PluginBuffer with fixed size
      */
-    public static PluginBuffer allocate(int size) {
+    public static PluginBuffer allocate(final int size) {
         return new PluginBuffer(size);
     }
 
     @Override
     public void flip() {
-        stringBuffer.flip();
+        this.stringBuffer.flip();
     }
 
     @Override
-    public void put(Plugin plugin) {
-        stringBuffer.put(plugin.getName());
+    public void put(final Plugin plugin) {
+        this.stringBuffer.put(plugin.getName());
     }
 
     @Nullable
     @Override
     public Plugin get() {
-        return Plugin.getPlugin(stringBuffer.get());
+        return Plugin.getPlugin(this.stringBuffer.get());
     }
 
     @Nullable
     @Override
-    public Plugin get(int index) {
-        return Plugin.getPlugin(stringBuffer.get(index));
+    public Plugin get(final int index) {
+        return Plugin.getPlugin(this.stringBuffer.get(index));
     }
 }

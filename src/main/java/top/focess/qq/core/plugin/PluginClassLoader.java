@@ -119,7 +119,7 @@ public class PluginClassLoader extends URLClassLoader {
             COMMAND_INITIALIZE_FIELD.setAccessible(true);
             PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
             PLUGIN_INIT_METHOD.setAccessible(true);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-init-classloader", e);
         }
 
@@ -127,7 +127,7 @@ public class PluginClassLoader extends URLClassLoader {
             if (name.endsWith(".class"))
                 try {
                     pluginClassLoader.loadedClasses.add(pluginClassLoader.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
-                } catch (ClassNotFoundException e) {
+                } catch (final ClassNotFoundException e) {
                     FocessQQ.getLogger().thrLang("exception-load-class",e);
                 }
         });
@@ -138,18 +138,18 @@ public class PluginClassLoader extends URLClassLoader {
         });
 
         HANDLERS.put(CommandType.class, (c, annotation, classLoader) -> {
-            CommandType commandType = (CommandType) annotation;
+            final CommandType commandType = (CommandType) annotation;
             if (Command.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
-                    Plugin plugin = classLoader.plugin;
-                    Command command = (Command) c.newInstance();
+                    final Plugin plugin = classLoader.plugin;
+                    final Command command = (Command) c.newInstance();
                     if (!commandType.name().isEmpty()){
                         COMMAND_NAME_FIELD.set(command,commandType.name());
                         COMMAND_ALIASES_FIELD.set(command,Lists.newArrayList(commandType.aliases()));
                         if (!COMMAND_INITIALIZE_FIELD.getBoolean(command)) {
                             try {
                                 command.init();
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 throw new CommandLoadException((Class<? extends Command>) c, e);
                             }
                             COMMAND_INITIALIZE_FIELD.set(command,true);
@@ -157,7 +157,7 @@ public class PluginClassLoader extends URLClassLoader {
                     }
                     plugin.registerCommand(command);
                     return true;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     if (e instanceof CommandDuplicateException)
                         throw (CommandDuplicateException)e;
                     else if (e instanceof CommandLoadException)
@@ -170,45 +170,45 @@ public class PluginClassLoader extends URLClassLoader {
         HANDLERS.put(ListenerType.class, (c, annotation, classLoader) -> {
             if (Listener.class.isAssignableFrom(c) && !Modifier.isInterface(c.getModifiers()) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
-                    Plugin plugin = classLoader.plugin;
-                    Listener listener = (Listener) c.newInstance();
+                    final Plugin plugin = classLoader.plugin;
+                    final Listener listener = (Listener) c.newInstance();
                     plugin.registerListener(listener);
                     return true;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new IllegalListenerClassException((Class<? extends Listener>) c, e);
                 }
             } else throw new IllegalListenerClassException(c);
         });
 
         FIELD_ANNOTATION_HANDLERS.put(DataConverterType.class,(field, annotation, classLoader) -> {
-            DataConverterType dataConverterType = (DataConverterType) annotation;
+            final DataConverterType dataConverterType = (DataConverterType) annotation;
             if (DataConverter.class.isAssignableFrom(field.getType())) {
                 try {
-                    Plugin plugin = classLoader.plugin;
-                    DataConverter dataConverter = (DataConverter) field.get(null);
-                    Constructor<DataBuffer<?>> constructor = (Constructor<DataBuffer<?>>) dataConverterType.buffer().getDeclaredConstructor(int.class);
+                    final Plugin plugin = classLoader.plugin;
+                    final DataConverter dataConverter = (DataConverter) field.get(null);
+                    final Constructor<DataBuffer<?>> constructor = (Constructor<DataBuffer<?>>) dataConverterType.buffer().getDeclaredConstructor(int.class);
                     constructor.setAccessible(true);
                     plugin.registerBuffer(dataConverter, size -> {
                         try {
                             return constructor.newInstance(size);
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             throw new RuntimeException(e);
                         }
                     });
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new IllegalDataConverterClassException((Class<? extends DataConverter>) field.getType(), e);
                 }
             } else throw new IllegalDataConverterClassException(field.getType());
         });
 
         FIELD_ANNOTATION_HANDLERS.put(SpecialArgumentType.class,(field, annotation, classLoader) -> {
-            SpecialArgumentType specialArgumentType = (SpecialArgumentType) annotation;
+            final SpecialArgumentType specialArgumentType = (SpecialArgumentType) annotation;
             if (SpecialArgumentComplexHandler.class.isAssignableFrom(field.getType())) {
                 try {
-                    String name = specialArgumentType.name();
-                    Plugin plugin = classLoader.plugin;
+                    final String name = specialArgumentType.name();
+                    final Plugin plugin = classLoader.plugin;
                     plugin.registerSpecialArgumentHandler(name, (SpecialArgumentComplexHandler) field.get(null));
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new IllegalSpecialArgumentComplexHandlerClassException((Class<? extends SpecialArgumentComplexHandler>) field.getType(), e);
                 }
             } else throw new IllegalSpecialArgumentComplexHandlerClassException(field.getType());
@@ -227,13 +227,13 @@ public class PluginClassLoader extends URLClassLoader {
      * @throws PluginLoadException      if there is an error while enabling the plugin
      * @throws PluginUnloadException    if the plugin should be unloaded
      */
-    public static void enablePlugin(Plugin plugin) {
+    public static void enablePlugin(final Plugin plugin) {
         if (plugin.getClass() != FocessQQ.MainPlugin.class) {
-            Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
-            Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
+            final Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
+            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
             try {
                 task.join();
-            } catch (ExecutionException | InterruptedException | CancellationException e) {
+            } catch (final ExecutionException | InterruptedException | CancellationException e) {
                 if (e.getCause() instanceof PluginLoadException)
                     throw (PluginLoadException) e.getCause();
                 else if (e.getCause() instanceof PluginDuplicateException)
@@ -246,7 +246,7 @@ public class PluginClassLoader extends URLClassLoader {
         } else enablePlugin0(plugin);
     }
 
-    private static void enablePlugin0(Plugin plugin) {
+    private static void enablePlugin0(final Plugin plugin) {
         try {
             FocessQQ.getLogger().debugLang("start-enable-plugin",plugin.getName());
             // no try-catch because it should be noticed by the Plugin User
@@ -254,7 +254,7 @@ public class PluginClassLoader extends URLClassLoader {
             CLASS_PLUGIN_MAP.put(plugin.getClass(), plugin);
             NAME_PLUGIN_MAP.put(plugin.getName(), plugin);
             FocessQQ.getLogger().debugLang("end-enable-plugin",plugin.getName());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             if (e instanceof PluginDuplicateException)
                 throw (PluginDuplicateException) e;
             throw new PluginLoadException(plugin.getClass(), e);
@@ -268,13 +268,13 @@ public class PluginClassLoader extends URLClassLoader {
      * @return the plugin jar file, or null if the plugin is MainPlugin
      */
     @Nullable
-    public static File disablePlugin(Plugin plugin) {
-        Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
-        Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
+    public static File disablePlugin(final Plugin plugin) {
+        final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
+        final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
         File file = null;
         try {
           file = callback.waitCall();
-        } catch (InterruptedException | ExecutionException | CancellationException e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
             FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
         }
         section.stop();
@@ -284,12 +284,12 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     @Nullable
-    public static File disablePlugin0(Plugin plugin) {
+    public static File disablePlugin0(final Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-disable-plugin",plugin.getName());
         // try-catch because it should take over the process
         try {
             plugin.onDisable();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-plugin-disable", e);
         }
         if (plugin != FocessQQ.getMainPlugin()) {
@@ -317,21 +317,21 @@ public class PluginClassLoader extends URLClassLoader {
         File ret = null;
         if (plugin.getClass().getClassLoader() instanceof PluginClassLoader)
             try {
-                PluginClassLoader loader = (PluginClassLoader) plugin.getClass().getClassLoader();
+                final PluginClassLoader loader = (PluginClassLoader) plugin.getClass().getClassLoader();
                 PluginCoreClassLoader.LOADERS.remove(loader);
                 if (loader != null) {
                     ret = loader.getFile();
                     loader.close();
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 FocessQQ.getLogger().thrLang("exception-remove-plugin-loader", e);
             }
         FocessQQ.getLogger().debugLang("remove-plugin-loader");
         FocessQQ.getLogger().debugLang("end-disable-plugin",plugin.getName());
-        PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
+        final PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
         try {
             EventManager.submit(pluginUnloadEvent);
-        } catch (EventSubmitException e) {
+        } catch (final EventSubmitException e) {
             FocessQQ.getLogger().thrLang("exception-submit-plugin-unload-event",e);
         }
         return ret;
@@ -346,7 +346,7 @@ public class PluginClassLoader extends URLClassLoader {
      * @see Plugin#getPlugin(Class)
      */
     @Nullable
-    public static <T extends Plugin> T getPlugin(Class<T> plugin) {
+    public static <T extends Plugin> T getPlugin(final Class<T> plugin) {
         return (T) CLASS_PLUGIN_MAP.get(plugin);
     }
 
@@ -368,29 +368,29 @@ public class PluginClassLoader extends URLClassLoader {
      * @see Plugin#getPlugin(String)
      */
     @Nullable
-    public static Plugin getPlugin(String name) {
+    public static Plugin getPlugin(final String name) {
         return NAME_PLUGIN_MAP.get(name);
     }
 
     public File getFile() {
-        return file;
+        return this.file;
     }
 
     private final File file;
 
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 
     private Plugin plugin;
 
     public Set<Class<?>> getLoadedClasses() {
-        return loadedClasses;
+        return this.loadedClasses;
     }
 
     private final Set<Class<?>> loadedClasses = Sets.newHashSet();
 
-    public PluginClassLoader(@NotNull File file) throws IOException {
+    public PluginClassLoader(@NotNull final File file) throws IOException {
         super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
         this.file = file;
         this.jarFile = new JarFile(file);
@@ -407,23 +407,23 @@ public class PluginClassLoader extends URLClassLoader {
     public boolean load() {
         //make sure only one plugin is loaded at the same time
         synchronized (LOCK) {
-            FocessQQ.getLogger().debugLang("start-load-plugin", file.getName());
+            FocessQQ.getLogger().debugLang("start-load-plugin", this.file.getName());
             try {
-                Enumeration<JarEntry> entries = jarFile.entries();
+                final Enumeration<JarEntry> entries = this.jarFile.entries();
                 while (entries.hasMoreElements()) {
-                    JarEntry jarEntry = entries.nextElement();
-                    String name = jarEntry.getName();
-                    for (ResourceHandler resourceHandler : RESOURCE_HANDLERS)
-                        resourceHandler.handle(name,jarFile.getInputStream(jarEntry),this);
+                    final JarEntry jarEntry = entries.nextElement();
+                    final String name = jarEntry.getName();
+                    for (final ResourceHandler resourceHandler : RESOURCE_HANDLERS)
+                        resourceHandler.handle(name, this.jarFile.getInputStream(jarEntry),this);
                 }
-                FocessQQ.getLogger().debugLang("load-plugin-classes", loadedClasses.size());
+                FocessQQ.getLogger().debugLang("load-plugin-classes", this.loadedClasses.size());
                 if (this.pluginDescription == null) {
                     FocessQQ.getLogger().debugLang("plugin-description-not-found");
                     PluginCoreClassLoader.LOADERS.remove(this);
                     return false;
                 }
-                Class<?> pluginClass = this.findClass(this.pluginDescription.getMain(),false);
-                Annotation annotation = pluginClass.getAnnotation(PluginType.class);
+                final Class<?> pluginClass = this.findClass(this.pluginDescription.getMain(),false);
+                final Annotation annotation = pluginClass.getAnnotation(PluginType.class);
                 if (annotation != null) {
                     if (!PLUGIN_TYPE_HANDLER.handle(pluginClass, annotation, this)) {
                         PluginCoreClassLoader.LOADERS.remove(this);
@@ -433,16 +433,16 @@ public class PluginClassLoader extends URLClassLoader {
                     PluginCoreClassLoader.LOADERS.remove(this);
                     return false;
                 }
-                enablePlugin(plugin);
+                enablePlugin(this.plugin);
                 FocessQQ.getLogger().debugLang("load-plugin-class");
 
-                for (Class<?> c : loadedClasses)
-                    analyseClass(c);
+                for (final Class<?> c : this.loadedClasses)
+                    this.analyseClass(c);
                 FocessQQ.getLogger().debugLang("load-class");
 
                 FocessQQ.getLogger().debugLang("load-depend-plugin");
-                for (File file : AFTER_PLUGINS_MAP.getOrDefault(plugin.getName(), Sets.newHashSet())) {
-                    PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
+                for (final File file : AFTER_PLUGINS_MAP.getOrDefault(this.plugin.getName(), Sets.newHashSet())) {
+                    final PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
                     if (pluginClassLoader.load())
                         FocessQQ.getLogger().infoLang("load-depend-plugin-succeed", pluginClassLoader.getPlugin().getName());
                     else {
@@ -450,52 +450,52 @@ public class PluginClassLoader extends URLClassLoader {
                         pluginClassLoader.close();
                     }
                 }
-                AFTER_PLUGINS_MAP.remove(plugin.getName());
+                AFTER_PLUGINS_MAP.remove(this.plugin.getName());
 
-                PluginLoadEvent pluginLoadEvent = new PluginLoadEvent(plugin);
+                final PluginLoadEvent pluginLoadEvent = new PluginLoadEvent(this.plugin);
                 try {
                     EventManager.submit(pluginLoadEvent);
-                } catch (EventSubmitException e) {
+                } catch (final EventSubmitException e) {
                     FocessQQ.getLogger().thrLang("exception-submit-plugin-load-event",e);
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 if (e instanceof IllegalStateException)
                     FocessQQ.getLogger().debugLang("plugin-depend-on-other-plugin");
-                if (plugin != null) {
+                if (this.plugin != null) {
                     if (!(e instanceof PluginUnloadException))
                         FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                     else
-                        FocessQQ.getLogger().debugLang("plugin-unload-self",plugin.getName());
-                    ListenerHandler.unregister(plugin);
-                    DataCollection.unregister(plugin);
-                    Command.unregister(plugin);
-                    Schedulers.close(plugin);
-                    SimpleBotManager.remove(plugin);
-                    CommandLine.unregister(plugin);
+                        FocessQQ.getLogger().debugLang("plugin-unload-self", this.plugin.getName());
+                    ListenerHandler.unregister(this.plugin);
+                    DataCollection.unregister(this.plugin);
+                    Command.unregister(this.plugin);
+                    Schedulers.close(this.plugin);
+                    SimpleBotManager.remove(this.plugin);
+                    CommandLine.unregister(this.plugin);
                     if (FocessQQ.getSocket() != null)
-                        FocessQQ.getSocket().unregister(plugin);
+                        FocessQQ.getSocket().unregister(this.plugin);
                     if (FocessQQ.getUdpSocket() != null)
-                        FocessQQ.getUdpSocket().unregister(plugin);
+                        FocessQQ.getUdpSocket().unregister(this.plugin);
                 } else if (e instanceof PluginLoadException)
                     FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                 PluginCoreClassLoader.LOADERS.remove(this);
                 return false;
             }
-            FocessQQ.getLogger().debugLang("end-load-plugin", file.getName());
+            FocessQQ.getLogger().debugLang("end-load-plugin", this.file.getName());
             return true;
         }
     }
 
-    private void analyseClass(@NotNull Class<?> c) {
-        for (Class<? extends Annotation> annotation : HANDLERS.keySet()) {
-            Annotation a;
+    private void analyseClass(@NotNull final Class<?> c) {
+        for (final Class<? extends Annotation> annotation : HANDLERS.keySet()) {
+            final Annotation a;
             if ((a = c.getAnnotation(annotation)) != null)
                 HANDLERS.get(annotation).handle(c, a, this);
         }
-        for (Field field : c.getDeclaredFields())
+        for (final Field field : c.getDeclaredFields())
             if (Modifier.isStatic(field.getModifiers()))
-                for (Class<? extends Annotation> annotation : FIELD_ANNOTATION_HANDLERS.keySet()) {
-                    Annotation a;
+                for (final Class<? extends Annotation> annotation : FIELD_ANNOTATION_HANDLERS.keySet()) {
+                    final Annotation a;
                     if ((a = field.getAnnotation(annotation)) != null) {
                         field.setAccessible(true);
                         FIELD_ANNOTATION_HANDLERS.get(annotation).handle(field, a, this);
@@ -503,9 +503,9 @@ public class PluginClassLoader extends URLClassLoader {
                 }
     }
 
-    public Class<?> findClass(String name, boolean resolve) throws ClassNotFoundException {
+    public Class<?> findClass(final String name, final boolean resolve) throws ClassNotFoundException {
         Class<?> c = null;
-        for (Class<?> loadedClass : this.loadedClasses)
+        for (final Class<?> loadedClass : this.loadedClasses)
             if (loadedClass.getName().equals(name)) {
                 c = loadedClass;
                 break;
@@ -513,15 +513,15 @@ public class PluginClassLoader extends URLClassLoader {
         if (c == null)
             throw new ClassNotFoundException(name);
         if (resolve)
-            resolveClass(c);
+            this.resolveClass(c);
         return c;
     }
 
     @Override
-    public InputStream getResourceAsStream(String name) {
+    public InputStream getResourceAsStream(final String name) {
         try {
-            return jarFile.getInputStream(jarFile.getEntry(name));
-        } catch (Exception e) {
+            return this.jarFile.getInputStream(this.jarFile.getEntry(name));
+        } catch (final Exception e) {
             return null;
         }
     }

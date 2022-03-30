@@ -8,7 +8,7 @@ public class IllegalListenerClassException extends IllegalArgumentException {
      *
      * @param c the illegal listener class
      */
-    public IllegalListenerClassException(Class<?> c) {
+    public IllegalListenerClassException(final Class<?> c) {
         super("The class " + c.getName() + " is an illegal Listener class");
     }
 
@@ -17,7 +17,7 @@ public class IllegalListenerClassException extends IllegalArgumentException {
      * @param c the illegal Listener class
      * @param e the cause
      */
-    public IllegalListenerClassException(Class<? extends Listener> c, Exception e) {
+    public IllegalListenerClassException(final Class<? extends Listener> c, final Exception e) {
         super("The class " + c.getName() + " is an illegal Listener class", e);
     }
 }

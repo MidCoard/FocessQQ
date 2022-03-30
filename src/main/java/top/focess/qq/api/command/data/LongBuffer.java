@@ -7,7 +7,7 @@ public class LongBuffer extends DataBuffer<Long> {
 
     private final java.nio.LongBuffer buffer;
 
-    private LongBuffer(int size) {
+    private LongBuffer(final int size) {
         this.buffer = java.nio.LongBuffer.allocate(size);
     }
 
@@ -17,7 +17,7 @@ public class LongBuffer extends DataBuffer<Long> {
      * @param size the target buffer size
      * @return a LongBuffer with fixed size
      */
-    public static LongBuffer allocate(int size) {
+    public static LongBuffer allocate(final int size) {
         return new LongBuffer(size);
     }
 
@@ -27,7 +27,7 @@ public class LongBuffer extends DataBuffer<Long> {
     }
 
     @Override
-    public void put(Long l) {
+    public void put(final Long l) {
         this.buffer.put(l);
     }
 
@@ -37,7 +37,7 @@ public class LongBuffer extends DataBuffer<Long> {
     }
 
     @Override
-    public Long get(int index) {
+    public Long get(final int index) {
         return this.buffer.get(index);
     }
 }

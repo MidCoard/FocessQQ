@@ -15,11 +15,11 @@ public class ConsoleMessageEvent extends Event {
      */
     private final String message;
 
-    public ConsoleMessageEvent(String message) {
+    public ConsoleMessageEvent(final String message) {
         this.message = message;
     }
 
     public String getMessage() {
-        return message;
+        return this.message;
     }
 }

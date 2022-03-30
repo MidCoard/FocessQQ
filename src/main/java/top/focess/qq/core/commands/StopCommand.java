@@ -28,7 +28,7 @@ public class StopCommand extends Command {
 
     @Override
     @NotNull
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: stop");
     }
 

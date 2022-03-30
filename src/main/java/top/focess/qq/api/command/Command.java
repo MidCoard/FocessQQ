@@ -60,7 +60,7 @@ public abstract class Command {
     /**
      * Indicate {@link Command#init()} is called
      */
-    private boolean initialize = false;
+    private boolean initialize;
 
     /**
      * Instance a <code>Command</code> Class with special name and aliases.
@@ -69,17 +69,17 @@ public abstract class Command {
      * @param aliases the aliases of the command
      * @throws CommandLoadException if there is any exception thrown in the initializing process
      */
-    public Command(final @NotNull String name, final @NotNull String... aliases) {
+    public Command(@NotNull final String name, @NotNull final String... aliases) {
         this.name = name;
         this.aliases = Lists.newArrayList(aliases);
         this.permission = CommandPermission.MEMBER;
         this.executorPermission = i -> true;
         try {
             this.init();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new CommandLoadException(this.getClass(),e);
         }
-        initialize = true;
+        this.initialize = true;
     }
 
     /**
@@ -91,7 +91,7 @@ public abstract class Command {
         this.executorPermission = i -> true;
     }
 
-    public void setExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
+    public void setExecutorPermission(@NotNull final Predicate<CommandSender> executorPermission) {
         this.executorPermission = executorPermission;
     }
 
@@ -100,8 +100,8 @@ public abstract class Command {
      *
      * @param plugin the plugin that the commands that need to be unregistered belongs to
      */
-    public static void unregister(Plugin plugin) {
-        for (Command command : COMMANDS_MAP.values())
+    public static void unregister(final Plugin plugin) {
+        for (final Command command : COMMANDS_MAP.values())
             if (command.getPlugin().equals(plugin))
                 command.unregister();
     }
@@ -113,7 +113,7 @@ public abstract class Command {
      */
     public static boolean unregisterAll() {
         boolean ret = false;
-        for (Command command : COMMANDS_MAP.values()) {
+        for (final Command command : COMMANDS_MAP.values()) {
             if (command.getPlugin() != FocessQQ.getMainPlugin())
                 ret = true;
             command.unregister();
@@ -138,14 +138,14 @@ public abstract class Command {
      * @param command the command that need to be registered
      * @throws CommandDuplicateException if the command name already exists in the registered commands
      */
-    public static void register(@NotNull Plugin plugin, @NotNull final Command command) {
+    public static void register(@NotNull final Plugin plugin, @NotNull final Command command) {
         if (command.name == null)
             throw new IllegalStateException("CommandType does not contain name or the constructor does not super name");
         if (COMMANDS_MAP.containsKey(command.getName()))
             throw new CommandDuplicateException(command.getName());
         command.registered = true;
         command.plugin = plugin;
-        Command.COMMANDS_MAP.put(command.getName(),command);
+        COMMANDS_MAP.put(command.getName(),command);
     }
 
     public boolean isRegistered() {
@@ -154,7 +154,7 @@ public abstract class Command {
 
     @NotNull
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 
     /**
@@ -168,16 +168,16 @@ public abstract class Command {
 
     @NotNull
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @NotNull
     public List<String> getAliases() {
-        return aliases;
+        return this.aliases;
     }
 
     public Predicate<CommandSender> getExecutorPermission() {
-        return executorPermission;
+        return this.executorPermission;
     }
 
     /**
@@ -199,8 +199,8 @@ public abstract class Command {
      * @return the Executor to define other proprieties
      */
     @NotNull
-    public final Executor addExecutor(final @NotNull CommandExecutor executor, final @NotNull CommandArgument<?>... commandArguments) {
-        Executor executor1 = new Executor(executor,this.executorPermission,this,commandArguments);
+    public final Executor addExecutor(@NotNull final CommandExecutor executor, @NotNull final CommandArgument<?>... commandArguments) {
+        final Executor executor1 = new Executor(executor,this.executorPermission,this,commandArguments);
         this.executors.add(executor1);
         return executor1;
     }
@@ -214,7 +214,7 @@ public abstract class Command {
      * @param ioHandler the receiver
      * @return the command result
      */
-    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args,@NotNull IOHandler ioHandler) {
+    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args,@NotNull final IOHandler ioHandler) {
         if (!this.isRegistered())
             return CommandResult.COMMAND_REFUSED;
         if (!sender.hasPermission(this.getPermission()))
@@ -223,22 +223,22 @@ public abstract class Command {
         CommandResult result = CommandResult.NONE;
         for (final Executor executor : this.executors)
             if (sender.hasPermission(executor.permission)) {
-                DataCollection dataCollection;
+                final DataCollection dataCollection;
                 if ((dataCollection = executor.check(args)) != null) {
                     try {
                         result = executor.execute(sender, dataCollection, ioHandler);
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         result = CommandResult.REFUSE;
                         FocessQQ.getLogger().thrLang("exception-command-execute", e);
                         ioHandler.outputLang("command-execute-exception",e.getMessage());
                     }
-                    for (CommandResult r : executor.results.keySet())
+                    for (final CommandResult r : executor.results.keySet())
                         if ((r.getValue() & result.getValue()) != 0)
                             executor.results.get(r).execute(result);
-                    CommandExecutedEvent event = new CommandExecutedEvent(executor, args, ioHandler, sender, result);
+                    final CommandExecutedEvent event = new CommandExecutedEvent(executor, args, ioHandler, sender, result);
                     try {
                         EventManager.submit(event);
-                    } catch (EventSubmitException e) {
+                    } catch (final EventSubmitException e) {
                         FocessQQ.getLogger().thrLang("exception-submit-command-executed-event", e);
                     }
                     flag = true;
@@ -246,7 +246,7 @@ public abstract class Command {
                 }
             }
         if (this.executorPermission.test(sender) && (!flag || result == CommandResult.ARGS)) {
-            infoUsage(sender, ioHandler);
+            this.infoUsage(sender, ioHandler);
             return CommandResult.ARGS;
         }
         return result;
@@ -273,8 +273,8 @@ public abstract class Command {
     @NotNull
     public abstract List<String> usage(CommandSender sender);
 
-    public final void infoUsage(CommandSender sender, IOHandler ioHandler) {
-        List<String> usage = this.usage(sender);
+    public final void infoUsage(final CommandSender sender, final IOHandler ioHandler) {
+        final List<String> usage = this.usage(sender);
         int pos = 0;
         final int targetPos = 7;
         StringBuilder stringBuilder = null;
@@ -291,7 +291,7 @@ public abstract class Command {
     }
 
     public boolean isInitialize() {
-        return initialize;
+        return this.initialize;
     }
 
     /**
@@ -299,7 +299,7 @@ public abstract class Command {
      *
      * @param permission the target permission the command need
      */
-    public void setPermission(CommandPermission permission) {
+    public void setPermission(final CommandPermission permission) {
         this.permission = permission;
     }
 
@@ -317,7 +317,7 @@ public abstract class Command {
         private final Command command;
         private final int nullableCommandArguments;
 
-        private Executor(CommandExecutor executor, Predicate<CommandSender> executorPermission, Command command, CommandArgument<?>[] commandArguments) {
+        private Executor(final CommandExecutor executor, final Predicate<CommandSender> executorPermission, final Command command, final CommandArgument<?>[] commandArguments) {
             this.executor = executor;
             this.executorPermission = executorPermission;
             this.command = command;
@@ -325,7 +325,7 @@ public abstract class Command {
             this.nullableCommandArguments = (int) Arrays.stream(commandArguments).filter(CommandArgument::isNullable).count();
         }
 
-        private CommandResult execute(final CommandSender sender, final DataCollection dataCollection, IOHandler ioHandler) {
+        private CommandResult execute(final CommandSender sender, final DataCollection dataCollection, final IOHandler ioHandler) {
             if (!this.executorPermission.test(sender))
                 return CommandResult.REFUSE;
             return this.executor.execute(sender, dataCollection, ioHandler);
@@ -340,7 +340,7 @@ public abstract class Command {
          * @return the Executor itself
          */
         @NotNull
-        public Executor setPermission(@NotNull CommandPermission permission) {
+        public Executor setPermission(@NotNull final CommandPermission permission) {
             this.permission = permission;
             return this;
         }
@@ -354,8 +354,8 @@ public abstract class Command {
          * @return the Executor itself
          */
         @NotNull
-        public Executor addCommandResultExecutor(@NotNull CommandResult result,@NotNull CommandResultExecutor executor) {
-            results.put(result, executor);
+        public Executor addCommandResultExecutor(@NotNull final CommandResult result, @NotNull final CommandResultExecutor executor) {
+            this.results.put(result, executor);
             return this;
         }
 
@@ -367,7 +367,7 @@ public abstract class Command {
          * @return the Executor self
          */
         @NotNull
-        public Executor setExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
+        public Executor setExecutorPermission(@NotNull final Predicate<CommandSender> executorPermission) {
             this.executorPermission = this.executorPermission.and(executorPermission);
             return this;
         }
@@ -391,7 +391,7 @@ public abstract class Command {
          * @return the Executor self
          */
         @NotNull
-        public Executor overrideExecutorPermission(@NotNull Predicate<CommandSender> executorPermission) {
+        public Executor overrideExecutorPermission(@NotNull final Predicate<CommandSender> executorPermission) {
             this.executorPermission = executorPermission;
             return this;
         }
@@ -402,37 +402,37 @@ public abstract class Command {
          * @return the command this Executor belongs to
          */
         public Command getCommand() {
-            return command;
+            return this.command;
         }
 
         @Nullable
-        private DataCollection check(String[] args) {
+        private DataCollection check(final String[] args) {
             if (args.length > this.commandArguments.length)
                 return null;
             if (args.length < this.commandArguments.length - this.nullableCommandArguments)
                 return null;
-            List<CommandArgument<?>> commandArgumentList = Lists.newArrayList();
-            boolean ret = dfsCheck(args,0,0,this.commandArguments.length - args.length,commandArgumentList);
+            final List<CommandArgument<?>> commandArgumentList = Lists.newArrayList();
+            final boolean ret = this.dfsCheck(args,0,0,this.commandArguments.length - args.length,commandArgumentList);
             if (!ret)
                 return null;
-            DataCollection dataCollection = new DataCollection(Arrays.stream(this.commandArguments).map(CommandArgument::getDataConverter).toArray(DataConverter[]::new));
+            final DataCollection dataCollection = new DataCollection(Arrays.stream(this.commandArguments).map(CommandArgument::getDataConverter).toArray(DataConverter[]::new));
             for (int i = 0; i < args.length; i++)
                 commandArgumentList.get(i).put(dataCollection, args[i]);
             dataCollection.flip();
             return dataCollection;
         }
 
-        private boolean dfsCheck(String[] args, int indexOfArgs, int index, int nullableCommandArguments, List<CommandArgument<?>> commandArgumentList) {
+        private boolean dfsCheck(final String[] args, final int indexOfArgs, final int index, final int nullableCommandArguments, final List<CommandArgument<?>> commandArgumentList) {
             if (indexOfArgs == args.length)
                 return true;
             if (this.commandArguments[index].isNullable() && nullableCommandArguments > 0) {
-                boolean ret = this.dfsCheck(args, indexOfArgs, index + 1, nullableCommandArguments - 1, commandArgumentList);
+                final boolean ret = this.dfsCheck(args, indexOfArgs, index + 1, nullableCommandArguments - 1, commandArgumentList);
                 if (ret)
                     return true;
             }
             if (this.commandArguments[index].accept(args[indexOfArgs])) {
                 commandArgumentList.add(this.commandArguments[index]);
-                boolean ret = this.dfsCheck(args,indexOfArgs + 1,index + 1,nullableCommandArguments,commandArgumentList);
+                final boolean ret = this.dfsCheck(args,indexOfArgs + 1,index + 1,nullableCommandArguments,commandArgumentList);
                 if (ret)
                     return true;
                 commandArgumentList.remove(commandArgumentList.size() - 1);

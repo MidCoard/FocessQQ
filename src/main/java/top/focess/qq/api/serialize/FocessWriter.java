@@ -9,17 +9,17 @@ public abstract class FocessWriter {
 
     public abstract void write(Object o);
 
-    public static FocessWriter newFocessWriter(OutputStream outputStream) {
+    public static FocessWriter newFocessWriter(final OutputStream outputStream) {
         return new SimpleFocessWriter(){
 
             @Override
-            public void write(Object o) {
+            public void write(final Object o) {
                 super.write(o);
                 try {
                     outputStream.write(this.toByteArray());
                     outputStream.flush();
                     outputStream.close();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     throw new IllegalStateException(e);
                 }
             }

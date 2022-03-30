@@ -20,12 +20,12 @@ public class ConsoleChatEvent extends Event {
      *
      * @param message the console message
      */
-    public ConsoleChatEvent(String message) {
+    public ConsoleChatEvent(final String message) {
         this.message = message;
     }
 
     @NotNull
     public String getMessage() {
-        return message;
+        return this.message;
     }
 }

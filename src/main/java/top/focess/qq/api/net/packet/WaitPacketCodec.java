@@ -8,14 +8,14 @@ import top.focess.qq.api.net.PacketPreCodec;
 public class WaitPacketCodec extends PacketCodec<WaitPacket>{
 
     @Override
-    public WaitPacket readPacket(PacketPreCodec packetPreCodec) {
-        int clientId = packetPreCodec.readInt();
-        String token = packetPreCodec.readString();
+    public WaitPacket readPacket(final PacketPreCodec packetPreCodec) {
+        final int clientId = packetPreCodec.readInt();
+        final String token = packetPreCodec.readString();
         return new WaitPacket(clientId,token);
     }
 
     @Override
-    public void writePacket(WaitPacket packet, PacketPreCodec packetPreCodec) {
+    public void writePacket(final WaitPacket packet, final PacketPreCodec packetPreCodec) {
         packetPreCodec.writeInt(packet.getClientId());
         packetPreCodec.writeString(packet.getToken());
     }

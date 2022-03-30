@@ -15,7 +15,7 @@ public class PluginDataConverter extends NullDataConverter<Plugin> {
 
     @Nullable
     @Override
-    public Plugin convert(String arg) {
+    public Plugin convert(final String arg) {
         return Plugin.getPlugin(arg);
     }
 

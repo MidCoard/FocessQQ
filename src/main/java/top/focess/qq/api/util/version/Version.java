@@ -52,7 +52,7 @@ public class Version {
      * @param revision the revision version number
      * @param build the build version
      */
-    public Version(int major,int minor,int revision,String build){
+    public Version(final int major, final int minor, final int revision, final String build){
         this.major = major;
         this.minor = minor;
         this.revision = revision;
@@ -67,7 +67,7 @@ public class Version {
      * @param minor the minor version number
      * @param revision the revision version number
      */
-    public Version(int major,int minor,int revision) {
+    public Version(final int major, final int minor, final int revision) {
         this.major = major;
         this.minor = minor;
         this.revision = revision;
@@ -80,7 +80,7 @@ public class Version {
      * @param major the major version number
      * @param minor the minor version number
      */
-    public Version(int major,int minor) {
+    public Version(final int major, final int minor) {
         this.major = major;
         this.minor = minor;
         this.length = 2;
@@ -91,14 +91,14 @@ public class Version {
      *
      * @param version the version to be parsed.
      */
-    public Version(String version) {
-        String[] temp = version.split("\\.");
+    public Version(final String version) {
+        final String[] temp = version.split("\\.");
         try {
             if (temp.length == 1)
                 this.build = temp[0];
             else if (temp.length == 2) {
                 this.major = Integer.parseInt(temp[0]);
-                String[] temp2 = temp[1].split("-");
+                final String[] temp2 = temp[1].split("-");
                 this.minor = Integer.parseInt(temp2[0]);
                 if (temp2.length == 2)
                     this.build = temp2[1];
@@ -106,7 +106,7 @@ public class Version {
             } else if (temp.length == 3) {
                 this.major = Integer.parseInt(temp[0]);
                 this.minor = Integer.parseInt(temp[1]);
-                String[] temp2 = temp[2].split("-");
+                final String[] temp2 = temp[2].split("-");
                 this.revision = Integer.parseInt(temp2[0]);
                 if (temp2.length == 2)
                     this.build = temp2[1];
@@ -117,38 +117,38 @@ public class Version {
                 this.revision = Integer.parseInt(temp[2]);
                 this.build = temp[3];
             } else throw new VersionFormatException(version);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new VersionFormatException(version);
         }
         this.length = temp.length;
     }
 
     public int getMajor() {
-        return major;
+        return this.major;
     }
 
     public int getMinor() {
-        return minor;
+        return this.minor;
     }
 
     public int getRevision() {
-        return revision;
+        return this.revision;
     }
 
     public String getBuild() {
-        return build;
+        return this.build;
     }
 
     @Override
     public String toString() {
-        if (length == 1)
-            return build;
-        else if (length == 2)
-            return major + "." + minor + (build == null ? "" : "-" + build);
-        else if (length == 3)
-            return major + "." + minor + "." + revision + (build == null ? "" : "-" + build);
-        else if (length == 4)
-            return major + "." + minor + "." + revision + "." + build;
+        if (this.length == 1)
+            return this.build;
+        else if (this.length == 2)
+            return this.major + "." + this.minor + (this.build == null ? "" : "-" + this.build);
+        else if (this.length == 3)
+            return this.major + "." + this.minor + "." + this.revision + (this.build == null ? "" : "-" + this.build);
+        else if (this.length == 4)
+            return this.major + "." + this.minor + "." + this.revision + "." + this.build;
         throw new VersionFormatException("");
     }
 }

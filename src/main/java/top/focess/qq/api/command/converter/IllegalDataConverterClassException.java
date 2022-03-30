@@ -12,11 +12,11 @@ public class IllegalDataConverterClassException extends IllegalArgumentException
      * @param c the illegal DataConverter class
      * @param e the cause
      */
-    public IllegalDataConverterClassException(Class<? extends DataConverter> c, Exception e) {
+    public IllegalDataConverterClassException(final Class<? extends DataConverter> c, final Exception e) {
         super("The class " + c.getName() + " is an illegal DataConverter class", e);
     }
 
-    public IllegalDataConverterClassException(Class<?> c) {
+    public IllegalDataConverterClassException(final Class<?> c) {
         super("The class " + c.getName() + " is an illegal DataConverter class");
     }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 public class SessionSection extends Session{
     private final Session parent;
 
-    public SessionSection(Session session, Map<String, Object> values) {
+    public SessionSection(final Session session, final Map<String, Object> values) {
         super(values);
         this.parent = session;
     }
@@ -19,6 +19,6 @@ public class SessionSection extends Session{
      * @return the parent section
      */
     public Session getParent() {
-        return parent;
+        return this.parent;
     }
 }

@@ -11,7 +11,7 @@ import top.focess.qq.api.command.DataConverter;
 public abstract class NullDataConverter<T> extends DataConverter<T>{
 
     @Override
-    protected boolean accept(String arg) {
-        return convert(arg) != null;
+    protected boolean accept(final String arg) {
+        return this.convert(arg) != null;
     }
 }

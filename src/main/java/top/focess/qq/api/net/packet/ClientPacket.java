@@ -21,16 +21,16 @@ public abstract class ClientPacket extends Packet{
      * @param clientId the client id
      * @param token the client token
      */
-    public ClientPacket(int clientId, String token) {
+    public ClientPacket(final int clientId, final String token) {
         this.clientId = clientId;
         this.token = token;
     }
 
     public int getClientId() {
-        return clientId;
+        return this.clientId;
     }
 
     public String getToken() {
-        return token;
+        return this.token;
     }
 }

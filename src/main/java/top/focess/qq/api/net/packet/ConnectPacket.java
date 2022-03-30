@@ -26,7 +26,7 @@ public class ConnectPacket extends Packet{
      * @param port the client port
      * @param name the client name
      */
-    public ConnectPacket(String host,int port,String name) {
+    public ConnectPacket(final String host, final int port, final String name) {
         this.host = host;
         this.port = port;
         this.name = name;
@@ -38,14 +38,14 @@ public class ConnectPacket extends Packet{
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public int getPort() {
-        return port;
+        return this.port;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 }

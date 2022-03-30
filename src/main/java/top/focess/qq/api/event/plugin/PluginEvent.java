@@ -21,11 +21,11 @@ public class PluginEvent extends Event {
      *
      * @param plugin the plugin
      */
-    public PluginEvent(Plugin plugin) {
+    public PluginEvent(final Plugin plugin) {
         this.plugin = plugin;
     }
 
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 }

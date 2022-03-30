@@ -8,7 +8,7 @@ public abstract class SimpleSpeaker extends SimpleTransmitter implements Speaker
 
     private final AudioSupported audioSupported;
 
-    public SimpleSpeaker(Bot bot, AudioSupported contact) {
+    public SimpleSpeaker(final Bot bot, final AudioSupported contact) {
         super(bot, contact);
         this.audioSupported = contact;
     }

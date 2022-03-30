@@ -7,14 +7,14 @@ import top.focess.qq.api.net.PacketPreCodec;
  */
 public class DisconnectPacketCodec extends PacketCodec<DisconnectPacket>{
     @Override
-    public DisconnectPacket readPacket(PacketPreCodec packetPreCodec) {
-        int clientId = packetPreCodec.readInt();
-        String token = packetPreCodec.readString();
+    public DisconnectPacket readPacket(final PacketPreCodec packetPreCodec) {
+        final int clientId = packetPreCodec.readInt();
+        final String token = packetPreCodec.readString();
         return new DisconnectPacket(clientId,token);
     }
 
     @Override
-    public void writePacket(DisconnectPacket packet, PacketPreCodec packetPreCodec) {
+    public void writePacket(final DisconnectPacket packet, final PacketPreCodec packetPreCodec) {
         packetPreCodec.writeInt(packet.getClientId());
         packetPreCodec.writeString(packet.getToken());
     }

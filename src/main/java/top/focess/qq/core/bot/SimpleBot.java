@@ -23,7 +23,7 @@ public class SimpleBot implements Bot {
     private final Plugin plugin;
     private net.mamoe.mirai.Bot nativeBot;
 
-    public SimpleBot(long username, String password, net.mamoe.mirai.Bot bot, Plugin plugin) {
+    public SimpleBot(final long username, final String password, final net.mamoe.mirai.Bot bot, final Plugin plugin) {
         this.username = username;
         this.password = password;
         this.nativeBot = bot;
@@ -53,32 +53,34 @@ public class SimpleBot implements Bot {
 
 
     @Override
-    public @NonNull Friend getFriendOrFail(long id) {
+    public @NonNull Friend getFriendOrFail(final long id) {
         return Objects.requireNonNull(SimpleFriend.get(this, this.nativeBot.getFriendOrFail(id)));
     }
 
     @Override
-    public @NonNull Group getGroupOrFail(long id) {
+    public @NonNull Group getGroupOrFail(final long id) {
         return Objects.requireNonNull(SimpleGroup.get(this, this.nativeBot.getGroupOrFail(id)));
     }
 
     @Override
-    public @Nullable Group getGroup(long id) {
+    public @Nullable Group getGroup(final long id) {
         return SimpleGroup.get(this,this.nativeBot.getGroup(id));
     }
 
     @Override
-    public @Nullable Friend getFriend(long id) {
+    public @Nullable Friend getFriend(final long id) {
         return SimpleFriend.get(this,this.nativeBot.getFriend(id));
     }
 
     @Override
-    public @NotNull List<Friend> getFriends() {
+    @NotNull
+    public List<Friend> getFriends() {
         return this.nativeBot.getFriends().stream().map(i -> SimpleFriend.get(this, i)).collect(Collectors.toList());
     }
 
     @Override
-    public @NotNull List<Group> getGroups() {
+    @NotNull
+    public List<Group> getGroups() {
         return this.nativeBot.getGroups().stream().map(i -> SimpleGroup.get(this, i)).collect(Collectors.toList());
     }
 
@@ -104,34 +106,34 @@ public class SimpleBot implements Bot {
     }
 
     public long getUsername() {
-        return username;
+        return this.username;
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
-    public void setNativeBot(net.mamoe.mirai.Bot nativeBot) {
+    public void setNativeBot(final net.mamoe.mirai.Bot nativeBot) {
         this.nativeBot = nativeBot;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
 
-        SimpleBot simpleBot = (SimpleBot) o;
+        final SimpleBot simpleBot = (SimpleBot) o;
 
-        return Objects.equals(nativeBot, simpleBot.nativeBot);
+        return Objects.equals(this.nativeBot, simpleBot.nativeBot);
     }
 
     @Override
     public int hashCode() {
-        return nativeBot != null ? nativeBot.hashCode() : 0;
+        return this.nativeBot != null ? this.nativeBot.hashCode() : 0;
     }
 
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 
     @Override

@@ -9,13 +9,13 @@ import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 public class PluginListener implements Listener {
 
     @EventHandler
-    public void onPluginLoad(PluginLoadEvent event) {
+    public void onPluginLoad(final PluginLoadEvent event) {
         FocessQQ.getLogger().info("Plugin " + event.getPlugin().getName() + " is loaded.");
         FocessQQ.getLogger().info("Author: " + event.getPlugin().getAuthor() + ", Version: " + event.getPlugin().getVersion().toString() + ".");
     }
 
     @EventHandler
-    public void onPluginUnload(PluginUnloadEvent event) {
+    public void onPluginUnload(final PluginUnloadEvent event) {
         FocessQQ.getLogger().info("Plugin " + event.getPlugin().getName() + " is unloaded.");
         FocessQQ.getLogger().info("Author: " + event.getPlugin().getAuthor() + ", Version: " + event.getPlugin().getVersion().toString() + ".");
     }

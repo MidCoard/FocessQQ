@@ -21,46 +21,46 @@ public class FocessSidedReceiver extends AServerReceiver {
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessSidedReceiver");
 
     public FocessSidedReceiver() {
-        scheduler.runTimer(()->{
-            for (SimpleClient simpleClient : clientInfos.values()) {
-                long time = lastHeart.getOrDefault(simpleClient.getId(),0L);
+        this.scheduler.runTimer(()->{
+            for (final SimpleClient simpleClient : this.clientInfos.values()) {
+                final long time = this.lastHeart.getOrDefault(simpleClient.getId(),0L);
                 if (System.currentTimeMillis() - time > 10 * 1000)
-                    clientInfos.remove(simpleClient.getId());
+                    this.clientInfos.remove(simpleClient.getId());
             }
         }, Duration.ZERO,Duration.ofSeconds(1));
     }
 
     @Nullable
     @PacketHandler
-    public ConnectedPacket onConnect(SidedConnectPacket packet) {
-        for (SimpleClient simpleClient : clientInfos.values())
+    public ConnectedPacket onConnect(final SidedConnectPacket packet) {
+        for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(packet.getName()))
                 return null;
-        SimpleClient simpleClient = new SimpleClient(defaultClientId++,packet.getName(),generateToken());
-        lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
-        clientInfos.put(simpleClient.getId(), simpleClient);
+        final SimpleClient simpleClient = new SimpleClient(this.defaultClientId++,packet.getName(),generateToken());
+        this.lastHeart.put(simpleClient.getId(),System.currentTimeMillis());
+        this.clientInfos.put(simpleClient.getId(), simpleClient);
         return new ConnectedPacket(simpleClient.getId(), simpleClient.getToken());
     }
 
     @Nullable
     @PacketHandler
-    public DisconnectedPacket onDisconnect(DisconnectPacket packet) {
-        if (clientInfos.get(packet.getClientId()) != null) {
-            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+    public DisconnectedPacket onDisconnect(final DisconnectPacket packet) {
+        if (this.clientInfos.get(packet.getClientId()) != null) {
+            final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
-                return disconnect(packet.getClientId());
+                return this.disconnect(packet.getClientId());
         }
         return null;
     }
 
     @Nullable
     @PacketHandler
-    public Packet onHeart(HeartPacket packet) {
-        if (clientInfos.get(packet.getClientId()) != null) {
-            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+    public Packet onHeart(final HeartPacket packet) {
+        if (this.clientInfos.get(packet.getClientId()) != null) {
+            final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000 > packet.getTime()) {
-                lastHeart.put(simpleClient.getId(), packet.getTime());
-                return packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
+                this.lastHeart.put(simpleClient.getId(), packet.getTime());
+                return this.packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
             }
         }
         return null;
@@ -68,14 +68,14 @@ public class FocessSidedReceiver extends AServerReceiver {
 
     @Nullable
     @PacketHandler
-    public Packet onClientPacket(ClientPackPacket packet) {
-        if (clientInfos.get(packet.getClientId()) != null) {
-            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+    public Packet onClientPacket(final ClientPackPacket packet) {
+        if (this.clientInfos.get(packet.getClientId()) != null) {
+            final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken())) {
-                for (Plugin plugin : this.packHandlers.keySet())
-                    for (PackHandler packHandler : packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
+                for (final Plugin plugin : this.packHandlers.keySet())
+                    for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(simpleClient.getName(), Maps.newHashMap()).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
                         packHandler.handle(packet.getPacket());
-                return packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
+                return this.packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
             }
         }
         return null;
@@ -83,17 +83,17 @@ public class FocessSidedReceiver extends AServerReceiver {
 
     @Nullable
     @PacketHandler
-    public Packet onWait(WaitPacket packet) {
-        if (clientInfos.get(packet.getClientId()) != null) {
-            SimpleClient simpleClient = clientInfos.get(packet.getClientId());
+    public Packet onWait(final WaitPacket packet) {
+        if (this.clientInfos.get(packet.getClientId()) != null) {
+            final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
-                return packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
+                return this.packets.getOrDefault(simpleClient.getName(), Queues.newConcurrentLinkedQueue()).poll();
         }
         return null;
     }
 
-    public void sendPacket(String client,Packet packet) {
-        packets.compute(client,(k, v)->{
+    public void sendPacket(final String client, final Packet packet) {
+        this.packets.compute(client,(k, v)->{
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
             v.offer(new ServerPackPacket(packet));
@@ -101,16 +101,16 @@ public class FocessSidedReceiver extends AServerReceiver {
         });
     }
 
-    private DisconnectedPacket disconnect(int clientId) {
-        clientInfos.remove(clientId);
+    private DisconnectedPacket disconnect(final int clientId) {
+        this.clientInfos.remove(clientId);
         return new DisconnectedPacket();
     }
 
     @Override
     public boolean close() {
-        scheduler.close();
-        for (Integer id : clientInfos.keySet())
-            disconnect(id);
+        this.scheduler.close();
+        for (final Integer id : this.clientInfos.keySet())
+            this.disconnect(id);
         return this.unregisterAll();
     }
 }

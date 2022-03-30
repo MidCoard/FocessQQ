@@ -21,70 +21,70 @@ public class FocessScheduler extends AScheduler {
     private final String name;
     private final Thread thread;
 
-    private volatile boolean shouldStop = false;
+    private volatile boolean shouldStop;
 
-    public FocessScheduler(@NotNull Plugin plugin, String name) {
+    public FocessScheduler(@NotNull final Plugin plugin, final String name) {
         super(plugin);
         this.name = name;
         this.thread = new SchedulerThread(this.getName());
         this.thread.start();
     }
 
-    public FocessScheduler(@NotNull Plugin plugin) {
+    public FocessScheduler(@NotNull final Plugin plugin) {
         this(plugin, plugin.getName() + "-FocessScheduler-" + UUID.randomUUID().toString().substring(0,8));
     }
 
     @Override
-    public synchronized Task run(Runnable runnable, Duration delay) {
+    public synchronized Task run(final Runnable runnable, final Duration delay) {
         if (this.shouldStop)
             throw new SchedulerClosedException(this);
-        FocessTask task = new FocessTask(runnable, this);
-        tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
+        final FocessTask task = new FocessTask(runnable, this);
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
         this.notify();
         return task;
     }
 
     @Override
-    public synchronized Task runTimer(Runnable runnable, Duration delay, Duration period) {
+    public synchronized Task runTimer(final Runnable runnable, final Duration delay, final Duration period) {
         if (this.shouldStop)
             throw new SchedulerClosedException(this);
-        FocessTask task = new FocessTask(runnable, period, this);
-        tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
+        final FocessTask task = new FocessTask(runnable, period, this);
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), task));
         this.notify();
         return task;
     }
 
     @Override
-    public synchronized <V> Callback<V> submit(Callable<V> callable, Duration delay) {
+    public synchronized <V> Callback<V> submit(final Callable<V> callable, final Duration delay) {
         if (this.shouldStop)
             throw new SchedulerClosedException(this);
-        FocessCallback<V> callback = new FocessCallback<>(callable, this);
-        tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), callback));
+        final FocessCallback<V> callback = new FocessCallback<>(callable, this);
+        this.tasks.add(new ComparableTask(System.currentTimeMillis() + delay.toMillis(), callback));
         this.notify();
         return callback;
     }
 
     @Override
     public void cancelAll() {
-        tasks.clear();
+        this.tasks.clear();
     }
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public synchronized void close() {
         super.close();
-        shouldStop = true;
+        this.shouldStop = true;
         this.cancelAll();
         this.notify();
     }
 
     @Override
     public boolean isClosed() {
-        return shouldStop;
+        return this.shouldStop;
     }
 
     @Override
@@ -98,13 +98,13 @@ public class FocessScheduler extends AScheduler {
         @Nullable
         private ComparableTask task;
 
-        public SchedulerThread(String name) {
+        public SchedulerThread(final String name) {
             super(name);
             this.setUncaughtExceptionHandler((t,e)->{
-                close();
-                if (task != null) {
-                    task.getTask().setException(new ExecutionException(e));
-                    task.getTask().endRun();
+                FocessScheduler.this.close();
+                if (this.task != null) {
+                    this.task.getTask().setException(new ExecutionException(e));
+                    this.task.getTask().endRun();
                 }
                 FocessQQ.getLogger().thrLang("exception-focess-scheduler-uncaught",e,FocessScheduler.this.getName());
             });
@@ -115,35 +115,35 @@ public class FocessScheduler extends AScheduler {
             while (true) {
                 try {
                     synchronized (FocessScheduler.this) {
-                        if (shouldStop)
+                        if (FocessScheduler.this.shouldStop)
                             break;
-                        if (tasks.isEmpty())
+                        if (FocessScheduler.this.tasks.isEmpty())
                             FocessScheduler.this.wait();
                     }
-                    task = tasks.peek();
-                    if (task != null) {
-                        synchronized (task.getTask()) {
-                            if (task.isCancelled()) {
-                                tasks.poll();
+                    this.task = FocessScheduler.this.tasks.peek();
+                    if (this.task != null) {
+                        synchronized (this.task.getTask()) {
+                            if (this.task.isCancelled()) {
+                                FocessScheduler.this.tasks.poll();
                                 continue;
                             }
-                            if (task.getTime() <= System.currentTimeMillis()) {
-                                tasks.poll();
-                                task.getTask().startRun();
+                            if (this.task.getTime() <= System.currentTimeMillis()) {
+                                FocessScheduler.this.tasks.poll();
+                                this.task.getTask().startRun();
                             }
                         }
-                        if (task.getTask().isRunning()) {
+                        if (this.task.getTask().isRunning()) {
                             try {
-                                task.getTask().run();
-                            } catch(Exception e) {
-                                task.getTask().setException(new ExecutionException(e));
+                                this.task.getTask().run();
+                            } catch(final Exception e) {
+                                this.task.getTask().setException(new ExecutionException(e));
                             }
-                            task.getTask().endRun();
-                            if (task.getTask().isPeriod())
-                                tasks.add(new ComparableTask(System.currentTimeMillis() + task.getTask().getPeriod().toMillis(), task.getTask()));
+                            this.task.getTask().endRun();
+                            if (this.task.getTask().isPeriod())
+                                FocessScheduler.this.tasks.add(new ComparableTask(System.currentTimeMillis() + this.task.getTask().getPeriod().toMillis(), this.task.getTask()));
                         }
                     }
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     FocessQQ.getLogger().thrLang("exception-focess-scheduler",e);
                 }
             }

@@ -22,13 +22,13 @@ public class Session implements SectionMap {
      *
      * @param values the session key-value pairs
      */
-    public Session(@Nullable Map<String,Object> values) {
+    public Session(@Nullable final Map<String,Object> values) {
         this.values = values == null ? Maps.newHashMap() : values;
     }
 
     @Override
-    public SessionSection createSection(String key) {
-        Map<String,Object> values = Maps.newHashMap();
+    public SessionSection createSection(final String key) {
+        final Map<String,Object> values = Maps.newHashMap();
         this.set(key,values);
         return new SessionSection(this,values);
     }
@@ -39,68 +39,68 @@ public class Session implements SectionMap {
     }
 
     @Override
-    public SectionMap getSection(String key) {
-        Object value = get(key);
+    public SectionMap getSection(final String key) {
+        final Object value = this.get(key);
         if (value == null)
-            containsSection(key);
+            this.containsSection(key);
         if (value instanceof Map)
             return new SessionSection(this, (Map<String, Object>) value);
         throw new IllegalStateException("This " + key + " is not a valid section.");
     }
 
     @Override
-    public boolean containsSection(String key) {
-        return get(key) instanceof Map;
+    public boolean containsSection(final String key) {
+        return this.get(key) instanceof Map;
     }
 
     @Override
     public String toString() {
-        return values.toString();
+        return this.values.toString();
     }
 
     @Override
-    public void set(String key, Object value) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    public void set(final String key, final Object value) {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin != null)
             SectionMap.super.set(plugin.getName() + ":" + key, value);
         else SectionMap.super.set(key, value);
     }
 
     @Override
-    public <T> T get(String key) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    public <T> T get(final String key) {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin != null)
             return SectionMap.super.get(plugin.getName() + ":" + key);
         else return SectionMap.super.get(key);
     }
 
     @Override
-    public <T> T getOrDefault(String key, T defaultValue) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    public <T> T getOrDefault(final String key, final T defaultValue) {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin != null)
             return SectionMap.super.getOrDefault(plugin.getName() + ":" + key, defaultValue);
         else return SectionMap.super.getOrDefault(key, defaultValue);
     }
 
     @Override
-    public boolean contains(String key) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    public boolean contains(final String key) {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin != null)
             return SectionMap.super.contains(plugin.getName() + ":" + key);
         else return SectionMap.super.contains(key);
     }
 
     @Override
-    public void remove(String key) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    public void remove(final String key) {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin != null)
             SectionMap.super.remove(plugin.getName() + ":" + key);
         else SectionMap.super.remove(key);
     }
 
     @Override
-    public void compute(String key, BiFunction<? super String, ? super Object, ?> remappingFunction) {
-        Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+    public void compute(final String key, final BiFunction<? super String, ? super Object, ?> remappingFunction) {
+        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
         if (plugin != null)
             SectionMap.super.compute(plugin.getName() + ":" + key, remappingFunction);
         else SectionMap.super.compute(key, remappingFunction);

@@ -13,7 +13,7 @@ public class RandomIntegerArgumentHandler implements SpecialArgumentHandler {
     private static final Random RANDOM = new Random();
 
     @Override
-    public @NonNull String handle(CommandSender sender, Command command, String[] args, int i) {
+    public @NonNull String handle(final CommandSender sender, final Command command, final String[] args, final int i) {
         return String.valueOf(RANDOM.nextInt());
     }
 }

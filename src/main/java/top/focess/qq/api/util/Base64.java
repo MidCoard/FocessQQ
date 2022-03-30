@@ -13,7 +13,7 @@ public class Base64 {
      * @param bytes the data need to be encoded
      * @return the encoded data with base64
      */
-    public static String base64Encode(byte[] bytes) {
+    public static String base64Encode(final byte[] bytes) {
         return new String(java.util.Base64.getEncoder().encode(bytes),StandardCharsets.ISO_8859_1);
     }
 
@@ -23,7 +23,7 @@ public class Base64 {
      * @param value the data need to be decoded
      * @return the decoded data with base64
      */
-    public static byte[] base64Decode(String value) {
+    public static byte[] base64Decode(final String value) {
         return java.util.Base64.getDecoder().decode(value);
     }
 }

@@ -4,7 +4,7 @@ public class MessageSource {
 
     private final net.mamoe.mirai.message.data.MessageSource source;
 
-    public MessageSource(net.mamoe.mirai.message.data.MessageSource source) {
+    public MessageSource(final net.mamoe.mirai.message.data.MessageSource source) {
         this.source = source;
     }
 

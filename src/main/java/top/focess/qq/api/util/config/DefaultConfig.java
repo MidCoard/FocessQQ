@@ -9,22 +9,22 @@ import java.util.Map;
 
 public class DefaultConfig extends Config {
 
-    public DefaultConfig(File file) throws YamlLoadException {
+    public DefaultConfig(final File file) throws YamlLoadException {
         super(file);
     }
 
-    public DefaultConfig(YamlConfiguration yamlConfiguration) {
+    public DefaultConfig(final YamlConfiguration yamlConfiguration) {
         super(yamlConfiguration);
     }
 
     @Override
-    public void set(String key, @Nullable Object value) {
+    public void set(final String key, @Nullable final Object value) {
         super.set(key,value);
     }
 
     @Override
     @Nullable
-    public <T> T get(String key) {
+    public <T> T get(final String key) {
         return super.get(key);
     }
 
@@ -39,21 +39,21 @@ public class DefaultConfig extends Config {
     }
 
     @Override
-    public boolean contains(String key) {
+    public boolean contains(final String key) {
         return super.contains(key);
     }
 
-    public <T> T getOrDefault(String key,T def) {
-        return contains(key) ? get(key) : def;
+    public <T> T getOrDefault(final String key, final T def) {
+        return this.contains(key) ? this.get(key) : def;
     }
 
     @Override
-    public void remove(String key) {
+    public void remove(final String key) {
         super.remove(key);
     }
 
     @Override
-    public DefaultConfig getSection(String key) {
+    public DefaultConfig getSection(final String key) {
         return new DefaultConfig(this.yaml.getSection(key));
     }
 }

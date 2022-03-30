@@ -7,14 +7,14 @@ import top.focess.qq.api.net.PacketPreCodec;
  */
 public class ConnectedPacketCodec extends PacketCodec<ConnectedPacket>{
     @Override
-    public ConnectedPacket readPacket(PacketPreCodec packetPreCodec) {
-        int clientId = packetPreCodec.readInt();
-        String token = packetPreCodec.readString();
+    public ConnectedPacket readPacket(final PacketPreCodec packetPreCodec) {
+        final int clientId = packetPreCodec.readInt();
+        final String token = packetPreCodec.readString();
         return new ConnectedPacket(clientId,token);
     }
 
     @Override
-    public void writePacket(ConnectedPacket packet, PacketPreCodec packetPreCodec) {
+    public void writePacket(final ConnectedPacket packet, final PacketPreCodec packetPreCodec) {
         packetPreCodec.writeInt(packet.getClientId());
         packetPreCodec.writeString(packet.getToken());
     }

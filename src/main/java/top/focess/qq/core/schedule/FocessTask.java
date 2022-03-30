@@ -9,32 +9,32 @@ import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-public class FocessTask implements Task, ITask {
+public class FocessTask implements ITask {
 
     private final Runnable runnable;
     private final Scheduler scheduler;
     private final String name;
     private Duration period;
-    protected boolean isRunning = false;
-    private boolean isPeriod = false;
-    protected boolean isFinished = false;
+    protected boolean isRunning;
+    private boolean isPeriod;
+    protected boolean isFinished;
     private ComparableTask nativeTask;
     protected ExecutionException exception;
 
-    FocessTask(Runnable runnable, Scheduler scheduler) {
+    FocessTask(final Runnable runnable, final Scheduler scheduler) {
         this.runnable = runnable;
         this.scheduler = scheduler;
         this.name = scheduler.getName() + "-" + UUID.randomUUID().toString().substring(0,8);
     }
 
-    FocessTask(Runnable runnable, Duration period,Scheduler scheduler) {
+    FocessTask(final Runnable runnable, final Duration period, final Scheduler scheduler) {
         this(runnable,scheduler);
         this.isPeriod = true;
         this.period = period;
     }
 
     @Override
-    public void setNativeTask(ComparableTask nativeTask) {
+    public void setNativeTask(final ComparableTask nativeTask) {
         this.nativeTask = nativeTask;
     }
 
@@ -57,7 +57,7 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public void setException(ExecutionException e) {
+    public void setException(final ExecutionException e) {
         this.exception = e;
     }
 
@@ -67,13 +67,13 @@ public class FocessTask implements Task, ITask {
     }
 
     @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
+    public boolean cancel(final boolean mayInterruptIfRunning) {
         return this.nativeTask.cancel(mayInterruptIfRunning);
     }
 
     @Override
     public synchronized boolean isRunning() {
-        return isRunning;
+        return this.isRunning;
     }
 
     @Override

@@ -42,7 +42,7 @@ public class ChatListener implements Listener {
      * @param commandSender the commandSender
      * @param flag true if you want to get the string value of this message, false if you want to get MiraiCode of this message
      */
-    public static void registerInputListener(IOHandler ioHandler, CommandSender commandSender, boolean flag) {
+    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final boolean flag) {
         QUESTS.compute(commandSender, (k, v) -> {
             if (v == null)
                 v = Queues.newLinkedBlockingDeque();
@@ -51,7 +51,7 @@ public class ChatListener implements Listener {
         });
     }
 
-    private static void updateInput(CommandSender sender, String content, String miraiContent, AtomicBoolean flag) {
+    private static void updateInput(final CommandSender sender, final String content, final String miraiContent, final AtomicBoolean flag) {
         QUESTS.compute(sender, (k, v) -> {
             if (v != null) {
                 Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
@@ -71,87 +71,87 @@ public class ChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onStrangerChat(StrangerChatEvent event) {
+    public void onStrangerChat(final StrangerChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getRawName(), event.getStranger().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i->!i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
-        StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger(),event.getSource());
+        final StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(),event.getMessage(),event.getStranger(),event.getSource());
         try {
             EventManager.submit(strangerMessageEvent);
-        } catch (EventSubmitException e) {
+        } catch (final EventSubmitException e) {
             FocessQQ.getLogger().thrLang("exception-submit-stranger-message-event",e);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onGroupChat(GroupChatEvent event) {
+    public void onGroupChat(final GroupChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getCardName(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i->!i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
-        CommandSender sender = new CommandSender(event.getMember());
-        AtomicBoolean flag = new AtomicBoolean(false);
+        final CommandSender sender = new CommandSender(event.getMember());
+        final AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
+                final Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
                 EXECUTOR.run(()->{
-                    Section section = Section.startSection("command-group-exec",ret, Duration.ofMinutes(10));
+                    final Section section = Section.startSection("command-group-exec",ret, Duration.ofMinutes(10));
                     try {
                         if (ret.get() == CommandResult.NONE) {
-                            GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(),event.getMember(),event.getMessage(),event.getSource());
+                            final GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(),event.getMember(),event.getMessage(),event.getSource());
                             try {
                                 EventManager.submit(groupMessageEvent);
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 FocessQQ.getLogger().thrLang("exception-submit-group-message-event", e);
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         if (!(e.getCause() instanceof InputTimeoutException))
                             FocessQQ.getLogger().thrLang("exception-exec-group-command",e);
                     }
                     section.stop();
                 });
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-group-command",e);
             }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onFriendChat(FriendChatEvent event){
+    public void onFriendChat(final FriendChatEvent event){
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getRawName(), event.getFriend().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i->!i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
-        CommandSender sender = new CommandSender(event.getFriend());
-        AtomicBoolean flag = new AtomicBoolean(false);
+        final CommandSender sender = new CommandSender(event.getFriend());
+        final AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
         if (!flag.get())
             try {
-                Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
+                final Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
                 EXECUTOR.run(()->{
-                    Section section = Section.startSection("command-friend-exec",ret, Duration.ofMinutes(10));
+                    final Section section = Section.startSection("command-friend-exec",ret, Duration.ofMinutes(10));
                     try {
                         if (ret.get() == CommandResult.NONE) {
-                            FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage(),event.getSource());
+                            final FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(),event.getFriend(),event.getMessage(),event.getSource());
                             try {
                                 EventManager.submit(friendMessageEvent);
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 FocessQQ.getLogger().thrLang("exception-submit-friend-message-event", e);
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         if (!(e.getCause() instanceof InputTimeoutException))
                             FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);
                     }
                     section.stop();
                 });
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-friend-command",e);
             }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBotSendMessage(BotSendMessageEvent event) {
-        List<String> args = CommandLine.splitCommand(event.getMessage().toString());
+    public void onBotSendMessage(final BotSendMessageEvent event) {
+        final List<String> args = CommandLine.splitCommand(event.getMessage().toString());
         if (args.size() != 0 && args.get(0).equalsIgnoreCase("exec"))
             if (event.getContact() instanceof Friend)
                 CommandLine.exec(new CommandSender((Friend) event.getContact()), event.getMessage().toString());

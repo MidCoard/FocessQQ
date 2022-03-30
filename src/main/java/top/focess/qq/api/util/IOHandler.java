@@ -20,13 +20,13 @@ public abstract class IOHandler {
 
 
         @Override
-        public void output(String output) {
-            String[] messages = output.split("\n");
+        public void output(final String output) {
+            final String[] messages = output.split("\n");
             Arrays.stream(messages).forEachOrdered(FocessQQ.getLogger()::info);
         }
 
         @Override
-        public boolean hasInput(boolean flag) {
+        public boolean hasInput(final boolean flag) {
             ConsoleListener.registerInputListener(this);
             while (!this.flag);
             return true;
@@ -37,14 +37,14 @@ public abstract class IOHandler {
         return CONSOLE_IO_HANDLER;
     }
 
-    public static void setConsoleIoHandler(IOHandler consoleIoHandler) {
+    public static void setConsoleIoHandler(final IOHandler consoleIoHandler) {
         CONSOLE_IO_HANDLER = consoleIoHandler;
     }
 
     @Nullable
-    protected volatile String value = null;
+    protected volatile String value;
 
-    protected volatile boolean flag = false;
+    protected volatile boolean flag;
 
     /**
      * Used to output String
@@ -59,8 +59,8 @@ public abstract class IOHandler {
      * @param key the language key
      * @param objects the objects need to replace
      */
-    public void outputLang(String key,Object... objects) {
-        output(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+    public void outputLang(final String key, final Object... objects) {
+        this.output(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -71,7 +71,7 @@ public abstract class IOHandler {
      */
     public String input() throws InputTimeoutException {
         if (!this.flag)
-            hasInput();
+            this.hasInput();
         this.flag = false;
         if (this.value == null)
             throw new InputTimeoutException();
@@ -83,7 +83,7 @@ public abstract class IOHandler {
      *
      * @param input the inputted String
      */
-    public void input(@Nullable String input) {
+    public void input(@Nullable final String input) {
         this.value = input;
         this.flag = true;
     }
@@ -95,7 +95,7 @@ public abstract class IOHandler {
      * @return true if there is an input String, false otherwise
      */
     public boolean hasInput() {
-        return hasInput(false);
+        return this.hasInput(false);
     }
 
     /**

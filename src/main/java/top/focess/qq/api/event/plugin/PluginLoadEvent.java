@@ -16,7 +16,7 @@ public class PluginLoadEvent extends PluginEvent{
      *
      * @param plugin the plugin
      */
-    public PluginLoadEvent(Plugin plugin) {
+    public PluginLoadEvent(final Plugin plugin) {
         super(plugin);
     }
 

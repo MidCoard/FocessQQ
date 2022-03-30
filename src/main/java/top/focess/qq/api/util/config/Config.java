@@ -15,53 +15,53 @@ public abstract class Config {
 
     protected final YamlConfiguration yaml;
 
-    protected Config(@Nullable File file) throws YamlLoadException {
+    protected Config(@Nullable final File file) throws YamlLoadException {
         this.file = file;
         this.yaml = this.file != null && this.file.exists() ? YamlConfiguration.loadFile(file) : new YamlConfiguration(null);
     }
 
-    protected Config(@Nullable InputStream stream) {
+    protected Config(@Nullable final InputStream stream) {
         this.file = null;
         this.yaml = YamlConfiguration.load(stream);
     }
 
-    protected Config(@Nullable Map<String,Object> values) {
+    protected Config(@Nullable final Map<String,Object> values) {
         this.yaml = new YamlConfiguration(values);
     }
 
-    protected Config(YamlConfiguration yaml) {
+    protected Config(final YamlConfiguration yaml) {
         this.yaml = yaml;
     }
 
     @Nullable
     public File getFile() {
-        return file;
+        return this.file;
     }
 
     @Nullable
-    protected <T> T get(String key) {
+    protected <T> T get(final String key) {
         return this.yaml.get(key);
     }
 
-    protected void set(String key, @Nullable Object value) {
+    protected void set(final String key, @Nullable final Object value) {
         this.yaml.set(key, value);
     }
 
     protected void save() {
-        if (file == null)
+        if (this.file == null)
             throw new UnsupportedOperationException("File is null");
-        this.yaml.save(file);
+        this.yaml.save(this.file);
     }
 
     protected Map<String,Object> getValues() {
         return this.yaml.getValues();
     }
 
-    protected boolean contains(String key) {
+    protected boolean contains(final String key) {
         return this.yaml.contains(key);
     }
 
-    protected void remove(String key) {
+    protected void remove(final String key) {
         this.yaml.remove(key);
     }
 

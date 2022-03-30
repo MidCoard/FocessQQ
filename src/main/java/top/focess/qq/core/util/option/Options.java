@@ -11,42 +11,42 @@ public class Options {
 
     private final Map<String,Option> options = Maps.newHashMap();
 
-    public static Options parse(String[] args, OptionParserClassifier... classifiers) {
-        List<String> temp = Lists.newArrayList();
-        List<OptionParserClassifier> defaultClassifier = Lists.newArrayList();
-        Options options = new Options();
-        for (String arg : args) {
+    public static Options parse(final String[] args, final OptionParserClassifier... classifiers) {
+        final List<String> temp = Lists.newArrayList();
+        final List<OptionParserClassifier> defaultClassifier = Lists.newArrayList();
+        final Options options = new Options();
+        for (final String arg : args) {
             if (arg.startsWith("--")) {
-                for (OptionParserClassifier classifier : defaultClassifier)
+                for (final OptionParserClassifier classifier : defaultClassifier)
                     options.add(classifier.createOption(temp.toArray(new String[0])));
                 defaultClassifier.clear();
                 temp.clear();
-                for (OptionParserClassifier classifier : classifiers)
+                for (final OptionParserClassifier classifier : classifiers)
                     if (arg.equals("--" + classifier.getName()))
                         defaultClassifier.add(classifier);
             } else
                 temp.add(arg);
         }
-        for (OptionParserClassifier classifier : defaultClassifier)
+        for (final OptionParserClassifier classifier : defaultClassifier)
             options.add(classifier.createOption(temp.toArray(new String[0])));
         return options;
     }
 
-    private void add(@Nullable Option option) {
+    private void add(@Nullable final Option option) {
         if (option == null)
             return;
         this.options.put(option.getName(),option);
     }
 
     @Nullable
-    public Option get(String name) {
+    public Option get(final String name) {
         return this.options.get(name);
     }
 
     @Override
     public String toString() {
         return "Options{" +
-                "options=" + options +
+                "options=" + this.options +
                 '}';
     }
 }

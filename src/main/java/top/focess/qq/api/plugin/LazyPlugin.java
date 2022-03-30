@@ -20,7 +20,7 @@ public abstract class LazyPlugin extends Plugin{
      * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
-    public LazyPlugin(String name, String author, Version version) {
+    public LazyPlugin(final String name, final String author, final Version version) {
         super(name,author, version);
     }
 

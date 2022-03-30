@@ -7,7 +7,7 @@ public class IllegalPluginClassException extends IllegalArgumentException {
      * Constructs a IllegalPluginClassException
      * @param c the illegal plugin class
      */
-    public IllegalPluginClassException(Class<?> c) {
+    public IllegalPluginClassException(final Class<?> c) {
         super("The class " + c.getName() + " is an illegal Plugin class");
     }
 }

@@ -20,16 +20,16 @@ public class ReloadCommand extends Command {
         super("reload");
     }
 
-    public static boolean reloadPlugin(Plugin plugin) {
+    public static boolean reloadPlugin(final Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-reload-plugin", plugin.getName());
         if (plugin == FocessQQ.getMainPlugin())
             return false;
-        File pluginFile = PluginClassLoader.disablePlugin(plugin);
+        final File pluginFile = PluginClassLoader.disablePlugin(plugin);
         if (pluginFile == null) {
             FocessQQ.getLogger().fatalLang("fatal-reload-plugin", plugin.getName());
             return false;
         }
-        PluginClassLoader classLoader;
+        final PluginClassLoader classLoader;
         try {
             classLoader = new PluginClassLoader(pluginFile);
             if (classLoader.load())
@@ -38,7 +38,7 @@ public class ReloadCommand extends Command {
                 classLoader.close();
                 return false;
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-reload-plugin", e);
             return false;
         }
@@ -48,7 +48,7 @@ public class ReloadCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor( (sender, data, ioHandler) -> {
-            Plugin plugin = data.getPlugin();
+            final Plugin plugin = data.getPlugin();
             if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("reload-command-reload-main-plugin");
                 return CommandResult.REFUSE;
@@ -66,7 +66,7 @@ public class ReloadCommand extends Command {
 
     @Override
     @NotNull
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: reload <plugin>");
     }
 }

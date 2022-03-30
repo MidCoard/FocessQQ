@@ -9,13 +9,13 @@ public class CommandArgument<V> {
     private final V value;
     private final boolean isNullable;
 
-    private CommandArgument(@NotNull DataConverter<V> dataConverter, @Nullable V value) {
+    private CommandArgument(@NotNull final DataConverter<V> dataConverter, @Nullable final V value) {
         this.dataConverter = dataConverter;
         this.value = value;
         this.isNullable = false;
     }
 
-    private CommandArgument(@NotNull DataConverter<V> dataConverter,boolean isNullable) {
+    private CommandArgument(@NotNull final DataConverter<V> dataConverter, final boolean isNullable) {
         this.dataConverter = dataConverter;
         this.value = null;
         this.isNullable = isNullable;
@@ -34,47 +34,47 @@ public class CommandArgument<V> {
     }
 
     public boolean isNullable() {
-        return isNullable;
+        return this.isNullable;
     }
 
     public boolean isDefault() {
-        return value != null;
+        return this.value != null;
     }
 
     public V getValue() {
-        return value;
+        return this.value;
     }
 
     public DataConverter<V> getDataConverter() {
-        return dataConverter;
+        return this.dataConverter;
     }
 
-    public static <V> CommandArgument<V> of(DataConverter<V> defaultDataConverter) {
+    public static <V> CommandArgument<V> of(final DataConverter<V> defaultDataConverter) {
         return new CommandArgument<>(defaultDataConverter,null);
     }
 
     @NotNull
-    public static CommandArgument<String> of(@NotNull String value) {
+    public static CommandArgument<String> of(@NotNull final String value) {
         return new CommandArgument<>(DataConverter.DEFAULT_DATA_CONVERTER, value);
     }
 
     @NotNull
-    public static <V> CommandArgument<V> of(@NotNull DataConverter<V> dataConverter,@NotNull V value) {
+    public static <V> CommandArgument<V> of(@NotNull final DataConverter<V> dataConverter, @NotNull final V value) {
         return new CommandArgument<>(dataConverter,value);
     }
 
     @NotNull
-    public static <V> CommandArgument<V> ofNullable(@NotNull DataConverter<V> dataConverter) {
+    public static <V> CommandArgument<V> ofNullable(@NotNull final DataConverter<V> dataConverter) {
         return new CommandArgument<>(dataConverter,true);
     }
 
-    public boolean accept(String arg) {
+    public boolean accept(final String arg) {
         if (this.isDefault())
             return this.getDataConverter().accept(arg) && this.getValue().equals(this.getDataConverter().convert(arg));
         else return this.getDataConverter().accept(arg);
     }
 
-    public void put(DataCollection dataCollection, String arg) {
+    public void put(final DataCollection dataCollection, final String arg) {
         if (!this.isDefault())
             this.getDataConverter().put(dataCollection, arg);
     }
@@ -82,9 +82,9 @@ public class CommandArgument<V> {
     @Override
     public String toString() {
         return "CommandArgument{" +
-                "dataConverter=" + dataConverter +
-                ", value=" + value +
-                ", isNullable=" + isNullable +
+                "dataConverter=" + this.dataConverter +
+                ", value=" + this.value +
+                ", isNullable=" + this.isNullable +
                 '}';
     }
 }

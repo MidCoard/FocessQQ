@@ -29,17 +29,17 @@ public class FriendRecallEvent extends BotEvent {
      * @param friend the friend who send the message
      * @param messageIds the message ids
      */
-    public FriendRecallEvent(Bot bot, Friend friend, int[] messageIds) {
+    public FriendRecallEvent(final Bot bot, final Friend friend, final int[] messageIds) {
         super(bot);
         this.friend = friend;
         this.messageIds = messageIds;
     }
 
     public Friend getFriend() {
-        return friend;
+        return this.friend;
     }
 
     public int[] getMessageIds() {
-        return messageIds;
+        return this.messageIds;
     }
 }

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Represent this field is a DataConverter
  */
-@Target(value = ElementType.FIELD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DataConverterType {
 

@@ -23,43 +23,43 @@ public class FocessUDPSocket extends ASocket {
     private final DatagramSocket socket;
     private final DatagramPacket packet;
 
-    public FocessUDPSocket(int port) throws IllegalPortException {
+    public FocessUDPSocket(final int port) throws IllegalPortException {
         try {
             this.socket = new DatagramSocket(port);
-        } catch (SocketException e) {
+        } catch (final SocketException e) {
             throw new IllegalPortException(port);
         }
         this.packet = new DatagramPacket(new byte[1024*1024],1024*1024);
-        Thread thread = new Thread(() -> {
+        final Thread thread = new Thread(() -> {
             FocessQQ.getLogger().debugLang("start-focess-udp-socket", port);
-            while (!socket.isClosed()) {
+            while (!this.socket.isClosed()) {
                 try {
-                    socket.receive(this.packet);
-                    PacketPreCodec packetPreCodec = new PacketPreCodec();
+                    this.socket.receive(this.packet);
+                    final PacketPreCodec packetPreCodec = new PacketPreCodec();
                     packetPreCodec.push(this.packet.getData(), this.packet.getOffset(), this.packet.getLength());
                     Packet packet = packetPreCodec.readPacket();
                     if (packet != null) {
                         if (packet instanceof SidedConnectPacket) {
-                            String name = ((SidedConnectPacket) packet).getName();
+                            final String name = ((SidedConnectPacket) packet).getName();
                             packet = new ConnectPacket(this.packet.getAddress().getHostName(), this.packet.getPort(), name);
                         }
-                        for (Pair<Receiver, Method> pair : packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
-                            Method method = pair.getValue();
+                        for (final Pair<Receiver, Method> pair : this.packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
+                            final Method method = pair.getValue();
                             try {
                                 method.setAccessible(true);
-                                Object o = method.invoke(pair.getKey(), packet);
+                                final Object o = method.invoke(pair.getKey(), packet);
                                 if (o != null) {
-                                    PacketPreCodec handler = new PacketPreCodec();
+                                    final PacketPreCodec handler = new PacketPreCodec();
                                     handler.writePacket((Packet) o);
-                                    DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(), handler.getBytes().length, this.packet.getSocketAddress());
-                                    socket.send(sendPacket);
+                                    final DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(), handler.getBytes().length, this.packet.getSocketAddress());
+                                    this.socket.send(sendPacket);
                                 }
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                     }
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     FocessQQ.getLogger().thrLang("exception-focess-udp-socket", e);
                 }
             }
@@ -68,7 +68,7 @@ public class FocessUDPSocket extends ASocket {
     }
 
     @Override
-    public void registerReceiver(Receiver receiver) {
+    public void registerReceiver(final Receiver receiver) {
         if (!(receiver instanceof ServerReceiver))
             throw new UnsupportedOperationException();
         super.registerReceiver(receiver);
@@ -87,19 +87,19 @@ public class FocessUDPSocket extends ASocket {
     @Override
     public boolean close() {
         boolean ret = false;
-        for (Receiver receiver: receivers)
+        for (final Receiver receiver: this.receivers)
             ret = ret || receiver.close();
         this.socket.close();
         return ret;
     }
 
-    public void sendPacket(String host, int port, Packet packet) {
-        PacketPreCodec handler = new PacketPreCodec();
+    public void sendPacket(final String host, final int port, final Packet packet) {
+        final PacketPreCodec handler = new PacketPreCodec();
         handler.writePacket(packet);
-        DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(),handler.getBytes().length,new InetSocketAddress(host,port));
+        final DatagramPacket sendPacket = new DatagramPacket(handler.getBytes(),handler.getBytes().length,new InetSocketAddress(host,port));
         try {
             this.socket.send(sendPacket);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             FocessQQ.getLogger().thrLang("exception-send-packet",e);
         }
     }

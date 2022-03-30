@@ -7,12 +7,12 @@ public class CommandBuffer extends DataBuffer<Command> {
 
     private final StringBuffer stringBuffer;
 
-    public static CommandBuffer allocate(int size) {
+    public static CommandBuffer allocate(final int size) {
         return new CommandBuffer(size);
     }
 
-    public CommandBuffer(int size) {
-        stringBuffer = StringBuffer.allocate(size);
+    public CommandBuffer(final int size) {
+        this.stringBuffer = StringBuffer.allocate(size);
     }
 
     @Override
@@ -21,15 +21,15 @@ public class CommandBuffer extends DataBuffer<Command> {
     }
 
     @Override
-    public void put(Command command) {
+    public void put(final Command command) {
         this.stringBuffer.put(command.getName());
     }
 
     @Nullable
     @Override
     public Command get() {
-        String name = stringBuffer.get();
-        for (Command command:Command.getCommands())
+        final String name = this.stringBuffer.get();
+        for (final Command command:Command.getCommands())
             if (command.getName().equals(name))
                 return command;
         return null;
@@ -37,9 +37,9 @@ public class CommandBuffer extends DataBuffer<Command> {
 
     @Nullable
     @Override
-    public Command get(int index) {
-        String name = stringBuffer.get(index);
-        for (Command command:Command.getCommands())
+    public Command get(final int index) {
+        final String name = this.stringBuffer.get(index);
+        for (final Command command:Command.getCommands())
             if (command.getName().equals(name))
                 return command;
         return null;

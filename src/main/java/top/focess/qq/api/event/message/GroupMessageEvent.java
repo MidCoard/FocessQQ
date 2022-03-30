@@ -27,13 +27,13 @@ public class GroupMessageEvent extends MessageEvent {
      * @param message the chat message
      * @param source the source of the message
      */
-    public GroupMessageEvent(Bot bot, Member member, MessageChain message, MessageSource source) {
+    public GroupMessageEvent(final Bot bot, final Member member, final MessageChain message, final MessageSource source) {
         super(bot,message, source);
         this.member = member;
     }
 
     public Member getMember() {
-        return member;
+        return this.member;
     }
 
     /**

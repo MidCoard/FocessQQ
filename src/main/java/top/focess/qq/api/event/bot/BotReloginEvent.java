@@ -15,7 +15,7 @@ public class BotReloginEvent extends BotEvent {
      *
      * @param bot the bot
      */
-    public BotReloginEvent(Bot bot) {
+    public BotReloginEvent(final Bot bot) {
         super(bot);
     }
 }

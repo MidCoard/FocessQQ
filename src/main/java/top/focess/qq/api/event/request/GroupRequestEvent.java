@@ -38,7 +38,7 @@ public class GroupRequestEvent extends BotEvent {
      * @param name the name of the group
      * @param invitor the invitor of the request
      */
-    public GroupRequestEvent(Bot bot, long id, String name, @Nullable Friend invitor) {
+    public GroupRequestEvent(final Bot bot, final long id, final String name, @Nullable final Friend invitor) {
         super(bot);
         this.id = id;
         this.name = name;
@@ -46,16 +46,16 @@ public class GroupRequestEvent extends BotEvent {
     }
 
     public long getId() {
-        return id;
+        return this.id;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Nullable
     public Friend getInvitor() {
-        return invitor;
+        return this.invitor;
     }
 
     /**
@@ -73,6 +73,6 @@ public class GroupRequestEvent extends BotEvent {
     }
 
     public Boolean getAccept() {
-        return accept;
+        return this.accept;
     }
 }

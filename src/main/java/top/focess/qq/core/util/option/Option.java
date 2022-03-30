@@ -13,16 +13,16 @@ public class Option {
 
     private final Map<OptionType<?>, Queue<String>> optionTypes = Maps.newHashMap();
 
-    public Option(OptionParserClassifier classifier) {
+    public Option(final OptionParserClassifier classifier) {
         this.classifier = classifier;
     }
 
     public String getName() {
-        return classifier.getName();
+        return this.classifier.getName();
     }
 
-    public void put(OptionType<?> optionType, String value) {
-        optionTypes.compute(optionType,(k,v)->{
+    public void put(final OptionType<?> optionType, final String value) {
+        this.optionTypes.compute(optionType,(k, v)->{
             if (v == null)
                 v = Queues.newConcurrentLinkedQueue();
             v.offer(value);
@@ -30,18 +30,18 @@ public class Option {
         });
     }
 
-    public <T> T get(OptionType<T> optionType) {
-        Queue<String> options = optionTypes.getOrDefault(optionType,Queues.newConcurrentLinkedQueue());
-        String v = options.poll();
-        T t = optionType.parse(v == null ? "" : v);
-        optionTypes.put(optionType,options);
+    public <T> T get(final OptionType<T> optionType) {
+        final Queue<String> options = this.optionTypes.getOrDefault(optionType,Queues.newConcurrentLinkedQueue());
+        final String v = options.poll();
+        final T t = optionType.parse(v == null ? "" : v);
+        this.optionTypes.put(optionType,options);
         return t;
     }
 
     @Override
     public String toString() {
         return "Option{" +
-                "optionTypes=" + optionTypes +
+                "optionTypes=" + this.optionTypes +
                 '}';
     }
 }

@@ -29,17 +29,17 @@ public class FriendChatEvent extends ChatEvent {
      * @param message the chat message
      * @param source the source of the message
      */
-    public FriendChatEvent(Bot bot, Friend friend, MessageChain message, MessageSource source) {
+    public FriendChatEvent(final Bot bot, final Friend friend, final MessageChain message, final MessageSource source) {
         super(bot,message, source);
         this.friend = friend;
         this.source = source;
     }
 
     public Friend getFriend() {
-        return friend;
+        return this.friend;
     }
 
     public MessageSource getSource() {
-        return source;
+        return this.source;
     }
 }

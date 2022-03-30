@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Represent a packet receiver method. It means this method mush own one argument whose class is an implemented Packet.
  */
-@Target(value = ElementType.METHOD)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PacketHandler {
 }

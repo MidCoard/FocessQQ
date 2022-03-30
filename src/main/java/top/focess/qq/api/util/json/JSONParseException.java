@@ -10,7 +10,7 @@ public class JSONParseException extends RuntimeException{
      *
      * @param json the error parsed json
      */
-    public JSONParseException(String json){
+    public JSONParseException(final String json){
         super("Error in parsing JSON: " + json + ".");
     }
 }

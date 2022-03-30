@@ -11,10 +11,10 @@ public abstract class JSONObject {
      * @param json the string to parse
      * @return the JSON object
      */
-    public static JSONObject parse(String json) {
+    public static JSONObject parse(final String json) {
         try {
             return new JSON(json);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return new JSONList(json);
         }
     }
@@ -28,7 +28,7 @@ public abstract class JSONObject {
      * @param <T> the type of the value
      * @return the value at the given index
      */
-    public <T> T get(int index) {
+    public <T> T get(final int index) {
         throw new UnsupportedOperationException();
     }
 
@@ -41,7 +41,7 @@ public abstract class JSONObject {
      * @param <T> the type of the value
      * @return the value
      */
-    public <T> T get(String key) {
+    public <T> T get(final String key) {
         throw new UnsupportedOperationException();
     }
 
@@ -53,7 +53,7 @@ public abstract class JSONObject {
      * @param index the index of the list
      * @return the list at the given index
      */
-    public JSONObject getList(int index) {
+    public JSONObject getList(final int index) {
         throw new UnsupportedOperationException();
     }
 
@@ -65,7 +65,7 @@ public abstract class JSONObject {
      * @param key the key of the list
      * @return a list named key
      */
-    public JSONObject getList(String key) {
+    public JSONObject getList(final String key) {
         throw new UnsupportedOperationException();
     }
 
@@ -77,7 +77,7 @@ public abstract class JSONObject {
      * @param index the index of the JSON
      * @return the JSON at the given index
      */
-    public JSONObject getJSON(int index) {
+    public JSONObject getJSON(final int index) {
         throw new UnsupportedOperationException();
     }
 

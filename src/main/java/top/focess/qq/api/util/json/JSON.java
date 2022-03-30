@@ -20,21 +20,21 @@ public class JSON extends JSONObject implements SectionMap {
 
     private final Map<String,Object> values;
 
-    public JSON(String json) {
+    public JSON(final String json) {
         try {
             this.values = OBJECT_MAPPER.readValue(json,TYPE_REFERENCE);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new JSONParseException(json);
         }
     }
 
-    public JSON(Map<String, Object> values) {
+    public JSON(final Map<String, Object> values) {
         this.values = values;
     }
 
     @Override
-    public JSONSection createSection(String key) {
-        Map<String,Object> values = Maps.newHashMap();
+    public JSONSection createSection(final String key) {
+        final Map<String,Object> values = Maps.newHashMap();
         this.set(key,values);
         return new JSONSection(this,values);
     }
@@ -45,22 +45,22 @@ public class JSON extends JSONObject implements SectionMap {
     }
 
     @Override
-    public JSONSection getSection(String key) {
-        Object value = get(key);
+    public JSONSection getSection(final String key) {
+        final Object value = this.get(key);
         if (value == null)
-            createSection(key);
+            this.createSection(key);
         if (value instanceof Map)
             return new JSONSection(this, (Map<String, Object>) value);
         throw new IllegalStateException("This " + key + " is not a valid section.");
     }
 
     @Override
-    public boolean containsSection(String key) {
-        return get(key) instanceof Map;
+    public boolean containsSection(final String key) {
+        return this.get(key) instanceof Map;
     }
 
-    public JSONList getList(String key) {
-        if (get(key) instanceof List)
+    public JSONList getList(final String key) {
+        if (this.get(key) instanceof List)
             return new JSONList(this.<List<?>>get(key));
         else throw new IllegalStateException("This " + key + " is not a valid list.");
     }
@@ -68,18 +68,18 @@ public class JSON extends JSONObject implements SectionMap {
     public String toJson() {
         try {
             return OBJECT_MAPPER.writeValueAsString(this.values);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public <T> T get(String key) {
+    public <T> T get(final String key) {
         return SectionMap.super.get(key);
     }
 
     @Override
     public String toString() {
-        return values.toString();
+        return this.values.toString();
     }
 }

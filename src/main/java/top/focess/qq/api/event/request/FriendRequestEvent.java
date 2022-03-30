@@ -46,7 +46,7 @@ public class FriendRequestEvent extends BotEvent {
      * @param group the group of the stranger where the application comes from
      * @param message the message of the application
      */
-    public FriendRequestEvent(Bot bot, long id, String nick, @Nullable Group group, String message) {
+    public FriendRequestEvent(final Bot bot, final long id, final String nick, @Nullable final Group group, final String message) {
         super(bot);
         this.id = id;
         this.nick = nick;
@@ -55,22 +55,22 @@ public class FriendRequestEvent extends BotEvent {
     }
 
     public long getId() {
-        return id;
+        return this.id;
     }
 
     @NonNull
     public String getNick() {
-        return nick;
+        return this.nick;
     }
 
     @Nullable
     public Group getGroup() {
-        return group;
+        return this.group;
     }
 
     @NonNull
     public String getMessage() {
-        return message;
+        return this.message;
     }
 
     /**
@@ -82,7 +82,7 @@ public class FriendRequestEvent extends BotEvent {
 
     @Nullable
     public Boolean getAccept() {
-        return accept;
+        return this.accept;
     }
 
     /**
@@ -97,7 +97,7 @@ public class FriendRequestEvent extends BotEvent {
      *
      * @param blacklist whether to add blacklist to
      */
-    public void refuse(boolean blacklist) {
+    public void refuse(final boolean blacklist) {
         this.accept = false;
         this.blacklist = blacklist;
     }
@@ -108,6 +108,6 @@ public class FriendRequestEvent extends BotEvent {
      * @return true if add this stranger to blacklist, false otherwise
      */
     public boolean isBlackList() {
-        return blacklist;
+        return this.blacklist;
     }
 }

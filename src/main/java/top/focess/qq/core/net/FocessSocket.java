@@ -21,37 +21,37 @@ public class FocessSocket extends ASocket {
     private final ServerSocket server;
     private final int localPort;
 
-    public FocessSocket(int localPort) throws IllegalPortException{
+    public FocessSocket(final int localPort) throws IllegalPortException{
         this.localPort = localPort;
         try {
             this.server = new ServerSocket(localPort);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalPortException(localPort);
         }
-        Thread thread = new Thread(() -> {
+        final Thread thread = new Thread(() -> {
             FocessQQ.getLogger().debugLang("start-focess-socket", localPort);
-            while (!server.isClosed())
+            while (!this.server.isClosed())
                 try {
-                    java.net.Socket socket = server.accept();
-                    InputStream inputStream = socket.getInputStream();
-                    byte[] buffer = new byte[1024];
-                    PacketPreCodec packetPreCodec = new PacketPreCodec();
+                    final java.net.Socket socket = this.server.accept();
+                    final InputStream inputStream = socket.getInputStream();
+                    final byte[] buffer = new byte[1024];
+                    final PacketPreCodec packetPreCodec = new PacketPreCodec();
                     int length;
                     while ((length = inputStream.read(buffer)) != -1)
                         packetPreCodec.push(buffer, length);
                     inputStream.close();
-                    Packet packet = packetPreCodec.readPacket();
+                    final Packet packet = packetPreCodec.readPacket();
                     if (packet != null)
-                        for (Pair<Receiver, Method> pair : packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
-                            Method method = pair.getValue();
+                        for (final Pair<Receiver, Method> pair : this.packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
+                            final Method method = pair.getValue();
                             try {
                                 method.setAccessible(true);
                                 method.invoke(pair.getKey(), packet);
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     FocessQQ.getLogger().thrLang("exception-focess-socket", e);
                     if (this.server.isClosed())
                         return;
@@ -60,38 +60,38 @@ public class FocessSocket extends ASocket {
         thread.start();
     }
 
-    private boolean serverSide = false;
-    private boolean clientSide = false;
+    private boolean serverSide;
+    private boolean clientSide;
 
-    public void registerReceiver(Receiver receiver) {
+    public void registerReceiver(final Receiver receiver) {
         if (receiver instanceof ServerReceiver)
-            serverSide = true;
+            this.serverSide = true;
         if (receiver instanceof ClientReceiver)
-            clientSide = true;
+            this.clientSide = true;
         super.registerReceiver(receiver);
     }
 
     @Override
     public boolean containsServerSide() {
-        return serverSide;
+        return this.serverSide;
     }
 
     @Override
     public boolean containsClientSide() {
-        return clientSide;
+        return this.clientSide;
     }
 
-    public <T extends Packet> boolean sendPacket(String targetHost,int targetPort,T packet) {
-        PacketPreCodec packetPreCodec = new PacketPreCodec();
+    public <T extends Packet> boolean sendPacket(final String targetHost, final int targetPort, final T packet) {
+        final PacketPreCodec packetPreCodec = new PacketPreCodec();
         if (packetPreCodec.writePacket(packet))
             try {
-                java.net.Socket socket = new java.net.Socket(targetHost, targetPort);
-                OutputStream outputStream = socket.getOutputStream();
+                final java.net.Socket socket = new java.net.Socket(targetHost, targetPort);
+                final OutputStream outputStream = socket.getOutputStream();
                 outputStream.write(packetPreCodec.getBytes());
                 outputStream.flush();
                 outputStream.close();
                 return true;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 FocessQQ.getLogger().thrLang("exception-send-packet",e);
                 return false;
             }
@@ -101,17 +101,17 @@ public class FocessSocket extends ASocket {
     @Override
     public boolean close() {
         boolean ret = false;
-        for (Receiver receiver : receivers)
+        for (final Receiver receiver : this.receivers)
             ret = ret || receiver.close();
         try {
             this.server.close();
-        } catch (IOException ignored) {
+        } catch (final IOException ignored) {
         }
         return ret;
     }
 
     public int getLocalPort() {
-        return localPort;
+        return this.localPort;
     }
 
 }

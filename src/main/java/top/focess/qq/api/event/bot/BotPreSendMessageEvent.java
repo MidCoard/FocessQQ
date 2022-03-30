@@ -36,7 +36,7 @@ public class BotPreSendMessageEvent extends BotEvent {
      * @param target the target contact
      * @param event the raw event
      */
-    public BotPreSendMessageEvent(Bot b, Message message, Contact target, MessagePreSendEvent event) {
+    public BotPreSendMessageEvent(final Bot b, final Message message, final Contact target, final MessagePreSendEvent event) {
         super(b);
         this.message = message;
         this.target = target;
@@ -44,14 +44,14 @@ public class BotPreSendMessageEvent extends BotEvent {
     }
 
     public Message getMessage() {
-        return message;
+        return this.message;
     }
 
     public Contact getTarget() {
-        return target;
+        return this.target;
     }
 
-    public void setMessage(Message message) {
+    public void setMessage(final Message message) {
         this.event.setMessage(message.getNativeMessage());
     }
 }

@@ -15,7 +15,7 @@ public class HeartPacket extends ClientPacket{
      * @param token the client token
      * @param time the client time
      */
-    public HeartPacket(int clientId, String token,long time) {
+    public HeartPacket(final int clientId, final String token, final long time) {
         super(clientId, token);
         this.time = time;
     }
@@ -26,6 +26,6 @@ public class HeartPacket extends ClientPacket{
     }
 
     public long getTime() {
-        return time;
+        return this.time;
     }
 }

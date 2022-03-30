@@ -13,7 +13,7 @@ public class SimpleOtherClient extends SimpleContact implements OtherClient{
     private static final Map<Long, Map<Long,SimpleOtherClient>> OTHER_CLIENT_MAP = Maps.newConcurrentMap();
     private final net.mamoe.mirai.contact.OtherClient nativeOtherClient;
 
-    public SimpleOtherClient(Bot bot, net.mamoe.mirai.contact.OtherClient contact) {
+    public SimpleOtherClient(final Bot bot, final net.mamoe.mirai.contact.OtherClient contact) {
         super(bot, contact);
         this.nativeOtherClient = contact;
     }
@@ -24,7 +24,7 @@ public class SimpleOtherClient extends SimpleContact implements OtherClient{
     }
 
     @Nullable
-    public static SimpleOtherClient get(Bot bot, @Nullable net.mamoe.mirai.contact.OtherClient otherClient) {
+    public static SimpleOtherClient get(final Bot bot, @Nullable final net.mamoe.mirai.contact.OtherClient otherClient) {
         if (otherClient == null)
             return null;
         if (otherClient.getBot().getId() != bot.getId())

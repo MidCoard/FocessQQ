@@ -18,31 +18,31 @@ public class JSONList extends JSONObject {
     private final List<?> values;
 
 
-    public JSONList(String json) {
+    public JSONList(final String json) {
         try {
             this.values = OBJECT_MAPPER.readValue(json,TYPE_REFERENCE);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new JSONParseException(json);
         }
     }
 
-    public JSONList(List<?> values) {
+    public JSONList(final List<?> values) {
         this.values = values;
     }
 
-    public <T> T get(int index) {
-        return (T) values.get(index);
+    public <T> T get(final int index) {
+        return (T) this.values.get(index);
     }
 
-    public JSON getJSON(int index) {
-        if (values.get(index) instanceof Map)
-            return new JSON((Map<String,Object>) values.get(index));
+    public JSON getJSON(final int index) {
+        if (this.values.get(index) instanceof Map)
+            return new JSON((Map<String,Object>) this.values.get(index));
         throw new IllegalStateException("This element is not a valid map.");
     }
 
-    public JSONList getList(int index) {
-        if (values.get(index) instanceof List)
-            return new JSONList((List<?>) values.get(index));
+    public JSONList getList(final int index) {
+        if (this.values.get(index) instanceof List)
+            return new JSONList((List<?>) this.values.get(index));
         throw new IllegalStateException("This element is not a valid list.");
     }
 
@@ -53,13 +53,13 @@ public class JSONList extends JSONObject {
     public String toJson() {
         try {
             return OBJECT_MAPPER.writeValueAsString(this.values);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public String toString() {
-        return values.toString();
+        return this.values.toString();
     }
 }

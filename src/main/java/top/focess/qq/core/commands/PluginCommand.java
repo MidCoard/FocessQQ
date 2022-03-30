@@ -22,8 +22,8 @@ public class PluginCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor((sender,data,ioHandler)->{
             if (FocessQQ.getPlugins().size() != 0) {
-                StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("plugin-command-list"));
-                for (Plugin plugin : FocessQQ.getPlugins())
+                final StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("plugin-command-list"));
+                for (final Plugin plugin : FocessQQ.getPlugins())
                     stringBuilder.append(' ').append(plugin.getName());
                 ioHandler.output(stringBuilder.toString());
             } else ioHandler.outputLang("plugin-command-no-plugin");
@@ -33,7 +33,7 @@ public class PluginCommand extends Command {
 
     @Override
     @NotNull
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: plugin list");
     }
 

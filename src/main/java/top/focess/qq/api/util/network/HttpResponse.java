@@ -56,12 +56,12 @@ public class HttpResponse {
      * @param plugin the request plugin
      * @param code the response code
      */
-    private HttpResponse(Plugin plugin,int code) {
+    private HttpResponse(final Plugin plugin, final int code) {
         this.code = code;
         this.plugin = plugin;
     }
 
-    private HttpResponse(Plugin plugin) {
+    private HttpResponse(final Plugin plugin) {
         this(plugin,UNKNOWN_REQUEST);
     }
 
@@ -71,7 +71,7 @@ public class HttpResponse {
      * @param plugin the request plugin
      * @param e the thrown exception in this http-request processing
      */
-    public HttpResponse(Plugin plugin,Exception e) {
+    public HttpResponse(final Plugin plugin, final Exception e) {
         this(plugin,EXCEPTION);
         this.exception = e;
     }
@@ -84,23 +84,23 @@ public class HttpResponse {
      * @param headers the response header
      * @param value the response data
      */
-    public HttpResponse(Plugin plugin,int code, Headers headers, String value) {
+    public HttpResponse(final Plugin plugin, final int code, final Headers headers, final String value) {
         this(plugin,code);
         this.value = value;
         this.headers = headers;
     }
 
-    public static HttpResponse ofNull(Plugin plugin) {
+    public static HttpResponse ofNull(final Plugin plugin) {
         return UNKNOWN_REQUEST_TYPE.apply(plugin);
     }
 
     @Nullable
     public Exception getException() {
-        return exception;
+        return this.exception;
     }
 
     public int getCode() {
-        return code;
+        return this.code;
     }
 
     /**
@@ -111,7 +111,7 @@ public class HttpResponse {
      */
     @NotNull
     public JSON getAsJSON() throws HttpResponseException {
-        if (isError())
+        if (this.isError())
             throw new HttpResponseException();
         return new JSON(this.value);
     }
@@ -123,11 +123,11 @@ public class HttpResponse {
 
     @Nullable
     public Headers getHeaders() {
-        return headers;
+        return this.headers;
     }
 
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 
     /**

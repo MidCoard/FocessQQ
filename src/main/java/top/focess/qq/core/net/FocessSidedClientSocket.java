@@ -18,53 +18,53 @@ public class FocessSidedClientSocket extends ASocket {
     private final String host;
     private final int port;
 
-    public FocessSidedClientSocket(String host, int port) {
+    public FocessSidedClientSocket(final String host, final int port) {
         this.host = host;
         this.port = port;
     }
 
     public String getHost() {
-        return host;
+        return this.host;
     }
 
     public int getPort() {
-        return port;
+        return this.port;
     }
 
-    public <T extends Packet> boolean sendPacket(T packet) {
-        PacketPreCodec packetPreCodec = new PacketPreCodec();
+    public <T extends Packet> boolean sendPacket(final T packet) {
+        final PacketPreCodec packetPreCodec = new PacketPreCodec();
         if (packetPreCodec.writePacket(packet))
             try {
-                java.net.Socket socket = new java.net.Socket(host, port);
-                OutputStream outputStream = socket.getOutputStream();
+                final java.net.Socket socket = new java.net.Socket(this.host, this.port);
+                final OutputStream outputStream = socket.getOutputStream();
                 outputStream.write(packetPreCodec.getBytes());
                 outputStream.flush();
                 socket.shutdownOutput();
-                InputStream inputStream = socket.getInputStream();
-                byte[] buffer = new byte[1024];
+                final InputStream inputStream = socket.getInputStream();
+                final byte[] buffer = new byte[1024];
                 int length;
-                PacketPreCodec codec = new PacketPreCodec();
+                final PacketPreCodec codec = new PacketPreCodec();
                 while ((length = inputStream.read(buffer)) != -1)
                     codec.push(buffer, length);
-                Packet p = codec.readPacket();
+                final Packet p = codec.readPacket();
                 if (p != null)
-                    for (Pair<Receiver, Method> pair : packetMethods.getOrDefault(p.getClass(), Lists.newArrayList())) {
-                        Method method = pair.getValue();
+                    for (final Pair<Receiver, Method> pair : this.packetMethods.getOrDefault(p.getClass(), Lists.newArrayList())) {
+                        final Method method = pair.getValue();
                         try {
                             method.setAccessible(true);
                             method.invoke(pair.getKey(), p);
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                         }
                     }
                 return true;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 return false;
             }
         return false;
     }
 
-    public void registerReceiver(Receiver receiver) {
+    public void registerReceiver(final Receiver receiver) {
         if (!(receiver instanceof ClientReceiver))
             throw new UnsupportedOperationException();
         super.registerReceiver(receiver);
@@ -83,7 +83,7 @@ public class FocessSidedClientSocket extends ASocket {
     @Override
     public boolean close() {
         boolean ret = false;
-        for (Receiver receiver : this.receivers)
+        for (final Receiver receiver : this.receivers)
             ret = ret || receiver.close();
         return ret;
     }

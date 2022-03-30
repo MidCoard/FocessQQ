@@ -14,23 +14,23 @@ public class FocessClientReceiver extends AClientReceiver {
 
     private final String localhost;
     private final FocessSocket focessSocket;
-    private volatile boolean connected = false;
+    private volatile boolean connected;
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessClientReceiver");
 
-    public FocessClientReceiver(FocessSocket focessSocket,String localhost,String host,int port,String name) {
+    public FocessClientReceiver(final FocessSocket focessSocket, final String localhost, final String host, final int port, final String name) {
         super(host,port,name);
         this.localhost = localhost;
         this.focessSocket = focessSocket;
-        scheduler.runTimer(()->{
-            if (connected)
-                focessSocket.sendPacket(host,port,new HeartPacket(id,token,System.currentTimeMillis()));
+        this.scheduler.runTimer(()->{
+            if (this.connected)
+                focessSocket.sendPacket(host,port,new HeartPacket(this.id, this.token,System.currentTimeMillis()));
             else
                 focessSocket.sendPacket(this.host,this.port,new ConnectPacket(localhost,focessSocket.getLocalPort(),name));
         },Duration.ZERO, Duration.ofSeconds(2));
     }
 
     @PacketHandler
-    public void onConnected(ConnectedPacket packet) {
+    public void onConnected(final ConnectedPacket packet) {
         if (this.connected)
             return;
         this.token = packet.getToken();
@@ -39,21 +39,21 @@ public class FocessClientReceiver extends AClientReceiver {
     }
 
     @PacketHandler
-    public void onDisconnected(DisconnectedPacket packet) {
+    public void onDisconnected(final DisconnectedPacket packet) {
         this.connected = false;
-        focessSocket.sendPacket(this.host,this.port,new ConnectPacket(this.localhost,focessSocket.getLocalPort(),name));
+        this.focessSocket.sendPacket(this.host,this.port,new ConnectPacket(this.localhost, this.focessSocket.getLocalPort(), this.name));
     }
 
     @PacketHandler
-    public void onServerPacket(ServerPackPacket packet) {
-        for (Plugin plugin : this.packHandlers.keySet())
-            for (PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
+    public void onServerPacket(final ServerPackPacket packet) {
+        for (final Plugin plugin : this.packHandlers.keySet())
+            for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(packet.getPacket().getClass(),Lists.newArrayList()))
                 packHandler.handle(packet.getPacket());
     }
 
     @Override
-    public void sendPacket(Packet packet) {
-        focessSocket.sendPacket(this.host,this.port,new ClientPackPacket(this.id,this.token,packet));
+    public void sendPacket(final Packet packet) {
+        this.focessSocket.sendPacket(this.host,this.port,new ClientPackPacket(this.id,this.token,packet));
     }
 
     @Override

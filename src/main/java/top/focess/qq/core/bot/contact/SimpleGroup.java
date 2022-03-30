@@ -18,13 +18,13 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
 
     private final net.mamoe.mirai.contact.Group nativeGroup;
 
-    private SimpleGroup(Bot bot, net.mamoe.mirai.contact.Group nativeGroup) {
+    private SimpleGroup(final Bot bot, final net.mamoe.mirai.contact.Group nativeGroup) {
         super(bot, nativeGroup);
         this.nativeGroup = nativeGroup;
     }
 
     @Nullable
-    public static Group get(Bot bot, @Nullable net.mamoe.mirai.contact.Group group) {
+    public static Group get(final Bot bot, @Nullable final net.mamoe.mirai.contact.Group group) {
         if (group == null)
             return null;
         if (bot.getId() != group.getBot().getId())
@@ -32,7 +32,7 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
         return GROUP_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(group.getId(), k -> new SimpleGroup(bot, group));
     }
 
-    public static void remove(Bot bot) {
+    public static void remove(final Bot bot) {
         GROUP_MAP.remove(bot.getId());
     }
 
@@ -48,12 +48,12 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
 
     @Nullable
     @Override
-    public Member getMember(long id) {
+    public Member getMember(final long id) {
         return SimpleMember.get(this,this.nativeGroup.get(id));
     }
 
     @Override
-    public Member getMemberOrFail(long id) {
+    public Member getMemberOrFail(final long id) {
         return Objects.requireNonNull(SimpleMember.get(this,this.nativeGroup.getOrFail(id)));
     }
 

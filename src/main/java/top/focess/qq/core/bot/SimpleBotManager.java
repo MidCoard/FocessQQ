@@ -54,15 +54,17 @@ public class SimpleBotManager implements BotManager {
     private static final Map<Long,Bot> BOTS = Maps.newConcurrentMap();
 
     @Override
-    public @NotNull Future<Bot> login(long id, String password,Plugin plugin) {
-        return SCHEDULER.submit(() -> loginDirectly(id,password,plugin));
+    @NotNull
+    public Future<Bot> login(final long id, final String password, final Plugin plugin) {
+        return SCHEDULER.submit(() -> this.loginDirectly(id,password,plugin));
     }
 
     @Override
-    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException {
-        BotConfiguration configuration = BotConfiguration.getDefault();
+    @NotNull
+    public Bot loginDirectly(final long id, final String password, final Plugin plugin) throws BotLoginException {
+        final BotConfiguration configuration = BotConfiguration.getDefault();
         configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
-        File cache = new File("devices/" + id + "/cache");
+        final File cache = new File("devices/" + id + "/cache");
         if (!cache.exists())
             if(!cache.mkdirs())
                 throw new BotLoginException(id, FocessQQ.getLangConfig().get("fatal-create-cache-dir-failed"));
@@ -71,95 +73,95 @@ public class SimpleBotManager implements BotManager {
         configuration.setLoginSolver(new LoginSolver() {
             @Nullable
             @Override
-            public Object onSolvePicCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull byte[] bytes, @NotNull Continuation<? super String> continuation) {
+            public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final byte[] bytes, @NotNull final Continuation<? super String> continuation) {
                 try {
-                    FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
+                    final FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
                     outputStream.write(bytes);
                     outputStream.close();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     FocessQQ.getLogger().thrLang("exception-load-captcha-picture",e);
                 }
                 FocessQQ.getLogger().infoLang("input-captcha-code");
                 try {
                     return IOHandler.getConsoleIoHandler().input();
-                } catch (InputTimeoutException e) {
+                } catch (final InputTimeoutException e) {
                     return "";
                 }
             }
 
             @Nullable
             @Override
-            public Object onSolveSliderCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
+            public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
                 try {
                     IOHandler.getConsoleIoHandler().input();
-                } catch (InputTimeoutException ignored) {
+                } catch (final InputTimeoutException ignored) {
                 }
                 return null;
             }
 
             @Nullable
             @Override
-            public Object onSolveUnsafeDeviceLoginVerify(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
+            public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
                 try {
                     IOHandler.getConsoleIoHandler().input();
-                } catch (InputTimeoutException ignored) {
+                } catch (final InputTimeoutException ignored) {
                 }
                 return null;
             }
         });
-        net.mamoe.mirai.Bot bot;
+        final net.mamoe.mirai.Bot bot;
         try {
             bot = BotFactory.INSTANCE.newBot(id, password, configuration);
             bot.login();
-        } catch(Exception e) {
+        } catch(final Exception e) {
             throw new BotLoginException(id,e);
         }
-        Bot b = new SimpleBot(id,password, bot,plugin);
+        final Bot b = new SimpleBot(id,password, bot,plugin);
         try {
             EventManager.submit(new BotLoginEvent(b));
-        } catch (EventSubmitException e) {
+        } catch (final EventSubmitException e) {
             FocessQQ.getLogger().thrLang("exception-submit-bot-login-event",e);
         }
-        List<Listener<?>> listeners = Lists.newArrayList();
+        final List<Listener<?>> listeners = Lists.newArrayList();
         listeners.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-            GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getSender())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
+            final GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getSender())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException eventSubmitException) {
+            } catch (final EventSubmitException eventSubmitException) {
                 FocessQQ.getLogger().thrLang("exception-submit-group-chat-event",eventSubmitException);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-            FriendChatEvent e = new FriendChatEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
+            final FriendChatEvent e = new FriendChatEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException eventSubmitException) {
+            } catch (final EventSubmitException eventSubmitException) {
                 FocessQQ.getLogger().thrLang("exception-submit-friend-chat-event",eventSubmitException);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-            GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getAuthor())),event.getMessageIds(),SimpleMember.get(b,event.getOperator()));
+            final GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getAuthor())),event.getMessageIds(),SimpleMember.get(b,event.getOperator()));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-group-recall-event",ex);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
-            FriendRecallEvent e = new FriendRecallEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getAuthor())),event.getMessageIds());
+            final FriendRecallEvent e = new FriendRecallEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getAuthor())),event.getMessageIds());
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-friend-recall-event",ex);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
-            FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(), SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
+            final FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(), SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-friend-request-event",ex);
             }
             if (e.getAccept() != null)
@@ -168,10 +170,10 @@ public class SimpleBotManager implements BotManager {
                 else event.reject(e.isBlackList());
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
-            GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),SimpleFriend.get(b,event.getInvitor()));
+            final GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),SimpleFriend.get(b,event.getInvitor()));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-group-request-event",ex);
             }
             if (e.getAccept() != null)
@@ -180,42 +182,42 @@ public class SimpleBotManager implements BotManager {
                 else event.ignore();
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
-            FriendInputStatusEvent e = new FriendInputStatusEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getInputting());
+            final FriendInputStatusEvent e = new FriendInputStatusEvent(b, Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getInputting());
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-friend-input-status-event",ex);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
-            StrangerChatEvent e = new StrangerChatEvent(b, Objects.requireNonNull(SimpleStranger.get(b, event.getSender())), new MessageChain(event.getMessage()), new MessageSource(event.getSource()));
+            final StrangerChatEvent e = new StrangerChatEvent(b, Objects.requireNonNull(SimpleStranger.get(b, event.getSender())), new MessageChain(event.getMessage()), new MessageSource(event.getSource()));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-stranger-chat-event",ex);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
-            BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
+            final BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class,event->{
-            BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,new Message(event.getMessage()), Objects.requireNonNull(SimpleContact.get(b, event.getTarget())),event);
+            final BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,new Message(event.getMessage()), Objects.requireNonNull(SimpleContact.get(b, event.getTarget())),event);
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-bot-pre-send-message-event",ex);
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
-            BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()), Objects.requireNonNull(SimpleContact.get(b, event.getSubject())));
+            final BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()), Objects.requireNonNull(SimpleContact.get(b, event.getSubject())));
             try {
                 EventManager.submit(e);
-            } catch (EventSubmitException ex) {
+            } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
             }
         }));
@@ -231,12 +233,12 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
-    public boolean login(Bot b) throws BotLoginException {
+    public boolean login(final Bot b) throws BotLoginException {
         if (!b.isOnline() && b instanceof SimpleBot) {
-            long id = b.getId();
-            BotConfiguration configuration = BotConfiguration.getDefault();
+            final long id = b.getId();
+            final BotConfiguration configuration = BotConfiguration.getDefault();
             configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
-            File cache = new File("devices/" + id + "/cache");
+            final File cache = new File("devices/" + id + "/cache");
             if (!cache.exists())
                 if(!cache.mkdirs())
                     throw new BotLoginException(id, FocessQQ.getLangConfig().get("fatal-create-cache-dir-failed"));
@@ -245,95 +247,95 @@ public class SimpleBotManager implements BotManager {
             configuration.setLoginSolver(new LoginSolver() {
                 @Nullable
                 @Override
-                public Object onSolvePicCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull byte[] bytes, @NotNull Continuation<? super String> continuation) {
+                public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final byte[] bytes, @NotNull final Continuation<? super String> continuation) {
                     try {
-                        FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
+                        final FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
                         outputStream.write(bytes);
                         outputStream.close();
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         FocessQQ.getLogger().thrLang("exception-load-captcha-picture",e);
                     }
                     FocessQQ.getLogger().infoLang("input-captcha-code");
                     try {
                         return IOHandler.getConsoleIoHandler().input();
-                    } catch (InputTimeoutException e) {
+                    } catch (final InputTimeoutException e) {
                         return null;
                     }
                 }
 
                 @Nullable
                 @Override
-                public Object onSolveSliderCaptcha(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
+                public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                     FocessQQ.getLogger().info(s);
                     try {
                         IOHandler.getConsoleIoHandler().input();
-                    } catch (InputTimeoutException ignored) {
+                    } catch (final InputTimeoutException ignored) {
                     }
                     return null;
                 }
 
                 @Nullable
                 @Override
-                public Object onSolveUnsafeDeviceLoginVerify(@NotNull net.mamoe.mirai.Bot bot, @NotNull String s, @NotNull Continuation<? super String> continuation) {
+                public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                     FocessQQ.getLogger().info(s);
                     try {
                         IOHandler.getConsoleIoHandler().input();
-                    } catch (InputTimeoutException ignored) {
+                    } catch (final InputTimeoutException ignored) {
                     }
                     return null;
                 }
             });
-            net.mamoe.mirai.Bot bot;
+            final net.mamoe.mirai.Bot bot;
             try {
                 bot = BotFactory.INSTANCE.newBot(id, ((SimpleBot) b).getPassword(), configuration);
                 bot.login();
                 ((SimpleBot) b).setNativeBot(bot);
-            } catch(Exception e) {
+            } catch(final Exception e) {
                 throw new BotLoginException(id,e);
             }
             try {
                 EventManager.submit(new BotLoginEvent(b));
-            } catch (EventSubmitException e) {
+            } catch (final EventSubmitException e) {
                 FocessQQ.getLogger().thrLang("exception-submit-bot-login-event",e);
             }
-            List<Listener<?>> listeners = Lists.newArrayList();
+            final List<Listener<?>> listeners = Lists.newArrayList();
             listeners.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-                GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getSender())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
+                final GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getSender())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException eventSubmitException) {
+                } catch (final EventSubmitException eventSubmitException) {
                     FocessQQ.getLogger().thrLang("exception-submit-group-chat-event",eventSubmitException);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-                FriendChatEvent e = new FriendChatEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
+                final FriendChatEvent e = new FriendChatEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException eventSubmitException) {
+                } catch (final EventSubmitException eventSubmitException) {
                     FocessQQ.getLogger().thrLang("exception-submit-friend-chat-event",eventSubmitException);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-                GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getAuthor())),event.getMessageIds(),SimpleMember.get(b,event.getOperator()));
+                final GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(SimpleMember.get(b, event.getAuthor())),event.getMessageIds(),SimpleMember.get(b,event.getOperator()));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-group-recall-event",ex);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
-                FriendRecallEvent e = new FriendRecallEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getAuthor())),event.getMessageIds());
+                final FriendRecallEvent e = new FriendRecallEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getAuthor())),event.getMessageIds());
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-friend-recall-event",ex);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event ->{
-                FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
+                final FriendRequestEvent e = new FriendRequestEvent(b,event.getFromId(),event.getFromNick(),SimpleGroup.get(b,event.getFromGroup()),event.getMessage());
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-friend-request-event",ex);
                 }
                 if (e.getAccept() != null)
@@ -342,10 +344,10 @@ public class SimpleBotManager implements BotManager {
                     else event.reject(e.isBlackList());
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event->{
-                GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),SimpleFriend.get(b,event.getInvitor()));
+                final GroupRequestEvent e = new GroupRequestEvent(b,event.getGroupId(),event.getGroupName(),SimpleFriend.get(b,event.getInvitor()));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-group-request-event",ex);
                 }
                 if (e.getAccept() != null)
@@ -354,43 +356,43 @@ public class SimpleBotManager implements BotManager {
                     else event.ignore();
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class,event->{
-                FriendInputStatusEvent e = new FriendInputStatusEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getInputting());
+                final FriendInputStatusEvent e = new FriendInputStatusEvent(b,Objects.requireNonNull(SimpleFriend.get(b, event.getFriend())), event.getInputting());
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-friend-input-status-event",ex);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class,event->{
-                StrangerChatEvent e = new StrangerChatEvent(b, Objects.requireNonNull(SimpleStranger.get(b, event.getSender())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
+                final StrangerChatEvent e = new StrangerChatEvent(b, Objects.requireNonNull(SimpleStranger.get(b, event.getSender())), new MessageChain(event.getMessage()),new MessageSource(event.getSource()));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-stranger-chat-event",ex);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class,event->{
                 System.out.println(event.getBot().getId() + " " + event.getMessage());
-                BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
+                final BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class,event->{
-                BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())),event);
+                final BotPreSendMessageEvent e = new BotPreSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getTarget())),event);
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-bot-pre-send-message-event",ex);
                 }
             }));
             listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class,event->{
-                BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getSubject())));
+                final BotSendMessageEvent e = new BotSendMessageEvent(b,new Message(event.getMessage()),Objects.requireNonNull(SimpleContact.get(b, event.getSubject())));
                 try {
                     EventManager.submit(e);
-                } catch (EventSubmitException ex) {
+                } catch (final EventSubmitException ex) {
                     FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event",ex);
                 }
             }));
@@ -402,11 +404,11 @@ public class SimpleBotManager implements BotManager {
 
 
     @Override
-    public boolean logout(@NotNull Bot bot) {
+    public boolean logout(@NotNull final Bot bot) {
         if (!bot.isOnline())
             return false;
         bot.getNativeBot().close();
-        for (Listener<?> listener : BOT_LISTENER_MAP.getOrDefault(bot,Lists.newArrayList()))
+        for (final Listener<?> listener : BOT_LISTENER_MAP.getOrDefault(bot,Lists.newArrayList()))
             listener.complete();
         BOT_LISTENER_MAP.remove(bot);
         SimpleFriend.remove(bot);
@@ -415,23 +417,24 @@ public class SimpleBotManager implements BotManager {
         SimpleMember.remove(bot);
         try {
             EventManager.submit(new BotLogoutEvent(bot));
-        } catch (EventSubmitException e) {
+        } catch (final EventSubmitException e) {
             FocessQQ.getLogger().thrLang("exception-submit-bot-logout-event",e);
         }
         return true;
     }
 
     @Override
-    public @Nullable Bot getBot(long username) {
+    @Nullable
+    public Bot getBot(final long username) {
         return BOTS.get(username);
     }
 
     @Override
-    public boolean relogin(@NotNull Bot bot) throws BotLoginException {
-        boolean ret = this.logout(bot) & this.login(bot);
+    public boolean relogin(@NotNull final Bot bot) throws BotLoginException {
+        final boolean ret = this.logout(bot) & this.login(bot);
         try {
             EventManager.submit(new BotReloginEvent(bot));
-        } catch (EventSubmitException e) {
+        } catch (final EventSubmitException e) {
             FocessQQ.getLogger().thrLang("exception-submit-bot-relogin-event",e);
         }
         return ret;
@@ -444,26 +447,26 @@ public class SimpleBotManager implements BotManager {
 
     @Nullable
     @Override
-    public Bot remove(long id) {
+    public Bot remove(final long id) {
         if (FocessQQ.getBot().getId() == id)
             return null;
-        Bot b = BOTS.remove(id);
+        final Bot b = BOTS.remove(id);
         if (b != null)
             b.logout();
         return b;
     }
 
     public static void removeAll() {
-        for (Long id : BOTS.keySet())
+        for (final Long id : BOTS.keySet())
             FocessQQ.getBotManager().remove(id);
         //remove default bot
-        Bot b = BOTS.remove(FocessQQ.getBot().getId());
+        final Bot b = BOTS.remove(FocessQQ.getBot().getId());
         if (b != null)
             b.logout();
     }
 
-    public static void remove(Plugin plugin) {
-        for (Bot b : PLUGIN_BOT_MAP.getOrDefault(plugin,Lists.newArrayList()))
+    public static void remove(final Plugin plugin) {
+        for (final Bot b : PLUGIN_BOT_MAP.getOrDefault(plugin,Lists.newArrayList()))
             FocessQQ.getBotManager().remove(b.getId());
         PLUGIN_BOT_MAP.remove(plugin);
     }

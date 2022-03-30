@@ -6,7 +6,7 @@ public class PluginDescription {
 
     private final String main;
 
-    public PluginDescription(YamlConfiguration pluginConfig) {
+    public PluginDescription(final YamlConfiguration pluginConfig) {
         this.main = pluginConfig.get("main");
     }
 
@@ -15,6 +15,6 @@ public class PluginDescription {
     }
 
     public String getMain() {
-        return main;
+        return this.main;
     }
 }

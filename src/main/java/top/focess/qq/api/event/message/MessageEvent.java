@@ -29,17 +29,17 @@ public class MessageEvent extends BotEvent {
      * @param message the chat message
      * @param source the source of the message
      */
-    public MessageEvent(Bot bot, MessageChain message, MessageSource source) {
+    public MessageEvent(final Bot bot, final MessageChain message, final MessageSource source) {
         super(bot);
         this.message = message;
         this.source = source;
     }
 
     public MessageChain getMessage() {
-        return message;
+        return this.message;
     }
 
     public MessageSource getSource() {
-        return source;
+        return this.source;
     }
 }

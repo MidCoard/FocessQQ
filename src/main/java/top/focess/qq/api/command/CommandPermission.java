@@ -12,17 +12,17 @@ public enum CommandPermission {
     final MemberPermission permission;
     final int priority;
 
-    CommandPermission(MemberPermission permission, int priority) {
+    CommandPermission(final MemberPermission permission, final int priority) {
         this.permission = permission;
         this.priority = priority;
     }
 
-    CommandPermission(CommandPermission commandPermission) {
+    CommandPermission(final CommandPermission commandPermission) {
         this.permission = commandPermission.permission;
         this.priority = commandPermission.priority;
     }
 
-    public boolean hasPermission(CommandPermission permission) {
+    public boolean hasPermission(final CommandPermission permission) {
         return this.priority >= permission.priority;
     }
 }

@@ -45,7 +45,7 @@ public class CommandPrepostEvent extends Event implements Cancellable {
      * @param args the data of this executor
      * @param ioHandler the input and output handler
      */
-    public CommandPrepostEvent(CommandSender sender, Command command, String[] args, IOHandler ioHandler) {
+    public CommandPrepostEvent(final CommandSender sender, final Command command, final String[] args, final IOHandler ioHandler) {
         this.command = command;
         this.args = args;
         this.ioHandler = ioHandler;
@@ -59,23 +59,23 @@ public class CommandPrepostEvent extends Event implements Cancellable {
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
+    public void setCancelled(final boolean cancelled) {
         this.cancelled = cancelled;
     }
 
     public String[] getArgs() {
-        return args;
+        return this.args;
     }
 
     public IOHandler getIoHandler() {
-        return ioHandler;
+        return this.ioHandler;
     }
 
     public CommandSender getSender() {
-        return sender;
+        return this.sender;
     }
 
     public Command getCommand() {
-        return command;
+        return this.command;
     }
 }

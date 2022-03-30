@@ -35,7 +35,7 @@ public class CommandLine {
      * @return a Future representing pending completion of the command
      */
     @NotNull
-    public static Future<CommandResult> exec(String command) {
+    public static Future<CommandResult> exec(final String command) {
         return exec(CommandSender.CONSOLE, command);
     }
 
@@ -47,7 +47,7 @@ public class CommandLine {
      * @return a Future representing pending completion of the command
      */
     @NotNull
-    public static Future<CommandResult> exec(CommandSender sender, String command) {
+    public static Future<CommandResult> exec(final CommandSender sender, final String command) {
         return exec(sender, command, sender.getIOHandler());
     }
 
@@ -60,13 +60,13 @@ public class CommandLine {
      * @return a Future representing pending completion of the command
      */
     @NotNull
-    public static Future<CommandResult> exec(CommandSender sender, String command, IOHandler ioHandler) {
+    public static Future<CommandResult> exec(final CommandSender sender, final String command, final IOHandler ioHandler) {
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
-        List<String> args = splitCommand(command);
+        final List<String> args = splitCommand(command);
         if (args.size() == 0)
             return CompletableFuture.completedFuture(CommandResult.NONE);
-        String name = args.get(0);
+        final String name = args.get(0);
         args.remove(0);
         return exec0(sender, name, args.toArray(new String[0]), ioHandler, command);
     }
@@ -76,13 +76,13 @@ public class CommandLine {
      * @param command the command needed to be split
      * @return the split arguments
      */
-    public static List<String> splitCommand(String command) {
-        List<String> args = Lists.newArrayList();
-        StringBuilder stringBuilder = new StringBuilder();
+    public static List<String> splitCommand(final String command) {
+        final List<String> args = Lists.newArrayList();
+        final StringBuilder stringBuilder = new StringBuilder();
         boolean stack = false;
         boolean ignore = false;
         Character last = null;
-        for (char c : command.toCharArray()) {
+        for (final char c : command.toCharArray()) {
             if (ignore) {
                 ignore = false;
                 switch (c) {
@@ -123,7 +123,7 @@ public class CommandLine {
                         stringBuilder.delete(0, stringBuilder.length());
                     }
                 } else
-                    stringBuilder.append(c);
+                    stringBuilder.append(' ');
             } else if (c == '"')
                 stack = !stack;
             else if (c == '@' && !stack && last != null && last == ' ') {
@@ -138,36 +138,36 @@ public class CommandLine {
         return args;
     }
 
-    private static Pair<String,String[]> splitSpecialArgument(String argument) {
-        int leftIndex = argument.indexOf('(');
+    private static Pair<String,String[]> splitSpecialArgument(final String argument) {
+        final int leftIndex = argument.indexOf('(');
         if (leftIndex == -1 || !argument.endsWith(")"))
             return new Pair<>(argument, new String[0]);
-        String name = argument.substring(0, leftIndex);
-        String[] args = argument.substring(leftIndex + 1,argument.length() - 1).split(",");
+        final String name = argument.substring(0, leftIndex);
+        final String[] args = argument.substring(leftIndex + 1,argument.length() - 1).split(",");
         return new Pair<>(name, args);
     }
 
-    private static Future<CommandResult> exec0(CommandSender sender, String command, String[] args, IOHandler ioHandler, String rawCommand) {
+    private static Future<CommandResult> exec0(final CommandSender sender, final String command, final String[] args, final IOHandler ioHandler, final String rawCommand) {
         boolean flag = false;
         Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
-        for (Command com : Command.getCommands())
+        for (final Command com : Command.getCommands())
             if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
                 for (int i = 0;i<args.length;i++)
                     if (args[i].startsWith("\"@")) {
-                        String h = args[i].substring(2);
-                        Pair<String,String[]> pair = splitSpecialArgument(h);
-                        String head = pair.getKey();
-                        String[] values = pair.getValue();
+                        final String h = args[i].substring(2);
+                        final Pair<String,String[]> pair = splitSpecialArgument(h);
+                        final String head = pair.getKey();
+                        final String[] values = pair.getValue();
                         if (SPECIAL_ARGUMENT_HANDLERS.containsKey(head))
                             args[i] = SPECIAL_ARGUMENT_HANDLERS.get(head).handle(head,sender,com,args,i,values);
                         else if (SPECIAL_ARGUMENT_HANDLERS.containsKey(com.getPlugin().getName() + ":" + head))
                             args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head,sender,com,args,i,values);
                         else args[i] = args[i].substring(1);
                     }
-                CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
+                final CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
                 try {
                     EventManager.submit(event);
-                } catch (EventSubmitException e) {
+                } catch (final EventSubmitException e) {
                     FocessQQ.getLogger().thrLang("exception-submit-command-prepost-event", e);
                 }
                 if (event.isCancelled())
@@ -190,11 +190,11 @@ public class CommandLine {
      * @param name the name of the special argument handler
      * @param handler the special argument handler
      */
-    public static void register(Plugin plugin, String name, SpecialArgumentComplexHandler handler) {
+    public static void register(final Plugin plugin, final String name, final SpecialArgumentComplexHandler handler) {
         PLUGIN_SPECIAL_ARGUMENT_MAP.compute(plugin,(k,v)->{
           if (v == null)
               v = Lists.newArrayList();
-          String n = plugin == FocessQQ.getMainPlugin() ? name : plugin.getName() + ":" + name;
+          final String n = plugin == FocessQQ.getMainPlugin() ? name : plugin.getName() + ":" + name;
           v.removeIf(i->i.getKey().equals(n));
           v.add(Pair.of(n,handler));
           SPECIAL_ARGUMENT_HANDLERS.put(n,handler);
@@ -207,7 +207,7 @@ public class CommandLine {
      *
      * @param handler the special argument handler
      */
-    public static void unregister(SpecialArgumentComplexHandler handler) {
+    public static void unregister(final SpecialArgumentComplexHandler handler) {
         PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k,v)->{
             v.removeIf(i->i.getRight() == handler);
         });
@@ -223,7 +223,7 @@ public class CommandLine {
      * @param plugin the plugin
      * @param name the name of the special argument handler
      */
-    public static void unregister(Plugin plugin,String name) {
+    public static void unregister(final Plugin plugin, final String name) {
         PLUGIN_SPECIAL_ARGUMENT_MAP.computeIfPresent(plugin,(k,v)->{
             v.removeIf(i->i.getLeft().equals(name));
             return v;
@@ -236,8 +236,8 @@ public class CommandLine {
      *
      * @param plugin the plugin
      */
-    public static void unregister(Plugin plugin) {
-        for (Pair<String,SpecialArgumentComplexHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin,Lists.newArrayList()))
+    public static void unregister(final Plugin plugin) {
+        for (final Pair<String,SpecialArgumentComplexHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin,Lists.newArrayList()))
             SPECIAL_ARGUMENT_HANDLERS.remove(pair.getLeft());
         PLUGIN_SPECIAL_ARGUMENT_MAP.remove(plugin);
     }
@@ -248,7 +248,7 @@ public class CommandLine {
      */
     public static boolean unregisterAll() {
         boolean flag = false;
-        for (Plugin plugin : PLUGIN_SPECIAL_ARGUMENT_MAP.keySet()) {
+        for (final Plugin plugin : PLUGIN_SPECIAL_ARGUMENT_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
                 flag = true;
             unregister(plugin);

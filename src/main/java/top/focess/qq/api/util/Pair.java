@@ -20,7 +20,7 @@ public class Pair<K, V> implements Serializable {
      */
     private final V value;
 
-    public Pair(K key, V value) {
+    public Pair(final K key, final V value) {
         this.key = key;
         this.value = value;
     }
@@ -34,16 +34,16 @@ public class Pair<K, V> implements Serializable {
      * @param <V> the second element type
      * @return the pair
      */
-    public static <K, V> Pair<K, V> of(K key, V value) {
+    public static <K, V> Pair<K, V> of(final K key, final V value) {
         return new Pair<>(key, value);
     }
 
     public K getKey() {
-        return key;
+        return this.key;
     }
 
     public V getValue() {
-        return value;
+        return this.value;
     }
 
     public K getLeft() {
@@ -64,6 +64,6 @@ public class Pair<K, V> implements Serializable {
 
     @Override
     public String toString() {
-        return "(" + key + ',' + value + ')';
+        return "(" + this.key + ',' + this.value + ')';
     }
 }

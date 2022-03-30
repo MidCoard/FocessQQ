@@ -26,17 +26,17 @@ public class FriendInputStatusEvent extends BotEvent{
      * @param friend the friend
      * @param input the friend input status
      */
-    public FriendInputStatusEvent(Bot bot, Friend friend, boolean input) {
+    public FriendInputStatusEvent(final Bot bot, final Friend friend, final boolean input) {
         super(bot);
         this.friend = friend;
         this.input = input;
     }
 
     public boolean isInput() {
-        return input;
+        return this.input;
     }
 
     public Friend getFriend() {
-        return friend;
+        return this.friend;
     }
 }

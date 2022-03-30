@@ -10,17 +10,17 @@ public class ClientPackPacketCodec extends PacketCodec<ClientPackPacket>{
 
     @Nullable
     @Override
-    public ClientPackPacket readPacket(PacketPreCodec packetPreCodec) {
-        int clientId = packetPreCodec.readInt();
-        String token = packetPreCodec.readString();
-        Packet packet = packetPreCodec.readPacket();
+    public ClientPackPacket readPacket(final PacketPreCodec packetPreCodec) {
+        final int clientId = packetPreCodec.readInt();
+        final String token = packetPreCodec.readString();
+        final Packet packet = packetPreCodec.readPacket();
         if (packet == null)
             return null;
         return new ClientPackPacket(clientId,token,packet);
     }
 
     @Override
-    public void writePacket(ClientPackPacket packet, PacketPreCodec packetPreCodec) {
+    public void writePacket(final ClientPackPacket packet, final PacketPreCodec packetPreCodec) {
         packetPreCodec.writeInt(packet.getClientId());
         packetPreCodec.writeString(packet.getToken());
         packetPreCodec.writePacket(packet.getPacket());

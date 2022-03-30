@@ -7,7 +7,7 @@ public class IntBuffer extends DataBuffer<Integer> {
 
     private final java.nio.IntBuffer buffer;
 
-    private IntBuffer(int size) {
+    private IntBuffer(final int size) {
         this.buffer = java.nio.IntBuffer.allocate(size);
     }
 
@@ -17,7 +17,7 @@ public class IntBuffer extends DataBuffer<Integer> {
      * @param size the target buffer size
      * @return a IntBuffer with fixed size
      */
-    public static IntBuffer allocate(int size) {
+    public static IntBuffer allocate(final int size) {
         return new IntBuffer(size);
     }
 
@@ -27,7 +27,7 @@ public class IntBuffer extends DataBuffer<Integer> {
     }
 
     @Override
-    public void put(Integer integer) {
+    public void put(final Integer integer) {
         this.buffer.put(integer);
     }
 
@@ -37,7 +37,7 @@ public class IntBuffer extends DataBuffer<Integer> {
     }
 
     @Override
-    public Integer get(int index) {
+    public Integer get(final int index) {
         return this.buffer.get(index);
     }
 }

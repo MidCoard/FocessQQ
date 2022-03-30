@@ -4,7 +4,7 @@ public class Message {
 
     protected final net.mamoe.mirai.message.data.Message message;
 
-    public Message(net.mamoe.mirai.message.data.Message message) {
+    public Message(final net.mamoe.mirai.message.data.Message message) {
         this.message = message;
     }
 
@@ -17,11 +17,11 @@ public class Message {
         return this.message.contentToString();
     }
 
-    public static Message of(net.mamoe.mirai.message.data.Message message) {
+    public static Message of(final net.mamoe.mirai.message.data.Message message) {
         return new Message(message);
     }
 
-    public Message plus(Message message) {
+    public Message plus(final Message message) {
         return new Message(this.message.plus(message.message));
     }
 }

@@ -23,15 +23,15 @@ public class CommandCommand extends Command {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor((sender,data,ioHandler)->{
             if (Command.getCommands().size() != 0 ) {
-                StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("command-command-list"));
-                for (Command command : Command.getCommands())
+                final StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("command-command-list"));
+                for (final Command command : Command.getCommands())
                     stringBuilder.append(' ').append(command.getName());
                 ioHandler.output(stringBuilder.toString());
             } else ioHandler.outputLang("command-command-no-command");
             return CommandResult.ALLOW;
         }, CommandArgument.of("list"));
         this.addExecutor((sender,data,ioHandler) ->{
-            Command command = data.getCommand();
+            final Command command = data.getCommand();
             if (command.getPlugin() == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("command-command-unload-main-plugin-command", command.getName());
                 return CommandResult.REFUSE;
@@ -44,7 +44,7 @@ public class CommandCommand extends Command {
 
     @Override
     @NotNull
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList(
                 "Use: command list",
                 "Use: command unload <command>"

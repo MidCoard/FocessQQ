@@ -22,7 +22,7 @@ public class UnloadCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor( (sender, data, ioHandler) -> {
-            Plugin plugin = data.getPlugin();
+            final Plugin plugin = data.getPlugin();
             if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("unload-command-unload-main-plugin");
                 return CommandResult.REFUSE;
@@ -39,7 +39,7 @@ public class UnloadCommand extends Command {
 
     @Override
     @NotNull
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: unload <plugin>");
     }
 

@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 public class MessageChain extends Message implements Iterable<Message> {
 
-    public MessageChain(net.mamoe.mirai.message.data.MessageChain message) {
+    public MessageChain(final net.mamoe.mirai.message.data.MessageChain message) {
         super(message);
     }
 
@@ -25,7 +25,7 @@ public class MessageChain extends Message implements Iterable<Message> {
         return ((net.mamoe.mirai.message.data.MessageChain)this.message).serializeToMiraiCode();
     }
 
-    public Message get(int index) {
+    public Message get(final int index) {
         return new Message(((net.mamoe.mirai.message.data.MessageChain)this.message).get(index));
     }
 

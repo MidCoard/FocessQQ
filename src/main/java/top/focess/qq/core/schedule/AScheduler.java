@@ -15,7 +15,7 @@ public abstract class AScheduler implements Scheduler {
 
     private static final Map<Plugin, List<Scheduler>> PLUGIN_SCHEDULER_MAP = Maps.newConcurrentMap();
 
-    public AScheduler(Plugin plugin){
+    public AScheduler(final Plugin plugin){
         this.plugin = plugin;
         PLUGIN_SCHEDULER_MAP.compute(plugin,(k,v)->{
             if (v == null)
@@ -32,7 +32,7 @@ public abstract class AScheduler implements Scheduler {
 
     @Override
     public void close() {
-        PLUGIN_SCHEDULER_MAP.compute(plugin,(k,v)->{
+        PLUGIN_SCHEDULER_MAP.compute(this.plugin,(k, v)->{
             if (v != null)
                 v.remove(this);
             return v;
@@ -44,8 +44,8 @@ public abstract class AScheduler implements Scheduler {
      *
      * @param plugin the plugin
      */
-    public static void close(Plugin plugin) {
-        for (Scheduler scheduler : PLUGIN_SCHEDULER_MAP.getOrDefault(plugin, Lists.newCopyOnWriteArrayList()))
+    public static void close(final Plugin plugin) {
+        for (final Scheduler scheduler : PLUGIN_SCHEDULER_MAP.getOrDefault(plugin, Lists.newCopyOnWriteArrayList()))
             scheduler.close();
         PLUGIN_SCHEDULER_MAP.remove(plugin);
     }
@@ -57,7 +57,7 @@ public abstract class AScheduler implements Scheduler {
      */
     public static boolean closeAll() {
         boolean ret = false;
-        for (Plugin plugin : PLUGIN_SCHEDULER_MAP.keySet()) {
+        for (final Plugin plugin : PLUGIN_SCHEDULER_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
             close(plugin);

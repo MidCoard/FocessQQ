@@ -9,7 +9,7 @@ public class EventSubmitException extends Exception {
      * Constructs a EventSubmitException
      * @param event the event
      */
-    public EventSubmitException(Event event) {
+    public EventSubmitException(final Event event) {
         super("Event " + event.getClass().getSimpleName() + " cannot be submitted.");
     }
 
@@ -19,7 +19,7 @@ public class EventSubmitException extends Exception {
      * @param event the event
      * @param message the detail message
      */
-    public EventSubmitException(Event event, String message) {
+    public EventSubmitException(final Event event, final String message) {
         super("Event " + event.getClass().getSimpleName() + " cannot be submitted. Message: " + message);
     }
 }

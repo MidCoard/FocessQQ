@@ -11,13 +11,13 @@ public abstract class Event implements Serializable {
     /**
      * Used to prevent submitting in the future Event Chain
      */
-    private boolean prevent = false;
+    private boolean prevent;
 
-    public void setPrevent(boolean prevent) {
+    public void setPrevent(final boolean prevent) {
         this.prevent = prevent;
     }
 
     public boolean isPrevent() {
-        return prevent;
+        return this.prevent;
     }
 }

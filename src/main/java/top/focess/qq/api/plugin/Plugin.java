@@ -65,7 +65,7 @@ public abstract class Plugin {
     /**
      * Whether the plugin is enabled or not
      */
-    private boolean isEnabled = false;
+    private boolean isEnabled;
 
     /**
      * Initialize a Plugin instance by its name.
@@ -76,7 +76,7 @@ public abstract class Plugin {
      * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      */
-    public Plugin(String name, String author, Version version) {
+    public Plugin(final String name, final String author, final Version version) {
         this.name = name;
         this.author = author;
         this.version = version;
@@ -91,37 +91,37 @@ public abstract class Plugin {
 
     private void init() {
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
-            throw new PluginLoaderException(name);
+            throw new PluginLoaderException(this.name);
         if (this.getClass() != FocessQQ.MainPlugin.class || FocessQQ.isRunning()) {
-            if (Plugin.getPlugin(this.getClass()) != null)
-                throw new PluginDuplicateException(name,"Cannot new a plugin at runtime");
-            this.pluginDescription = new PluginDescription(YamlConfiguration.load(loadResource("plugin.yml")));
+            if (getPlugin(this.getClass()) != null)
+                throw new PluginDuplicateException(this.name,"Cannot new a plugin at runtime");
+            this.pluginDescription = new PluginDescription(YamlConfiguration.load(this.loadResource("plugin.yml")));
         }
         else this.pluginDescription = new PluginDescription();
         if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
             throw new IllegalStateException("Cannot new a plugin at runtime");
-        if (!getDefaultFolder().exists())
-            if (!getDefaultFolder().mkdirs())
-                FocessQQ.getLogger().debugLang("create-default-folder-failed",getDefaultFolder().getAbsolutePath());
-        File config = new File(getDefaultFolder(), "config.yml");
+        if (!this.getDefaultFolder().exists())
+            if (!this.getDefaultFolder().mkdirs())
+                FocessQQ.getLogger().debugLang("create-default-folder-failed", this.getDefaultFolder().getAbsolutePath());
+        final File config = new File(this.getDefaultFolder(), "config.yml");
         if (!config.exists()) {
             try {
-                InputStream configResource = loadResource("config.yml");
+                final InputStream configResource = this.loadResource("config.yml");
                 if (configResource != null) {
                     Files.copy(configResource, config.toPath());
                     configResource.close();
                 } else if (!config.createNewFile())
                     FocessQQ.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 FocessQQ.getLogger().thrLang("exception-create-config-file",e);
             }
         }
         try {
-            defaultConfig = new DefaultConfig(config);
-        } catch (YamlLoadException e) {
+            this.defaultConfig = new DefaultConfig(config);
+        } catch (final YamlLoadException e) {
             FocessQQ.getLogger().thrLang("exception-load-default-configuration",e);
         }
-        langConfig = new LangConfig(loadResource("lang.yml"));
+        this.langConfig = new LangConfig(this.loadResource("lang.yml"));
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class Plugin {
      * @return the plugin instance
      */
     @Nullable
-    public static Plugin getPlugin(Class<? extends Plugin> plugin) {
+    public static Plugin getPlugin(final Class<? extends Plugin> plugin) {
         return PluginClassLoader.getPlugin(plugin);
     }
 
@@ -144,7 +144,7 @@ public abstract class Plugin {
      * @return the plugin instance
      */
     @Nullable
-    public static Plugin getPlugin(String name) {
+    public static Plugin getPlugin(final String name) {
         return PluginClassLoader.getPlugin(name);
     }
 
@@ -155,7 +155,7 @@ public abstract class Plugin {
 
     @NonNull
     public final String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -184,18 +184,18 @@ public abstract class Plugin {
     }
 
     @Override
-    public boolean equals(@org.checkerframework.checker.nullness.qual.Nullable Object o) {
+    public boolean equals(@org.checkerframework.checker.nullness.qual.Nullable final Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
 
-        Plugin plugin = (Plugin) o;
+        final Plugin plugin = (Plugin) o;
 
-        return Objects.equals(name, plugin.name);
+        return Objects.equals(this.name, plugin.name);
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return this.name != null ? this.name.hashCode() : 0;
     }
 
     /**
@@ -203,22 +203,22 @@ public abstract class Plugin {
      *
      * @param listener the listener need to be registered
      */
-    public final void registerListener(Listener listener) {
+    public final void registerListener(final Listener listener) {
         ListenerHandler.register(this, listener);
-        for (Method method : listener.getClass().getDeclaredMethods()) {
-            EventHandler handler;
+        for (final Method method : listener.getClass().getDeclaredMethods()) {
+            final EventHandler handler;
             if ((handler = method.getAnnotation(EventHandler.class)) != null) {
                 if (method.getParameterTypes().length == 1) {
-                    Class<?> eventClass = method.getParameterTypes()[0];
+                    final Class<?> eventClass = method.getParameterTypes()[0];
                     if (Event.class.isAssignableFrom(eventClass) && !Modifier.isAbstract(eventClass.getModifiers())) {
                         try {
-                            Field field = eventClass.getDeclaredField("LISTENER_HANDLER");
-                            boolean flag = field.isAccessible();
+                            final Field field = eventClass.getDeclaredField("LISTENER_HANDLER");
+                            final boolean flag = field.isAccessible();
                             field.setAccessible(true);
-                            ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
+                            final ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
                             field.setAccessible(flag);
                             listenerHandler.register(listener, method, handler);
-                        } catch (Exception ignored) {
+                        } catch (final Exception ignored) {
                         }
                     }
                 }
@@ -231,7 +231,7 @@ public abstract class Plugin {
      * @param command the command need to be registered
      * @see Command#register(Plugin, Command)
      */
-    public final void registerCommand(Command command) {
+    public final void registerCommand(final Command command) {
         Command.register(this,command);
     }
 
@@ -242,37 +242,37 @@ public abstract class Plugin {
      * @param bufferGetter the getter of the buffer
      * @see DataCollection#register(Plugin, DataConverter, DataCollection.BufferGetter)
      */
-    public final void registerBuffer(DataConverter<?> dataConverter, DataCollection.BufferGetter bufferGetter) {
+    public final void registerBuffer(final DataConverter<?> dataConverter, final DataCollection.BufferGetter bufferGetter) {
         DataCollection.register(this,dataConverter,bufferGetter);
     }
 
     public final String getAuthor() {
-        return author;
+        return this.author;
     }
 
     public final Version getVersion() {
-        return version;
+        return this.version;
     }
 
     public final LangConfig getLangConfig() {
-        return langConfig;
+        return this.langConfig;
     }
 
     public final DefaultConfig getDefaultConfig() {
-        return defaultConfig;
+        return this.defaultConfig;
     }
 
     public final PluginDescription getPluginDescription() {
-        return pluginDescription;
+        return this.pluginDescription;
     }
 
     @Nullable
-    public final InputStream loadResource(String path) {
+    public final InputStream loadResource(final String path) {
         return this.getClass().getClassLoader().getResourceAsStream(path);
     }
 
     public final boolean isEnabled() {
-        return isEnabled;
+        return this.isEnabled;
     }
 
     /**
@@ -291,7 +291,7 @@ public abstract class Plugin {
      * @param handler the special argument handler
      * @see CommandLine#register(Plugin, String, SpecialArgumentComplexHandler)
      */
-    public final void registerSpecialArgumentHandler(String name, SpecialArgumentComplexHandler handler) {
+    public final void registerSpecialArgumentHandler(final String name, final SpecialArgumentComplexHandler handler) {
         CommandLine.register(this,name,handler);
     }
 }

@@ -16,7 +16,7 @@ public interface Scheduler {
      * @param runnable the task
      * @return the wrapped task
      */
-    default Task run(Runnable runnable) {
+    default Task run(final Runnable runnable) {
         return this.run(runnable, Duration.ZERO);
     }
 
@@ -46,7 +46,7 @@ public interface Scheduler {
      * @param <V> the return type
      * @return the wrapped task
      */
-    default <V> Callback<V> submit(Callable<V> callable) {
+    default <V> Callback<V> submit(final Callable<V> callable) {
         return this.submit(callable, Duration.ZERO);
     }
 

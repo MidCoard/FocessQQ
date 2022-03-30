@@ -9,7 +9,7 @@ public class BooleanBuffer extends DataBuffer<Boolean> {
 
     private final ByteBuffer byteBuffer;
 
-    private BooleanBuffer(int size) {
+    private BooleanBuffer(final int size) {
         this.byteBuffer = ByteBuffer.allocate(size);
     }
 
@@ -19,22 +19,22 @@ public class BooleanBuffer extends DataBuffer<Boolean> {
      * @param size the target buffer size
      * @return a BooleanBuffer with fixed size
      */
-    public static BooleanBuffer allocate(int size) {
+    public static BooleanBuffer allocate(final int size) {
         return new BooleanBuffer(size);
     }
 
     @Override
-    public void put(Boolean b) {
-        byteBuffer.put((byte) (b ? 1 : 0));
+    public void put(final Boolean b) {
+        this.byteBuffer.put((byte) (b ? 1 : 0));
     }
 
     @Override
     public Boolean get() {
-        return byteBuffer.get() != 0;
+        return this.byteBuffer.get() != 0;
     }
 
     @Override
-    public Boolean get(int index) {
+    public Boolean get(final int index) {
         return this.byteBuffer.get(index) != 0;
     }
 

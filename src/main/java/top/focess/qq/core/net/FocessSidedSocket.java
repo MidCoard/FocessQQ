@@ -20,44 +20,44 @@ public class FocessSidedSocket extends ASocket {
     private final int localPort;
     private final ServerSocket server;
 
-    public FocessSidedSocket(int localPort) throws IllegalPortException {
+    public FocessSidedSocket(final int localPort) throws IllegalPortException {
         this.localPort = localPort;
         try {
             this.server = new ServerSocket(localPort);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalPortException(localPort);
         }
-        Thread thread = new Thread(() -> {
+        final Thread thread = new Thread(() -> {
             FocessQQ.getLogger().debugLang("start-focess-sided-socket", localPort);
-            while (!server.isClosed())
+            while (!this.server.isClosed())
                 try {
-                    java.net.Socket socket = server.accept();
-                    InputStream inputStream = socket.getInputStream();
-                    byte[] buffer = new byte[1024];
-                    PacketPreCodec packetPreCodec = new PacketPreCodec();
+                    final java.net.Socket socket = this.server.accept();
+                    final InputStream inputStream = socket.getInputStream();
+                    final byte[] buffer = new byte[1024];
+                    final PacketPreCodec packetPreCodec = new PacketPreCodec();
                     int length;
                     while ((length = inputStream.read(buffer)) != -1)
                         packetPreCodec.push(buffer, length);
-                    Packet packet = packetPreCodec.readPacket();
-                    OutputStream outputStream = socket.getOutputStream();
+                    final Packet packet = packetPreCodec.readPacket();
+                    final OutputStream outputStream = socket.getOutputStream();
                     if (packet != null)
-                        for (Pair<Receiver, Method> pair : packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
-                            Method method = pair.getValue();
+                        for (final Pair<Receiver, Method> pair : this.packetMethods.getOrDefault(packet.getClass(), Lists.newArrayList())) {
+                            final Method method = pair.getValue();
                             try {
                                 method.setAccessible(true);
-                                Object o = method.invoke(pair.getKey(), packet);
+                                final Object o = method.invoke(pair.getKey(), packet);
                                 if (o != null) {
-                                    PacketPreCodec handler = new PacketPreCodec();
+                                    final PacketPreCodec handler = new PacketPreCodec();
                                     handler.writePacket((Packet) o);
                                     outputStream.write(handler.getBytes());
                                     outputStream.flush();
                                 }
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 FocessQQ.getLogger().thrLang("exception-handle-packet", e);
                             }
                         }
                     socket.shutdownOutput();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     FocessQQ.getLogger().thrLang("exception-focess-sided-socket", e);
                     if (this.server.isClosed())
                         return;
@@ -69,17 +69,17 @@ public class FocessSidedSocket extends ASocket {
     @Override
     public boolean close() {
         boolean ret = false;
-        for (Receiver receiver : receivers)
+        for (final Receiver receiver : this.receivers)
             ret = ret || receiver.close();
         try {
             this.server.close();
-        } catch (IOException ignored) {
+        } catch (final IOException ignored) {
         }
         return ret;
     }
 
     @Override
-    public void registerReceiver(Receiver receiver) {
+    public void registerReceiver(final Receiver receiver) {
         if (!(receiver instanceof ServerReceiver))
             throw new UnsupportedOperationException();
         super.registerReceiver(receiver);
@@ -96,6 +96,6 @@ public class FocessSidedSocket extends ASocket {
     }
 
     public int getLocalPort() {
-        return localPort;
+        return this.localPort;
     }
 }

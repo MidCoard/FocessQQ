@@ -16,7 +16,7 @@ public interface SectionMap extends Serializable {
      * @param key the key of the key-value pair
      * @param value the value of the key-value pair
      */
-    default void set(String key, Object value) {
+    default void set(final String key, final Object value) {
         this.getValues().put(key,value);
     }
 
@@ -27,7 +27,7 @@ public interface SectionMap extends Serializable {
      * @return the desired value
      * @throws ClassCastException if the desired T type is not equal to its original type
      */
-    default <T> T get(String key) {
+    default <T> T get(final String key) {
         return (T) this.getValues().get(key);
     }
 
@@ -37,7 +37,7 @@ public interface SectionMap extends Serializable {
      * @param key the key of the key-value pair
      * @return true there is a key-value pair named key, false otherwise
      */
-    default boolean contains(String key) {
+    default boolean contains(final String key) {
         return this.getValues().containsKey(key);
     }
 
@@ -46,7 +46,7 @@ public interface SectionMap extends Serializable {
      *
      * @param key the key of the key-value pair
      */
-    default void remove(String key) {
+    default void remove(final String key) {
         this.getValues().remove(key);
     }
 
@@ -102,7 +102,7 @@ public interface SectionMap extends Serializable {
      * @param <T> the desired type
      * @return the desired value or defaultValue if there is no value
      */
-    default <T> T getOrDefault(String key, T defaultValue) {
+    default <T> T getOrDefault(final String key, final T defaultValue) {
         return this.getValues().containsKey(key) ? this.get(key) : defaultValue;
     }
 
@@ -112,7 +112,7 @@ public interface SectionMap extends Serializable {
      * @param key the key of the key-value pair
      * @param remappingFunction the remapping function
      */
-    default void compute(String key, BiFunction<? super String, ? super Object, ?> remappingFunction) {
+    default void compute(final String key, final BiFunction<? super String, ? super Object, ?> remappingFunction) {
         this.getValues().compute(key, remappingFunction);
     }
 }

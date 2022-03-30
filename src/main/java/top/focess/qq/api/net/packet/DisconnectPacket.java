@@ -12,7 +12,7 @@ public class DisconnectPacket extends ClientPacket {
      * @param clientId the client id
      * @param token the client token
      */
-    public DisconnectPacket(int clientId,String token) {
+    public DisconnectPacket(final int clientId, final String token) {
         super(clientId, token);
     }
 

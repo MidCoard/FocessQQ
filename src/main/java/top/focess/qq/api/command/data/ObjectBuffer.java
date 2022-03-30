@@ -14,7 +14,7 @@ public class ObjectBuffer extends DataBuffer<Object> {
 
     private int limit;
 
-    private ObjectBuffer(int size) {
+    private ObjectBuffer(final int size) {
         this.objects = new Object[size];
         this.pos = 0;
         this.limit = size;
@@ -25,32 +25,32 @@ public class ObjectBuffer extends DataBuffer<Object> {
      * @param size the target buffer size
      * @return a ObjectBuffer with fixed size
      */
-    public static ObjectBuffer allocate(int size) {
+    public static ObjectBuffer allocate(final int size) {
         return new ObjectBuffer(size);
     }
 
     @Override
     public void flip() {
-        this.limit = pos;
+        this.limit = this.pos;
         this.pos = 0;
     }
 
     @Override
-    public void put(Object o) {
-        if (pos == limit)
+    public void put(final Object o) {
+        if (this.pos == this.limit)
             throw new BufferOverflowException();
-        objects[pos++] = o;
+        this.objects[this.pos++] = o;
     }
 
     @Override
     public Object get() {
-        if (pos == limit)
+        if (this.pos == this.limit)
             throw new BufferUnderflowException();
-        return objects[pos++];
+        return this.objects[this.pos++];
     }
 
     @Override
-    public Object get(int index) {
-        return objects[index];
+    public Object get(final int index) {
+        return this.objects[index];
     }
 }

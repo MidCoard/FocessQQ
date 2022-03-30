@@ -26,12 +26,12 @@ public class StrangerMessageEvent extends MessageEvent{
      * @param stranger the stranger who chats with bot
      * @param source  the message source
      */
-    public StrangerMessageEvent(Bot bot, MessageChain message, Stranger stranger, MessageSource source) {
+    public StrangerMessageEvent(final Bot bot, final MessageChain message, final Stranger stranger, final MessageSource source) {
         super(bot, message, source);
         this.stranger = stranger;
     }
 
     public Stranger getStranger() {
-        return stranger;
+        return this.stranger;
     }
 }

@@ -7,10 +7,10 @@ import top.focess.qq.api.net.PacketPreCodec;
  */
 public class DisconnectedPacketCodec extends PacketCodec<DisconnectedPacket>{
     @Override
-    public DisconnectedPacket readPacket(PacketPreCodec packetPreCodec) {
+    public DisconnectedPacket readPacket(final PacketPreCodec packetPreCodec) {
         return new DisconnectedPacket();
     }
 
     @Override
-    public void writePacket(DisconnectedPacket packet, PacketPreCodec packetPreCodec) {}
+    public void writePacket(final DisconnectedPacket packet, final PacketPreCodec packetPreCodec) {}
 }

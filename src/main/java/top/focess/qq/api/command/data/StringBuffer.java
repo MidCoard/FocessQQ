@@ -10,9 +10,9 @@ public class StringBuffer extends DataBuffer<String> {
     private final IntBuffer intBuffer;
 
     private final CharBuffer[] charBuffers;
-    private int pos = 0;
+    private int pos;
 
-    private StringBuffer(int size) {
+    private StringBuffer(final int size) {
         this.intBuffer = IntBuffer.allocate(size);
         this.charBuffers = new CharBuffer[size];
     }
@@ -23,7 +23,7 @@ public class StringBuffer extends DataBuffer<String> {
      * @param size the target buffer size
      * @return a StringBuffer with fixed size
      */
-    public static StringBuffer allocate(int size) {
+    public static StringBuffer allocate(final int size) {
         return new StringBuffer(size);
     }
 
@@ -31,19 +31,19 @@ public class StringBuffer extends DataBuffer<String> {
         this.intBuffer.flip();
     }
 
-    public void put(String s) {
-        charBuffers[pos] = CharBuffer.allocate(s.length()).put(s);
-        charBuffers[pos].flip();
-        intBuffer.put(pos++);
+    public void put(final String s) {
+        this.charBuffers[this.pos] = CharBuffer.allocate(s.length()).put(s);
+        this.charBuffers[this.pos].flip();
+        this.intBuffer.put(this.pos++);
     }
 
     @Override
     public String get() {
-        return new String(charBuffers[intBuffer.get()].array());
+        return new String(this.charBuffers[this.intBuffer.get()].array());
     }
 
     @Override
-    public String get(int index) {
-        return new String(charBuffers[intBuffer.get(index)].array());
+    public String get(final int index) {
+        return new String(this.charBuffers[this.intBuffer.get(index)].array());
     }
 }

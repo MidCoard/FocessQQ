@@ -12,7 +12,7 @@ public class BotLoginException extends IOException {
      * Constructs a BotLoginException
      * @param id the id of the login failed bot
      */
-    public BotLoginException(long id) {
+    public BotLoginException(final long id) {
         super("Bot " + id + " login failed.");
     }
 
@@ -21,11 +21,11 @@ public class BotLoginException extends IOException {
      * @param id the id of the login failed bot
      * @param e the cause of the exception
      */
-    public BotLoginException(long id, Exception e) {
+    public BotLoginException(final long id, final Exception e) {
         super("Bot " + id + " login failed.", e);
     }
 
-    public BotLoginException(long id, String message) {
+    public BotLoginException(final long id, final String message) {
         super("Bot " + id + " login failed: " + message);
     }
 }

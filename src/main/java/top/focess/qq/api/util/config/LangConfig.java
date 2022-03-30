@@ -9,22 +9,22 @@ import java.io.InputStream;
 
 public class LangConfig extends Config {
 
-    public LangConfig(@Nullable InputStream inputStream) {
+    public LangConfig(@Nullable final InputStream inputStream) {
         super(inputStream);
     }
 
     @Override
-    protected Config getSection(String key) {
+    protected Config getSection(final String key) {
         throw new UnsupportedOperationException();
     }
 
-    public LangConfig(File file) throws YamlLoadException {
+    public LangConfig(final File file) throws YamlLoadException {
         super(file);
     }
 
     @Override
-    public String get(String key) {
-        String ret = super.get(key);
+    public String get(final String key) {
+        final String ret = super.get(key);
         if (ret == null)
             FocessQQ.getLogger().debugLang("unknown-key", key);
         return ret != null ? ret : "";

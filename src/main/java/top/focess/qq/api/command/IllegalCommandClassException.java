@@ -9,7 +9,7 @@ public class IllegalCommandClassException extends IllegalArgumentException {
      *
      * @param c the illegal command class
      */
-    public IllegalCommandClassException(Class<?> c) {
+    public IllegalCommandClassException(final Class<?> c) {
         super("The class " + c.getName() + " is an illegal Command class.");
     }
 }

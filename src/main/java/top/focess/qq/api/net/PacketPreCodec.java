@@ -18,21 +18,21 @@ public class PacketPreCodec {
 
     private static final Map<Integer, PacketCodec<? extends Packet>> PACKET_CODECS = Maps.newHashMap();
     static{
-        PacketPreCodec.registerPacketCodec(MessagePacket.PACKET_ID,new MessagePacketCodec());
-        PacketPreCodec.registerPacketCodec(HeartPacket.PACKET_ID,new HeartPacketCodec());
-        PacketPreCodec.registerPacketCodec(ConnectPacket.PACKET_ID,new ConnectPacketCodec());
-        PacketPreCodec.registerPacketCodec(ConnectedPacket.PACKET_ID,new ConnectedPacketCodec());
-        PacketPreCodec.registerPacketCodec(DisconnectPacket.PACKET_ID,new DisconnectPacketCodec());
-        PacketPreCodec.registerPacketCodec(DisconnectedPacket.PACKET_ID,new DisconnectedPacketCodec());
-        PacketPreCodec.registerPacketCodec(ClientPackPacket.PACKET_ID,new ClientPackPacketCodec());
-        PacketPreCodec.registerPacketCodec(ServerPackPacket.PACKET_ID,new ServerPackPacketCodec());
-        PacketPreCodec.registerPacketCodec(SidedConnectPacket.PACKET_ID,new SidedConnectPacketCodec());
-        PacketPreCodec.registerPacketCodec(WaitPacket.PACKET_ID,new WaitPacketCodec());
+        registerPacketCodec(MessagePacket.PACKET_ID,new MessagePacketCodec());
+        registerPacketCodec(HeartPacket.PACKET_ID,new HeartPacketCodec());
+        registerPacketCodec(ConnectPacket.PACKET_ID,new ConnectPacketCodec());
+        registerPacketCodec(ConnectedPacket.PACKET_ID,new ConnectedPacketCodec());
+        registerPacketCodec(DisconnectPacket.PACKET_ID,new DisconnectPacketCodec());
+        registerPacketCodec(DisconnectedPacket.PACKET_ID,new DisconnectedPacketCodec());
+        registerPacketCodec(ClientPackPacket.PACKET_ID,new ClientPackPacketCodec());
+        registerPacketCodec(ServerPackPacket.PACKET_ID,new ServerPackPacketCodec());
+        registerPacketCodec(SidedConnectPacket.PACKET_ID,new SidedConnectPacketCodec());
+        registerPacketCodec(WaitPacket.PACKET_ID,new WaitPacketCodec());
     }
 
     private final List<Byte> data = Lists.newArrayList();
 
-    private int pointer = 0;
+    private int pointer;
 
     /**
      * Read a integer
@@ -41,7 +41,7 @@ public class PacketPreCodec {
     public int readInt() {
         int r = 0;
         for (int i = 0; i < 4; i++)
-            r += Byte.toUnsignedInt(data.get(pointer++)) << (i * 8);
+            r += Byte.toUnsignedInt(this.data.get(this.pointer++)) << (i * 8);
         return r;
     }
 
@@ -52,7 +52,7 @@ public class PacketPreCodec {
     public long readLong() {
         long r = 0L;
         for (int i = 0; i < 8; i++)
-            r += Byte.toUnsignedLong(data.get(pointer++)) << (i * 8L);
+            r += Byte.toUnsignedLong(this.data.get(this.pointer++)) << (i * 8L);
         return r;
     }
 
@@ -62,7 +62,7 @@ public class PacketPreCodec {
      */
     public void writeInt(int v) {
         for (int i = 0; i < 4; i++) {
-            data.add((byte) (v & 0xFF));
+            this.data.add((byte) (v & 0xFF));
             v >>>= 8;
         }
     }
@@ -73,7 +73,7 @@ public class PacketPreCodec {
      */
     public void writeLong(long v) {
         for (int i = 0; i < 8; i++) {
-            data.add((byte) (v & 0xFFL));
+            this.data.add((byte) (v & 0xFFL));
             v >>>= 8;
         }
     }
@@ -82,10 +82,10 @@ public class PacketPreCodec {
      * Write a string
      * @param v the string
      */
-    public void writeString(String v) {
-        byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
-        writeInt(bytes.length);
-        data.addAll(Bytes.asList(bytes));
+    public void writeString(final String v) {
+        final byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
+        this.writeInt(bytes.length);
+        this.data.addAll(Bytes.asList(bytes));
     }
 
     /**
@@ -93,10 +93,10 @@ public class PacketPreCodec {
      * @return the string read from precodec
      */
     public String readString() {
-        int length = readInt();
-        byte[] bytes = new byte[length];
+        final int length = this.readInt();
+        final byte[] bytes = new byte[length];
         for (int i = 0; i < length; i++)
-            bytes[i] = data.get(pointer++);
+            bytes[i] = this.data.get(this.pointer++);
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
@@ -105,8 +105,8 @@ public class PacketPreCodec {
      *
      * @param v the float
      */
-    public void writeFloat(float v) {
-        writeInt(Float.floatToIntBits(v));
+    public void writeFloat(final float v) {
+        this.writeInt(Float.floatToIntBits(v));
     }
 
     /**
@@ -114,15 +114,15 @@ public class PacketPreCodec {
      * @return the float read from precodec
      */
     public float readFloat() {
-        return Float.intBitsToFloat(readInt());
+        return Float.intBitsToFloat(this.readInt());
     }
 
     /**
      * Write a double
      * @param v the double
      */
-    public void writeDouble(double v) {
-        writeLong(Double.doubleToLongBits(v));
+    public void writeDouble(final double v) {
+        this.writeLong(Double.doubleToLongBits(v));
     }
 
     /**
@@ -131,7 +131,7 @@ public class PacketPreCodec {
      * @return the double read from precodec
      */
     public double readDouble() {
-        return Double.longBitsToDouble(readLong());
+        return Double.longBitsToDouble(this.readLong());
     }
 
     /**
@@ -140,14 +140,14 @@ public class PacketPreCodec {
      * @return the byte read from precodec
      */
     public byte readByte() {
-        return this.data.get(pointer++);
+        return this.data.get(this.pointer++);
     }
 
     /**
      * Write a byte
      * @param b the byte
      */
-    public void writeByte(byte b) {
+    public void writeByte(final byte b) {
         this.data.add(b);
     }
 
@@ -158,7 +158,7 @@ public class PacketPreCodec {
     public short readShort() {
         short r = 0;
         for (int i = 0; i < 2; i++)
-            r += (short) Byte.toUnsignedInt(data.get(pointer++)) << (i * 8);
+            r += (short) Byte.toUnsignedInt(this.data.get(this.pointer++)) << (i * 8);
         return r;
     }
 
@@ -169,7 +169,7 @@ public class PacketPreCodec {
      */
     public void writeShort(short v) {
         for (int i = 0; i < 2; i++) {
-            data.add((byte) (v & 0xFF));
+            this.data.add((byte) (v & 0xFF));
             v >>>= 8;
         }
     }
@@ -188,13 +188,13 @@ public class PacketPreCodec {
      */
     @Nullable
     public Packet readPacket() {
-        int packetId;
+        final int packetId;
         try {
-            packetId = readInt();
-        } catch (Exception e) {
+            packetId = this.readInt();
+        } catch (final Exception e) {
             return null;
         }
-        PacketCodec<? extends Packet> packetCodec = PACKET_CODECS.get(packetId);
+        final PacketCodec<? extends Packet> packetCodec = PACKET_CODECS.get(packetId);
         if (packetCodec != null)
             return packetCodec.readPacket(this);
         FocessQQ.getLogger().debugLang("unknown-packet", packetId);
@@ -208,9 +208,9 @@ public class PacketPreCodec {
      * @param <T> the packet type
      * @return true if the packet has been written successfully, false otherwise
      */
-    public <T extends Packet> boolean writePacket(T packet) {
-        int packetId = packet.getId();
-        PacketCodec<T> packetCodec = (PacketCodec<T>) PACKET_CODECS.get(packetId);
+    public <T extends Packet> boolean writePacket(final T packet) {
+        final int packetId = packet.getId();
+        final PacketCodec<T> packetCodec = (PacketCodec<T>) PACKET_CODECS.get(packetId);
         if (packetCodec != null) {
             this.writeInt(packetId);
             packetCodec.writePacket(packet, this);
@@ -226,7 +226,7 @@ public class PacketPreCodec {
      * @param packetCodec the packet codec
      * @param <T>  the packet type
      */
-    public static <T extends Packet> void registerPacketCodec(int packetId, PacketCodec<T> packetCodec) {
+    public static <T extends Packet> void registerPacketCodec(final int packetId, final PacketCodec<T> packetCodec) {
         PACKET_CODECS.put(packetId, packetCodec);
     }
 
@@ -238,9 +238,9 @@ public class PacketPreCodec {
      * @param length the length of the data
      * @see #push(byte[], int)
      */
-    public void push(byte[] buffer, int offset, int length) {
+    public void push(final byte[] buffer, final int offset, final int length) {
         for (int i = offset; i < length; i++)
-            data.add(buffer[i]);
+            this.data.add(buffer[i]);
     }
 
     /**
@@ -250,7 +250,7 @@ public class PacketPreCodec {
      * @param length the length of the data
      * @see #push(byte[], int, int)
      */
-    public void push(byte[] buffer, int length) {
+    public void push(final byte[] buffer, final int length) {
         this.push(buffer,0,length);
     }
 }

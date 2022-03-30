@@ -8,27 +8,27 @@ public class OptionParserClassifier {
     private final String name;
     private final OptionType<?>[] optionTypes;
 
-    public OptionParserClassifier(String name,OptionType<?>... optionTypes) {
+    public OptionParserClassifier(final String name, final OptionType<?>... optionTypes) {
         this.name = name;
         this.optionTypes = optionTypes;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public OptionType<?>[] getOptionTypes() {
-        return optionTypes;
+        return this.optionTypes;
     }
 
     @Nullable
-    public Option createOption(String[] args) {
-        if (args.length != optionTypes.length)
+    public Option createOption(final String[] args) {
+        if (args.length != this.optionTypes.length)
             return null;
-        Option option = new Option(this);
+        final Option option = new Option(this);
         for (int i = 0;i<args.length;i++)
-            if (optionTypes[i].accept(args[i]))
-                option.put(optionTypes[i],args[i]);
+            if (this.optionTypes[i].accept(args[i]))
+                option.put(this.optionTypes[i],args[i]);
             else return null;
         return option;
     }

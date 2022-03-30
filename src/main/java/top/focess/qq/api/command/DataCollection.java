@@ -23,17 +23,17 @@ public class DataCollection {
      *
      * @param dataConverters the data converters
      */
-    public DataCollection(DataConverter<?>[] dataConverters) {
-        Map<DataConverter<?>,Integer> map = Maps.newHashMap();
-        for (DataConverter<?> dataConverter : dataConverters)
+    public DataCollection(final DataConverter<?>[] dataConverters) {
+        final Map<DataConverter<?>,Integer> map = Maps.newHashMap();
+        for (final DataConverter<?> dataConverter : dataConverters)
             map.compute(dataConverter, (k, v) -> {
               if (v == null)
                   v = 0;
               v++;
               return v;
             });
-        for (DataConverter<?> dataConverter : map.keySet())
-            buffers.put(dataConverter.getTargetClass(), DATA_CONVERTER_BUFFER_MAP.get(dataConverter).newBuffer(map.get(dataConverter)));
+        for (final DataConverter<?> dataConverter : map.keySet())
+            this.buffers.put(dataConverter.getTargetClass(), DATA_CONVERTER_BUFFER_MAP.get(dataConverter).newBuffer(map.get(dataConverter)));
     }
 
     /**
@@ -43,7 +43,7 @@ public class DataCollection {
      * @param dataConverter the buffer data converter
      * @param bufferGetter the getter of the buffer
      */
-    public static void register(Plugin plugin, DataConverter<?> dataConverter,BufferGetter bufferGetter) {
+    public static void register(final Plugin plugin, final DataConverter<?> dataConverter, final BufferGetter bufferGetter) {
         PLUGIN_DATA_CONVERTER_MAP.compute(plugin, (k, v) -> {
            if (v == null)
                v = Lists.newArrayList();
@@ -57,8 +57,8 @@ public class DataCollection {
      * Unregister the getter of the buffers by plugin
      * @param plugin the plugin
      */
-    public static void unregister(Plugin plugin) {
-        for (DataConverter<?> dataConverter : PLUGIN_DATA_CONVERTER_MAP.getOrDefault(plugin, Lists.newArrayList()))
+    public static void unregister(final Plugin plugin) {
+        for (final DataConverter<?> dataConverter : PLUGIN_DATA_CONVERTER_MAP.getOrDefault(plugin, Lists.newArrayList()))
             DATA_CONVERTER_BUFFER_MAP.remove(dataConverter);
         PLUGIN_DATA_CONVERTER_MAP.remove(plugin);
     }
@@ -70,7 +70,7 @@ public class DataCollection {
      */
     public static boolean unregisterAll() {
         boolean ret = false;
-        for (Plugin plugin : PLUGIN_DATA_CONVERTER_MAP.keySet()) {
+        for (final Plugin plugin : PLUGIN_DATA_CONVERTER_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
                 ret = true;
             unregister(plugin);
@@ -84,8 +84,8 @@ public class DataCollection {
      * Flip all the buffers. Make them all readable.
      */
     void flip() {
-        for (Class<?> c : buffers.keySet())
-            buffers.get(c).flip();
+        for (final Class<?> c : this.buffers.keySet())
+            this.buffers.get(c).flip();
     }
 
     /**
@@ -159,12 +159,12 @@ public class DataCollection {
      * @throws UnsupportedOperationException if the buffer is not registered
      * @return the buffer element
      */
-    public <T> T getOrDefault(Class<T> cls,T t) {
+    public <T> T getOrDefault(final Class<T> cls, final T t) {
         try {
-            if (buffers.get(cls) == null)
+            if (this.buffers.get(cls) == null)
                 throw new UnsupportedOperationException();
-            return (T) buffers.get(cls).get();
-        } catch (Exception e) {
+            return (T) this.buffers.get(cls).get();
+        } catch (final Exception e) {
             return t;
         }
     }
@@ -180,12 +180,12 @@ public class DataCollection {
      * @throws UnsupportedOperationException if the buffer is not registered
      * @return the buffer element
      */
-    public <T> T getOrDefault(Class<T> cls,int index, T t) {
+    public <T> T getOrDefault(final Class<T> cls, final int index, final T t) {
         try {
-            if (buffers.get(cls) == null)
+            if (this.buffers.get(cls) == null)
                 throw new UnsupportedOperationException();
-            return (T) buffers.get(cls).get(index);
-        } catch (Exception e) {
+            return (T) this.buffers.get(cls).get(index);
+        } catch (final Exception e) {
             return t;
         }
     }
@@ -198,8 +198,8 @@ public class DataCollection {
      * @param <T> the buffer elements' type
      * @throws UnsupportedOperationException if the buffer is not registered
      */
-    <T> void write(Class<T> cls, T t) {
-        buffers.compute(cls, (key, value) -> {
+    <T> void write(final Class<T> cls, final T t) {
+        this.buffers.compute(cls, (key, value) -> {
             if (value == null)
                 throw new UnsupportedOperationException();
             value.put(t);
@@ -215,10 +215,10 @@ public class DataCollection {
      * @throws UnsupportedOperationException if the buffer is not registered
      * @return the buffer element
      */
-    public <T> T get(Class<T> c) {
-        if (buffers.get(c) == null)
+    public <T> T get(final Class<T> c) {
+        if (this.buffers.get(c) == null)
             throw new UnsupportedOperationException();
-        return (T) buffers.get(c).get();
+        return (T) this.buffers.get(c).get();
     }
 
     /**
@@ -231,10 +231,10 @@ public class DataCollection {
      * @throws UnsupportedOperationException if the buffer is not registered
      * @return the buffer element
      */
-    public <T> T get(Class<T> c,int index) {
-        if (buffers.get(c) == null)
+    public <T> T get(final Class<T> c, final int index) {
+        if (this.buffers.get(c) == null)
             throw new UnsupportedOperationException();
-        return (T) buffers.get(c).get(index);
+        return (T) this.buffers.get(c).get(index);
     }
 
     /**

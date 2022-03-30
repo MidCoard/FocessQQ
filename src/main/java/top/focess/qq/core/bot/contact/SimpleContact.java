@@ -10,13 +10,13 @@ public abstract class SimpleContact implements Contact {
     private final Bot bot;
     protected final net.mamoe.mirai.contact.Contact contact;
 
-    public SimpleContact(Bot bot, net.mamoe.mirai.contact.Contact contact) {
+    public SimpleContact(final Bot bot, final net.mamoe.mirai.contact.Contact contact) {
         this.bot = bot;
         this.contact = contact;
     }
 
     @Nullable
-    public static Contact get(Bot bot, net.mamoe.mirai.contact.Contact contact) {
+    public static Contact get(final Bot bot, final net.mamoe.mirai.contact.Contact contact) {
         if (contact == null)
             return null;
         if (contact.getBot().getId() != bot.getId())

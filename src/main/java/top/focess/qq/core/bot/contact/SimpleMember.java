@@ -18,14 +18,14 @@ public class SimpleMember extends SimpleContact implements Member {
     private final net.mamoe.mirai.contact.Member nativeMember;
     private final Group simpleGroup;
 
-    private SimpleMember(Group simpleGroup, net.mamoe.mirai.contact.Member nativeMember) {
+    private SimpleMember(final Group simpleGroup, final net.mamoe.mirai.contact.Member nativeMember) {
         super(simpleGroup.getBot(), nativeMember);
         this.simpleGroup = simpleGroup;
         this.nativeMember = nativeMember;
     }
 
     @Nullable
-    public static Member get(Group group, @Nullable net.mamoe.mirai.contact.Member member) {
+    public static Member get(final Group group, @Nullable final net.mamoe.mirai.contact.Member member) {
         if (member == null)
             return null;
         if (group.getBot().getId() != member.getBot().getId())
@@ -34,16 +34,16 @@ public class SimpleMember extends SimpleContact implements Member {
     }
 
     @Nullable
-    public static Member get(Bot bot, @Nullable net.mamoe.mirai.contact.Member member) {
+    public static Member get(final Bot bot, @Nullable final net.mamoe.mirai.contact.Member member) {
         if (member == null)
             return null;
-        Group group = bot.getGroup(member.getGroup().getId());
+        final Group group = bot.getGroup(member.getGroup().getId());
         if (group == null)
             return null;
         return get(group, member);
     }
 
-    public static void remove(Bot bot) {
+    public static void remove(final Bot bot) {
         GROUP_MEMBER_MAP.remove(bot.getId());
     }
 
@@ -69,7 +69,7 @@ public class SimpleMember extends SimpleContact implements Member {
 
     @Override
     public CommandPermission getPermission() {
-        MemberPermission permission = this.nativeMember.getPermission();
+        final MemberPermission permission = this.nativeMember.getPermission();
         if (permission == MemberPermission.OWNER)
             return OWNER;
         else if (permission == MemberPermission.ADMINISTRATOR)

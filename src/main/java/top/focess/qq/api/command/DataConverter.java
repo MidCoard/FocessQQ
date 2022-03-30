@@ -50,12 +50,12 @@ public abstract class DataConverter<T> {
      */
     public static final DataConverter<String> DEFAULT_DATA_CONVERTER = new DataConverter<String>() {
         @Override
-        protected boolean accept(String arg) {
+        protected boolean accept(final String arg) {
             return true;
         }
 
         @Override
-        public String convert(String arg) {
+        public String convert(final String arg) {
             return arg;
         }
 
@@ -71,12 +71,12 @@ public abstract class DataConverter<T> {
      */
     public static final DataConverter<Integer> INTEGER_DATA_CONVERTER = new DataConverter<Integer>() {
         @Override
-        protected boolean accept(String arg) {
+        protected boolean accept(final String arg) {
             return INTEGER_PREDICATE.test(arg);
         }
 
         @Override
-        public Integer convert(String arg) {
+        public Integer convert(final String arg) {
             return Integer.parseInt(arg);
         }
 
@@ -91,12 +91,12 @@ public abstract class DataConverter<T> {
      */
     public static final DataConverter<Long> LONG_DATA_CONVERTER = new DataConverter<Long>() {
         @Override
-        protected boolean accept(String arg) {
+        protected boolean accept(final String arg) {
             return LONG_PREDICATE.test(arg);
         }
 
         @Override
-        public Long convert(String arg) {
+        public Long convert(final String arg) {
             return Long.parseLong(arg);
         }
 
@@ -111,12 +111,12 @@ public abstract class DataConverter<T> {
      */
     public static final DataConverter<Double> DOUBLE_DATA_CONVERTER = new DataConverter<Double>() {
         @Override
-        protected boolean accept(String s) {
+        protected boolean accept(final String s) {
             return DOUBLE_PREDICATE.test(s);
         }
 
         @Override
-        public Double convert(String s) {
+        public Double convert(final String s) {
             return Double.parseDouble(s);
         }
 
@@ -131,12 +131,12 @@ public abstract class DataConverter<T> {
      */
     public static final DataConverter<Boolean> BOOLEAN_DATA_CONVERTER = new DataConverter<Boolean>() {
         @Override
-        protected boolean accept(String arg) {
+        protected boolean accept(final String arg) {
             return arg.equalsIgnoreCase("true") || arg.equalsIgnoreCase("false");
         }
 
         @Override
-        public Boolean convert(String arg) {
+        public Boolean convert(final String arg) {
             return Boolean.parseBoolean(arg);
         }
 
@@ -162,15 +162,15 @@ public abstract class DataConverter<T> {
      */
     public abstract T convert(String arg);
 
-    boolean put(DataCollection dataCollection, String arg) {
+    boolean put(final DataCollection dataCollection, final String arg) {
         if (this.accept(arg)) {
-            this.connect(dataCollection, convert(arg));
+            this.connect(dataCollection, this.convert(arg));
             return true;
         }
         return false;
     }
 
-    void connect(DataCollection dataCollection, T arg) {
+    void connect(final DataCollection dataCollection, final T arg) {
         dataCollection.write(this.getTargetClass(),arg);
     }
 

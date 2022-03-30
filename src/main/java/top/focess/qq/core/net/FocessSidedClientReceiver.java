@@ -18,18 +18,18 @@ public class FocessSidedClientReceiver extends AClientReceiver {
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessSidedClientReceiver");
     private final Queue<Packet> packets = Queues.newConcurrentLinkedQueue();
 
-    public FocessSidedClientReceiver(FocessSidedClientSocket focessSidedClientSocket, String name) {
+    public FocessSidedClientReceiver(final FocessSidedClientSocket focessSidedClientSocket, final String name) {
         super(focessSidedClientSocket.getHost(), focessSidedClientSocket.getPort(),name);
         this.focessSidedClientSocket = focessSidedClientSocket;
-        scheduler.runTimer(()->{
-            if (connected)
-                packets.offer(new HeartPacket(id,token,System.currentTimeMillis()));
+        this.scheduler.runTimer(()->{
+            if (this.connected)
+                this.packets.offer(new HeartPacket(this.id, this.token,System.currentTimeMillis()));
             else
                 focessSidedClientSocket.sendPacket(new SidedConnectPacket(name));
         }, Duration.ZERO,Duration.ofSeconds(2));
-        scheduler.runTimer(()->{
-            if (connected) {
-                Packet packet = packets.poll();
+        this.scheduler.runTimer(()->{
+            if (this.connected) {
+                Packet packet = this.packets.poll();
                 if (packet == null)
                     packet = new WaitPacket(this.id,this.token);
                 focessSidedClientSocket.sendPacket(packet);
@@ -38,12 +38,12 @@ public class FocessSidedClientReceiver extends AClientReceiver {
     }
 
     @Override
-    public void sendPacket(Packet packet) {
+    public void sendPacket(final Packet packet) {
         this.packets.add(new ClientPackPacket(this.id,this.token,packet));
     }
 
     @PacketHandler
-    public void onConnected(ConnectedPacket packet) {
+    public void onConnected(final ConnectedPacket packet) {
         if (this.connected)
             return;
         this.token = packet.getToken();
@@ -52,21 +52,21 @@ public class FocessSidedClientReceiver extends AClientReceiver {
     }
 
     @PacketHandler
-    public void onDisconnected(DisconnectedPacket packet) {
+    public void onDisconnected(final DisconnectedPacket packet) {
         this.connected = false;
-        focessSidedClientSocket.sendPacket(new SidedConnectPacket(name));
+        this.focessSidedClientSocket.sendPacket(new SidedConnectPacket(this.name));
     }
 
     @PacketHandler
-    public void onServerPacket(ServerPackPacket packet) {
-        for (Plugin plugin : this.packHandlers.keySet())
-            for (PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
+    public void onServerPacket(final ServerPackPacket packet) {
+        for (final Plugin plugin : this.packHandlers.keySet())
+            for (final PackHandler packHandler : this.packHandlers.get(plugin).getOrDefault(packet.getPacket().getClass(), Lists.newArrayList()))
                 packHandler.handle(packet.getPacket());
     }
 
     @Override
     public boolean close() {
-        scheduler.close();
+        this.scheduler.close();
         return this.unregisterAll();
     }
 }

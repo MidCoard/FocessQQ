@@ -20,11 +20,11 @@ public class ServerPackPacket extends ServerPacket {
      * Constructs a ServerPackPacket
      * @param packet the packet sent by server
      */
-    public ServerPackPacket(Packet packet) {
+    public ServerPackPacket(final Packet packet) {
         this.packet = packet;
     }
 
     public Packet getPacket() {
-        return packet;
+        return this.packet;
     }
 }
