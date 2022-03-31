@@ -200,6 +200,7 @@ public class YamlConfiguration implements SectionMap {
             final Map<String, Object> ret = Maps.newHashMap();
             ret.put("class", "!!" + value.getClass().getName());
             ret.put("value", ((Enum<?>)value).name());
+            return ret;
         }
         if (value.getClass().isArray()) {
             final Map<String, Object> ret = Maps.newHashMap();
