@@ -327,7 +327,7 @@ public abstract class Plugin {
      * @param handler the special argument handler
      * @see CommandLine#register(Plugin, String, SpecialArgumentComplexHandler)
      */
-    public final void registerSpecialArgumentHandler(final String name, final SpecialArgumentComplexHandler handler) {
+    public final void registerSpecialArgumentComplexHandler(final String name, final SpecialArgumentComplexHandler handler) {
         CommandLine.register(this, name, handler);
     }
 }

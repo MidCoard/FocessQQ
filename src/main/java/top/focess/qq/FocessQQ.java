@@ -582,13 +582,14 @@ public class FocessQQ {
             this.registerCommand(new DebugCommand());
             this.registerCommand(new ExecCommand());
             getLogger().debugLang("register-default-commands");
-            this.registerSpecialArgumentHandler("previous", new PreviousArgumentHandler());
-            this.registerSpecialArgumentHandler("next", new NextArgumentHandler());
-            this.registerSpecialArgumentHandler("random_int", new RandomIntegerArgumentHandler());
-            this.registerSpecialArgumentHandler("random_double", new RandomDoubleArgumentHandler());
-            this.registerSpecialArgumentHandler("self", new SelfIdArgumentHandler());
-            this.registerSpecialArgumentHandler("target", new TargetIdArgumentHandler());
-            this.registerSpecialArgumentHandler("previous_command", new PreviousCommandArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("previous", new PreviousArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("next", new NextArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("random_int", new RandomIntegerArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("random_double", new RandomDoubleArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("self", new SelfIdArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("target", new TargetIdArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("previous_command", new PreviousCommandArgumentHandler());
+            this.registerSpecialArgumentComplexHandler("default", new DefaultBotIdArgumentHandler());
             getLogger().debugLang("register-default-special-argument-handlers");
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {

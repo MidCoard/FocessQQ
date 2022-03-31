@@ -199,7 +199,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     final String name = specialArgumentType.name();
                     final Plugin plugin = classLoader.plugin;
-                    plugin.registerSpecialArgumentHandler(name, (SpecialArgumentComplexHandler) field.get(null));
+                    plugin.registerSpecialArgumentComplexHandler(name, (SpecialArgumentComplexHandler) field.get(null));
                 } catch (final Exception e) {
                     throw new IllegalSpecialArgumentComplexHandlerClassException((Class<? extends SpecialArgumentComplexHandler>) field.getType(), e);
                 }

@@ -7,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
+import top.focess.qq.api.bot.contact.CommandExecutor;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Member;
 import top.focess.qq.api.bot.contact.Stranger;
@@ -55,6 +56,7 @@ public class CommandSender {
      *
      * @param friend the Mirai Friend instance
      */
+    @Deprecated
     public CommandSender(@NonNull final Friend friend) {
         this.member = null;
         this.stranger = null;
@@ -71,6 +73,7 @@ public class CommandSender {
      *
      * @param member The Mirai Member Instance
      */
+    @Deprecated
     public CommandSender(@NonNull final Member member) {
         this.member = member;
         this.stranger = null;
@@ -87,6 +90,7 @@ public class CommandSender {
      *
      * @param stranger The Mirai Stranger Instance
      */
+    @Deprecated
     public CommandSender(@NonNull final Stranger stranger) {
         this.member = null;
         this.friend = null;
@@ -291,5 +295,22 @@ public class CommandSender {
      */
     public boolean isStranger() {
         return this.isStranger;
+    }
+
+
+    /**
+     * Get the CommandSender by CommandExecutor
+     *
+     * @param executor the executor
+     * @return the CommandSender
+     */
+    public static CommandSender of(final CommandExecutor executor) {
+        if (executor instanceof Member)
+            return new CommandSender((Member) executor);
+        else if (executor instanceof Friend)
+            return new CommandSender((Friend) executor);
+        else if (executor instanceof Stranger)
+            return new CommandSender((Stranger) executor);
+        else return CONSOLE;
     }
 }

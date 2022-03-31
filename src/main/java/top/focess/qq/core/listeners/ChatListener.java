@@ -3,8 +3,7 @@ package top.focess.qq.core.listeners;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.contact.Friend;
-import top.focess.qq.api.bot.contact.Group;
+import top.focess.qq.api.bot.contact.CommandExecutor;
 import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
@@ -87,7 +86,7 @@ public class ChatListener implements Listener {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getCardName(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
-        final CommandSender sender = new CommandSender(event.getMember());
+        final CommandSender sender = event.getMember().getCommandSender();
         final AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
         if (!flag.get())
@@ -120,7 +119,7 @@ public class ChatListener implements Listener {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getRawName(), event.getFriend().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
-        final CommandSender sender = new CommandSender(event.getFriend());
+        final CommandSender sender = event.getFriend().getCommandSender();
         final AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
         if (!flag.get())
@@ -152,9 +151,7 @@ public class ChatListener implements Listener {
     public void onBotSendMessage(final BotSendMessageEvent event) {
         final List<String> args = CommandLine.splitCommand(event.getMessage().toString());
         if (args.size() != 0 && args.get(0).equalsIgnoreCase("exec"))
-            if (event.getContact() instanceof Friend)
-                CommandLine.exec(new CommandSender((Friend) event.getContact()), event.getMessage().toString());
-            else if (event.getContact() instanceof Group)
-                CommandLine.exec(new CommandSender(((Group) event.getContact()).getAsMember()), event.getMessage().toString());
+            if (event.getContact() instanceof CommandExecutor)
+                CommandLine.exec(((CommandExecutor) event.getContact()).getCommandSender(), event.getMessage().toString());
     }
 }

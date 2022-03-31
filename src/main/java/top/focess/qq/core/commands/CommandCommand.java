@@ -20,7 +20,7 @@ public class CommandCommand extends Command {
 
     @Override
     public void init() {
-        this.setExecutorPermission(CommandSender::isConsole);
+        this.setExecutorPermission(i -> i.isAdministrator() || i.isConsole());
         this.addExecutor((sender, data, ioHandler) -> {
             if (Command.getCommands().size() != 0) {
                 final StringBuilder stringBuilder = new StringBuilder(FocessQQ.getLangConfig().get("command-command-list"));

@@ -3,7 +3,7 @@ package top.focess.qq.api.bot.contact;
 /**
  * Represents a stranger.
  */
-public interface Stranger extends Transmitter {
+public interface Stranger extends Transmitter,CommandExecutor {
 
     /**
      * Get the stranger's raw name (its nickname)

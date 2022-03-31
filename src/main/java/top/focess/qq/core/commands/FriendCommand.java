@@ -22,7 +22,7 @@ public class FriendCommand extends Command {
 
     @Override
     public void init() {
-        this.setExecutorPermission(CommandSender::isConsole);
+        this.setExecutorPermission(i -> i.isAdministrator() || i.isConsole());
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             final long id = dataCollection.getLong();
             final Bot bot = FocessQQ.getBotManager().getBot(id);

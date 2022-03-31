@@ -5,7 +5,7 @@ import top.focess.qq.api.command.CommandPermission;
 /**
  * Represents a member in a group.
  */
-public interface Member extends Contact {
+public interface Member extends Contact,CommandExecutor {
 
     /**
      * Get the member's raw name (its nickname)

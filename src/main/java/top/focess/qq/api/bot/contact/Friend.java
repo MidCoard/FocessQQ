@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a friend.
  */
-public interface Friend extends Speaker {
+public interface Friend extends Speaker,CommandExecutor {
 
     /**
      * Get the friend's raw name (its nickname)
