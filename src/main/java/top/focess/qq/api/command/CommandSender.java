@@ -54,7 +54,7 @@ public class CommandSender {
     /**
      * Present Friend
      *
-     * @param friend the Mirai Friend instance
+     * @param friend the friend
      */
     @Deprecated
     public CommandSender(@NonNull final Friend friend) {
@@ -71,7 +71,7 @@ public class CommandSender {
     /**
      * Present Member in Group
      *
-     * @param member The Mirai Member Instance
+     * @param member the member
      */
     @Deprecated
     public CommandSender(@NonNull final Member member) {
@@ -88,7 +88,7 @@ public class CommandSender {
     /**
      * Present Stranger
      *
-     * @param stranger The Mirai Stranger Instance
+     * @param stranger the stranger
      */
     @Deprecated
     public CommandSender(@NonNull final Stranger stranger) {
@@ -114,9 +114,9 @@ public class CommandSender {
     }
 
     /**
-     * Get the Mirai Friend instance, or null if this CommandSender does not present a Mirai Friend instance.
+     * Get the friend, or null if this CommandSender does not present a friend
      *
-     * @return the Mirai Friend instance
+     * @return the friend
      */
     @Nullable
     public Friend getFriend() {
@@ -124,9 +124,9 @@ public class CommandSender {
     }
 
     /**
-     * Indicate whether this is a Mirai Friend instance
+     * Indicate this is a friend
      *
-     * @return true if this CommandSender presents a Mirai Friend instance, false otherwise
+     * @return true if this CommandSender presents a friend, false otherwise
      */
     @EnsuresNonNullIf(expression = "getFriend()", result = true)
     public boolean isFriend() {
@@ -134,7 +134,7 @@ public class CommandSender {
     }
 
     /**
-     * Indicate whether this CommandSender owns the permission
+     * Indicate this CommandSender owns the permission
      *
      * @param permission the compared permission
      * @return true if the permission of this CommandSender is higher or equivalent to the compared permission, false otherwise
@@ -146,9 +146,9 @@ public class CommandSender {
     }
 
     /**
-     * Get the Mirai Member instance, or null if this CommandSender does not present a Mirai Member instance.
+     * Get the member, or null if this CommandSender does not present a member
      *
-     * @return the Mirai Member instance
+     * @return the member
      */
     @Nullable
     public Member getMember() {
@@ -156,9 +156,9 @@ public class CommandSender {
     }
 
     /**
-     * Indicate whether this is a Mirai Member instance
+     * Indicate this is a member
      *
-     * @return true if this CommandSender presents a Mirai Member instance, false otherwise
+     * @return true if this CommandSender presents a member, false otherwise
      */
     @EnsuresNonNullIf(expression = "getMember()", result = true)
     public boolean isMember() {
@@ -166,7 +166,7 @@ public class CommandSender {
     }
 
     /**
-     * Indicate whether this is an Administrator
+     * Indicate this is an Administrator
      *
      * @return true if this CommandSender presents its id is equal to the id of the Administrator, false otherwise
      */
@@ -189,8 +189,10 @@ public class CommandSender {
     public String toString() {
         if (this.isFriend())
             return this.friend.getRawName() + "(" + this.friend.getId() + ")";
-        else if (this.isMember)
+        else if (this.isMember())
             return this.member.getCardName() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "]";
+        else if (this.isStranger())
+            return this.stranger.getRawName() + "(" + this.stranger.getId() + ")";
         else return "CONSOLE";
     }
 
@@ -203,7 +205,9 @@ public class CommandSender {
             return sender.getMember() == this.getMember();
         } else if (this.isFriend() && sender.isFriend()) {
             return sender.getFriend() == this.getFriend();
-        } else return this.isConsole() && sender.isConsole();
+        } else if (this.isStranger() && sender.isStranger())
+            return sender.getStranger() == this.getStranger();
+        else return this.isConsole() && sender.isConsole();
     }
 
 
@@ -240,6 +244,8 @@ public class CommandSender {
                     CommandSender.this.getMember().getGroup().sendMessage(output);
                 else if (CommandSender.this.isFriend())
                     CommandSender.this.getFriend().sendMessage(output);
+                else if (CommandSender.this.isStranger())
+                    CommandSender.this.getStranger().sendMessage(output);
             }
 
             @Override
@@ -263,7 +269,7 @@ public class CommandSender {
     }
 
     /**
-     * Get Session of a special CommandSender. It can be used to store some data for future using.
+     * Get Session of the CommandSender. It can be used to store some data for future using.
      * But the data it stored will be lost after Bot exiting.
      *
      * @return Session of sender
@@ -289,14 +295,23 @@ public class CommandSender {
     }
 
     /**
-     * Indicate whether this is a Mirai Stranger instance
+     * Indicate whether this is a stranger
      *
-     * @return true if this CommandSender presents a Mirai Stranger instance, false otherwise
+     * @return true if this CommandSender presents a stranger, false otherwise
      */
     public boolean isStranger() {
         return this.isStranger;
     }
 
+    /**
+     * Get the stranger, or null if this CommandSender does not present a stranger
+     *
+     * @return the stranger
+     */
+    @Nullable
+    public Stranger getStranger() {
+        return this.stranger;
+    }
 
     /**
      * Get the CommandSender by CommandExecutor
