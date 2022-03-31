@@ -56,6 +56,7 @@ public class GroupCommand extends Command {
                     return CommandResult.REFUSE;
                 }
                 group.sendMessage(new Message(MiraiCode.deserializeMiraiCode(message)));
+                ioHandler.outputLang("group-command-send-success",groupId);
             } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("group-command-input-timeout");
                 return CommandResult.REFUSE;

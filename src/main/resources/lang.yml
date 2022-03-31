@@ -141,11 +141,13 @@ group-command-no-group: There is no group
 group-command-input-one-message: Please input one message
 group-command-group-not-found: Group %d does not exist
 group-command-input-timeout: Input timeout
+group-command-send-success: Send message to group %d successfully
 friend-command-bot-not-found: Bot %d does not exist
 friend-command-list: "The following friends are :"
 friend-command-input-one-message: Please input one message
 friend-command-friend-not-found: Friend %d does not exist
 friend-command-input-timeout: Input timeout
+friend-command-send-success: Send message to friend %d successfully
 plugin-description-not-found: File plugin.yml not found
 unknown-command: Unknown command %s
 command-exec: "%s exec: %s"

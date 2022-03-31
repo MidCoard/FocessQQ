@@ -53,6 +53,7 @@ public class FriendCommand extends Command {
                     return CommandResult.REFUSE;
                 }
                 friend.sendMessage(new Message(MiraiCode.deserializeMiraiCode(message)));
+                ioHandler.outputLang("friend-command-send-success",friendId);
             } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("friend-command-input-timeout");
                 return CommandResult.REFUSE;
