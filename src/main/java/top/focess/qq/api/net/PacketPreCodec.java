@@ -181,7 +181,9 @@ public class PacketPreCodec {
     public short readShort() {
         short r = 0;
         for (int i = 0; i < 2; i++)
-            r += (short) Byte.toUnsignedInt(this.data.get(this.pointer++)) << (i * 8);
+            // still the right side is short even if not cast to short
+            // because two bytes are used to represent a short
+            r += (short)((short) Byte.toUnsignedInt(this.data.get(this.pointer++)) << (i * 8));
         return r;
     }
 
