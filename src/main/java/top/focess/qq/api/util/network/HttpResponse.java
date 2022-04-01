@@ -1,11 +1,14 @@
 package top.focess.qq.api.util.network;
 
 import okhttp3.Headers;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.json.JSON;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -104,7 +107,7 @@ public class HttpResponse {
     }
 
     /**
-     * Get the values as JSON instance
+     * Get the value as JSON
      *
      * @return JSON instance of this response data
      * @throws HttpResponseException if there is something wrong with this request
@@ -112,8 +115,20 @@ public class HttpResponse {
     @NotNull
     public JSON getAsJSON() throws HttpResponseException {
         if (this.isError())
-            throw new HttpResponseException();
+            throw new HttpResponseException(Objects.requireNonNull(this.getException()));
         return new JSON(this.value);
+    }
+
+    /**
+     * Get the value as String
+     * @return String instance of this response data
+     * @throws HttpResponseException if there is something wrong with this request
+     */
+    @NonNull
+    public String getAsString() throws HttpResponseException {
+        if (this.isError())
+            throw new HttpResponseException(Objects.requireNonNull(this.getException()));
+        return this.value;
     }
 
     @Nullable
@@ -135,6 +150,7 @@ public class HttpResponse {
      *
      * @return true if this is an exception thrown HttpResponse, false otherwise
      */
+    @EnsuresNonNullIf(result = true, expression = "getException()")
     public boolean isError() {
         return this.code == EXCEPTION;
     }

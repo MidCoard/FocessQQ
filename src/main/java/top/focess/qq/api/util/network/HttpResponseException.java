@@ -9,8 +9,9 @@ public class HttpResponseException extends IOException {
 
     /**
      * Constructs a HttpResponseException
+     * @param exception the cause
      */
-    public HttpResponseException() {
-        super("This request was not successful.");
+    public HttpResponseException(Exception exception) {
+        super("This request was not successful.", exception);
     }
 }

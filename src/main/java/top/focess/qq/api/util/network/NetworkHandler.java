@@ -14,6 +14,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.Objects;
@@ -38,16 +40,21 @@ public class NetworkHandler {
     private static final OkHttpClient CLIENT;
 
     static {
+        // A trust manager that does not validate certificate chains, needed for self-signed certificates
         final X509TrustManager[] managers = {
                 new X509TrustManager() {
                     @Override
-                    public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) {
-
+                    public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
+                        //check if the certificate is valid
+                        for (final X509Certificate certificate : x509Certificates)
+                            certificate.checkValidity();
                     }
 
                     @Override
-                    public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) {
-
+                    public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
+                        //check if the certificate is valid
+                        for (final X509Certificate certificate : x509Certificates)
+                            certificate.checkValidity();
                     }
 
                     @Override
@@ -68,7 +75,7 @@ public class NetworkHandler {
 
     private final Plugin plugin;
 
-    public NetworkHandler(final Plugin plugin) {
+    public NetworkHandler(@NonNull final Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -211,6 +218,9 @@ public class NetworkHandler {
         return this.plugin;
     }
 
+    /**
+     * Represents a request-type
+     */
     public enum RequestType {
         /**
          * HTTP GET Request Method
