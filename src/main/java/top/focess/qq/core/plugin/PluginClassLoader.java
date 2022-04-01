@@ -220,7 +220,7 @@ public class PluginClassLoader extends URLClassLoader {
         PluginCoreClassLoader.LOADERS.add(this);
     }
 
-    public static void enablePlugin(final Plugin plugin) {
+    public static void enablePlugin(@NotNull final Plugin plugin) {
         if (plugin.getClass() != FocessQQ.MainPlugin.class) {
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
             final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
@@ -271,7 +271,7 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     @Nullable
-    public static File disablePlugin0(final Plugin plugin) {
+    public static File disablePlugin0(@NotNull final Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-disable-plugin", plugin.getName());
         // try-catch because it should take over the process
         try {

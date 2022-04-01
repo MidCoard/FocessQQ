@@ -2,6 +2,7 @@ package top.focess.qq.core.listeners;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.contact.CommandExecutor;
 import top.focess.qq.api.command.CommandLine;
@@ -69,7 +70,7 @@ public class ChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onStrangerChat(final StrangerChatEvent event) {
+    public void onStrangerChat(@NotNull final StrangerChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getRawName(), event.getStranger().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
@@ -82,7 +83,7 @@ public class ChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onGroupChat(final GroupChatEvent event) {
+    public void onGroupChat(@NotNull final GroupChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getCardName(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
@@ -115,7 +116,7 @@ public class ChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onFriendChat(final FriendChatEvent event) {
+    public void onFriendChat(@NotNull final FriendChatEvent event) {
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getRawName(), event.getFriend().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
@@ -148,7 +149,7 @@ public class ChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBotSendMessage(final BotSendMessageEvent event) {
+    public void onBotSendMessage(@NotNull final BotSendMessageEvent event) {
         final List<String> args = CommandLine.splitCommand(event.getMessage().toString());
         if (args.size() != 0 && args.get(0).equalsIgnoreCase("exec"))
             if (event.getContact() instanceof CommandExecutor)

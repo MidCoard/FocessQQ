@@ -1,5 +1,6 @@
 package top.focess.qq.api.bot.message;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -14,7 +15,7 @@ public class MessageChain extends Message implements Iterable<Message> {
      * Constructs a MessageChain
      * @param message the native message
      */
-    public MessageChain(final net.mamoe.mirai.message.data.MessageChain message) {
+    private MessageChain(final net.mamoe.mirai.message.data.MessageChain message) {
         super(message);
     }
 
@@ -59,5 +60,16 @@ public class MessageChain extends Message implements Iterable<Message> {
      */
     public int size() {
         return ((net.mamoe.mirai.message.data.MessageChain) this.message).size();
+    }
+
+    /**
+     * Wrap a message chain
+     * @param message the native message chain
+     * @return the wrapped message chain
+     */
+    @NotNull
+    @Contract("_ -> new")
+    public static MessageChain of(net.mamoe.mirai.message.data.MessageChain message) {
+        return new MessageChain(message);
     }
 }

@@ -3,6 +3,7 @@ package top.focess.qq.api.net;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.packet.*;
@@ -99,7 +100,7 @@ public class PacketPreCodec {
      *
      * @param v the string
      */
-    public void writeString(final String v) {
+    public void writeString(@NotNull final String v) {
         final byte[] bytes = v.getBytes(StandardCharsets.UTF_8);
         this.writeInt(bytes.length);
         this.data.addAll(Bytes.asList(bytes));
@@ -232,7 +233,7 @@ public class PacketPreCodec {
      * @param <T>    the packet type
      * @return true if the packet has been written successfully, false otherwise
      */
-    public <T extends Packet> boolean writePacket(final T packet) {
+    public <T extends Packet> boolean writePacket(@NotNull final T packet) {
         final int packetId = packet.getId();
         final PacketCodec<T> packetCodec = (PacketCodec<T>) PACKET_CODECS.get(packetId);
         if (packetCodec != null) {

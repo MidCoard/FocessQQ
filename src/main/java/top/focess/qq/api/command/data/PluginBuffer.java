@@ -1,7 +1,10 @@
 package top.focess.qq.api.command.data;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.plugin.Plugin;
+
+import java.util.Objects;
 
 /**
  * Represent a buffer of Plugin.
@@ -20,6 +23,8 @@ public class PluginBuffer extends DataBuffer<Plugin> {
      * @param size the target buffer size
      * @return a PluginBuffer with fixed size
      */
+    @NotNull
+    @Contract("_ -> new")
     public static PluginBuffer allocate(final int size) {
         return new PluginBuffer(size);
     }
@@ -30,19 +35,29 @@ public class PluginBuffer extends DataBuffer<Plugin> {
     }
 
     @Override
-    public void put(final Plugin plugin) {
+    public void put(@NotNull final Plugin plugin) {
         this.stringBuffer.put(plugin.getName());
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Plugin get() {
-        return Plugin.getPlugin(this.stringBuffer.get());
+        String name = this.stringBuffer.get();
+        try {
+            return Objects.requireNonNull(Plugin.getPlugin(name));
+        } catch (final NullPointerException e) {
+            throw new IllegalArgumentException("Plugin: " + name + " is not found");
+        }
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Plugin get(final int index) {
-        return Plugin.getPlugin(this.stringBuffer.get(index));
+        String name = this.stringBuffer.get(index);
+        try {
+            return Objects.requireNonNull(Plugin.getPlugin(name));
+        } catch (final NullPointerException e) {
+            throw new IllegalArgumentException("Plugin: " + name + " is not found");
+        }
     }
 }

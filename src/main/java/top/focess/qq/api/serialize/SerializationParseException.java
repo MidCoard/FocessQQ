@@ -5,7 +5,7 @@ package top.focess.qq.api.serialize;
  */
 public class SerializationParseException extends RuntimeException {
     /**
-     * Constructs a SerializationParseException with the specified detail message
+     * Constructs a SerializationParseException
      *
      * @param message the detail message
      */
@@ -14,7 +14,7 @@ public class SerializationParseException extends RuntimeException {
     }
 
     /**
-     * Constructs a SerializationParseException with the cause
+     * Constructs a SerializationParseException
      *
      * @param e the cause
      */

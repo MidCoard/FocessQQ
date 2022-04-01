@@ -1,5 +1,6 @@
 package top.focess.qq.api.plugin;
 
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.util.yaml.YamlConfiguration;
 
 /**
@@ -17,7 +18,7 @@ public class PluginDescription {
      *
      * @param pluginConfig the plugin config named "plugin.yml"
      */
-    public PluginDescription(final YamlConfiguration pluginConfig) {
+    public PluginDescription(@NotNull final YamlConfiguration pluginConfig) {
         this.main = pluginConfig.get("main");
     }
 

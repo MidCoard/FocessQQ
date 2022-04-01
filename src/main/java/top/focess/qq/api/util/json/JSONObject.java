@@ -1,5 +1,8 @@
 package top.focess.qq.api.util.json;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a JSON object. It represents JSON or JSONList.
  */
@@ -11,6 +14,8 @@ public abstract class JSONObject {
      * @param json the string to parse
      * @return the JSON object
      */
+    @NotNull
+    @Contract("_ -> new")
     public static JSONObject parse(final String json) {
         try {
             return new JSON(json);

@@ -2,6 +2,8 @@ package top.focess.qq.api.serialize;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Bytes;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.core.serialize.SimpleFocessReader;
 
 import java.io.InputStream;
@@ -19,6 +21,8 @@ public abstract class FocessReader {
      *
      * @throws IllegalStateException if the input stream is not valid
      */
+    @NotNull
+    @Contract("_ -> new")
     public static FocessReader newFocessReader(final InputStream inputStream) {
         final List<Byte> byteList = Lists.newArrayList();
         final byte[] bytes = new byte[1024];

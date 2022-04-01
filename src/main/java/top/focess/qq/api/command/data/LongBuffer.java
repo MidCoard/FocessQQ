@@ -1,5 +1,8 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represent a buffer of Long.
  */
@@ -17,6 +20,8 @@ public class LongBuffer extends DataBuffer<Long> {
      * @param size the target buffer size
      * @return a LongBuffer with fixed size
      */
+    @NotNull
+    @Contract("_ -> new")
     public static LongBuffer allocate(final int size) {
         return new LongBuffer(size);
     }
@@ -31,11 +36,13 @@ public class LongBuffer extends DataBuffer<Long> {
         this.buffer.put(l);
     }
 
+    @NotNull
     @Override
     public Long get() {
         return this.buffer.get();
     }
 
+    @NotNull
     @Override
     public Long get(final int index) {
         return this.buffer.get(index);

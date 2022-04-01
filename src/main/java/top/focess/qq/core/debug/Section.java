@@ -1,5 +1,6 @@
 package top.focess.qq.core.debug;
 
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
@@ -20,6 +21,7 @@ public class Section {
         this.task = task;
     }
 
+    @NotNull
     public static Section startSection(final String name, final Future<?> task, final Duration timeout) {
         final Task t = SCHEDULER.run(() -> {
             task.cancel(true);
@@ -28,6 +30,7 @@ public class Section {
         return new Section(name, t);
     }
 
+    @NotNull
     public static Section startSection(final String name, final Task task, final Duration timeout) {
         final Task t = SCHEDULER.run(() -> {
             task.cancel(true);

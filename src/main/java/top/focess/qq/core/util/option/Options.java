@@ -2,6 +2,7 @@ package top.focess.qq.core.util.option;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -11,7 +12,8 @@ public class Options {
 
     private final Map<String, Option> options = Maps.newHashMap();
 
-    public static Options parse(final String[] args, final OptionParserClassifier... classifiers) {
+    @NotNull
+    public static Options parse(@NotNull final String[] args, final OptionParserClassifier... classifiers) {
         final List<String> temp = Lists.newArrayList();
         final List<OptionParserClassifier> defaultClassifier = Lists.newArrayList();
         final Options options = new Options();

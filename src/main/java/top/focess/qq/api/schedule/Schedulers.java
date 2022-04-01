@@ -1,5 +1,6 @@
 package top.focess.qq.api.schedule;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.schedule.AScheduler;
@@ -23,6 +24,8 @@ public class Schedulers {
      * @return a FocessScheduler
      * @see Schedulers#newFocessScheduler(Plugin)
      */
+    @NotNull
+    @Contract("_ -> new")
     public static Scheduler newFocessScheduler(@NotNull final Plugin plugin) {
         return new FocessScheduler(plugin);
     }
@@ -37,6 +40,8 @@ public class Schedulers {
      * @return a FocessScheduler
      * @see Schedulers#newFocessScheduler(Plugin)
      */
+    @NotNull
+    @Contract("_, _ -> new")
     public static Scheduler newFocessScheduler(@NotNull final Plugin plugin, @NotNull final String name) {
         return new FocessScheduler(plugin, name);
     }
@@ -51,6 +56,8 @@ public class Schedulers {
      * @return a ThreadPoolScheduler
      * @see Schedulers#newThreadPoolScheduler(Plugin, int, boolean, String)
      */
+    @NotNull
+    @Contract("_, _ -> new")
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize) {
         return new ThreadPoolScheduler(plugin, poolSize);
     }
@@ -67,6 +74,8 @@ public class Schedulers {
      * @return a ThreadPoolScheduler
      * @see Schedulers#newThreadPoolScheduler(Plugin, int)
      */
+    @NotNull
+    @Contract("_, _, _, _ -> new")
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize, final boolean immediate, @NotNull final String name) {
         return new ThreadPoolScheduler(plugin, poolSize, immediate, name);
     }

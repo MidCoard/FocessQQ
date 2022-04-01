@@ -1,5 +1,7 @@
 package top.focess.qq.api.command;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Predicate;
 
 /**
@@ -75,6 +77,7 @@ public abstract class DataConverter<T> {
             return INTEGER_PREDICATE.test(arg);
         }
 
+        @NotNull
         @Override
         public Integer convert(final String arg) {
             return Integer.parseInt(arg);
@@ -95,6 +98,7 @@ public abstract class DataConverter<T> {
             return LONG_PREDICATE.test(arg);
         }
 
+        @NotNull
         @Override
         public Long convert(final String arg) {
             return Long.parseLong(arg);
@@ -115,6 +119,7 @@ public abstract class DataConverter<T> {
             return DOUBLE_PREDICATE.test(s);
         }
 
+        @NotNull
         @Override
         public Double convert(final String s) {
             return Double.parseDouble(s);
@@ -170,7 +175,7 @@ public abstract class DataConverter<T> {
         return false;
     }
 
-    void connect(final DataCollection dataCollection, final T arg) {
+    void connect(@NotNull final DataCollection dataCollection, final T arg) {
         dataCollection.write(this.getTargetClass(), arg);
     }
 

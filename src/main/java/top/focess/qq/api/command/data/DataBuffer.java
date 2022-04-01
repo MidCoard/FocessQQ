@@ -1,6 +1,6 @@
 package top.focess.qq.api.command.data;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A buffer which stores data
@@ -26,7 +26,7 @@ public abstract class DataBuffer<T> {
      *
      * @return element in the buffer in order
      */
-    @Nullable
+    @NonNull
     public abstract T get();
 
     /**
@@ -35,6 +35,6 @@ public abstract class DataBuffer<T> {
      * @param index the element index
      * @return element in the index of the buffer
      */
-    @Nullable
+    @NonNull
     public abstract T get(int index);
 }

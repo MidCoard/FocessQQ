@@ -1,5 +1,8 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represent a buffer of Int.
  */
@@ -17,6 +20,8 @@ public class IntBuffer extends DataBuffer<Integer> {
      * @param size the target buffer size
      * @return a IntBuffer with fixed size
      */
+    @NotNull
+    @Contract("_ -> new")
     public static IntBuffer allocate(final int size) {
         return new IntBuffer(size);
     }
@@ -31,11 +36,13 @@ public class IntBuffer extends DataBuffer<Integer> {
         this.buffer.put(integer);
     }
 
+    @NotNull
     @Override
     public Integer get() {
         return this.buffer.get();
     }
 
+    @NotNull
     @Override
     public Integer get(final int index) {
         return this.buffer.get(index);

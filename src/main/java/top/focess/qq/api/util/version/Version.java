@@ -1,5 +1,7 @@
 package top.focess.qq.api.util.version;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a version of a plugin.
  */
@@ -88,7 +90,7 @@ public class Version {
      *
      * @param version the version to be parsed.
      */
-    public Version(final String version) {
+    public Version(@NotNull final String version) {
         final String[] temp = version.split("\\.");
         try {
             if (temp.length == 1)
@@ -146,6 +148,6 @@ public class Version {
             return this.major + "." + this.minor + "." + this.revision + (this.build == null ? "" : "-" + this.build);
         else if (this.length == 4)
             return this.major + "." + this.minor + "." + this.revision + "." + this.build;
-        throw new VersionFormatException("");
+        throw new IllegalStateException("Invalid version length: " + this.length);
     }
 }

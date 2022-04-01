@@ -2,6 +2,7 @@ package top.focess.qq.core.bot.contact;
 
 import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
@@ -32,7 +33,7 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
         return GROUP_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(group.getId(), k -> new SimpleGroup(bot, group));
     }
 
-    public static void remove(final Bot bot) {
+    public static void remove(@NotNull final Bot bot) {
         GROUP_MAP.remove(bot.getId());
     }
 

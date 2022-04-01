@@ -1,6 +1,7 @@
 package top.focess.qq.api.command.data;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.command.Command;
 
 public class CommandBuffer extends DataBuffer<Command> {
@@ -11,6 +12,8 @@ public class CommandBuffer extends DataBuffer<Command> {
         this.stringBuffer = StringBuffer.allocate(size);
     }
 
+    @NotNull
+    @Contract("_ -> new")
     public static CommandBuffer allocate(final int size) {
         return new CommandBuffer(size);
     }
@@ -21,27 +24,27 @@ public class CommandBuffer extends DataBuffer<Command> {
     }
 
     @Override
-    public void put(final Command command) {
+    public void put(@NotNull final Command command) {
         this.stringBuffer.put(command.getName());
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Command get() {
         final String name = this.stringBuffer.get();
         for (final Command command : Command.getCommands())
             if (command.getName().equals(name))
                 return command;
-        return null;
+        throw new IllegalArgumentException("Command: " + name + " is not found");
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Command get(final int index) {
         final String name = this.stringBuffer.get(index);
         for (final Command command : Command.getCommands())
             if (command.getName().equals(name))
                 return command;
-        return null;
+        throw new IllegalArgumentException("Command: " + name + " is not found");
     }
 }

@@ -1,6 +1,7 @@
 package top.focess.qq.core.bot.contact;
 
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Stranger;
@@ -27,7 +28,7 @@ public class SimpleStranger extends SimpleTransmitter implements Stranger {
         return STRANGER_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(stranger.getId(), k -> new SimpleStranger(bot, stranger));
     }
 
-    public static void remove(final Bot bot) {
+    public static void remove(@NotNull final Bot bot) {
         STRANGER_MAP.remove(bot.getId());
     }
 

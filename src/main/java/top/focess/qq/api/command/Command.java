@@ -120,8 +120,9 @@ public abstract class Command {
     /**
      * Get all commands
      *
-     * @return All commands as a <code>List</code>
+     * @return All commands as a list
      */
+    @NotNull
     public static List<Command> getCommands() {
         return Lists.newArrayList(COMMANDS_MAP.values());
     }
@@ -423,7 +424,7 @@ public abstract class Command {
             return dataCollection;
         }
 
-        private boolean dfsCheck(final String[] args, final int indexOfArgs, final int index, final int nullableCommandArguments, final List<CommandArgument<?>> commandArgumentList) {
+        private boolean dfsCheck(@NotNull final String[] args, final int indexOfArgs, final int index, final int nullableCommandArguments, final List<CommandArgument<?>> commandArgumentList) {
             if (indexOfArgs == args.length)
                 return true;
             if (this.commandArguments[index].isNullable() && nullableCommandArguments > 0) {

@@ -2,12 +2,17 @@ package top.focess.qq.api.command;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.data.DataBuffer;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Store and parser arguments for better CommandExecutor usage.
@@ -23,7 +28,7 @@ public class DataCollection {
      *
      * @param dataConverters the data converters
      */
-    public DataCollection(final DataConverter<?>[] dataConverters) {
+    public DataCollection(@NotNull final DataConverter<?>[] dataConverters) {
         final Map<DataConverter<?>, Integer> map = Maps.newHashMap();
         for (final DataConverter<?> dataConverter : dataConverters)
             map.compute(dataConverter, (k, v) -> {
@@ -93,54 +98,62 @@ public class DataCollection {
      * Get String argument in order
      *
      * @return the String argument in order
+     * @throws NullPointerException if the value is null
      */
+    @NonNull
     public String get() {
-        return this.get(String.class);
+        return Objects.requireNonNull(this.get(String.class));
     }
 
     /**
      * Get int argument in order
      *
      * @return the int argument in order
+     * @throws NullPointerException if the value is null
      */
     public int getInt() {
-        return this.get(Integer.class);
+        return Objects.requireNonNull(this.get(Integer.class));
     }
 
     /**
      * Get double argument in order
      *
      * @return the double argument in order
+     * @throws NullPointerException if the value is null
      */
     public double getDouble() {
-        return this.get(Double.class);
+        return Objects.requireNonNull(this.get(Double.class));
     }
 
     /**
      * Get boolean argument in order
      *
      * @return the boolean argument in order
+     * @throws NullPointerException if the value is null
      */
     public boolean getBoolean() {
-        return this.get(Boolean.class);
+        return Objects.requireNonNull(this.get(Boolean.class));
     }
 
     /**
      * Get long argument in order
      *
      * @return the long argument in order
+     * @throws NullPointerException if the value is null
      */
     public long getLong() {
-        return this.get(Long.class);
+        return Objects.requireNonNull(this.get(Long.class));
     }
 
     /**
      * Get Plugin argument in order
      *
      * @return the Plugin argument in order
+     * @throws NullPointerException if the value is null
      */
+    @NonNull
     public Plugin getPlugin() {
-        return this.get(Plugin.class);
+        return Objects.requireNonNull(this.get(Plugin.class));
     }
 
     /**
@@ -148,8 +161,9 @@ public class DataCollection {
      *
      * @return the Command argument in order
      */
+    @NonNull
     public Command getCommand() {
-        return this.get(Command.class);
+        return Objects.requireNonNull(this.get(Command.class));
     }
 
     /**
@@ -161,6 +175,7 @@ public class DataCollection {
      * @return the buffer element
      * @throws UnsupportedOperationException if the buffer is not registered
      */
+    @Contract("_,!null->!null")
     public <T> T getOrDefault(final Class<T> cls, final T t) {
         try {
             if (this.buffers.get(cls) == null)
@@ -181,6 +196,7 @@ public class DataCollection {
      * @return the buffer element
      * @throws UnsupportedOperationException if the buffer is not registered
      */
+    @Contract("_,_,!null->!null")
     public <T> T getOrDefault(final Class<T> cls, final int index, final T t) {
         try {
             if (this.buffers.get(cls) == null)
@@ -191,14 +207,6 @@ public class DataCollection {
         }
     }
 
-    /**
-     * Write buffer element
-     *
-     * @param cls the buffer elements' class
-     * @param t   the buffer element
-     * @param <T> the buffer elements' type
-     * @throws UnsupportedOperationException if the buffer is not registered
-     */
     <T> void write(final Class<T> cls, final T t) {
         this.buffers.compute(cls, (key, value) -> {
             if (value == null)
@@ -216,6 +224,7 @@ public class DataCollection {
      * @return the buffer element
      * @throws UnsupportedOperationException if the buffer is not registered
      */
+    @Nullable
     public <T> T get(final Class<T> c) {
         if (this.buffers.get(c) == null)
             throw new UnsupportedOperationException();
@@ -231,6 +240,7 @@ public class DataCollection {
      * @return the buffer element
      * @throws UnsupportedOperationException if the buffer is not registered
      */
+    @Nullable
     public <T> T get(final Class<T> c, final int index) {
         if (this.buffers.get(c) == null)
             throw new UnsupportedOperationException();

@@ -2,6 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
@@ -13,6 +14,7 @@ import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMultiReceiver {
 
@@ -33,7 +35,7 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     private void disconnect(final int clientId) {
         final SimpleClient simpleClient = this.clientInfos.remove(clientId);
         if (simpleClient != null)
-            this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new DisconnectedPacket());
+            this.focessUDPSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), new DisconnectedPacket());
     }
 
     @Override
@@ -45,7 +47,7 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     }
 
     @PacketHandler
-    public void onConnect(final ConnectPacket packet) {
+    public void onConnect(@NotNull final ConnectPacket packet) {
         final SimpleClient simpleClient = new SimpleClient(packet.getHost(), packet.getPort(), this.defaultClientId++, packet.getName(), generateToken());
         this.lastHeart.put(simpleClient.getId(), System.currentTimeMillis());
         this.clientInfos.put(simpleClient.getId(), simpleClient);
@@ -53,7 +55,7 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     }
 
     @PacketHandler
-    public void onDisconnect(final DisconnectPacket packet) {
+    public void onDisconnect(@NotNull final DisconnectPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -62,7 +64,7 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     }
 
     @PacketHandler
-    public void onHeart(final HeartPacket packet) {
+    public void onHeart(@NotNull final HeartPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -71,7 +73,7 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     }
 
     @PacketHandler
-    public void onClientPacket(final ClientPackPacket packet) {
+    public void onClientPacket(@NotNull final ClientPackPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -85,14 +87,14 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     public void sendPacket(final String client, final Packet packet) {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(client))
-                this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new ServerPackPacket(packet));
+                this.focessUDPSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), new ServerPackPacket(packet));
     }
 
     @Override
     public void sendPacket(final int id, final Packet packet) {
         final SimpleClient simpleClient = this.clientInfos.get(id);
         if (simpleClient != null)
-            this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), packet);
+            this.focessUDPSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), packet);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package top.focess.qq.api.command.converter;
 
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.command.DataConverter;
 
 /**
@@ -13,11 +14,15 @@ public class IllegalDataConverterClassException extends IllegalArgumentException
      * @param c the illegal DataConverter class
      * @param e the cause
      */
-    public IllegalDataConverterClassException(final Class<? extends DataConverter> c, final Exception e) {
+    public IllegalDataConverterClassException(@NotNull final Class<? extends DataConverter> c, final Exception e) {
         super("The class " + c.getName() + " is an illegal DataConverter class", e);
     }
 
-    public IllegalDataConverterClassException(final Class<?> c) {
+    /**
+     * Constructs a IllegalDataConverterClassException
+     * @param c the illegal DataConverter class
+     */
+    public IllegalDataConverterClassException(@NotNull final Class<?> c) {
         super("The class " + c.getName() + " is an illegal DataConverter class");
     }
 }

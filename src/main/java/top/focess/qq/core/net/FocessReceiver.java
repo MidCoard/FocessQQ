@@ -2,6 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.*;
@@ -10,6 +11,7 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
+import java.util.Objects;
 
 public class FocessReceiver extends AServerReceiver {
 
@@ -39,7 +41,7 @@ public class FocessReceiver extends AServerReceiver {
     }
 
     @PacketHandler
-    public void onDisconnect(final DisconnectPacket packet) {
+    public void onDisconnect(@NotNull final DisconnectPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -48,7 +50,7 @@ public class FocessReceiver extends AServerReceiver {
     }
 
     @PacketHandler
-    public void onHeart(final HeartPacket packet) {
+    public void onHeart(@NotNull final HeartPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000 > packet.getTime())
@@ -57,7 +59,7 @@ public class FocessReceiver extends AServerReceiver {
     }
 
     @PacketHandler
-    public void onClientPacket(final ClientPackPacket packet) {
+    public void onClientPacket(@NotNull final ClientPackPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -70,14 +72,14 @@ public class FocessReceiver extends AServerReceiver {
     private void disconnect(final int clientId) {
         final SimpleClient simpleClient = this.clientInfos.remove(clientId);
         if (simpleClient != null)
-            this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new DisconnectedPacket());
+            this.focessSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), new DisconnectedPacket());
     }
 
     @Override
     public void sendPacket(final String client, final Packet packet) {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(client))
-                this.focessSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new ServerPackPacket(packet));
+                this.focessSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), new ServerPackPacket(packet));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package top.focess.qq.core.util.option;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.core.util.option.type.OptionType;
 
@@ -22,7 +23,7 @@ public class OptionParserClassifier {
     }
 
     @Nullable
-    public Option createOption(final String[] args) {
+    public Option createOption(@NotNull final String[] args) {
         if (args.length != this.optionTypes.length)
             return null;
         final Option option = new Option(this);

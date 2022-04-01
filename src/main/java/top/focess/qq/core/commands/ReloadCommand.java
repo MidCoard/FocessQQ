@@ -20,7 +20,7 @@ public class ReloadCommand extends Command {
         super("reload");
     }
 
-    public static boolean reloadPlugin(final Plugin plugin) {
+    public static boolean reloadPlugin(@NotNull final Plugin plugin) {
         FocessQQ.getLogger().debugLang("start-reload-plugin", plugin.getName());
         if (plugin == FocessQQ.getMainPlugin())
             return false;

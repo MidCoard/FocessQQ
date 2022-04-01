@@ -17,7 +17,7 @@ public class Message {
      * Constructs a Message.
      * @param message the native message
      */
-    public Message(final net.mamoe.mirai.message.data.Message message) {
+    protected Message(final net.mamoe.mirai.message.data.Message message) {
         this.message = message;
     }
 

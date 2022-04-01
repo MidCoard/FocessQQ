@@ -1,5 +1,8 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represent a buffer of Double.
  */
@@ -17,6 +20,8 @@ public class DoubleBuffer extends DataBuffer<Double> {
      * @param size the target buffer size
      * @return a DoubleBuffer with fixed size
      */
+    @NotNull
+    @Contract("_ -> new")
     public static DoubleBuffer allocate(final int size) {
         return new DoubleBuffer(size);
     }
@@ -31,11 +36,13 @@ public class DoubleBuffer extends DataBuffer<Double> {
         this.buffer.put(d);
     }
 
+    @NotNull
     @Override
     public Double get() {
         return this.buffer.get();
     }
 
+    @NotNull
     @Override
     public Double get(final int index) {
         return this.buffer.get(index);

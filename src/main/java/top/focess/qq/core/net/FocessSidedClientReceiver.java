@@ -2,6 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.*;
@@ -18,7 +19,7 @@ public class FocessSidedClientReceiver extends AClientReceiver {
     private final Scheduler scheduler = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "FocessSidedClientReceiver");
     private final Queue<Packet> packets = Queues.newConcurrentLinkedQueue();
 
-    public FocessSidedClientReceiver(final FocessSidedClientSocket focessSidedClientSocket, final String name) {
+    public FocessSidedClientReceiver(@NotNull final FocessSidedClientSocket focessSidedClientSocket, final String name) {
         super(focessSidedClientSocket.getHost(), focessSidedClientSocket.getPort(), name);
         this.focessSidedClientSocket = focessSidedClientSocket;
         this.scheduler.runTimer(() -> {

@@ -1,9 +1,11 @@
 package top.focess.qq.api.command;
 
 import net.mamoe.mirai.contact.MemberPermission;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a executing permission of a command.
+ * Represents an executing permission of a command.
  */
 public enum CommandPermission {
 
@@ -38,7 +40,7 @@ public enum CommandPermission {
         this.priority = priority;
     }
 
-    CommandPermission(final CommandPermission commandPermission) {
+    CommandPermission(@NotNull final CommandPermission commandPermission) {
         this.permission = commandPermission.permission;
         this.priority = commandPermission.priority;
     }
@@ -49,7 +51,8 @@ public enum CommandPermission {
      * @param permission the comparing permission
      * @return true if this permission is higher than the comparing permission, false otherwise
      */
-    public boolean hasPermission(final CommandPermission permission) {
+    @Contract(pure = true)
+    public boolean hasPermission(@NotNull final CommandPermission permission) {
         return this.priority >= permission.priority;
     }
 }

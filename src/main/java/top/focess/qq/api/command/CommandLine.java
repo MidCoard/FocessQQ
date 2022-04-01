@@ -2,6 +2,7 @@ package top.focess.qq.api.command;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventManager;
@@ -78,7 +79,8 @@ public class CommandLine {
      * @param command the command needed to be split
      * @return the split arguments
      */
-    public static List<String> splitCommand(final String command) {
+    @NotNull
+    public static List<String> splitCommand(@NotNull final String command) {
         final List<String> args = Lists.newArrayList();
         final StringBuilder stringBuilder = new StringBuilder();
         boolean stack = false;
@@ -139,7 +141,9 @@ public class CommandLine {
         return args;
     }
 
-    private static Pair<String, String[]> splitSpecialArgument(final String argument) {
+    @NotNull
+    @Contract("_ -> new")
+    private static Pair<String, String[]> splitSpecialArgument(@NotNull final String argument) {
         final int leftIndex = argument.indexOf('(');
         if (leftIndex == -1 || !argument.endsWith(")"))
             return new Pair<>(argument, new String[0]);
@@ -211,9 +215,7 @@ public class CommandLine {
      * @param handler the special argument handler
      */
     public static void unregister(final SpecialArgumentComplexHandler handler) {
-        PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k, v) -> {
-            v.removeIf(i -> i.getRight() == handler);
-        });
+        PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k, v) -> v.removeIf(i -> i.getRight() == handler));
         SPECIAL_ARGUMENT_HANDLERS.forEach((k, v) -> {
             if (v == handler)
                 SPECIAL_ARGUMENT_HANDLERS.remove(k);

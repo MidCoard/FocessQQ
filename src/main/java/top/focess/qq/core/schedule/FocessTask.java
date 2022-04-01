@@ -1,5 +1,7 @@
 package top.focess.qq.core.schedule;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 
@@ -20,7 +22,7 @@ public class FocessTask implements ITask {
     private boolean isPeriod;
     private ComparableTask nativeTask;
 
-    FocessTask(final Runnable runnable, final Scheduler scheduler) {
+    FocessTask(@Nullable final Runnable runnable, @NotNull final Scheduler scheduler) {
         this.runnable = runnable;
         this.scheduler = scheduler;
         this.name = scheduler.getName() + "-" + UUID.randomUUID().toString().substring(0, 8);

@@ -255,13 +255,15 @@ public class SimpleFocessReader extends FocessReader {
             case C_SERIALIZABLE: {
                 final String className = this.readString();
                 final Object o = this.readObject();
-                try {
-                    final Class<?> cls = PluginCoreClassLoader.forName(className);
-                    final Method method = cls.getMethod("deserialize", Map.class);
-                    return method.invoke(null, o);
-                } catch (final Exception e) {
-                    throw new SerializationParseException(e);
-                }
+                if (o instanceof Map)
+                    try {
+                        final Class<?> cls = PluginCoreClassLoader.forName(className);
+                        final Method method = cls.getMethod("deserialize", Map.class);
+                        return method.invoke(null, o);
+                    } catch (final Exception e) {
+                        throw new SerializationParseException(e);
+                    }
+                else throw new SerializationParseException("Deserialize argument is not a map");
             }
             case C_OBJECT: {
                 final String className = this.readString();

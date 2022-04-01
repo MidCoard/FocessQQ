@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.serialize.FocessSerializable;
@@ -174,6 +176,7 @@ public class YamlConfiguration implements SectionMap {
      * @return YAML configuration
      * @throws YamlLoadException if there is any io exception in loading the file
      */
+    @NotNull
     public static YamlConfiguration loadFile(@NonNull final File file) throws YamlLoadException {
         try {
             final FileReader reader = new FileReader(file);
@@ -185,6 +188,8 @@ public class YamlConfiguration implements SectionMap {
         }
     }
 
+    @NotNull
+    @Contract("_ -> new")
     public static YamlConfiguration load(@Nullable final InputStream inputStream) {
         if (inputStream == null) return new YamlConfiguration(null);
         return new YamlConfiguration(YAML.load(inputStream));

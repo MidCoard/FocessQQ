@@ -2,6 +2,7 @@ package top.focess.qq.core.bot.contact;
 
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.contact.MemberPermission;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
@@ -18,7 +19,7 @@ public class SimpleMember extends SimpleContact implements Member {
     private final net.mamoe.mirai.contact.Member nativeMember;
     private final Group simpleGroup;
 
-    private SimpleMember(final Group simpleGroup, final net.mamoe.mirai.contact.Member nativeMember) {
+    private SimpleMember(@NotNull final Group simpleGroup, final net.mamoe.mirai.contact.Member nativeMember) {
         super(simpleGroup.getBot(), nativeMember);
         this.simpleGroup = simpleGroup;
         this.nativeMember = nativeMember;
@@ -43,7 +44,7 @@ public class SimpleMember extends SimpleContact implements Member {
         return get(group, member);
     }
 
-    public static void remove(final Bot bot) {
+    public static void remove(@NotNull final Bot bot) {
         GROUP_MEMBER_MAP.remove(bot.getId());
     }
 

@@ -1,6 +1,9 @@
 package top.focess.qq.core.util.option.type;
 
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 public abstract class OptionType<T> {
 
     public static final OptionType<String> DEFAULT_OPTION_TYPE = new OptionType<String>() {
@@ -14,6 +17,8 @@ public abstract class OptionType<T> {
             return true;
         }
 
+        @NotNull
+        @Contract(pure = true)
         @Override
         public String toString() {
             return "DEFAULT_OPTION_TYPE";

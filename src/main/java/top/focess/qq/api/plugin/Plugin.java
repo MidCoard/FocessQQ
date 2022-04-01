@@ -2,6 +2,7 @@ package top.focess.qq.api.plugin;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.*;
 import top.focess.qq.api.event.Event;
@@ -98,6 +99,7 @@ public abstract class Plugin {
      *
      * @return all the loaded plugins
      */
+    @NotNull
     public static List<Plugin> getPlugins() {
         return PluginClassLoader.getPlugins();
     }

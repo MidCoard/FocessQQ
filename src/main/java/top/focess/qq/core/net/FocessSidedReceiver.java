@@ -3,6 +3,8 @@ package top.focess.qq.core.net;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.PackHandler;
@@ -44,7 +46,7 @@ public class FocessSidedReceiver extends AServerReceiver {
 
     @Nullable
     @PacketHandler
-    public DisconnectedPacket onDisconnect(final DisconnectPacket packet) {
+    public DisconnectedPacket onDisconnect(@NotNull final DisconnectPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -55,7 +57,7 @@ public class FocessSidedReceiver extends AServerReceiver {
 
     @Nullable
     @PacketHandler
-    public Packet onHeart(final HeartPacket packet) {
+    public Packet onHeart(@NotNull final HeartPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()) && System.currentTimeMillis() + 5 * 1000 > packet.getTime()) {
@@ -68,7 +70,7 @@ public class FocessSidedReceiver extends AServerReceiver {
 
     @Nullable
     @PacketHandler
-    public Packet onClientPacket(final ClientPackPacket packet) {
+    public Packet onClientPacket(@NotNull final ClientPackPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken())) {
@@ -83,7 +85,7 @@ public class FocessSidedReceiver extends AServerReceiver {
 
     @Nullable
     @PacketHandler
-    public Packet onWait(final WaitPacket packet) {
+    public Packet onWait(@NotNull final WaitPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -101,6 +103,8 @@ public class FocessSidedReceiver extends AServerReceiver {
         });
     }
 
+    @NotNull
+    @Contract("_ -> new")
     private DisconnectedPacket disconnect(final int clientId) {
         this.clientInfos.remove(clientId);
         return new DisconnectedPacket();

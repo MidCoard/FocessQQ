@@ -1,5 +1,8 @@
 package top.focess.qq.api.bot.message;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a message source.
  */
@@ -14,8 +17,19 @@ public class MessageSource {
      * Constructs a message source
      * @param source the native message source
      */
-    public MessageSource(final net.mamoe.mirai.message.data.MessageSource source) {
+    private MessageSource(final net.mamoe.mirai.message.data.MessageSource source) {
         this.source = source;
+    }
+
+    /**
+     * Wrap a message source
+     * @param source the native message source
+     * @return the wrapped message source
+     */
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    public static MessageSource of(net.mamoe.mirai.message.data.MessageSource source) {
+        return new MessageSource(source);
     }
 
     public net.mamoe.mirai.message.data.MessageSource getNativeSource() {

@@ -52,7 +52,7 @@ public class FriendCommand extends Command {
                     ioHandler.outputLang("friend-command-friend-not-found");
                     return CommandResult.REFUSE;
                 }
-                friend.sendMessage(new Message(MiraiCode.deserializeMiraiCode(message)));
+                friend.sendMessage(Message.of(MiraiCode.deserializeMiraiCode(message)));
                 ioHandler.outputLang("friend-command-send-success",friendId);
             } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("friend-command-input-timeout");

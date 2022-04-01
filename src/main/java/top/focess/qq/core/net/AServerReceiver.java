@@ -2,6 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Client;
@@ -22,6 +23,7 @@ public abstract class AServerReceiver implements ServerReceiver {
     protected final Map<Plugin, Map<String, Map<Class<?>, List<PackHandler>>>> packHandlers = Maps.newConcurrentMap();
     protected int defaultClientId;
 
+    @NotNull
     protected static String generateToken() {
         final StringBuilder stringBuilder = new StringBuilder();
         final Random random = new Random(System.currentTimeMillis());

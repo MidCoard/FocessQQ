@@ -55,7 +55,7 @@ public class GroupCommand extends Command {
                     ioHandler.outputLang("group-command-group-not-found", groupId);
                     return CommandResult.REFUSE;
                 }
-                group.sendMessage(new Message(MiraiCode.deserializeMiraiCode(message)));
+                group.sendMessage(Message.of(MiraiCode.deserializeMiraiCode(message)));
                 ioHandler.outputLang("group-command-send-success",groupId);
             } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("group-command-input-timeout");

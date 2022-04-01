@@ -2,6 +2,7 @@ package top.focess.qq.core.net;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.packet.*;
@@ -10,6 +11,7 @@ import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 
 import java.time.Duration;
+import java.util.Objects;
 
 public class FocessUDPReceiver extends AServerReceiver {
 
@@ -30,7 +32,7 @@ public class FocessUDPReceiver extends AServerReceiver {
     private void disconnect(final int clientId) {
         final SimpleClient simpleClient = this.clientInfos.remove(clientId);
         if (simpleClient != null)
-            this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new DisconnectedPacket());
+            this.focessUDPSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), new DisconnectedPacket());
     }
 
     @Override
@@ -53,7 +55,7 @@ public class FocessUDPReceiver extends AServerReceiver {
     }
 
     @PacketHandler
-    public void onDisconnect(final DisconnectPacket packet) {
+    public void onDisconnect(@NotNull final DisconnectPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -62,7 +64,7 @@ public class FocessUDPReceiver extends AServerReceiver {
     }
 
     @PacketHandler
-    public void onHeart(final HeartPacket packet) {
+    public void onHeart(@NotNull final HeartPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -71,7 +73,7 @@ public class FocessUDPReceiver extends AServerReceiver {
     }
 
     @PacketHandler
-    public void onClientPacket(final ClientPackPacket packet) {
+    public void onClientPacket(@NotNull final ClientPackPacket packet) {
         if (this.clientInfos.get(packet.getClientId()) != null) {
             final SimpleClient simpleClient = this.clientInfos.get(packet.getClientId());
             if (simpleClient.getToken().equals(packet.getToken()))
@@ -85,7 +87,7 @@ public class FocessUDPReceiver extends AServerReceiver {
     public void sendPacket(final String client, final Packet packet) {
         for (final SimpleClient simpleClient : this.clientInfos.values())
             if (simpleClient.getName().equals(client))
-                this.focessUDPSocket.sendPacket(simpleClient.getHost(), simpleClient.getPort(), new ServerPackPacket(packet));
+                this.focessUDPSocket.sendPacket(Objects.requireNonNull(simpleClient.getHost()), simpleClient.getPort(), new ServerPackPacket(packet));
     }
 
 }

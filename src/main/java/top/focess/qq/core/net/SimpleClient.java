@@ -1,5 +1,6 @@
 package top.focess.qq.core.net;
 
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.net.Client;
 
 public class SimpleClient implements Client {
@@ -26,6 +27,7 @@ public class SimpleClient implements Client {
         this.token = token;
     }
 
+    @Nullable
     public String getHost() {
         return this.host;
     }

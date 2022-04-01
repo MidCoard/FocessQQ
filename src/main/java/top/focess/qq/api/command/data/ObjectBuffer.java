@@ -1,5 +1,8 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 
@@ -26,6 +29,8 @@ public class ObjectBuffer extends DataBuffer<Object> {
      * @param size the target buffer size
      * @return a ObjectBuffer with fixed size
      */
+    @NotNull
+    @Contract("_ -> new")
     public static ObjectBuffer allocate(final int size) {
         return new ObjectBuffer(size);
     }
@@ -43,6 +48,7 @@ public class ObjectBuffer extends DataBuffer<Object> {
         this.objects[this.pos++] = o;
     }
 
+    @NotNull
     @Override
     public Object get() {
         if (this.pos == this.limit)
@@ -50,6 +56,7 @@ public class ObjectBuffer extends DataBuffer<Object> {
         return this.objects[this.pos++];
     }
 
+    @NotNull
     @Override
     public Object get(final int index) {
         return this.objects[index];

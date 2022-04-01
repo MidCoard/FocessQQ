@@ -1,5 +1,7 @@
 package top.focess.qq.api.util;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.core.listeners.ConsoleListener;
@@ -7,6 +9,7 @@ import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * This class is used to handle input and output when executing Command.
@@ -18,9 +21,8 @@ public abstract class IOHandler {
      */
     private static volatile IOHandler CONSOLE_IO_HANDLER = new IOHandler() {
 
-
         @Override
-        public void output(final String output) {
+        public void output(@NotNull final String output) {
             final String[] messages = output.split("\n");
             Arrays.stream(messages).forEachOrdered(FocessQQ.getLogger()::info);
         }
@@ -32,6 +34,9 @@ public abstract class IOHandler {
             return true;
         }
     };
+
+    private final Object LOCK = new Object();
+
     @Nullable
     protected volatile String value;
     protected volatile boolean flag;
@@ -67,13 +72,17 @@ public abstract class IOHandler {
      * @return the input String
      * @throws InputTimeoutException if the command has waited for more than 10 minutes to get executor input string
      */
+    @NonNull
     public String input() throws InputTimeoutException {
         if (!this.flag)
             this.hasInput();
         this.flag = false;
-        if (this.value == null)
-            throw new InputTimeoutException();
-        return this.value;
+        synchronized (LOCK) {
+            if (this.value == null)
+                throw new InputTimeoutException();
+            // this.value cannot be null, because the change of value is synchronized
+            return Objects.requireNonNull(this.value);
+        }
     }
 
     /**
@@ -82,7 +91,9 @@ public abstract class IOHandler {
      * @param input the inputted String
      */
     public void input(@Nullable final String input) {
-        this.value = input;
+        synchronized (LOCK) {
+            this.value = input;
+        }
         this.flag = true;
     }
 

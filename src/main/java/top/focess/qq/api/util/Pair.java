@@ -1,5 +1,8 @@
 package top.focess.qq.api.util;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 /**
@@ -34,6 +37,8 @@ public class Pair<K, V> implements Serializable {
      * @param <V>   the second element type
      * @return the pair
      */
+    @NotNull
+    @Contract(value = "_, _ -> new", pure = true)
     public static <K, V> Pair<K, V> of(final K key, final V value) {
         return new Pair<>(key, value);
     }

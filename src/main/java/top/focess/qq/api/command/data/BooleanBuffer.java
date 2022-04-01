@@ -1,5 +1,8 @@
 package top.focess.qq.api.command.data;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -19,6 +22,8 @@ public class BooleanBuffer extends DataBuffer<Boolean> {
      * @param size the target buffer size
      * @return a BooleanBuffer with fixed size
      */
+    @NotNull
+    @Contract("_ -> new")
     public static BooleanBuffer allocate(final int size) {
         return new BooleanBuffer(size);
     }
@@ -28,11 +33,13 @@ public class BooleanBuffer extends DataBuffer<Boolean> {
         this.byteBuffer.put((byte) (b ? 1 : 0));
     }
 
+    @NotNull
     @Override
     public Boolean get() {
         return this.byteBuffer.get() != 0;
     }
 
+    @NotNull
     @Override
     public Boolean get(final int index) {
         return this.byteBuffer.get(index) != 0;

@@ -1,5 +1,7 @@
 package top.focess.qq.api.command;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * The result after executing a Command.
  */
@@ -46,7 +48,7 @@ public enum CommandResult {
         this.value = value;
     }
 
-    private static int toInt(final CommandResult result, final CommandResult[] results) {
+    private static int toInt(@NotNull final CommandResult result, @NotNull final CommandResult[] results) {
         int ret = result.getValue();
         for (final CommandResult r : results)
             ret |= r.getValue();

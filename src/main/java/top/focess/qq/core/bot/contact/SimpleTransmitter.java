@@ -3,6 +3,7 @@ package top.focess.qq.core.bot.contact;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.utils.ExternalResource;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Transmitter;
 import top.focess.qq.api.bot.message.Message;
@@ -20,7 +21,7 @@ public abstract class SimpleTransmitter extends SimpleContact implements Transmi
     }
 
     @Override
-    public void sendMessage(final Message message) {
+    public void sendMessage(@NotNull final Message message) {
         this.contact.sendMessage(message.getNativeMessage());
     }
 

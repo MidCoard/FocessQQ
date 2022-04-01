@@ -1,5 +1,7 @@
 package top.focess.qq.api.serialize;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.core.serialize.SimpleFocessWriter;
 
 import java.io.IOException;
@@ -17,6 +19,8 @@ public abstract class FocessWriter {
      *
      * @throws IllegalStateException if the given output stream is not valid
      */
+    @NotNull
+    @Contract("_ -> new")
     public static FocessWriter newFocessWriter(final OutputStream outputStream) {
         return new SimpleFocessWriter() {
 

@@ -1,6 +1,7 @@
 package top.focess.qq.api.event;
 
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
@@ -53,7 +54,7 @@ public class EventManager {
         section.stop();
     }
 
-    private static <T extends Event> void submit(final Class<T> cls, final T event) throws EventSubmitException {
+    private static <T extends Event> void submit(@NotNull final Class<T> cls, final T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
@@ -79,7 +80,7 @@ public class EventManager {
         submitOnce(cls, event);
     }
 
-    private static <T extends Event> void submitOnce(final Class<T> cls, final T event) throws EventSubmitException {
+    private static <T extends Event> void submitOnce(@NotNull final Class<T> cls, final T event) throws EventSubmitException {
         if (!Modifier.isAbstract(cls.getModifiers())) {
             ListenerHandler listenerHandler;
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {

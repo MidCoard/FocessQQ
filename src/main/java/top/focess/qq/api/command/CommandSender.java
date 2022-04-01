@@ -299,6 +299,7 @@ public class CommandSender {
      *
      * @return true if this CommandSender presents a stranger, false otherwise
      */
+    @EnsuresNonNullIf(expression = "getStranger()", result = true)
     public boolean isStranger() {
         return this.isStranger;
     }
