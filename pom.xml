@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.0.2000</version>
+    <version>4.1.0.3000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -27,7 +27,7 @@
         <mirai.version>2.10.0</mirai.version>
         <guava.version>31.1-jre</guava.version>
         <snakeyaml.version>1.30</snakeyaml.version>
-        <poi.version>5.2.0</poi.version>
+        <poi.version>5.2.2</poi.version>
         <okhttp3.version>4.9.3</okhttp3.version>
         <logback.version>1.2.11</logback.version>
         <jackson.version>2.13.2</jackson.version>

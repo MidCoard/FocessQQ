@@ -240,12 +240,18 @@ public class CommandSender {
 
             @Override
             public void output(final String output) {
-                if (CommandSender.this.isMember())
+                if (CommandSender.this.isMember()) {
+                    assert CommandSender.this.getMember() != null;
                     CommandSender.this.getMember().getGroup().sendMessage(output);
-                else if (CommandSender.this.isFriend())
+                }
+                else if (CommandSender.this.isFriend()) {
+                    assert CommandSender.this.getFriend() != null;
                     CommandSender.this.getFriend().sendMessage(output);
-                else if (CommandSender.this.isStranger())
+                }
+                else if (CommandSender.this.isStranger()) {
+                    assert CommandSender.this.getStranger() != null;
                     CommandSender.this.getStranger().sendMessage(output);
+                }
             }
 
             @Override

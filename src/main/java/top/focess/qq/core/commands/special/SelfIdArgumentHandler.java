@@ -8,10 +8,14 @@ import top.focess.qq.api.command.SpecialArgumentHandler;
 public class SelfIdArgumentHandler implements SpecialArgumentHandler {
     @Override
     public @NonNull String handle(final CommandSender sender, final Command command, final String[] args, final int i) {
-        if (sender.isFriend())
+        if (sender.isFriend()) {
+            assert sender.getFriend() != null;
             return String.valueOf(sender.getFriend().getId());
-        else if (sender.isMember())
+        }
+        else if (sender.isMember()) {
+            assert sender.getMember() != null;
             return String.valueOf(sender.getMember().getId());
+        }
         return "";
     }
 }

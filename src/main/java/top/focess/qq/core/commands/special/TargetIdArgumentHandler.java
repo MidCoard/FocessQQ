@@ -11,8 +11,10 @@ public class TargetIdArgumentHandler implements SpecialArgumentHandler {
     public @NonNull String handle(final CommandSender sender, final Command command, final String[] args, final int i) {
         if (sender.isFriend())
             return String.valueOf(FocessQQ.getBot().getId());
-        if (sender.isMember())
+        if (sender.isMember()) {
+            assert sender.getMember() != null;
             return String.valueOf(sender.getMember().getGroup().getId());
+        }
         return "";
     }
 }
