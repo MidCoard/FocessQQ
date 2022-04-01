@@ -13,6 +13,8 @@ public class FocessLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(FocessLogger.class);
 
+    private boolean debugOutput = false;
+
     /**
      * Log a message with INFO level
      *
@@ -89,6 +91,8 @@ public class FocessLogger {
      * @param message the message need to debug
      */
     public void debug(final String message) {
+        if (debugOutput)
+            this.info(ChatConstants.DEBUG_HEADER + message);
         LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
     }
 
@@ -110,5 +114,22 @@ public class FocessLogger {
      */
     public void trace(final String message, final Throwable e) {
         LOG.trace(message, e);
+    }
+
+    /**
+     * Toggle debug output
+     *
+     * Note: if debug output is true, the debug message will be outputted as INFO level and DEBUG level, otherwise, it will be outputted as DEBUG level
+     */
+    public void toggleDebugOutput() {
+        debugOutput = !debugOutput;
+    }
+
+    /**
+     * Get debug output status
+     * @return true if debug output as INFO level and DEBUG level, false otherwise
+     */
+    public boolean isDebugOutput() {
+        return debugOutput;
     }
 }

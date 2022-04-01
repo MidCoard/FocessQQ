@@ -148,6 +148,7 @@ friend-command-input-one-message: Please input one message
 friend-command-friend-not-found: Friend %d does not exist
 friend-command-input-timeout: Input timeout
 friend-command-send-success: Send message to friend %d successfully
+debug-command-debug-output-status: "Debug Output Status: %b"
 plugin-description-not-found: File plugin.yml not found
 unknown-command: Unknown command %s
 command-exec: "%s exec: %s"
@@ -194,4 +195,10 @@ exec-command-empty-command: The command is empty
 exec-command-error-command: Exec cannot execute command named itself
 section-exception: Section %s exception, %s
 clear-command-sender-session: Clear command sender session with plugin %s
+command-line-exec: "CommandLine#exec: %s exec: %s"
+command-pre-exec: "CommandLine#exec0: %s exec: Command: %s, Args: %s"
+command-before-special-handler: "BeforeSpecialHandle: %s exec: Command: %s, Args: %s"
+command-after-special-handler: "AfterSpecialHandle: %s exec: Command: %s, Args: %s"
+command-before-exec: "BeforeExec: %s exec: Command: %s, Args: %s"
+command-after-exec: "AfterExec: %s exec: Command: %s, Args: %s, Result: %s"
 

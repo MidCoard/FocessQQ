@@ -9,7 +9,6 @@ import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.command.CommandExecutedEvent;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.plugin.PluginType;
 import top.focess.qq.api.util.IOHandler;
 
 import java.util.Arrays;
@@ -83,8 +82,8 @@ public abstract class Command {
     }
 
     /**
-     * Provide a constructor to help {@link PluginType} design.
-     * Never instance it! It will be instanced when this class is loaded automatically.
+     * Provide a constructor to help {@link CommandType} design.
+     * Never instance it!Command will be instanced when this class is loaded automatically.
      */
     protected Command() {
         this.permission = CommandPermission.MEMBER;

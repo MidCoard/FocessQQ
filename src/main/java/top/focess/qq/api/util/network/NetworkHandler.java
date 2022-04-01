@@ -40,7 +40,6 @@ public class NetworkHandler {
     private static final OkHttpClient CLIENT;
 
     static {
-        // A trust manager that does not validate certificate chains, needed for self-signed certificates
         final X509TrustManager[] managers = {
                 new X509TrustManager() {
                     @Override

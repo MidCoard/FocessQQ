@@ -8,4 +8,5 @@ public class ChatConstants {
     public static final String CONSOLE_FATAL_HEADER = HEADER + " + ";
     public static final String CONSOLE_DEBUG_HEADER = HEADER + " - ";
     public static final String NETWORK_DEBUG_HEADER = HEADER + "[Network] -> ";
+    public static final String DEBUG_HEADER = "[Debug]";
 }

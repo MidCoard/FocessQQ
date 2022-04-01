@@ -14,6 +14,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -63,6 +64,7 @@ public class CommandLine {
     @NotNull
     public static Future<CommandResult> exec(final CommandSender sender, final String command, final IOHandler ioHandler) {
         // not check sender's bot
+        FocessQQ.getLogger().debugLang("command-line-exec",sender.toString(), command);
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
         final List<String> args = splitCommand(command);
@@ -153,10 +155,12 @@ public class CommandLine {
     }
 
     private static Future<CommandResult> exec0(final CommandSender sender, final String command, final String[] args, final IOHandler ioHandler, final String rawCommand) {
+        FocessQQ.getLogger().debugLang("command-pre-exec", sender.toString(), command, Arrays.toString(args));
         boolean flag = false;
         Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
         for (final Command com : Command.getCommands())
             if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
+                FocessQQ.getLogger().debugLang("command-before-special-handler", sender.toString(), command, Arrays.toString(args));
                 for (int i = 0; i < args.length; i++)
                     if (args[i].startsWith("\"@")) {
                         final String h = args[i].substring(2);
@@ -169,6 +173,7 @@ public class CommandLine {
                             args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head, sender, com, args, i, values);
                         else args[i] = args[i].substring(1);
                     }
+                FocessQQ.getLogger().debugLang("command-after-special-handler", sender.toString(), command, Arrays.toString(args));
                 final CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
                 try {
                     EventManager.submit(event);
@@ -178,11 +183,16 @@ public class CommandLine {
                 // if not want to execute, it should be cancelled
                 if (event.isCancelled())
                     continue;
+                FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args));
                 sender.getSession().set("@previous_command", rawCommand);
                 if (sender != CommandSender.CONSOLE)
                     IOHandler.getConsoleIoHandler().outputLang("command-exec", sender.toString(), rawCommand);
                 flag = true;
-                ret = EXECUTOR.submit(() -> com.execute(sender, args, ioHandler));
+                ret = EXECUTOR.submit(() -> {
+                    CommandResult result = com.execute(sender, args, ioHandler);
+                    FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString());
+                    return result;
+                });
                 break;
             }
         if (!flag && sender == CommandSender.CONSOLE)

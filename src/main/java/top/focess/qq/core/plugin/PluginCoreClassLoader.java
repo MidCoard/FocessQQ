@@ -10,8 +10,8 @@ import java.util.List;
 
 public class PluginCoreClassLoader extends ClassLoader {
 
-    public static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(PluginCoreClassLoader.class.getClassLoader());
-    public static final List<PluginClassLoader> LOADERS = Lists.newCopyOnWriteArrayList();
+    static final PluginCoreClassLoader DEFAULT_CLASS_LOADER = new PluginCoreClassLoader(PluginCoreClassLoader.class.getClassLoader());
+    static final List<PluginClassLoader> LOADERS = Lists.newCopyOnWriteArrayList();
 
     public PluginCoreClassLoader(final ClassLoader parent) {
         super(parent);
