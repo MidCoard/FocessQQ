@@ -36,7 +36,7 @@
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.native>native-mt</kotlin.native>
         <xstream.version>1.4.19</xstream.version>
-        <command.version>1.2.2</command.version>
+        <command.version>1.2.3</command.version>
     </properties>
 
     <repositories>
