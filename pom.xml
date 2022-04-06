@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>FocessQQ</name>
-    <url>https://github.com/MidCoard/MiraiQQ</url>
+    <url>https://github.com/MidCoard/FocessQQ</url>
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.0.4000</version>
+    <version>4.1.1.000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -284,9 +284,9 @@
     </licenses>
     <scm>
         <tag>master</tag>
-        <url>https://github.com/MidCoard/MiraiQQ</url>
-        <connection>scm:git:git://github.com/ElliotChen/BuildDemo.git</connection>
-        <developerConnection>scm:git:git://github.com/ElliotChen/BuildDemo.git</developerConnection>
+        <url>https://github.com/MidCoard/FocessQQ</url>
+        <connection>scm:git:git://github.com/MidCoard/FocessQQ.git</connection>
+        <developerConnection>scm:git:git://github.com/MidCoard/FocessQQ.git</developerConnection>
     </scm>
     <developers>
         <developer>
