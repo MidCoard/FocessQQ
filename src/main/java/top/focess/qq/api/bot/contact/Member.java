@@ -1,6 +1,6 @@
 package top.focess.qq.api.bot.contact;
 
-import top.focess.qq.api.command.CommandPermission;
+import top.focess.command.CommandPermission;
 
 /**
  * Represents a member in a group.

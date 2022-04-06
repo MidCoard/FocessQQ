@@ -1,6 +1,7 @@
 package top.focess.qq.api.command.converter;
 
 import org.jetbrains.annotations.Nullable;
+import top.focess.command.converter.NullDataConverter;
 import top.focess.qq.api.command.Command;
 
 /**

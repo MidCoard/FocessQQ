@@ -2,10 +2,10 @@ package top.focess.qq.core.commands;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
+import top.focess.command.CommandArgument;
+import top.focess.command.CommandResult;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandArgument;
-import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.command.converter.CommandDataConverter;
 
@@ -31,7 +31,7 @@ public class CommandCommand extends Command {
             return CommandResult.ALLOW;
         }, CommandArgument.of("list"));
         this.addExecutor((sender, data, ioHandler) -> {
-            final Command command = data.getCommand();
+            final Command command = data.get(Command.class);
             if (command.getPlugin() == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("command-command-unload-main-plugin-command", command.getName());
                 return CommandResult.REFUSE;

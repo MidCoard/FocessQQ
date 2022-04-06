@@ -10,6 +10,7 @@ import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.LoginSolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
@@ -32,7 +33,6 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.core.bot.contact.*;
 
 import javax.imageio.stream.FileImageOutputStream;

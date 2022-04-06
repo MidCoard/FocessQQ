@@ -1,9 +1,10 @@
 package top.focess.qq.core.listeners;
 
 import com.google.common.collect.Queues;
+import top.focess.command.CommandResult;
+import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.CommandLine;
-import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.EventManager;
@@ -14,7 +15,6 @@ import top.focess.qq.api.event.message.ConsoleMessageEvent;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.api.util.InputTimeoutException;
 import top.focess.qq.api.util.Pair;
 import top.focess.qq.core.debug.Section;
 

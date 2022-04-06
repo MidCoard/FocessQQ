@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.0.3000</version>
+    <version>4.1.0.4000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -125,6 +125,14 @@
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>${xstream.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>top.focess</groupId>
+            <artifactId>focess-command</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/../FocessCommand/focess-command-1.0.jar</systemPath>
         </dependency>
     </dependencies>
 

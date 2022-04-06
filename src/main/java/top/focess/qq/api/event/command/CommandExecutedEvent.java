@@ -1,8 +1,7 @@
 package top.focess.qq.api.event.command;
 
 import org.jetbrains.annotations.NotNull;
-import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandResult;
+import top.focess.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
@@ -14,11 +13,6 @@ import top.focess.qq.api.util.IOHandler;
 public class CommandExecutedEvent extends Event {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
-
-    /**
-     * The Executor
-     */
-    private final Command.Executor executor;
 
     /**
      * The args of this executor
@@ -44,14 +38,12 @@ public class CommandExecutedEvent extends Event {
     /**
      * Constructs a CommandExecutedEvent
      *
-     * @param executor  the Executor
      * @param args      the args of the executor
      * @param ioHandler the input and output handler
      * @param sender    the executor
      * @param result    the result
      */
-    public CommandExecutedEvent(final Command.Executor executor, @NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
-        this.executor = executor;
+    public CommandExecutedEvent(@NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
         this.args = args;
         this.ioHandler = ioHandler;
         this.sender = sender;
@@ -64,10 +56,6 @@ public class CommandExecutedEvent extends Event {
 
     public CommandSender getSender() {
         return this.sender;
-    }
-
-    public Command.Executor getExecutor() {
-        return this.executor;
     }
 
     @NotNull

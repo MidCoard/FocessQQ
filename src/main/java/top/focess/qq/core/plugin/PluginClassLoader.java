@@ -5,11 +5,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.focess.command.DataConverter;
+import top.focess.command.converter.DataConverterType;
+import top.focess.command.data.DataBuffer;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.*;
-import top.focess.qq.api.command.converter.DataConverterType;
 import top.focess.qq.api.command.converter.IllegalDataConverterClassException;
-import top.focess.qq.api.command.data.DataBuffer;
 import top.focess.qq.api.event.*;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
@@ -56,9 +57,7 @@ public class PluginClassLoader extends URLClassLoader {
     private static Field PLUGIN_NAME_FIELD,
             PLUGIN_VERSION_FIELD,
             PLUGIN_AUTHOR_FIELD,
-            COMMAND_NAME_FIELD,
-            COMMAND_ALIASES_FIELD,
-            COMMAND_INITIALIZE_FIELD;
+            COMMAND_COMMAND_FIELD;
     private static Method PLUGIN_INIT_METHOD;
     private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c, annotation, classLoader) -> {
         PluginType pluginType = (PluginType) annotation;
@@ -103,12 +102,8 @@ public class PluginClassLoader extends URLClassLoader {
             PLUGIN_VERSION_FIELD.setAccessible(true);
             PLUGIN_AUTHOR_FIELD = Plugin.class.getDeclaredField("author");
             PLUGIN_AUTHOR_FIELD.setAccessible(true);
-            COMMAND_NAME_FIELD = Command.class.getDeclaredField("name");
-            COMMAND_NAME_FIELD.setAccessible(true);
-            COMMAND_ALIASES_FIELD = Command.class.getDeclaredField("aliases");
-            COMMAND_ALIASES_FIELD.setAccessible(true);
-            COMMAND_INITIALIZE_FIELD = Command.class.getDeclaredField("initialize");
-            COMMAND_INITIALIZE_FIELD.setAccessible(true);
+            COMMAND_COMMAND_FIELD = Command.class.getDeclaredField("command");
+            COMMAND_COMMAND_FIELD.setAccessible(true);
             PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
             PLUGIN_INIT_METHOD.setAccessible(true);
         } catch (final Exception e) {
@@ -136,16 +131,18 @@ public class PluginClassLoader extends URLClassLoader {
                     final Plugin plugin = classLoader.plugin;
                     final Command command = (Command) c.newInstance();
                     if (!commandType.name().isEmpty()) {
-                        COMMAND_NAME_FIELD.set(command, commandType.name());
-                        COMMAND_ALIASES_FIELD.set(command, Lists.newArrayList(commandType.aliases()));
-                        if (!COMMAND_INITIALIZE_FIELD.getBoolean(command)) {
-                            try {
+                        top.focess.command.Command command1 = new top.focess.command.Command(commandType.name(),commandType.aliases()) {
+                            @Override
+                            public void init() {
                                 command.init();
-                            } catch (final Exception e) {
-                                throw new CommandLoadException((Class<? extends Command>) c, e);
                             }
-                            COMMAND_INITIALIZE_FIELD.set(command, true);
-                        }
+
+                            @Override
+                            public @NotNull List<String> usage(top.focess.command.CommandSender commandSender) {
+                                return command.usage((CommandSender) commandSender);
+                            }
+                        };
+                        COMMAND_COMMAND_FIELD.set(command, command1);
                     }
                     plugin.registerCommand(command);
                     return true;

@@ -2,10 +2,10 @@ package top.focess.qq.core.commands;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
+import top.focess.command.CommandArgument;
+import top.focess.command.CommandResult;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandArgument;
-import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.command.converter.PluginDataConverter;
 import top.focess.qq.api.plugin.Plugin;
@@ -22,7 +22,7 @@ public class UnloadCommand extends Command {
     public void init() {
         this.setExecutorPermission(CommandSender::isConsole);
         this.addExecutor((sender, data, ioHandler) -> {
-            final Plugin plugin = data.getPlugin();
+            final Plugin plugin = data.get(Plugin.class);
             if (plugin == FocessQQ.getMainPlugin()) {
                 ioHandler.outputLang("unload-command-unload-main-plugin");
                 return CommandResult.REFUSE;

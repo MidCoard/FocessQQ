@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import top.focess.command.CommandPermission;
+import top.focess.command.CommandResult;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.CommandExecutor;
@@ -18,11 +20,12 @@ import top.focess.qq.core.listeners.ChatListener;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * This class present an executor to execute command. We can use it to distinguish different permissions.
  */
-public class CommandSender {
+public class CommandSender extends top.focess.command.CommandSender {
 
     /**
      * Present CONSOLE or we call it Terminate
@@ -35,10 +38,10 @@ public class CommandSender {
     private final Bot bot;
     private final boolean isMember;
     private final boolean isFriend;
-    private final CommandPermission permission;
     private final boolean isStranger;
 
     private CommandSender() {
+        super(top.focess.command.CommandPermission.OWNER);
         if (CONSOLE != null)
             throw new IllegalStateException("CommandSender.CONSOLE is not null");
         this.member = null;
@@ -48,7 +51,6 @@ public class CommandSender {
         this.isFriend = false;
         this.isMember = false;
         this.isStranger = false;
-        this.permission = CommandPermission.OWNER;
     }
 
     /**
@@ -58,6 +60,7 @@ public class CommandSender {
      */
     @Deprecated
     public CommandSender(@NonNull final Friend friend) {
+        super(CommandPermission.OWNER);
         this.member = null;
         this.stranger = null;
         this.friend = friend;
@@ -65,7 +68,6 @@ public class CommandSender {
         this.isFriend = true;
         this.isMember = false;
         this.isStranger = false;
-        this.permission = CommandPermission.OWNER;
     }
 
     /**
@@ -75,6 +77,7 @@ public class CommandSender {
      */
     @Deprecated
     public CommandSender(@NonNull final Member member) {
+        super(member.getPermission());
         this.member = member;
         this.stranger = null;
         this.friend = null;
@@ -82,7 +85,6 @@ public class CommandSender {
         this.isMember = true;
         this.isFriend = false;
         this.isStranger = false;
-        this.permission = member.getPermission();
     }
 
     /**
@@ -92,6 +94,7 @@ public class CommandSender {
      */
     @Deprecated
     public CommandSender(@NonNull final Stranger stranger) {
+        super(CommandPermission.OWNER);
         this.member = null;
         this.friend = null;
         this.stranger = stranger;
@@ -99,7 +102,6 @@ public class CommandSender {
         this.isMember = false;
         this.isFriend = false;
         this.isStranger = true;
-        this.permission = CommandPermission.OWNER;
     }
 
     public static void clear(final Plugin plugin) {
@@ -142,7 +144,7 @@ public class CommandSender {
     public boolean hasPermission(final CommandPermission permission) {
         if (this.isAdministrator())
             return true;
-        return this.permission.hasPermission(permission);
+        return super.hasPermission(permission);
     }
 
     /**
@@ -174,16 +176,6 @@ public class CommandSender {
         if (FocessQQ.getAdministratorId() == null)
             return false;
         return this.isFriend ? this.friend.getId() == FocessQQ.getAdministratorId() : this.isMember && this.member.getId() == FocessQQ.getAdministratorId();
-    }
-
-    /**
-     * Get permission
-     *
-     * @return permission of this sender
-     */
-    @NonNull
-    public CommandPermission getPermission() {
-        return this.permission;
     }
 
     public String toString() {
@@ -252,6 +244,7 @@ public class CommandSender {
                     assert CommandSender.this.getStranger() != null;
                     CommandSender.this.getStranger().sendMessage(output);
                 }
+                throw new IllegalStateException("This CommandSender is not a member, friend or stranger");
             }
 
             @Override
@@ -269,9 +262,10 @@ public class CommandSender {
      *
      * @param command the command CommandSender execute
      * @see CommandLine#exec(CommandSender, String)
+     * @return the result of the command
      */
-    public void exec(final String command) {
-        CommandLine.exec(this, command);
+    public Future<CommandResult> exec(final String command) {
+        return CommandLine.exec(this, command);
     }
 
     /**

@@ -2,6 +2,8 @@ package top.focess.qq.api.command.data;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import top.focess.command.data.DataBuffer;
+import top.focess.command.data.StringBuffer;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.Objects;

@@ -2,7 +2,11 @@ package top.focess.qq.core.commands;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
-import top.focess.qq.api.command.*;
+import top.focess.command.CommandArgument;
+import top.focess.command.CommandResult;
+import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandLine;
+import top.focess.qq.api.command.CommandSender;
 
 import java.util.List;
 

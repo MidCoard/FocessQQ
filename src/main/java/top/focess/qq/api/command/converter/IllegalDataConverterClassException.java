@@ -1,7 +1,7 @@
 package top.focess.qq.api.command.converter;
 
 import org.jetbrains.annotations.NotNull;
-import top.focess.qq.api.command.DataConverter;
+import top.focess.command.DataConverter;
 
 /**
  * Thrown to indicate this class is an illegal DataConverter class

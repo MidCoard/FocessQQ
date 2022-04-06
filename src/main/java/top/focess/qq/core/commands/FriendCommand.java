@@ -3,15 +3,15 @@ package top.focess.qq.core.commands;
 import com.google.common.collect.Lists;
 import net.mamoe.mirai.message.code.MiraiCode;
 import org.jetbrains.annotations.NotNull;
+import top.focess.command.CommandArgument;
+import top.focess.command.CommandResult;
+import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.command.Command;
-import top.focess.qq.api.command.CommandArgument;
-import top.focess.qq.api.command.CommandResult;
 import top.focess.qq.api.command.CommandSender;
-import top.focess.qq.api.util.InputTimeoutException;
 
 import java.util.List;
 
