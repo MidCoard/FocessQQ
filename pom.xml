@@ -126,13 +126,10 @@
             <artifactId>xstream</artifactId>
             <version>${xstream.version}</version>
         </dependency>
-
         <dependency>
             <groupId>top.focess</groupId>
             <artifactId>focess-command</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/../FocessCommand/focess-command-1.0.jar</systemPath>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
