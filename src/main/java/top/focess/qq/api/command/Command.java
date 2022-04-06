@@ -45,7 +45,6 @@ public abstract class Command {
 
             @Override
             public void init() {
-                Command.this.init();
             }
 
             @Override
@@ -53,6 +52,7 @@ public abstract class Command {
                 return Command.this.usage((CommandSender) commandSender);
             }
         };
+        Command.this.init();
     }
 
     /**

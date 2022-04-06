@@ -134,7 +134,6 @@ public class PluginClassLoader extends URLClassLoader {
                         top.focess.command.Command command1 = new top.focess.command.Command(commandType.name(),commandType.aliases()) {
                             @Override
                             public void init() {
-                                command.init();
                             }
 
                             @Override
@@ -143,6 +142,7 @@ public class PluginClassLoader extends URLClassLoader {
                             }
                         };
                         COMMAND_COMMAND_FIELD.set(command, command1);
+                        command.init();
                     }
                     plugin.registerCommand(command);
                     return true;
