@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.1.1000</version>
+    <version>4.1.1.2000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -36,6 +36,7 @@
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.native>native-mt</kotlin.native>
         <xstream.version>1.4.19</xstream.version>
+        <command.version>1.2.2</command.version>
     </properties>
 
     <repositories>
@@ -129,7 +130,7 @@
         <dependency>
             <groupId>top.focess</groupId>
             <artifactId>focess-command</artifactId>
-            <version>1.1.1</version>
+            <version>${command.version}</version>
         </dependency>
     </dependencies>
 
