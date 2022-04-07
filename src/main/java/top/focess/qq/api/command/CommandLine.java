@@ -20,11 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The CommandLine Tool Class can be used to exec command with customize executor, arguments and receiver.
  */
 public class CommandLine {
+
+    private static final AtomicInteger COMMAND_ID = new AtomicInteger();
 
     private static final Map<String, SpecialArgumentComplexHandler> SPECIAL_ARGUMENT_HANDLERS = Maps.newConcurrentMap();
     private static final Map<Plugin, List<Pair<String, SpecialArgumentComplexHandler>>> PLUGIN_SPECIAL_ARGUMENT_MAP = Maps.newConcurrentMap();
@@ -65,7 +68,8 @@ public class CommandLine {
     @NotNull
     public static Future<CommandResult> exec(final CommandSender sender, final String command, final IOHandler ioHandler) {
         // not check sender's bot
-        FocessQQ.getLogger().debugLang("command-line-exec",sender.toString(), command);
+        int id = COMMAND_ID.getAndIncrement();
+        FocessQQ.getLogger().debugLang("command-line-exec",sender.toString(), command, id);
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
         final List<String> args = splitCommand(command);
@@ -73,7 +77,7 @@ public class CommandLine {
             return CompletableFuture.completedFuture(CommandResult.NONE);
         final String name = args.get(0);
         args.remove(0);
-        return exec0(sender, name, args.toArray(new String[0]), ioHandler, command);
+        return exec0(sender, name, args.toArray(new String[0]), ioHandler, command,id);
     }
 
     /**
@@ -155,13 +159,13 @@ public class CommandLine {
         return new Pair<>(name, args);
     }
 
-    private static Future<CommandResult> exec0(final CommandSender sender, final String command, final String[] args, final IOHandler ioHandler, final String rawCommand) {
-        FocessQQ.getLogger().debugLang("command-pre-exec", sender.toString(), command, Arrays.toString(args));
+    private static Future<CommandResult> exec0(final CommandSender sender, final String command, final String[] args, final IOHandler ioHandler, final String rawCommand, int id) {
+        FocessQQ.getLogger().debugLang("command-pre-exec", sender.toString(), command, Arrays.toString(args),id);
         boolean flag = false;
         Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
         for (final Command com : Command.getCommands())
             if (com.getAliases().stream().anyMatch(i -> i.equalsIgnoreCase(command)) || com.getName().equalsIgnoreCase(command)) {
-                FocessQQ.getLogger().debugLang("command-before-special-handler", sender.toString(), command, Arrays.toString(args));
+                FocessQQ.getLogger().debugLang("command-before-special-handler", sender.toString(), command, Arrays.toString(args),id);
                 for (int i = 0; i < args.length; i++)
                     if (args[i].startsWith("\"@")) {
                         final String h = args[i].substring(2);
@@ -174,7 +178,7 @@ public class CommandLine {
                             args[i] = SPECIAL_ARGUMENT_HANDLERS.get(com.getPlugin().getName() + ":" + head).handle(head, sender, com, args, i, values);
                         else args[i] = args[i].substring(1);
                     }
-                FocessQQ.getLogger().debugLang("command-after-special-handler", sender.toString(), command, Arrays.toString(args));
+                FocessQQ.getLogger().debugLang("command-after-special-handler", sender.toString(), command, Arrays.toString(args),id);
                 final CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
                 try {
                     EventManager.submit(event);
@@ -184,14 +188,14 @@ public class CommandLine {
                 // if not want to execute, it should be cancelled
                 if (event.isCancelled())
                     continue;
-                FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args));
+                FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args),id);
                 sender.getSession().set("@previous_command", rawCommand);
                 if (sender != CommandSender.CONSOLE)
                     IOHandler.getConsoleIoHandler().outputLang("command-exec", sender.toString(), rawCommand);
                 flag = true;
                 ret = EXECUTOR.submit(() -> {
                     CommandResult result = com.execute(sender, args, ioHandler);
-                    FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString());
+                    FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString(),id);
                     return result;
                 });
                 break;

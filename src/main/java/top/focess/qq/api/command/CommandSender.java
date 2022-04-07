@@ -180,11 +180,11 @@ public class CommandSender extends top.focess.command.CommandSender {
 
     public String toString() {
         if (this.isFriend())
-            return this.friend.getRawName() + "(" + this.friend.getId() + ")";
+            return this.friend.getRawName() + "(" + this.friend.getId() + ") in " +this.bot.getId();
         else if (this.isMember())
-            return this.member.getCardName() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "]";
+            return this.member.getCardName() + "(" + this.member.getId() + ")" + "[" + this.member.getGroup().getId() + "] in " +this.bot.getId();
         else if (this.isStranger())
-            return this.stranger.getRawName() + "(" + this.stranger.getId() + ")";
+            return this.stranger.getRawName() + "(" + this.stranger.getId() + ") in " +this.bot.getId();
         else return "CONSOLE";
     }
 
