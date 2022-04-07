@@ -190,13 +190,17 @@ public class CommandLine {
                     continue;
                 FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args),id);
                 sender.getSession().set("@previous_command", rawCommand);
-                if (sender != CommandSender.CONSOLE)
-                    IOHandler.getConsoleIoHandler().outputLang("command-exec", sender.toString(), rawCommand);
                 flag = true;
                 ret = EXECUTOR.submit(() -> {
-                    CommandResult result = com.execute(sender, args, ioHandler);
-                    FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString(),id);
-                    return result;
+                    try {
+                        CommandResult result = com.execute(sender, args, ioHandler);
+                        FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString(), id);
+                        return result;
+                    } catch (final Exception e) {
+                        ioHandler.outputLang("command-execute-exception", e.getMessage());
+                        FocessQQ.getLogger().thrLang("exception-command-execute", e);
+                        return CommandResult.REFUSE_EXCEPTION;
+                    }
                 });
                 break;
             }

@@ -179,8 +179,10 @@ public abstract class Command {
      * @param ioHandler the receiver
      * @return the command result
      * @see CommandLine#exec(CommandSender, String, IOHandler)
+     *
+     * @throws Exception the exception that occurred when executing the command
      */
-    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler) {
+    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler) throws Exception {
         CommandResult result = this.command.execute(sender, args,ioHandler);
         if (result.isExecuted()) {
             final CommandExecutedEvent event = new CommandExecutedEvent(args, ioHandler, sender, result);
