@@ -13,6 +13,7 @@ import top.focess.qq.api.event.command.CommandExecutedEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.IOHandler;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -95,7 +96,7 @@ public abstract class Command {
      */
     @NotNull
     public static List<Command> getCommands() {
-        return Lists.newArrayList(COMMANDS_MAP.values());
+        return Collections.unmodifiableList(Lists.newArrayList(COMMANDS_MAP.values()));
     }
 
     /**

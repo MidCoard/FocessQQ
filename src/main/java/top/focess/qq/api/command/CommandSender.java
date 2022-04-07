@@ -243,8 +243,7 @@ public class CommandSender extends top.focess.command.CommandSender {
                 else if (CommandSender.this.isStranger()) {
                     assert CommandSender.this.getStranger() != null;
                     CommandSender.this.getStranger().sendMessage(output);
-                }
-                throw new IllegalStateException("This CommandSender is not a member, friend or stranger");
+                } else throw new IllegalStateException("This CommandSender is not a member, friend or stranger");
             }
 
             @Override
