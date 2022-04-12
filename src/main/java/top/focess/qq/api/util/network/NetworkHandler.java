@@ -37,45 +37,52 @@ public class NetworkHandler {
     @NonNull
     public static final MediaType TEXT = Objects.requireNonNull(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"));
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
-    private static final OkHttpClient CLIENT;
+    private static final X509TrustManager[] X_509_TRUST_MANAGERS = {
+            new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
+                    //check if the certificate is valid
+                    for (final X509Certificate certificate : x509Certificates)
+                        certificate.checkValidity();
+                }
+
+                @Override
+                public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
+                    //check if the certificate is valid
+                    for (final X509Certificate certificate : x509Certificates)
+                        certificate.checkValidity();
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            }
+    };
+    private static final SSLContext SSL_CONTEXT;
 
     static {
-        final X509TrustManager[] managers = {
-                new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
-                        //check if the certificate is valid
-                        for (final X509Certificate certificate : x509Certificates)
-                            certificate.checkValidity();
-                    }
-
-                    @Override
-                    public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
-                        //check if the certificate is valid
-                        for (final X509Certificate certificate : x509Certificates)
-                            certificate.checkValidity();
-                    }
-
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-                }
-        };
-        final SSLContext sslContext;
+        SSLContext sslContext;
         try {
             sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, managers, new SecureRandom());
+            sslContext.init(null, X_509_TRUST_MANAGERS, new SecureRandom());
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-        CLIENT = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).sslSocketFactory(sslContext.getSocketFactory(), managers[0]).hostnameVerifier((hostname, session) -> true).build();
+        SSL_CONTEXT = sslContext;
     }
+    private final OkHttpClient client;
 
     private final Plugin plugin;
 
-    public NetworkHandler(@NonNull final Plugin plugin) {
+    public NetworkHandler(Options options,@NonNull final Plugin plugin) {
         this.plugin = plugin;
+        this.client = new OkHttpClient.Builder().connectTimeout(options.connectTimeout, TimeUnit.SECONDS).writeTimeout(options.writeTimeout, TimeUnit.SECONDS).readTimeout(options.readTimeout, TimeUnit.SECONDS).sslSocketFactory(SSL_CONTEXT.getSocketFactory(), X_509_TRUST_MANAGERS[0]).hostnameVerifier((hostname, session) -> true).build();
+    }
+
+
+    public NetworkHandler(@NonNull final Plugin plugin) {
+        this(Options.ofNull(),plugin);
     }
 
     /**
@@ -148,7 +155,7 @@ public class NetworkHandler {
         final RequestBody requestBody = RequestBody.create(value, mediaType);
         final Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
         try {
-            final Response response = CLIENT.newCall(request).execute();
+            final Response response = client.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             final String body = Objects.requireNonNull(response.body()).string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Response: " + body);
@@ -176,7 +183,7 @@ public class NetworkHandler {
         final RequestBody requestBody = RequestBody.create(value, mediaType);
         final Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
         try {
-            final Response response = CLIENT.newCall(request).execute();
+            final Response response = client.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             final String body = Objects.requireNonNull(response.body()).string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Response: " + body);
@@ -202,7 +209,7 @@ public class NetworkHandler {
         else
             request = new Request.Builder().url(url).get().headers(Headers.of(header)).build();
         try {
-            final Response response = CLIENT.newCall(request).execute();
+            final Response response = client.newCall(request).execute();
             // Call#execute() returns a non-null Response object
             final String body = Objects.requireNonNull(response.body()).string();
             LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
@@ -233,6 +240,44 @@ public class NetworkHandler {
          * HTTP PUT Request Method
          */
         PUT
+    }
+
+    public static class Options {
+
+        private int connectTimeout = 5;
+        private int writeTimeout = 10;
+        private int readTimeout = 10;
+
+        public static Options ofConnectTimeout(final int connectTimeout) {
+            return new Options().setConnectTimeout(connectTimeout);
+        }
+
+        public static Options ofWriteTimeout(final int writeTimeout) {
+            return new Options().setWriteTimeout(writeTimeout);
+        }
+
+        public static Options ofReadTimeout(final int readTimeout) {
+            return new Options().setReadTimeout(readTimeout);
+        }
+
+        public static Options ofNull() {
+            return new Options();
+        }
+
+        public Options setConnectTimeout(int connectTimeout) {
+            this.connectTimeout = connectTimeout;
+            return this;
+        }
+
+        public Options setReadTimeout(int readTimeout) {
+            this.readTimeout = readTimeout;
+            return this;
+        }
+
+        public Options setWriteTimeout(int writeTimeout) {
+            this.writeTimeout = writeTimeout;
+            return this;
+        }
     }
 
 }

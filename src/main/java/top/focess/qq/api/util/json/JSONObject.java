@@ -3,6 +3,9 @@ package top.focess.qq.api.util.json;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Represents a JSON object. It represents JSON or JSONList.
  */
@@ -22,6 +25,16 @@ public abstract class JSONObject {
         } catch (final Exception e) {
             return new JSONList(json);
         }
+    }
+
+    public static JSONObject parse(Object object) {
+        if (object instanceof Map)
+            return new JSON((Map) object);
+        else if (object instanceof List)
+            return new JSONList((List) object);
+        else if (object instanceof String)
+            return parse((String) object);
+        throw new IllegalStateException("This element type is not supported.");
     }
 
     /**
@@ -58,7 +71,7 @@ public abstract class JSONObject {
      * @param index the index of the list
      * @return the list at the given index
      */
-    public JSONObject getList(final int index) {
+    public JSONList getList(final int index) {
         throw new UnsupportedOperationException();
     }
 
@@ -70,7 +83,7 @@ public abstract class JSONObject {
      * @param key the key of the list
      * @return a list named key
      */
-    public JSONObject getList(final String key) {
+    public JSONList getList(final String key) {
         throw new UnsupportedOperationException();
     }
 
@@ -82,7 +95,7 @@ public abstract class JSONObject {
      * @param index the index of the JSON
      * @return the JSON at the given index
      */
-    public JSONObject getJSON(final int index) {
+    public JSON getJSON(final int index) {
         throw new UnsupportedOperationException();
     }
 
@@ -92,5 +105,16 @@ public abstract class JSONObject {
      * @return json String translated from this JSON instance
      */
     public abstract String toJson();
+
+    /**
+     * Get the size of this JSON instance
+     *
+     * Note: this is for JSONList only.
+     *
+     * @return the size of this JSON instance
+     */
+    public int size() {
+        throw new UnsupportedOperationException();
+    }
 
 }

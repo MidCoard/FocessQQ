@@ -3,15 +3,17 @@ package top.focess.qq.api.util.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * This class is used to define a JSON object as List.
  */
-public class JSONList extends JSONObject {
+public class JSONList extends JSONObject implements Iterable<JSONObject> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<List<Object>> TYPE_REFERENCE = new TypeReference<List<Object>>() {
@@ -67,8 +69,18 @@ public class JSONList extends JSONObject {
         }
     }
 
+    public int size() {
+        return this.values.size();
+    }
+
     @Override
     public String toString() {
         return this.values.toString();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<JSONObject> iterator() {
+        return values.stream().map(JSONObject::parse).iterator();
     }
 }
