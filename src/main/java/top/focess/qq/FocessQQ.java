@@ -386,7 +386,8 @@ public class FocessQQ {
                 new OptionParserClassifier("udp", IntegerOptionType.INTEGER_OPTION_TYPE),
                 new OptionParserClassifier("multi"),
                 new OptionParserClassifier("admin", LongOptionType.LONG_OPTION_TYPE),
-                new OptionParserClassifier("noDefaultPluginLoad")
+                new OptionParserClassifier("noDefaultPluginLoad"),
+                new OptionParserClassifier("debug")
         );
         Option option = options.get("help");
         if (option != null) {
@@ -399,6 +400,8 @@ public class FocessQQ {
             getLogger().info("--udp <port>");
             getLogger().info("--sided");
             getLogger().info("--multi");
+            getLogger().info("--noDefaultPluginLoad");
+            getLogger().info("--debug");
             saveLogFile();
             getLogger().debugLang("save-log");
             return;
@@ -608,6 +611,8 @@ public class FocessQQ {
                 exit();
             }
             getLogger().debugLang("login-default-bot");
+            if (options.get("debug") != null)
+                CommandLine.exec("debug");
             final File plugins = new File("plugins");
             if (plugins.exists() && plugins.isDirectory() && options.get("noDefaultPluginLoad") == null) {
                 final File[] files = plugins.listFiles(file -> file.getName().endsWith(".jar"));

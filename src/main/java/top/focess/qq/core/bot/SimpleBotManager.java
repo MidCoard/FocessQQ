@@ -38,9 +38,7 @@ import top.focess.qq.core.bot.contact.*;
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Future;
 
 public class SimpleBotManager implements BotManager {
@@ -357,7 +355,7 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public List<Bot> getBots() {
-        return Lists.newArrayList(BOTS.values());
+        return Collections.unmodifiableList(Lists.newArrayList(BOTS.values()));
     }
 
     @Nullable

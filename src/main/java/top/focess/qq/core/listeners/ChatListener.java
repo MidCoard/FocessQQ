@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
+    private static boolean pauseMode = false;
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean, Long>>>> QUESTS = Maps.newConcurrentMap();
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 5, true, "ChatListener");
 
@@ -71,6 +72,8 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onStrangerChat(@NotNull final StrangerChatEvent event) {
+        if (isPauseMode())
+            return;
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getRawName(), event.getStranger().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
@@ -84,6 +87,8 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onGroupChat(@NotNull final GroupChatEvent event) {
+        if (isPauseMode())
+            return;
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getCardName(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
@@ -117,6 +122,8 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFriendChat(@NotNull final FriendChatEvent event) {
+        if (isPauseMode())
+            return;
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getRawName(), event.getFriend().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
         event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
@@ -150,9 +157,19 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBotSendMessage(@NotNull final BotSendMessageEvent event) {
+        if (isPauseMode())
+            return;
         final List<String> args = CommandLine.splitCommand(event.getMessage().toString());
         if (args.size() != 0 && args.get(0).equalsIgnoreCase("exec"))
             if (event.getContact() instanceof CommandExecutor)
                 CommandLine.exec(((CommandExecutor) event.getContact()).getCommandSender(), event.getMessage().toString());
+    }
+
+    public static void togglePauseMode() {
+        pauseMode = !pauseMode;
+    }
+
+    public static boolean isPauseMode() {
+        return pauseMode;
     }
 }

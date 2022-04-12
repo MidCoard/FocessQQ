@@ -22,6 +22,10 @@
 --sided 设置单端 详情见通信
 
 --multi 设置可以多个同名客户端链接 详情见通信
+
+--noDefaultPluginLoad 设置不加载默认插件
+
+--debug 设置调试模式
 ```
 
 ## 通信
@@ -46,14 +50,14 @@ Maven 依赖
 <dependency>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.1.5000</version>
+    <version>4.1.1.6000</version>
 </dependency>
 ```
 
 Gradle 依赖
 
 ```gradle
-implementation 'top.focess:focess-qq:4.1.1.5000'
+implementation 'top.focess:focess-qq:4.1.1.6000'
 ```
 
 开发文档移步本项目[Wiki](https://github.com/MIdCoard/MiraiQQ/wiki)
