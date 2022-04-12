@@ -1,283 +1,83 @@
 package top.focess.qq.api.util.network;
 
-import com.google.common.collect.Maps;
-import okhttp3.*;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import okhttp3.MediaType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.util.json.JSON;
 import top.focess.qq.core.commands.util.ChatConstants;
+import top.focess.util.network.HttpHandler;
+import top.focess.util.network.HttpResponse;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This is a network util class.
  */
 public class NetworkHandler {
 
-    /**
-     * Used to indicate this http-request accepts JSON
-     */
-    @NonNull
-    public static final MediaType JSON = Objects.requireNonNull(MediaType.parse("application/json; charset=utf-8"));
-    /**
-     * Used to indicate this http-request accepts normal String
-     */
-    @NonNull
-    public static final MediaType TEXT = Objects.requireNonNull(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"));
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
-    private static final X509TrustManager[] X_509_TRUST_MANAGERS = {
-            new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
-                    //check if the certificate is valid
-                    for (final X509Certificate certificate : x509Certificates)
-                        certificate.checkValidity();
-                }
 
-                @Override
-                public void checkServerTrusted(final X509Certificate[] x509Certificates, final String s) throws CertificateNotYetValidException, CertificateExpiredException {
-                    //check if the certificate is valid
-                    for (final X509Certificate certificate : x509Certificates)
-                        certificate.checkValidity();
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-            }
-    };
-    private static final SSLContext SSL_CONTEXT;
-
-    static {
-        SSLContext sslContext;
-        try {
-            sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, X_509_TRUST_MANAGERS, new SecureRandom());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-        SSL_CONTEXT = sslContext;
-    }
-    private final OkHttpClient client;
-
+    /**
+     * The plugin
+     */
     private final Plugin plugin;
+    private final top.focess.util.network.NetworkHandler networkHandler;
 
-    public NetworkHandler(Options options,@NonNull final Plugin plugin) {
+    /**
+     * Initialize a new network handler with specified options
+     * @param plugin the plugin
+     * @param options the options
+     */
+    public NetworkHandler(Plugin plugin, top.focess.util.network.NetworkHandler.Options options) {
         this.plugin = plugin;
-        this.client = new OkHttpClient.Builder().connectTimeout(options.connectTimeout, TimeUnit.SECONDS).writeTimeout(options.writeTimeout, TimeUnit.SECONDS).readTimeout(options.readTimeout, TimeUnit.SECONDS).sslSocketFactory(SSL_CONTEXT.getSocketFactory(), X_509_TRUST_MANAGERS[0]).hostnameVerifier((hostname, session) -> true).build();
-    }
+        this.networkHandler = new top.focess.util.network.NetworkHandler(options);
+        this.networkHandler.addHandler(new HttpHandler() {
+            @Override
+            public void handle(String url, Map<String, Object> data, Map<String, String> header, String body) {
+                LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
+            }
 
-
-    public NetworkHandler(@NonNull final Plugin plugin) {
-        this(Options.ofNull(),plugin);
-    }
-
-    /**
-     * Send a http-request
-     *
-     * @param url         the request url
-     * @param data        the request data
-     * @param requestType the request type
-     * @return the response of this request
-     */
-    public HttpResponse request(final String url, final Map<String, Object> data, final RequestType requestType) {
-        return this.request(url, data, Maps.newHashMap(), TEXT, requestType);
+            @Override
+            public void handleException(String url, Map<String, Object> data, Map<String, String> header, Exception e) {
+                LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
+            }
+        });
     }
 
     /**
-     * Send a http-request
-     *
-     * @param url         the request url
-     * @param requestType the request type
-     * @return the response of this request
-     * @see NetworkHandler#request(String, Map, RequestType)
+     * Initialize a new network handler with default options
+     * @param plugin the plugin
      */
-    public HttpResponse request(final String url, final RequestType requestType) {
-        return this.request(url, Maps.newHashMap(), requestType);
-    }
-
-    /**
-     * Send a http-request
-     *
-     * @param url         the request url
-     * @param data        the request data
-     * @param header      the request header
-     * @param mediaType   the request acceptable type
-     * @param requestType the request type
-     * @return the response of this request
-     */
-    public HttpResponse request(final String url, final Map<String, Object> data, final Map<String, String> header, final MediaType mediaType, final RequestType requestType) {
-        if (requestType == RequestType.GET)
-            return this.get(url, data, header);
-        else if (requestType == RequestType.POST)
-            return this.post(url, data, header, mediaType);
-        else if (requestType == RequestType.PUT)
-            return this.put(url, data, header, mediaType);
-        return HttpResponse.ofNull(this.plugin);
-    }
-
-    private String process(@NotNull final Map<String, Object> data) {
-        final StringBuilder stringBuilder = new StringBuilder();
-        for (final String key : data.keySet())
-            stringBuilder.append(key).append('=').append(data.get(key)).append('&');
-        if (stringBuilder.length() != 0)
-            return stringBuilder.substring(0, stringBuilder.length() - 1);
-        return "";
-    }
-
-    /**
-     * Send a PUT http-request
-     *
-     * @param url       the request url
-     * @param data      the request data
-     * @param header    the request header
-     * @param mediaType the request acceptable type
-     * @return the response of this request
-     */
-    public HttpResponse put(final String url, final Map<String, Object> data, final Map<String, String> header, @NotNull final MediaType mediaType) {
-        final String value;
-        if (mediaType.equals(JSON))
-            value = new JSON(data).toJson();
-        else value = this.process(data);
-        final RequestBody requestBody = RequestBody.create(value, mediaType);
-        final Request request = new Request.Builder().url(url).headers(Headers.of(header)).put(requestBody).build();
-        try {
-            final Response response = client.newCall(request).execute();
-            // Call#execute() returns a non-null Response object
-            final String body = Objects.requireNonNull(response.body()).string();
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Response: " + body);
-            return new HttpResponse(this.plugin, response.code(), response.headers(), body);
-        } catch (final Exception e) {
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Put: " + data + " with Header: " + header + ", Error: " + e.getMessage());
-            return new HttpResponse(this.plugin, e);
-        }
-    }
-
-    /**
-     * Send a POST http-request
-     *
-     * @param url       the request url
-     * @param data      the request data
-     * @param header    the request header
-     * @param mediaType the request acceptable type
-     * @return the response of this request
-     */
-    public HttpResponse post(final String url, final Map<String, Object> data, final Map<String, String> header, @NotNull final MediaType mediaType) {
-        final String value;
-        if (mediaType.equals(JSON))
-            value = new JSON(data).toJson();
-        else value = this.process(data);
-        final RequestBody requestBody = RequestBody.create(value, mediaType);
-        final Request request = new Request.Builder().url(url).headers(Headers.of(header)).post(requestBody).build();
-        try {
-            final Response response = client.newCall(request).execute();
-            // Call#execute() returns a non-null Response object
-            final String body = Objects.requireNonNull(response.body()).string();
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Response: " + body);
-            return new HttpResponse(this.plugin, response.code(), response.headers(), body);
-        } catch (final IOException e) {
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
-            return new HttpResponse(this.plugin, e);
-        }
-    }
-
-    /**
-     * Send a GET http-request
-     *
-     * @param url    the request url
-     * @param data   the request data
-     * @param header the request header
-     * @return the response of this request
-     */
-    public HttpResponse get(final String url, @NotNull final Map<String, Object> data, final Map<String, String> header) {
-        final Request request;
-        if (data.size() != 0)
-            request = new Request.Builder().url(url + "?" + this.process(data)).get().headers(Headers.of(header)).build();
-        else
-            request = new Request.Builder().url(url).get().headers(Headers.of(header)).build();
-        try {
-            final Response response = client.newCall(request).execute();
-            // Call#execute() returns a non-null Response object
-            final String body = Objects.requireNonNull(response.body()).string();
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
-            return new HttpResponse(this.plugin, response.code(), response.headers(), body);
-        } catch (final IOException e) {
-            LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + this.plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Error: " + e.getMessage());
-            return new HttpResponse(this.plugin, e);
-        }
+    public NetworkHandler(Plugin plugin) {
+        this(plugin, top.focess.util.network.NetworkHandler.Options.ofNull());
     }
 
     public Plugin getPlugin() {
-        return this.plugin;
+        return plugin;
     }
 
-    /**
-     * Represents a request-type
-     */
-    public enum RequestType {
-        /**
-         * HTTP GET Request Method
-         */
-        GET,
-        /**
-         * HTTP POST Request Method
-         */
-        POST,
-        /**
-         * HTTP PUT Request Method
-         */
-        PUT
+    public HttpResponse request(String url, Map<String, Object> data, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, data, requestType);
     }
 
-    public static class Options {
-
-        private int connectTimeout = 5;
-        private int writeTimeout = 10;
-        private int readTimeout = 10;
-
-        public static Options ofConnectTimeout(final int connectTimeout) {
-            return new Options().setConnectTimeout(connectTimeout);
-        }
-
-        public static Options ofWriteTimeout(final int writeTimeout) {
-            return new Options().setWriteTimeout(writeTimeout);
-        }
-
-        public static Options ofReadTimeout(final int readTimeout) {
-            return new Options().setReadTimeout(readTimeout);
-        }
-
-        public static Options ofNull() {
-            return new Options();
-        }
-
-        public Options setConnectTimeout(int connectTimeout) {
-            this.connectTimeout = connectTimeout;
-            return this;
-        }
-
-        public Options setReadTimeout(int readTimeout) {
-            this.readTimeout = readTimeout;
-            return this;
-        }
-
-        public Options setWriteTimeout(int writeTimeout) {
-            this.writeTimeout = writeTimeout;
-            return this;
-        }
+    public HttpResponse request(String url, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, requestType);
     }
 
+    public HttpResponse request(String url, Map<String, Object> data, Map<String, String> header, MediaType mediaType, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, data, header, mediaType, requestType);
+    }
+
+    public HttpResponse put(String url, Map<String, Object> data, Map<String, String> header, @NotNull MediaType mediaType) {
+        return networkHandler.put(url, data, header, mediaType);
+    }
+
+    public HttpResponse post(String url, Map<String, Object> data, Map<String, String> header, @NotNull MediaType mediaType) {
+        return networkHandler.post(url, data, header, mediaType);
+    }
+
+    public HttpResponse get(String url, @NotNull Map<String, Object> data, Map<String, String> header) {
+        return networkHandler.get(url, data, header);
+    }
 }

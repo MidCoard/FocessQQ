@@ -15,12 +15,12 @@ import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.config.LangConfig;
-import top.focess.qq.api.util.version.Version;
-import top.focess.qq.api.util.yaml.YamlConfiguration;
-import top.focess.qq.api.util.yaml.YamlLoadException;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
+import top.focess.util.version.Version;
+import top.focess.util.yaml.YamlConfiguration;
+import top.focess.util.yaml.YamlLoadException;
 
 import java.io.File;
 import java.io.IOException;

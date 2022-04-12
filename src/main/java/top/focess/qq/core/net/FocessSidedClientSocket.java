@@ -6,7 +6,7 @@ import top.focess.qq.api.net.ClientReceiver;
 import top.focess.qq.api.net.PacketPreCodec;
 import top.focess.qq.api.net.Receiver;
 import top.focess.qq.api.net.packet.Packet;
-import top.focess.qq.api.util.Pair;
+import top.focess.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;

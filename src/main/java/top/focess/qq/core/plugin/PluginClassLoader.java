@@ -19,10 +19,10 @@ import top.focess.qq.api.schedule.Callback;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.schedule.Task;
-import top.focess.qq.api.util.version.Version;
-import top.focess.qq.api.util.yaml.YamlConfiguration;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.debug.Section;
+import top.focess.util.version.Version;
+import top.focess.util.yaml.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;

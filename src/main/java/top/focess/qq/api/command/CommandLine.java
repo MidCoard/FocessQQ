@@ -13,7 +13,7 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.api.util.Pair;
+import top.focess.util.Pair;
 
 import java.util.Arrays;
 import java.util.List;

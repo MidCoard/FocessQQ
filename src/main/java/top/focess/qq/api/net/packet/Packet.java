@@ -1,6 +1,6 @@
 package top.focess.qq.api.net.packet;
 
-import top.focess.qq.api.serialize.FocessSerializable;
+import top.focess.util.serialize.FocessSerializable;
 
 /**
  * This is the base class of all packets.

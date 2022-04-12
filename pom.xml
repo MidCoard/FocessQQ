@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.1.3000</version>
+    <version>4.1.1.4000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -25,18 +25,14 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <mirai.version>2.10.0</mirai.version>
-        <guava.version>31.1-jre</guava.version>
-        <snakeyaml.version>1.30</snakeyaml.version>
         <poi.version>5.2.2</poi.version>
-        <okhttp3.version>4.9.3</okhttp3.version>
         <logback.version>1.2.11</logback.version>
-        <jackson.version>2.13.2</jackson.version>
         <checker.version>3.21.3</checker.version>
         <errorprone.version>9+181-r4173-1</errorprone.version>
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.native>native-mt</kotlin.native>
-        <xstream.version>1.4.19</xstream.version>
         <command.version>1.2.5</command.version>
+        <util.version>1.0.2</util.version>
     </properties>
 
     <repositories>
@@ -50,6 +46,11 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>top.focess</groupId>
+            <artifactId>focess-util</artifactId>
+            <version>${util.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.checkerframework</groupId>
             <artifactId>checker-qual</artifactId>
@@ -66,44 +67,14 @@
             <version>${mirai.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp3.version}</version>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -124,11 +95,6 @@
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core-jvm</artifactId>
             <version>${kotlin.version}-${kotlin.native}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>${xstream.version}</version>
         </dependency>
         <dependency>
             <groupId>top.focess</groupId>

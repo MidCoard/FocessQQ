@@ -1,8 +1,8 @@
 package top.focess.qq.api.util.config;
 
 import org.jetbrains.annotations.Nullable;
-import top.focess.qq.api.util.yaml.YamlConfiguration;
-import top.focess.qq.api.util.yaml.YamlLoadException;
+import top.focess.util.yaml.YamlConfiguration;
+import top.focess.util.yaml.YamlLoadException;
 
 import java.io.File;
 import java.util.Map;

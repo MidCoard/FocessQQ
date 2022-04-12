@@ -20,8 +20,8 @@ import top.focess.qq.api.event.message.StrangerMessageEvent;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.api.util.Pair;
 import top.focess.qq.core.debug.Section;
+import top.focess.util.Pair;
 
 import java.time.Duration;
 import java.util.List;

@@ -1,7 +1,7 @@
 package top.focess.qq.api.plugin;
 
 import org.jetbrains.annotations.NotNull;
-import top.focess.qq.api.util.yaml.YamlConfiguration;
+import top.focess.util.yaml.YamlConfiguration;
 
 /**
  * The description of plugin.

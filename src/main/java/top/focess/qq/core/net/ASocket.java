@@ -6,7 +6,7 @@ import top.focess.qq.api.net.Receiver;
 import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.net.packet.Packet;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.util.Pair;
+import top.focess.util.Pair;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

@@ -30,10 +30,8 @@ import top.focess.qq.api.plugin.PluginLoadException;
 import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.api.util.Pair;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.logger.FocessLogger;
-import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.commands.*;
 import top.focess.qq.core.commands.special.*;
@@ -42,12 +40,16 @@ import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
 import top.focess.qq.core.plugin.PluginClassLoader;
+import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.option.Option;
 import top.focess.qq.core.util.option.OptionParserClassifier;
 import top.focess.qq.core.util.option.Options;
 import top.focess.qq.core.util.option.type.IntegerOptionType;
 import top.focess.qq.core.util.option.type.LongOptionType;
 import top.focess.qq.core.util.option.type.OptionType;
+import top.focess.util.Pair;
+import top.focess.util.serialize.SimpleFocessReader;
+import top.focess.util.version.Version;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,6 +62,10 @@ import java.util.concurrent.Future;
 import java.util.zip.GZIPOutputStream;
 
 public class FocessQQ {
+
+    static {
+        SimpleFocessReader.setDefaultClassFinder(PluginCoreClassLoader::forName);
+    }
 
     /**
      * Version of Focess

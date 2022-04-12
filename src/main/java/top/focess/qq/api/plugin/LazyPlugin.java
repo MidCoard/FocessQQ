@@ -1,8 +1,8 @@
 package top.focess.qq.api.plugin;
 
 
-import top.focess.qq.api.util.version.Version;
 import top.focess.qq.core.plugin.PluginClassLoader;
+import top.focess.util.version.Version;
 
 /**
  * This is lazy version of the plugin.

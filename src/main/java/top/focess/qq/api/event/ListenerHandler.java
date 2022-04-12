@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.util.Pair;
+import top.focess.util.Pair;
 
 import java.lang.reflect.Method;
 import java.util.Comparator;

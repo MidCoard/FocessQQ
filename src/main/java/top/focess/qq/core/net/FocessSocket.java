@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.*;
 import top.focess.qq.api.net.packet.Packet;
-import top.focess.qq.api.util.Pair;
+import top.focess.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;

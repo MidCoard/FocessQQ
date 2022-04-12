@@ -9,7 +9,7 @@ import top.focess.qq.api.net.ServerReceiver;
 import top.focess.qq.api.net.packet.ConnectPacket;
 import top.focess.qq.api.net.packet.Packet;
 import top.focess.qq.api.net.packet.SidedConnectPacket;
-import top.focess.qq.api.util.Pair;
+import top.focess.util.Pair;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
