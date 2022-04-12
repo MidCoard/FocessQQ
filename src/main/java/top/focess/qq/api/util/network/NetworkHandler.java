@@ -1,6 +1,7 @@
 package top.focess.qq.api.util.network;
 
 import okhttp3.MediaType;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import top.focess.util.network.HttpHandler;
 import top.focess.util.network.HttpResponse;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This is a network util class.
@@ -17,6 +19,10 @@ import java.util.Map;
 public class NetworkHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
+    @NonNull
+    public static final MediaType JSON = Objects.requireNonNull(MediaType.parse("application/json; charset=utf-8"));
+    @NonNull
+    public static final MediaType TEXT = Objects.requireNonNull(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"));
 
     /**
      * The plugin
