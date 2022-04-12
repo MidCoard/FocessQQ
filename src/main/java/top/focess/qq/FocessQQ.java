@@ -589,6 +589,7 @@ public class FocessQQ {
             this.registerCommand(new PluginCommand());
             this.registerCommand(new DebugCommand());
             this.registerCommand(new ExecCommand());
+            this.registerCommand(new PauseCommand());
             getLogger().debugLang("register-default-commands");
             this.registerSpecialArgumentComplexHandler("previous", new PreviousArgumentHandler());
             this.registerSpecialArgumentComplexHandler("next", new NextArgumentHandler());
