@@ -30,15 +30,18 @@ import top.focess.qq.api.event.recall.GroupRecallEvent;
 import top.focess.qq.api.event.request.FriendRequestEvent;
 import top.focess.qq.api.event.request.GroupRequestEvent;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.bot.contact.*;
+import top.focess.scheduler.Scheduler;
 
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class SimpleBotManager implements BotManager {

@@ -15,12 +15,12 @@ import top.focess.qq.api.event.*;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 import top.focess.qq.api.plugin.*;
-import top.focess.qq.api.schedule.Callback;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
-import top.focess.qq.api.schedule.Task;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.debug.Section;
+import top.focess.scheduler.Callback;
+import top.focess.scheduler.Scheduler;
+import top.focess.scheduler.Task;
 import top.focess.util.version.Version;
 import top.focess.util.yaml.YamlConfiguration;
 

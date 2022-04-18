@@ -20,7 +20,7 @@ public class ListenerHandler {
     //only access in classloader, classloader is in lock process
     private static final List<ListenerHandler> LISTENER_HANDLER_LIST = Lists.newArrayList();
     private static final Map<Plugin, List<Listener>> PLUGIN_LISTENER_MAP = Maps.newConcurrentMap();
-    //listeners only in one ListenerHandler, and one ListenerHandler only access by synchronized
+    //listeners only in one ListenerHandler, and one ListenerHandler is only accessed by synchronized
     private final Map<Listener, List<Pair<Method, EventHandler>>> listeners = Maps.newHashMap();
 
     public ListenerHandler() {
@@ -28,7 +28,7 @@ public class ListenerHandler {
     }
 
     /**
-     * Unregister all listeners bundle to the plugin
+     * Unregister all listeners bundled to the plugin
      *
      * @param plugin the plugin which need to unregister all its listeners
      */

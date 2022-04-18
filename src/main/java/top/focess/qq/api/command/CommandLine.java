@@ -10,9 +10,9 @@ import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.scheduler.Scheduler;
 import top.focess.util.Pair;
 
 import java.util.Arrays;

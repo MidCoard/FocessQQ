@@ -12,10 +12,10 @@ import top.focess.qq.api.event.EventPriority;
 import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.message.ConsoleMessageEvent;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.debug.Section;
+import top.focess.scheduler.Scheduler;
 import top.focess.util.Pair;
 
 import java.time.Duration;

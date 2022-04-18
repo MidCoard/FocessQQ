@@ -33,6 +33,7 @@
         <kotlin.native>native-mt</kotlin.native>
         <command.version>1.2.5</command.version>
         <util.version>1.0.3</util.version>
+        <scheduler.version>1.0.0</scheduler.version>
     </properties>
 
     <repositories>
@@ -100,6 +101,11 @@
             <groupId>top.focess</groupId>
             <artifactId>focess-command</artifactId>
             <version>${command.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>top.focess</groupId>
+            <artifactId>focess-scheduler</artifactId>
+            <version>${scheduler.version}</version>
         </dependency>
     </dependencies>
 

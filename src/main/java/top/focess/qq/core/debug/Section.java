@@ -2,9 +2,9 @@ package top.focess.qq.core.debug;
 
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
-import top.focess.qq.api.schedule.Task;
+import top.focess.scheduler.Scheduler;
+import top.focess.scheduler.Task;
 
 import java.time.Duration;
 import java.util.concurrent.Future;

@@ -9,8 +9,8 @@ import top.focess.qq.api.net.PackHandler;
 import top.focess.qq.api.net.ServerMultiReceiver;
 import top.focess.qq.api.net.packet.*;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
+import top.focess.scheduler.Scheduler;
 
 import java.time.Duration;
 import java.util.List;

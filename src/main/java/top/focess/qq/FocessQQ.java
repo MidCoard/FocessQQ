@@ -27,7 +27,6 @@ import top.focess.qq.api.event.server.ServerStopEvent;
 import top.focess.qq.api.net.*;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginLoadException;
-import top.focess.qq.api.schedule.Scheduler;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.config.LangConfig;
@@ -41,6 +40,7 @@ import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
+import top.focess.scheduler.Scheduler;
 import top.focess.util.Pair;
 import top.focess.util.option.Option;
 import top.focess.util.option.OptionParserClassifier;
@@ -53,7 +53,6 @@ import top.focess.util.version.Version;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -520,7 +519,7 @@ public class FocessQQ {
                 final String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
                 final File target = new File("logs", name + ".log");
                 Files.copy(latest, target); // use beta
-                final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(new File("logs", name + ".gz")));
+                final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(java.nio.file.Files.newOutputStream(new File("logs", name + ".gz").toPath()));
                 final FileInputStream inputStream = new FileInputStream(target);
                 final byte[] buf = new byte[1024];
                 int len;
