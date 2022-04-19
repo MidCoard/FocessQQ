@@ -185,7 +185,7 @@ public abstract class Command {
     public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler) throws Exception {
         CommandResult result = this.command.execute(sender, args,ioHandler);
         if (result.isExecuted()) {
-            final CommandExecutedEvent event = new CommandExecutedEvent(args, ioHandler, sender, result);
+            final CommandExecutedEvent event = new CommandExecutedEvent(this,args, ioHandler, sender, result);
             try {
                 EventManager.submit(event);
             } catch (final EventSubmitException e) {

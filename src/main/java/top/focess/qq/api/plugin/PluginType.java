@@ -17,6 +17,7 @@ public @interface PluginType {
      *
      * @return the dependent plugins or {} if there is no dependent
      */
+    @Deprecated
     String[] depend() default {};
 
     /**

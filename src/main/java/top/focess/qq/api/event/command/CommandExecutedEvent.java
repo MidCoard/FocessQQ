@@ -2,6 +2,7 @@ package top.focess.qq.api.event.command;
 
 import org.jetbrains.annotations.NotNull;
 import top.focess.command.CommandResult;
+import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
@@ -34,16 +35,22 @@ public class CommandExecutedEvent extends Event {
      * The result
      */
     private final CommandResult result;
+    /**
+     * The command
+     */
+    private final Command command;
 
     /**
      * Constructs a CommandExecutedEvent
      *
+     * @param command   the executed command
      * @param args      the args of the executor
      * @param ioHandler the input and output handler
      * @param sender    the executor
      * @param result    the result
      */
-    public CommandExecutedEvent(@NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
+    public CommandExecutedEvent(Command command, @NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
+        this.command = command;
         this.args = args;
         this.ioHandler = ioHandler;
         this.sender = sender;
@@ -65,5 +72,9 @@ public class CommandExecutedEvent extends Event {
 
     public IOHandler getIoHandler() {
         return this.ioHandler;
+    }
+
+    public Command getCommand() {
+        return command;
     }
 }

@@ -20,4 +20,11 @@ public abstract class Event implements Serializable {
     public void setPrevent(final boolean prevent) {
         this.prevent = prevent;
     }
+
+    /**
+     * Prevent submitting in the future Event Chain
+     */
+    public void prevent() {
+        this.setPrevent(true);
+    }
 }

@@ -18,4 +18,11 @@ public interface Cancellable {
      * @param cancelled true if cancel this event, false not cancel this event
      */
     void setCancelled(boolean cancelled);
+
+    /**
+     * Cancel the event
+     */
+    default void cancel() {
+        this.setCancelled(true);
+    }
 }

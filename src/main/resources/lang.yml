@@ -47,7 +47,7 @@ exception-load-captcha-picture: Load captcha picture exception
 exception-reload-plugin: Reload plugin exception
 exception-load-default-plugin: Load default plugin exception
 exception-unload-default-plugin: Unload default plugin exception
-exception-handle-event: Handle event exception
+exception-handle-event: Handle %s event exception
 exception-handle-packet: Handle packet exception
 exception-load-file: Load file exception
 exception-save-file: Save file exception

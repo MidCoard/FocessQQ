@@ -518,7 +518,7 @@ public class FocessQQ {
             if (latest.exists()) {
                 final String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
                 final File target = new File("logs", name + ".log");
-                Files.copy(latest, target); // use beta
+                Files.copy(latest, target);
                 final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(java.nio.file.Files.newOutputStream(new File("logs", name + ".gz").toPath()));
                 final FileInputStream inputStream = new FileInputStream(target);
                 final byte[] buf = new byte[1024];

@@ -135,7 +135,7 @@ public class ListenerHandler {
                             method.setAccessible(true);
                             method.invoke(listener, event);
                         } catch (final Exception e) {
-                            FocessQQ.getLogger().thrLang("exception-handle-event", e);
+                            FocessQQ.getLogger().thrLang("exception-handle-event", e, event.getClass().getName());
                         }
                     }
             );
