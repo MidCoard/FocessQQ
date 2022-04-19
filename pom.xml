@@ -32,7 +32,7 @@
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.native>native-mt</kotlin.native>
         <command.version>1.2.5</command.version>
-        <util.version>1.0.3</util.version>
+        <util.version>1.0.7</util.version>
         <scheduler.version>1.0.0</scheduler.version>
     </properties>
 
@@ -194,6 +194,8 @@
                 <version>3.1</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
+                    <source>9</source>
+                    <target>9</target>
                 </configuration>
             </plugin>
             <plugin>

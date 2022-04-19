@@ -1,21 +1,36 @@
 package top.focess;
 
-import top.focess.command.data.StringBuffer;
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.Schedulers;
-import top.focess.scheduler.Scheduler;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import top.focess.qq.api.plugin.Plugin;
 
 public class Test2 {
-    public static void main(String[] args) {
-        Scheduler scheduler = Schedulers.newFocessScheduler(new FocessQQ.MainPlugin(), "test");
-        scheduler.run(()->{
-            StringBuffer sb = StringBuffer.allocate(20);
-            sb.put("hello");
-            sb.put("world");
-            sb.put("focess");
-            sb.flip();
-            System.out.println(sb.get());
-        });
 
+    private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
+
+
+    public static class A extends Plugin {
+
+        public A(String s){
+
+        }
+
+        @Override
+        public void enable() {
+
+        }
+
+        @Override
+        public void disable() {
+
+        }
+
+        @Override
+        public String toString() {
+            return "Hello";
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(PROVIDER.newInstance(A.class));
     }
 }

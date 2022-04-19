@@ -551,7 +551,6 @@ public class FocessQQ {
         private ConsoleListener consoleListener;
 
         public MainPlugin() {
-            super("MainPlugin", "MidCoard", FocessQQ.getVersion());
             if (running) {
                 getLogger().fatalLang("fatal-main-plugin-already-running");
                 exit();
@@ -625,6 +624,7 @@ public class FocessQQ {
                             getLogger().thrLang("exception-load-default-plugin", e);
                         }
             }
+            PluginClassLoader.loadSoftDependentPlugins();
             getLogger().debugLang("load-default-plugins");
             Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
             getLogger().debugLang("setup-shutdown-hook");

@@ -1,5 +1,6 @@
 package top.focess.qq.api.plugin;
 
+import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,7 @@ import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
+import top.focess.util.serialize.FocessSerializable;
 import top.focess.util.version.Version;
 import top.focess.util.yaml.YamlConfiguration;
 import top.focess.util.yaml.YamlLoadException;
@@ -30,13 +32,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Represent a Plugin class that can be load, enable and disable. Also, provide plenty of API for the plugin to get better with this framework.
  * You should declare {@link PluginType} to this class.
  */
-public abstract class Plugin {
+public abstract class Plugin implements FocessSerializable {
 
     /**
      * The plugin author
@@ -73,31 +76,20 @@ public abstract class Plugin {
      */
     private boolean isEnabled;
 
+
+    private boolean initialized = false;
+
     /**
-     * Initialize a Plugin instance by its name.
+     * Initialize a Plugin Instance.
      * Never instance it! It will be instanced when bot bootstraps automatically.
      *
-     * @param name    the plugin name
-     * @param author  the plugin author
-     * @param version the plugin version
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      * @throws PluginDuplicateException if the plugin is already loaded
      * @throws IllegalStateException if the plugin is newed in runtime
      */
-    public Plugin(final String name, final String author, final Version version) {
-        this.name = name;
-        this.author = author;
-        this.version = version;
-        this.init();
+    public Plugin() {
+        this.initialize();
     }
-
-    /**
-     * Provide a constructor to help {@link PluginType} design.
-     * Never instance it! It will be instanced when bot bootstraps automatically.
-     */
-    protected Plugin() {
-    }
-
     /**
      * Get all the loaded plugins
      *
@@ -153,39 +145,6 @@ public abstract class Plugin {
         return plugin == null ? FocessQQ.getMainPlugin() : plugin;
     }
 
-    private void init() {
-        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
-            throw new PluginLoaderException(this.name);
-        if (this.getClass() != FocessQQ.MainPlugin.class || FocessQQ.isRunning()) {
-            if (getPlugin(this.getClass()) != null)
-                throw new PluginDuplicateException(this.name, "Cannot new a plugin at runtime");
-            this.pluginDescription = new PluginDescription(YamlConfiguration.load(this.loadResource("plugin.yml")));
-        } else this.pluginDescription = new PluginDescription();
-        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
-            throw new IllegalStateException("Cannot new a plugin at runtime");
-        if (!this.getDefaultFolder().exists())
-            if (!this.getDefaultFolder().mkdirs())
-                FocessQQ.getLogger().debugLang("create-default-folder-failed", this.getDefaultFolder().getAbsolutePath());
-        final File config = new File(this.getDefaultFolder(), "config.yml");
-        if (!config.exists()) {
-            try {
-                final InputStream configResource = this.loadResource("config.yml");
-                if (configResource != null) {
-                    Files.copy(configResource, config.toPath());
-                    configResource.close();
-                } else if (!config.createNewFile())
-                    FocessQQ.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
-            } catch (final IOException e) {
-                FocessQQ.getLogger().thrLang("exception-create-config-file", e);
-            }
-        }
-        try {
-            this.defaultConfig = new DefaultConfig(config);
-        } catch (final YamlLoadException e) {
-            FocessQQ.getLogger().thrLang("exception-load-default-configuration", e);
-        }
-        this.langConfig = new LangConfig(this.loadResource("lang.yml"));
-    }
 
     @NonNull
     public final String getName() {
@@ -218,7 +177,7 @@ public abstract class Plugin {
     }
 
     @Override
-    public boolean equals(@org.checkerframework.checker.nullness.qual.Nullable final Object o) {
+    public boolean equals(@Nullable final Object o) {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
 
@@ -247,7 +206,7 @@ public abstract class Plugin {
                     if (Event.class.isAssignableFrom(eventClass) && !Modifier.isAbstract(eventClass.getModifiers())) {
                         try {
                             final Field field = eventClass.getDeclaredField("LISTENER_HANDLER");
-                            final boolean flag = field.isAccessible();
+                            final boolean flag = field.canAccess(null);
                             field.setAccessible(true);
                             final ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
                             field.setAccessible(flag);
@@ -335,5 +294,80 @@ public abstract class Plugin {
      */
     public final void registerSpecialArgumentComplexHandler(final String name, final SpecialArgumentComplexHandler handler) {
         CommandLine.register(this, name, handler);
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("name",this.name);
+        return map;
+    }
+
+    @Nullable
+    public static Plugin deserialize(Map<String,Object> map){
+        return Plugin.getPlugin((String) map.get("name"));
+    }
+
+    /**
+     * Get the plugin jar file
+     * @return the plugin jar file or null if it is not loaded from PluginClassLoader (the MainPlugin)
+     */
+    @Nullable
+    public File getFile() {
+        if (this.getClass().getClassLoader() instanceof PluginClassLoader)
+            return ((PluginClassLoader) this.getClass().getClassLoader()).getFile();
+        else return null;
+    }
+
+    /**
+     * Indicate whether the plugin is initialized or not
+     * @return true if the plugin is initialized, false otherwise
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void initialize() {
+        if (this.getClass() != FocessQQ.MainPlugin.class || FocessQQ.isRunning()) {
+            this.pluginDescription = new PluginDescription(YamlConfiguration.load(this.loadResource("plugin.yml")));
+            this.name = this.pluginDescription.getName();
+            this.author = this.pluginDescription.getAuthor();
+            this.version = this.pluginDescription.getVersion();
+            if (getPlugin(this.getClass()) != null)
+                throw new PluginDuplicateException(this.name, "Cannot new a plugin at runtime");
+        } else {
+            this.pluginDescription = new PluginDescription();
+            this.name = this.pluginDescription.getName();
+            this.author = this.pluginDescription.getAuthor();
+            this.version = this.pluginDescription.getVersion();
+        }
+        if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
+            throw new PluginLoaderException(this.name);
+        if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
+            throw new IllegalStateException("Cannot new a plugin at runtime");
+        if (!this.getDefaultFolder().exists())
+            if (!this.getDefaultFolder().mkdirs())
+                FocessQQ.getLogger().debugLang("create-default-folder-failed", this.getDefaultFolder().getAbsolutePath());
+        final File config = new File(this.getDefaultFolder(), "config.yml");
+        if (!config.exists()) {
+            try {
+                final InputStream configResource = this.loadResource("config.yml");
+                if (configResource != null) {
+                    Files.copy(configResource, config.toPath());
+                    configResource.close();
+                } else if (!config.createNewFile())
+                    FocessQQ.getLogger().debugLang("create-config-file-failed", config.getAbsolutePath());
+            } catch (final IOException e) {
+                FocessQQ.getLogger().thrLang("exception-create-config-file", e);
+            }
+        }
+        try {
+            this.defaultConfig = new DefaultConfig(config);
+        } catch (final YamlLoadException e) {
+            FocessQQ.getLogger().thrLang("exception-load-default-configuration", e);
+        }
+        this.langConfig = new LangConfig(this.loadResource("lang.yml"));
+        this.initialized = true;
     }
 }

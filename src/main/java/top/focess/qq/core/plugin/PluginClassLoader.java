@@ -3,6 +3,7 @@ package top.focess.qq.core.plugin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.command.DataConverter;
@@ -21,7 +22,7 @@ import top.focess.qq.core.debug.Section;
 import top.focess.scheduler.Callback;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
-import top.focess.util.version.Version;
+import top.focess.util.Pair;
 import top.focess.util.yaml.YamlConfiguration;
 
 import java.io.File;
@@ -30,7 +31,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -48,45 +48,69 @@ public class PluginClassLoader extends URLClassLoader {
     private static final Map<Class<? extends Plugin>, Plugin> CLASS_PLUGIN_MAP = Maps.newConcurrentMap();
     private static final Map<String, Plugin> NAME_PLUGIN_MAP = Maps.newConcurrentMap();
     private static final Object LOCK = new Object();
-    private static final Map<String, Set<File>> AFTER_PLUGINS_MAP = Maps.newHashMap();
+    // false if it is soft
+    private static final Map<String, Set<Pair<File,Boolean>>> AFTER_PLUGINS_MAP = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
     private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
     private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 2, false, "PluginLoader");
     private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "GC");
-    private static Field PLUGIN_NAME_FIELD,
-            PLUGIN_VERSION_FIELD,
-            PLUGIN_AUTHOR_FIELD,
+    private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
+    private static Field
             COMMAND_COMMAND_FIELD;
-    private static Method PLUGIN_INIT_METHOD;
+    private final boolean ignoreSoftDependencies;
+
+    public static void loadSoftDependentPlugins() {
+        for (String dependency : AFTER_PLUGINS_MAP.keySet())
+            for (Pair<File, Boolean> pair : AFTER_PLUGINS_MAP.get(dependency)){
+                if (!pair.getRight()) {
+                    try {
+                        final PluginClassLoader pluginClassLoader = new PluginClassLoader(pair.getFirst(), true);
+                        if (pluginClassLoader.load())
+                            FocessQQ.getLogger().infoLang("load-soft-depend-plugin-succeed", pluginClassLoader.getPlugin().getName());
+                        else {
+                            FocessQQ.getLogger().infoLang("load-soft-depend-plugin-failed", pair.getFirst().getName());
+                            pluginClassLoader.close();
+                        }
+                    } catch (IOException e) {
+                        FocessQQ.getLogger().thrLang("exception-load-soft-depend-plugin",e, pair.getFirst().getName());
+                    }
+                }
+            }
+    }
+
     private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c, annotation, classLoader) -> {
         PluginType pluginType = (PluginType) annotation;
-        if (pluginType.depend().length != 0) {
-            boolean flag = false;
-            for (String p : pluginType.depend())
-                if (Plugin.getPlugin(p) == null) {
-                    AFTER_PLUGINS_MAP.compute(p, (key, value) -> {
-                        if (value == null)
-                            value = Sets.newHashSet();
-                        value.add(classLoader.file);
-                        return value;
-                    });
+        boolean flag = false;
+        for (String p : classLoader.getPluginDescription().getDependencies())
+            if (Plugin.getPlugin(p) == null) {
+                AFTER_PLUGINS_MAP.compute(p, (key, value) -> {
+                    if (value == null)
+                        value = Sets.newHashSet();
+                    value.add(Pair.of(classLoader.file,true));
+                    return value;
+                });
+                flag = true;
+            }
+        for (String p : classLoader.getPluginDescription().getSoftDependencies())
+            if (Plugin.getPlugin(p) == null) {
+                AFTER_PLUGINS_MAP.compute(p, (key, value) -> {
+                    if (value == null)
+                        value = Sets.newHashSet();
+                    value.add(Pair.of(classLoader.file,false));
+                    return value;
+                });
+                if (!classLoader.ignoreSoftDependencies)
                     flag = true;
-                }
-            if (flag)
-                throw new IllegalStateException("Plugin depends on other plugins, but not all of them are loaded.");
-        }
+            }
+        if (flag)
+            //outer will catch the exception
+            throw new IllegalStateException("Plugin depends on other plugins, but not all of them are loaded.");
         if (Plugin.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
             try {
-                Plugin plugin = (Plugin) c.newInstance();
-                if (!((PluginType) annotation).name().isEmpty()) {
-                    String name = ((PluginType) annotation).name();
-                    PLUGIN_NAME_FIELD.set(plugin, name);
-                    PLUGIN_AUTHOR_FIELD.set(plugin, ((PluginType) annotation).author());
-                    PLUGIN_VERSION_FIELD.set(plugin, new Version(((PluginType) annotation).version()));
-                }
-                PLUGIN_INIT_METHOD.invoke(plugin);
-                classLoader.plugin = plugin;
+                classLoader.plugin = (Plugin) PROVIDER.newInstance(c);
+                if (!classLoader.plugin.isInitialized())
+                    classLoader.plugin.initialize();
                 return true;
             } catch (Exception e) {
                 throw new PluginLoadException((Class<? extends Plugin>) c, e);
@@ -96,16 +120,8 @@ public class PluginClassLoader extends URLClassLoader {
 
     static {
         try {
-            PLUGIN_NAME_FIELD = Plugin.class.getDeclaredField("name");
-            PLUGIN_NAME_FIELD.setAccessible(true);
-            PLUGIN_VERSION_FIELD = Plugin.class.getDeclaredField("version");
-            PLUGIN_VERSION_FIELD.setAccessible(true);
-            PLUGIN_AUTHOR_FIELD = Plugin.class.getDeclaredField("author");
-            PLUGIN_AUTHOR_FIELD.setAccessible(true);
             COMMAND_COMMAND_FIELD = Command.class.getDeclaredField("command");
             COMMAND_COMMAND_FIELD.setAccessible(true);
-            PLUGIN_INIT_METHOD = Plugin.class.getDeclaredMethod("init");
-            PLUGIN_INIT_METHOD.setAccessible(true);
         } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-init-classloader", e);
         }
@@ -129,7 +145,7 @@ public class PluginClassLoader extends URLClassLoader {
             if (Command.class.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
                     final Plugin plugin = classLoader.plugin;
-                    final Command command = (Command) c.newInstance();
+                    final Command command = (Command) PROVIDER.newInstance(c);
                     if (!commandType.name().isEmpty()) {
                         top.focess.command.Command command1 = new top.focess.command.Command(commandType.name(),commandType.aliases()) {
                             @Override
@@ -160,7 +176,7 @@ public class PluginClassLoader extends URLClassLoader {
             if (Listener.class.isAssignableFrom(c) && !Modifier.isInterface(c.getModifiers()) && !Modifier.isAbstract(c.getModifiers())) {
                 try {
                     final Plugin plugin = classLoader.plugin;
-                    final Listener listener = (Listener) c.newInstance();
+                    final Listener listener = (Listener) PROVIDER.newInstance(c);
                     plugin.registerListener(listener);
                     return true;
                 } catch (final Exception e) {
@@ -211,7 +227,12 @@ public class PluginClassLoader extends URLClassLoader {
     private Plugin plugin;
 
     public PluginClassLoader(@NotNull final File file) throws IOException {
+        this(file, false);
+    }
+
+    public PluginClassLoader(@NotNull final File file, boolean ignoreSoftDependencies) throws IOException {
         super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
+        this.ignoreSoftDependencies = ignoreSoftDependencies;
         this.file = file;
         this.jarFile = new JarFile(file);
         PluginCoreClassLoader.LOADERS.add(this);
@@ -262,8 +283,10 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
         }
         section.stop();
-        if (!GC_SCHEDULER.isClosed())
-            GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1));
+        synchronized (GC_SCHEDULER) {
+            if (!GC_SCHEDULER.isClosed())
+                GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1));
+        }
         return file;
     }
 
@@ -396,12 +419,12 @@ public class PluginClassLoader extends URLClassLoader {
                 FocessQQ.getLogger().debugLang("load-class");
 
                 FocessQQ.getLogger().debugLang("load-depend-plugin");
-                for (final File file : AFTER_PLUGINS_MAP.getOrDefault(this.plugin.getName(), Sets.newHashSet())) {
-                    final PluginClassLoader pluginClassLoader = new PluginClassLoader(file);
+                for (final Pair<File,Boolean> pair : AFTER_PLUGINS_MAP.getOrDefault(this.plugin.getName(), Sets.newHashSet())) {
+                    final PluginClassLoader pluginClassLoader = new PluginClassLoader(pair.getFirst());
                     if (pluginClassLoader.load())
                         FocessQQ.getLogger().infoLang("load-depend-plugin-succeed", pluginClassLoader.getPlugin().getName());
                     else {
-                        FocessQQ.getLogger().infoLang("load-depend-plugin-failed", file.getName());
+                        FocessQQ.getLogger().infoLang("load-depend-plugin-failed", pair.getFirst().getName());
                         pluginClassLoader.close();
                     }
                 }
@@ -434,6 +457,10 @@ public class PluginClassLoader extends URLClassLoader {
                 } else if (e instanceof PluginLoadException)
                     FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                 PluginCoreClassLoader.LOADERS.remove(this);
+                synchronized (GC_SCHEDULER) {
+                    if (!GC_SCHEDULER.isClosed())
+                        GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1));
+                }
                 return false;
             }
             FocessQQ.getLogger().debugLang("end-load-plugin", this.file.getName());

@@ -19,3 +19,4 @@ ts.obj
 NightClass.obj
 *.gz
 *.log
+temp.yml

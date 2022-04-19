@@ -25,6 +25,7 @@ public @interface PluginType {
      *
      * @return the name of the plugin
      */
+    @Deprecated
     String name() default "";
 
     /**
@@ -32,6 +33,7 @@ public @interface PluginType {
      *
      * @return the author of the plugin
      */
+    @Deprecated
     String author() default "MidCoard";
 
     /**
@@ -39,6 +41,7 @@ public @interface PluginType {
      *
      * @return the version of the plugin
      */
+    @Deprecated
     String version() default "1.0.0";
 
 }

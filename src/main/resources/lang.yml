@@ -72,6 +72,7 @@ exception-command-execute: Command execute exception
 exception-thread-pool-scheduler-thread-uncaught: ThreadPoolSchedulerThread %s uncaught exception
 exception-thread-pool-scheduler-uncaught: ThreadPoolScheduler %s uncaught exception
 exception-focess-scheduler-uncaught: FocessScheduler %s uncaught excpetion
+exception-load-soft-depend-plugin: Load soft-dependent plugin file %s exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
@@ -97,8 +98,10 @@ load-main-plugin: Load main plugin
 load-plugin-class: Load plugin class
 load-class: Load classes
 load-depend-plugin: Load depended plugin
-load-depend-plugin-succeed: Load depended plugin %s successfully
+load-depend-plugin-succeed: Load dependent plugin %s successfully
+load-soft-depend-plugin-succeed: Load soft-dependent plugin %s successfully
 load-depend-plugin-failed: Failed to load dependent plugin file %s
+load-soft-depend-plugin-failed: Failed to load soft-dependent plugin file %s
 load-plugin-classes: Load plugin classes %d
 load-default-plugins: Load default plugins
 load-default-properties: Load default properties
