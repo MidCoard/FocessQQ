@@ -86,6 +86,7 @@ public abstract class Plugin implements FocessSerializable {
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader}
      * @throws PluginDuplicateException if the plugin is already loaded
      * @throws IllegalStateException if the plugin is newed in runtime
+     * @throws IllegalArgumentException if the plugin name is empty
      */
     public Plugin() {
         this.initialize();
@@ -342,6 +343,8 @@ public abstract class Plugin implements FocessSerializable {
             this.author = this.pluginDescription.getAuthor();
             this.version = this.pluginDescription.getVersion();
         }
+        if (this.name.isEmpty())
+            throw new IllegalArgumentException("Plugin name cannot be empty");
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(this.name);
         if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
