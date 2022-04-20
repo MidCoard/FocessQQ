@@ -32,7 +32,7 @@
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.native>native-mt</kotlin.native>
         <command.version>1.2.5</command.version>
-        <util.version>1.0.7</util.version>
+        <util.version>1.1.1</util.version>
         <scheduler.version>1.0.2</scheduler.version>
     </properties>
 

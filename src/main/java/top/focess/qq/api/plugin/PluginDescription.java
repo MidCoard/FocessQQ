@@ -41,6 +41,15 @@ public class PluginDescription {
      * The plugin name
      */
     private final String name;
+    /**
+     * The plugin required Focess version
+     */
+    private final Version requireVersion;
+
+    /**
+     * The plugin limited Focess version
+     */
+    private final Version limitVersion;
 
     /**
      * Constructs a new PluginDescription from the plugin config
@@ -51,9 +60,11 @@ public class PluginDescription {
         this.main = pluginConfig.get("main");
         this.author = pluginConfig.getOrDefault("author","");
         this.dependencies = pluginConfig.getListOrEmpty("depend");
-        this.softDependencies = pluginConfig.getListOrEmpty("softdepend");
+        this.softDependencies = pluginConfig.getListOrEmpty("soft-depend");
         this.version = new Version(pluginConfig.getOrDefault("version","1.0.0"));
         this.name = pluginConfig.getOrDefault("name","");
+        this.requireVersion = new Version(pluginConfig.getOrDefault("require-version",FocessQQ.getVersion().toString()));
+        this.limitVersion = new Version(pluginConfig.getOrDefault("limit-version",FocessQQ.getVersion().toString()));
     }
 
     PluginDescription() {
@@ -63,6 +74,8 @@ public class PluginDescription {
         this.softDependencies = Lists.newArrayList();
         this.version = FocessQQ.getVersion();
         this.name = "MainPlugin";
+        this.requireVersion = FocessQQ.getVersion();
+        this.limitVersion = FocessQQ.getVersion();
     }
 
     public String getMain() {
@@ -88,5 +101,13 @@ public class PluginDescription {
 
     public Version getVersion() {
         return this.version;
+    }
+
+    public Version getRequireVersion() {
+        return requireVersion;
+    }
+
+    public Version getLimitVersion() {
+        return limitVersion;
     }
 }

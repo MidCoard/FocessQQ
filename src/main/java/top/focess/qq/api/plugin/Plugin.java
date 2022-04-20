@@ -345,6 +345,8 @@ public abstract class Plugin implements FocessSerializable {
         }
         if (this.name.isEmpty())
             throw new IllegalArgumentException("Plugin name cannot be empty");
+        if (FocessQQ.getVersion().higher(this.pluginDescription.getRequireVersion()) || !this.pluginDescription.getLimitVersion().equals(FocessQQ.getVersion()))
+            throw new IllegalStateException("Version limitation not satisfied");
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(this.name);
         if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
