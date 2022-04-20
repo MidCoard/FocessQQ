@@ -60,17 +60,28 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPOutputStream;
-
 public class FocessQQ {
 
-    static {
-        SimpleFocessReader.setDefaultClassFinder(PluginCoreClassLoader::forName);
-    }
 
     /**
      * Version of Focess
      */
     private static final Version VERSION;
+
+    static {
+        SimpleFocessReader.setDefaultClassFinder(PluginCoreClassLoader::forName);
+
+        Version version;
+        final Properties properties = new Properties();
+        try {
+            properties.load(FocessQQ.class.getResourceAsStream("/default.properties"));
+            version = new Version(properties.getProperty("version"));
+        } catch (final Exception e) {
+            version = new Version("build");
+        }
+        VERSION = version;
+    }
+
     /**
      * The Focess Logger
      */
@@ -166,18 +177,6 @@ public class FocessQQ {
     };
     private static Options options;
     private static Boolean isStopped = false;
-
-    static {
-        Version version;
-        final Properties properties = new Properties();
-        try {
-            properties.load(FocessQQ.class.getResourceAsStream("/default.properties"));
-            version = new Version(properties.getProperty("version"));
-        } catch (final Exception e) {
-            version = new Version("build");
-        }
-        VERSION = version;
-    }
 
     /**
      * Get the Friend Mirai instance by its id
