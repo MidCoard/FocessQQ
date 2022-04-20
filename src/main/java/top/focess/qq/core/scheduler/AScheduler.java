@@ -2,9 +2,11 @@ package top.focess.qq.core.scheduler;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.scheduler.Callback;
+import top.focess.scheduler.CatchExceptionHandler;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 
@@ -23,6 +25,12 @@ public class AScheduler implements Scheduler {
     public AScheduler(Plugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
         this.scheduler = scheduler;
+        this.scheduler.setUncaughtExceptionHandler((t, e) -> {
+            FocessQQ.getLogger().thrLang("exception-scheduler-uncaught", e, this.getName());
+        });
+        this.scheduler.setCatchExceptionHandler((t, e) -> {
+            FocessQQ.getLogger().thrLang("exception-scheduler", e, this.getName());
+        });
         PLUGIN_SCHEDULER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newCopyOnWriteArrayList();
@@ -78,6 +86,27 @@ public class AScheduler implements Scheduler {
     @Override
     public void closeNow() {
         this.scheduler.closeNow();
+    }
+
+    @Override
+    public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler uncaughtExceptionHandler) {
+        this.scheduler.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+    }
+
+    @Override
+    @Nullable
+    public Thread.UncaughtExceptionHandler getUncaughtExceptionHandler() {
+        return this.scheduler.getUncaughtExceptionHandler();
+    }
+
+    @Override
+    public @Nullable CatchExceptionHandler getCatchExceptionHandler() {
+        return this.scheduler.getCatchExceptionHandler();
+    }
+
+    @Override
+    public void setCatchExceptionHandler(CatchExceptionHandler catchExceptionHandler) {
+        this.scheduler.setCatchExceptionHandler(catchExceptionHandler);
     }
 
     /**

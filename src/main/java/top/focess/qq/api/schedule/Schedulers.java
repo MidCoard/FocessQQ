@@ -2,6 +2,7 @@ package top.focess.qq.api.schedule;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.scheduler.AScheduler;
 import top.focess.scheduler.FocessScheduler;
@@ -60,7 +61,14 @@ public class Schedulers {
     @NotNull
     @Contract("_, _ -> new")
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize) {
-        return new AScheduler(plugin, new ThreadPoolScheduler(plugin.getName(),poolSize));
+        ThreadPoolScheduler scheduler = new ThreadPoolScheduler(plugin.getName(),poolSize);
+        scheduler.setThreadUncaughtExceptionHandler((t, e) -> {
+            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName());
+        });
+        scheduler.setThreadCatchExceptionHandler((t, e) -> {
+            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e);
+        });
+        return new AScheduler(plugin, scheduler);
     }
 
     /**
@@ -78,7 +86,14 @@ public class Schedulers {
     @NotNull
     @Contract("_, _, _, _ -> new")
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize, final boolean immediate, @NotNull final String name) {
-        return new AScheduler(plugin,new ThreadPoolScheduler(poolSize, immediate, name));
+        ThreadPoolScheduler scheduler = new ThreadPoolScheduler(poolSize, immediate, name);
+        scheduler.setThreadUncaughtExceptionHandler((t, e) -> {
+            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName());
+        });
+        scheduler.setThreadCatchExceptionHandler((t, e) -> {
+           FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e);
+        });
+        return new AScheduler(plugin,scheduler);
     }
 
     /**

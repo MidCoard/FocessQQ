@@ -59,8 +59,7 @@ exception-send-packet: Send packet exception
 exception-focess-socket: Focess socket exception
 exception-focess-udp-socket: Focess udp socket exception
 exception-init-classloader: Init classloader exception
-exception-focess-scheduler: Focess scheduler exception
-exception-thread-pool-scheduler: Thread pool scheduler exception
+exception-scheduler: Scheduler exception
 exception-thread-pool-scheduler-thread: Thread pool scheduler thread exception
 exception-default-bot-login-failed: Default bot login failed exception
 exception-serialize-field: "%s in %s serialize field exception"
@@ -70,8 +69,7 @@ exception-load-lang-configuration: Load lang configuration exception
 exception-login-default-bot: Login default bot exception
 exception-command-execute: Command execute exception
 exception-thread-pool-scheduler-thread-uncaught: ThreadPoolSchedulerThread %s uncaught exception
-exception-thread-pool-scheduler-uncaught: ThreadPoolScheduler %s uncaught exception
-exception-focess-scheduler-uncaught: FocessScheduler %s uncaught excpetion
+exception-scheduler-uncaught: Scheduler %s uncaught exception
 exception-load-soft-depend-plugin: Load soft-dependent plugin file %s exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
