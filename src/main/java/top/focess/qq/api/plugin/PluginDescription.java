@@ -73,7 +73,7 @@ public class PluginDescription {
         this.dependencies = Lists.newArrayList();
         this.softDependencies = Lists.newArrayList();
         this.version = FocessQQ.getVersion();
-        this.name = "MainPlugin";
+        this.name = "Main";
         this.requireVersion = FocessQQ.getVersion();
         this.limitVersion = FocessQQ.getVersion();
     }
