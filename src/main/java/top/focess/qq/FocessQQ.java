@@ -40,6 +40,7 @@ import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
+import top.focess.scheduler.FocessScheduler;
 import top.focess.scheduler.Scheduler;
 import top.focess.util.Pair;
 import top.focess.util.option.Option;
@@ -82,7 +83,7 @@ public class FocessQQ {
      * The Bot Manager
      */
     private static final BotManager BOT_MANAGER = new SimpleBotManager();
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(MAIN_PLUGIN, "FocessQQ");
+    private static final Scheduler SCHEDULER = new FocessScheduler("FocessQQ");
     /**
      * The lang config
      */
@@ -326,11 +327,8 @@ public class FocessQQ {
         try {
             IOHandler.getConsoleIoHandler().outputLang("input-account-username");
             final String str = IOHandler.getConsoleIoHandler().input().trim();
-            if (str.equals("stop")) {
-                getLogger().debugLang("save-log");
-                saveLogFile();
-                System.exit(0);
-            }
+            if (str.equals("stop"))
+                exit();
             username = Long.parseLong(str);
             IOHandler.getConsoleIoHandler().outputLang("input-account-password");
             password = IOHandler.getConsoleIoHandler().input();
@@ -350,7 +348,7 @@ public class FocessQQ {
             getLogger().debugLang("setup-uncaught-exception-handler");
         } catch (final Exception e) {
             e.printStackTrace();
-            System.exit(0);
+            exit();
         }
 
         SCHEDULER.runTimer(() -> {
@@ -403,7 +401,7 @@ public class FocessQQ {
             getLogger().info("--debug");
             saveLogFile();
             getLogger().debugLang("save-log");
-            return;
+            exit();
         }
         getLogger().infoLang("start-main", getVersion());
         option = options.get("user");
@@ -495,7 +493,7 @@ public class FocessQQ {
     }
 
     /**
-     * Exit Bot
+     * Exit FocessQQ Framework.
      */
     public static void exit() {
         synchronized (STOP_LOCK) {
@@ -504,12 +502,16 @@ public class FocessQQ {
             isStopped = true;
         }
         SCHEDULER.run(() -> {
-            getLogger().fatalLang("fatal-exit-failed");
-            Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
+            try {
+                getLogger().fatalLang("fatal-exit-failed");
+            } catch (final Exception ignored) {}
             System.exit(0);
         }, Duration.ofSeconds(5));
+        Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
         if (MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);
+        SCHEDULER.close();
+        System.exit(0);
     }
 
     private static void saveLogFile() {
@@ -703,16 +705,13 @@ public class FocessQQ {
             if (!saved) {
                 getLogger().debugLang("save-log");
                 saveLogFile();
+                saved = true;
             }
             running = false;
             // make sure scheduler is stopped at end of disable
             if (Schedulers.closeAll())
                 getLogger().debugLang("schedulers-not-empty");
             getLogger().debugLang("unregister-all-schedulers");
-            if (!saved) {
-                saved = true;
-                System.exit(0);
-            }
         }
 
     }

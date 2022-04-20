@@ -78,7 +78,7 @@ public class Schedulers {
      *
      * @param plugin    the plugin
      * @param poolSize  the thread pool size
-     * @param immediate true if the scheduler should run immediately, false otherwise
+     * @param immediate true if the task should run immediately when there is not enough threads, false otherwise
      * @param name      the scheduler name
      * @return a ThreadPoolScheduler
      * @see Schedulers#newThreadPoolScheduler(Plugin, int)

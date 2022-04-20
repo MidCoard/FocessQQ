@@ -60,7 +60,7 @@ public class EventManager {
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
                 try {
                     final Field field = cls.getDeclaredField("LISTENER_HANDLER");
-                    final boolean flag = field.isAccessible();
+                    final boolean flag = field.canAccess(null);
                     field.setAccessible(true);
                     listenerHandler = (ListenerHandler) field.get(null);
                     field.setAccessible(flag);
@@ -86,7 +86,7 @@ public class EventManager {
             if ((listenerHandler = LISTENER_HANDLER_MAP.get(cls)) == null) {
                 try {
                     final Field field = cls.getDeclaredField("LISTENER_HANDLER");
-                    final boolean flag = field.isAccessible();
+                    final boolean flag = field.canAccess(null);
                     field.setAccessible(true);
                     listenerHandler = (ListenerHandler) field.get(null);
                     field.setAccessible(flag);

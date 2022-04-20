@@ -2,6 +2,7 @@ package top.focess.qq.api.util.logger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.focess.qq.FocessQQ;
 import top.focess.qq.core.commands.util.ChatConstants;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -51,6 +52,8 @@ public class FocessLogger {
      */
     public void thr(final String message, final Throwable e) {
         LOG.error(message, e);
+        if (debugOutput && FocessQQ.getAdministrator() != null)
+            FocessQQ.getAdministrator().sendMessage(message + ", " + e.getMessage());
     }
 
     /**
@@ -93,7 +96,8 @@ public class FocessLogger {
     public void debug(final String message) {
         if (debugOutput)
             this.info(ChatConstants.DEBUG_HEADER + message);
-        LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
+        else
+            LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
     }
 
     /**

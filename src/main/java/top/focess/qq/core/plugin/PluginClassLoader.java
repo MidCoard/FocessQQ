@@ -19,6 +19,7 @@ import top.focess.qq.api.plugin.*;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.core.bot.SimpleBotManager;
 import top.focess.qq.core.debug.Section;
+import top.focess.qq.core.util.MethodCaller;
 import top.focess.scheduler.Callback;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
@@ -35,10 +36,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.time.Duration;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
@@ -119,6 +117,13 @@ public class PluginClassLoader extends URLClassLoader {
     };
 
     static {
+        SCHEDULER.setUncaughtExceptionHandler(
+                (t, e) -> {
+                    Objects.requireNonNull(SCHEDULER.getUncaughtExceptionHandler()).uncaughtException(t, e);
+                    //todo
+                }
+        );
+
         try {
             COMMAND_COMMAND_FIELD = Command.class.getDeclaredField("command");
             COMMAND_COMMAND_FIELD.setAccessible(true);
@@ -274,6 +279,8 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Nullable
     public static File disablePlugin(final Plugin plugin) {
+        if (plugin == FocessQQ.getMainPlugin() && MethodCaller.getCallerClass() != FocessQQ.class)
+            throw new IllegalStateException("You don't have permission to disable the MainPlugin");
         final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
         final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
         File file = null;
