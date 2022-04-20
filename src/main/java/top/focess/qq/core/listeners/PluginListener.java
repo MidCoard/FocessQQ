@@ -12,12 +12,12 @@ public class PluginListener implements Listener {
     @EventHandler
     public void onPluginLoad(@NotNull final PluginLoadEvent event) {
         FocessQQ.getLogger().info("Plugin " + event.getPlugin().getName() + " is loaded.");
-        FocessQQ.getLogger().info("Author: " + event.getPlugin().getAuthor() + ", Version: " + event.getPlugin().getVersion().toString() + ".");
+        FocessQQ.getLogger().info("Author: " + event.getPlugin().getAuthor() + ", Version: " + event.getPlugin().getVersion().toString() + " .");
     }
 
     @EventHandler
     public void onPluginUnload(@NotNull final PluginUnloadEvent event) {
         FocessQQ.getLogger().info("Plugin " + event.getPlugin().getName() + " is unloaded.");
-        FocessQQ.getLogger().info("Author: " + event.getPlugin().getAuthor() + ", Version: " + event.getPlugin().getVersion().toString() + ".");
+        FocessQQ.getLogger().info("Author: " + event.getPlugin().getAuthor() + ", Version: " + event.getPlugin().getVersion().toString() + " .");
     }
 }
