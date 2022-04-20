@@ -117,13 +117,6 @@ public class PluginClassLoader extends URLClassLoader {
     };
 
     static {
-        SCHEDULER.setUncaughtExceptionHandler(
-                (t, e) -> {
-                    Objects.requireNonNull(SCHEDULER.getUncaughtExceptionHandler()).uncaughtException(t, e);
-                    //todo
-                }
-        );
-
         try {
             COMMAND_COMMAND_FIELD = Command.class.getDeclaredField("command");
             COMMAND_COMMAND_FIELD.setAccessible(true);
@@ -250,13 +243,19 @@ public class PluginClassLoader extends URLClassLoader {
             try {
                 task.join();
             } catch (final ExecutionException | InterruptedException | CancellationException e) {
-                if (e.getCause() instanceof PluginLoadException)
-                    throw (PluginLoadException) e.getCause();
-                else if (e.getCause() instanceof PluginDuplicateException)
-                    throw (PluginDuplicateException) e.getCause();
-                else if (e.getCause() instanceof PluginUnloadException)
-                    throw (PluginUnloadException) e.getCause();
-                else FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+                if (e instanceof ExecutionException)
+                    if (e.getCause() instanceof PluginLoadException)
+                        throw (PluginLoadException) e.getCause();
+                    else if (e.getCause() instanceof PluginDuplicateException)
+                        throw (PluginDuplicateException) e.getCause();
+                    else if (e.getCause() instanceof PluginUnloadException)
+                        throw (PluginUnloadException) e.getCause();
+                    else if (e.getCause() instanceof IncompatibleClassChangeError)
+                        throw new PluginLoadException(plugin.getClass(), e.getCause());
+                    else
+                        FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getCause().getMessage());
+                else if (!(e instanceof CancellationException))
+                    FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
             }
             section.stop();
         } else enablePlugin0(plugin);
@@ -287,7 +286,10 @@ public class PluginClassLoader extends URLClassLoader {
         try {
             file = callback.waitCall();
         } catch (final InterruptedException | ExecutionException | CancellationException e) {
-            FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+            if (e instanceof ExecutionException && e.getCause() instanceof IncompatibleClassChangeError)
+                FocessQQ.getLogger().thrLang("exception-section",e, section.getName(), e.getCause().getMessage());
+            else if (!(e instanceof CancellationException))
+                FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
         }
         section.stop();
         synchronized (GC_SCHEDULER) {
@@ -447,6 +449,7 @@ public class PluginClassLoader extends URLClassLoader {
                 if (e instanceof IllegalStateException)
                     FocessQQ.getLogger().debugLang("plugin-depend-on-other-plugin");
                 if (this.plugin != null) {
+                    // this plugin is not null and PluginLoadException means there is something wrong in the initialize-method or enable-method of the plugin
                     if (!(e instanceof PluginUnloadException))
                         FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                     else
@@ -462,6 +465,7 @@ public class PluginClassLoader extends URLClassLoader {
                     if (FocessQQ.getUdpSocket() != null)
                         FocessQQ.getUdpSocket().unregister(this.plugin);
                 } else if (e instanceof PluginLoadException)
+                    // this plugin is null and PluginLoadException means there is something wrong in the new instance of the plugin
                     FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                 PluginCoreClassLoader.LOADERS.remove(this);
                 synchronized (GC_SCHEDULER) {

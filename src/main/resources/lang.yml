@@ -71,6 +71,7 @@ exception-command-execute: Command execute exception
 exception-thread-pool-scheduler-thread-uncaught: ThreadPoolSchedulerThread %s uncaught exception
 exception-scheduler-uncaught: Scheduler %s uncaught exception
 exception-load-soft-depend-plugin: Load soft-dependent plugin file %s exception
+exception-section: Section %s exception, %s
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
