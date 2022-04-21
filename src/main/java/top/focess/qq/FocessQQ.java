@@ -350,25 +350,6 @@ public class FocessQQ {
             exit();
         }
 
-        SCHEDULER.runTimer(() -> {
-            Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
-            while (consoleElement != null && System.currentTimeMillis() - consoleElement.getValue() > 60 * 5 * 1000) {
-                consoleElement.getKey().input(null);
-                consoleElement = ConsoleListener.QUESTS.poll();
-            }
-            for (final CommandSender sender : ChatListener.QUESTS.keySet())
-                ChatListener.QUESTS.compute(sender, (k, v) -> {
-                    if (v != null) {
-                        Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
-                        while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 5) {
-                            element.getKey().input(null);
-                            element = v.poll();
-                        }
-                    }
-                    return v;
-                });
-        }, Duration.ZERO, Duration.ofSeconds(10));
-
         CONSOLE_INPUT_THREAD.start();
         getLogger().debugLang("start-console-input-thread");
 
@@ -651,7 +632,7 @@ public class FocessQQ {
                 chatListener.unregister();
             Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
             while (consoleElement != null) {
-                consoleElement.getKey().input(null);
+                consoleElement.getKey().input((String) null);
                 consoleElement = ConsoleListener.QUESTS.poll();
             }
             for (final CommandSender sender : ChatListener.QUESTS.keySet())
@@ -659,7 +640,7 @@ public class FocessQQ {
                     if (v != null) {
                         Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
                         while (element != null) {
-                            element.getKey().input(null);
+                            element.getKey().input((String) null);
                             element = v.poll();
                         }
                     }

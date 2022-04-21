@@ -40,12 +40,6 @@ public class ConsoleListener implements Listener {
     public void onConsoleChat(final ConsoleChatEvent event) {
         Pair<IOHandler, Long> element;
         if ((element = QUESTS.poll()) != null) {
-            while (element != null && System.currentTimeMillis() - element.getValue() > 60 * 5 * 1000) {
-                element.getKey().input(null);
-                element = QUESTS.poll();
-            }
-            if (element == null)
-                return;
             element.getKey().input(event.getMessage());
             return;
         }

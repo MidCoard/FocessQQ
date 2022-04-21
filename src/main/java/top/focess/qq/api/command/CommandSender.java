@@ -18,6 +18,7 @@ import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
 import top.focess.qq.core.listeners.ChatListener;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -247,10 +248,17 @@ public class CommandSender extends top.focess.command.CommandSender {
             }
 
             @Override
-            public boolean hasInput(final boolean flag) {
+            public synchronized boolean hasInput(boolean flag, int seconds) {
                 ChatListener.registerInputListener(this, CommandSender.this, flag);
-                while (!this.flag) ;
-                return true;
+                IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds));
+                return super.hasInput(flag);
+            }
+
+            @Override
+            public synchronized boolean hasInput(final boolean flag) {
+                ChatListener.registerInputListener(this, CommandSender.this, flag);
+                IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofMinutes(10));
+                return super.hasInput(flag);
             }
 
         };

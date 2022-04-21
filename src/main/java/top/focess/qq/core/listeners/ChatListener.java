@@ -55,10 +55,6 @@ public class ChatListener implements Listener {
         QUESTS.compute(sender, (k, v) -> {
             if (v != null) {
                 Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
-                while (element != null && System.currentTimeMillis() - element.getValue().getValue() > 1000 * 60 * 5) {
-                    element.getKey().input(null);
-                    element = v.poll();
-                }
                 if (element == null)
                     return v;
                 if (element.getValue().getKey())
