@@ -72,6 +72,7 @@ public class TestCommand extends Command {
         }, CommandArgument.of("scheduler"));
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             System.gc();
+            ioHandler.output("gc done");
             return CommandResult.ALLOW;
         },CommandArgument.of("gc"));
     }

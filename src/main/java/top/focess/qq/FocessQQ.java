@@ -371,6 +371,7 @@ public class FocessQQ {
                 bytes.clear();
             }
         };
+//        System.out.println();
 //        System.setOut(new PrintStream(out));
 
         try {
