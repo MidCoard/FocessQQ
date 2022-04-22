@@ -3,6 +3,7 @@ package top.focess.qq.core.scheduler;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.scheduler.Callback;
@@ -107,6 +108,11 @@ public class AScheduler implements Scheduler {
     @Override
     public void setCatchExceptionHandler(CatchExceptionHandler catchExceptionHandler) {
         this.scheduler.setCatchExceptionHandler(catchExceptionHandler);
+    }
+
+    @Override
+    public @UnmodifiableView List<Task> getRemainingTasks() {
+        return this.scheduler.getRemainingTasks();
     }
 
     /**

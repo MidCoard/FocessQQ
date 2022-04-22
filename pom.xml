@@ -33,7 +33,7 @@
         <kotlin.native>native-mt</kotlin.native>
         <command.version>1.2.7</command.version>
         <util.version>1.1.1</util.version>
-        <scheduler.version>1.0.2</scheduler.version>
+        <scheduler.version>1.0.3</scheduler.version>
     </properties>
 
     <repositories>
@@ -106,6 +106,12 @@
             <groupId>top.focess</groupId>
             <artifactId>focess-scheduler</artifactId>
             <version>${scheduler.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

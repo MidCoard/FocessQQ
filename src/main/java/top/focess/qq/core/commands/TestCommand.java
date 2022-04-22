@@ -11,6 +11,9 @@ import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.scheduler.AScheduler;
+import top.focess.scheduler.FocessCallback;
+import top.focess.scheduler.Scheduler;
 
 import java.util.List;
 
@@ -59,6 +62,14 @@ public class TestCommand extends Command {
             }
             return CommandResult.ALLOW;
         }, CommandArgument.of("input"));
+        this.addExecutor((sender, dataCollection, ioHandler) -> {
+            System.out.println(FocessCallback.getCallbackSet());
+            for (Scheduler scheduler : AScheduler.getSchedulers()) {
+                ioHandler.output("scheduler: " + scheduler.getName());
+                ioHandler.output("scheduler remaining tasks" + scheduler.getRemainingTasks());
+            }
+            return CommandResult.ALLOW;
+        }, CommandArgument.of("scheduler"));
     }
 
     @NotNull

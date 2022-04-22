@@ -240,7 +240,7 @@ public class PluginClassLoader extends URLClassLoader {
     public static void enablePlugin(@NotNull final Plugin plugin) {
         if (plugin.getClass() != FocessQQ.MainPlugin.class) {
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
-            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
+            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(15));
             try {
                 task.join();
             } catch (final ExecutionException | InterruptedException | CancellationException e) {
