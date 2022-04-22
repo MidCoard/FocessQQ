@@ -64,7 +64,7 @@ public class ConsoleListener implements Listener {
                         FocessQQ.getLogger().thrLang("exception-exec-console-command", e);
                 }
                 section.stop();
-            });
+            },"command-console-exec");
         } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-exec-console-command", e);
         }

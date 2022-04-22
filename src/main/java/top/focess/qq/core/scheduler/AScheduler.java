@@ -50,13 +50,28 @@ public class AScheduler implements Scheduler {
     }
 
     @Override
+    public Task run(Runnable runnable, Duration duration, String name) {
+        return this.scheduler.run(runnable, duration, name);
+    }
+
+    @Override
     public Task runTimer(Runnable runnable, Duration delay, Duration period) {
         return this.scheduler.runTimer(runnable, delay, period);
     }
 
     @Override
+    public Task runTimer(Runnable runnable, Duration delay, Duration period, String name) {
+        return this.scheduler.runTimer(runnable, delay, period, name);
+    }
+
+    @Override
     public <V> Callback<V> submit(Callable<V> callable, Duration delay) {
         return this.scheduler.submit(callable, delay);
+    }
+
+    @Override
+    public <V> Callback<V> submit(Callable<V> callable, Duration duration, String name) {
+        return this.scheduler.submit(callable, duration, name);
     }
 
     @Override

@@ -239,7 +239,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     public static void enablePlugin(@NotNull final Plugin plugin) {
         if (plugin.getClass() != FocessQQ.MainPlugin.class) {
-            final Task task = SCHEDULER.run(() -> enablePlugin0(plugin));
+            final Task task = SCHEDULER.run(() -> enablePlugin0(plugin), "enable-plugin-" + plugin.getName());
             final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(15));
             try {
                 task.join();
@@ -281,7 +281,7 @@ public class PluginClassLoader extends URLClassLoader {
     public static File disablePlugin(final Plugin plugin) {
         if (plugin == FocessQQ.getMainPlugin() && MethodCaller.getCallerClass() != FocessQQ.class)
             throw new IllegalStateException("You don't have permission to disable the MainPlugin");
-        final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin));
+        final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin),"disable-plugin-" + plugin.getName());
         final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
         File file = null;
         try {
@@ -293,9 +293,10 @@ public class PluginClassLoader extends URLClassLoader {
                 FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
         }
         section.stop();
+        String name = plugin.getName();
         synchronized (GC_SCHEDULER) {
             if (!GC_SCHEDULER.isClosed())
-                GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1));
+                GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1),name);
         }
         return file;
     }
@@ -473,7 +474,7 @@ public class PluginClassLoader extends URLClassLoader {
                 PluginCoreClassLoader.LOADERS.remove(this);
                 synchronized (GC_SCHEDULER) {
                     if (!GC_SCHEDULER.isClosed())
-                        GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1));
+                        GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1),"load-failed");
                 }
                 return false;
             }

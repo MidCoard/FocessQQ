@@ -37,13 +37,13 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
 
         @Override
         public synchronized boolean hasInput(boolean flag) {
-            ConsoleListener.registerInputListener(this,SCHEDULER.run(() -> input((String) null),Duration.ofMinutes(10)));
+            ConsoleListener.registerInputListener(this,SCHEDULER.run(() -> input((String) null),Duration.ofMinutes(10),"input-10-min"));
             return super.hasInput(flag);
         }
 
         @Override
         public synchronized boolean hasInput(boolean flag, int seconds) {
-            ConsoleListener.registerInputListener(this, SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds)));
+            ConsoleListener.registerInputListener(this, SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
             return super.hasInput(flag);
         }
     };
@@ -72,7 +72,7 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
     }
 
     public void async(Consumer<IOHandler> consumer) {
-        ASYNC_SCHEDULER.run(() -> consumer.accept(this));
+        ASYNC_SCHEDULER.run(() -> consumer.accept(this), "async");
     }
 
     /**

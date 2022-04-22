@@ -201,7 +201,7 @@ public class CommandLine {
                         FocessQQ.getLogger().thrLang("exception-command-execute", e);
                         return CommandResult.REFUSE_EXCEPTION;
                     }
-                });
+                },"execute-" + command + "-with-" + id);
                 break;
             }
         if (!flag && sender == CommandSender.CONSOLE)

@@ -42,7 +42,7 @@ public class EventManager {
             } catch (final EventSubmitException e) {
                 throw new EventSubmitRuntimeException(e);
             }
-        });
+        }, "submit-" + event.getClass().getName());
         final Section section = Section.startSection("event-submit", task, Duration.ofSeconds(10));
         try {
             task.join();

@@ -115,7 +115,7 @@ public class ChatListener implements Listener {
                             FocessQQ.getLogger().thrLang("exception-exec-group-command", e);
                     }
                     section.stop();
-                });
+                },"command-group-exec");
             } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-group-command", e);
             }
@@ -150,7 +150,7 @@ public class ChatListener implements Listener {
                             FocessQQ.getLogger().thrLang("exception-exec-friend-command", e);
                     }
                     section.stop();
-                });
+                }, "command-friend-exec");
             } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-friend-command", e);
             }

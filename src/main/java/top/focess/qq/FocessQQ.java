@@ -1,9 +1,12 @@
 package top.focess.qq;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.google.common.primitives.Bytes;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandResult;
 import top.focess.qq.api.bot.Bot;
@@ -54,9 +57,8 @@ import top.focess.util.option.type.OptionType;
 import top.focess.util.serialize.SimpleFocessReader;
 import top.focess.util.version.Version;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -165,6 +167,11 @@ public class FocessQQ {
      */
     private static Bot bot;
     private static boolean saved;
+
+    private static void disableMainPlugin() {
+        PluginClassLoader.disablePlugin(MAIN_PLUGIN);
+    }
+
     private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
         @Override
         public void run() {
@@ -173,7 +180,7 @@ public class FocessQQ {
                 getLogger().debugLang("save-log");
                 saveLogFile();
                 saved = true;
-                PluginClassLoader.disablePlugin(MAIN_PLUGIN);
+                disableMainPlugin();
             }
         }
     };
@@ -345,6 +352,27 @@ public class FocessQQ {
             exit();
         });
 
+        OutputStream out = new OutputStream() {
+
+            private final List<Byte> bytes = Lists.newArrayList();
+            @Override
+            public synchronized void write(int b) {
+                bytes.add((byte) b);
+            }
+
+            @Override
+            public synchronized void write(byte @NotNull [] b, int off, int len) throws IOException {
+                super.write(b, off, len);
+            }
+
+            @Override
+            public synchronized void flush() throws IOException {
+                LOGGER.info(new String(Bytes.toArray(bytes), StandardCharsets.UTF_8));
+                bytes.clear();
+            }
+        };
+//        System.setOut(new PrintStream(out));
+
         try {
             getLogger().debugLang("setup-uncaught-exception-handler");
         } catch (final Exception e) {
@@ -488,7 +516,7 @@ public class FocessQQ {
                 getLogger().fatalLang("fatal-exit-failed");
             } catch (final Exception ignored) {}
             System.exit(0);
-        }, Duration.ofSeconds(5));
+        }, Duration.ofSeconds(5), "force-exit");
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
         if (MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);

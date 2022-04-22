@@ -73,7 +73,7 @@ public class SimpleBotManager implements BotManager {
     @Override
     @NotNull
     public Future<Bot> login(final long id, final String password, final Plugin plugin) {
-        return SCHEDULER.submit(() -> this.loginDirectly(id, password, plugin));
+        return SCHEDULER.submit(() -> this.loginDirectly(id, password, plugin),"login-bot-" + id);
     }
 
     @Override

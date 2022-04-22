@@ -26,7 +26,7 @@ public class Section {
         final Task t = SCHEDULER.run(() -> {
             task.cancel(true);
             FocessQQ.getLogger().debugLang("debug-section-timeout", name);
-        }, timeout);
+        }, timeout, name);
         return new Section(name, t);
     }
 
@@ -35,7 +35,7 @@ public class Section {
         final Task t = SCHEDULER.run(() -> {
             task.cancel(true);
             FocessQQ.getLogger().debugLang("debug-section-timeout", name);
-        }, timeout);
+        }, timeout, name);
         return new Section(name, t);
     }
 
