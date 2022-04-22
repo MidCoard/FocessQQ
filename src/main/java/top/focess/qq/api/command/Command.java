@@ -3,6 +3,7 @@ package top.focess.qq.api.command;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandArgument;
 import top.focess.command.CommandPermission;
 import top.focess.command.CommandResult;
@@ -95,6 +96,7 @@ public abstract class Command {
      * @return All commands as a list
      */
     @NotNull
+    @UnmodifiableView
     public static List<Command> getCommands() {
         return Collections.unmodifiableList(Lists.newArrayList(COMMANDS_MAP.values()));
     }
@@ -136,8 +138,9 @@ public abstract class Command {
     }
 
     @NotNull
+    @UnmodifiableView
     public List<String> getAliases() {
-        return this.command.getAliases();
+        return Collections.unmodifiableList(this.command.getAliases());
     }
 
     public Predicate<CommandSender> getExecutorPermission() {

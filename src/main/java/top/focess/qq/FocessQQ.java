@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandResult;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
@@ -283,7 +284,7 @@ public class FocessQQ {
      * @see Plugin#getPlugins()
      */
     @NonNull
-    public static List<Plugin> getPlugins() {
+    public static @UnmodifiableView List<Plugin> getPlugins() {
         return PluginClassLoader.getPlugins();
     }
 

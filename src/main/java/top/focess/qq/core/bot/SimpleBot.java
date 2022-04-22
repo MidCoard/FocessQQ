@@ -3,6 +3,7 @@ package top.focess.qq.core.bot;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
@@ -76,14 +77,16 @@ public class SimpleBot implements Bot {
 
     @Override
     @NotNull
+    @UnmodifiableView
     public List<Friend> getFriends() {
-        return this.nativeBot.getFriends().stream().map(i -> SimpleFriend.get(this, i)).collect(Collectors.toList());
+        return this.nativeBot.getFriends().stream().map(i -> Objects.requireNonNull(SimpleFriend.get(this, i))).collect(Collectors.toUnmodifiableList());
     }
 
     @Override
     @NotNull
+    @UnmodifiableView
     public List<Group> getGroups() {
-        return this.nativeBot.getGroups().stream().map(i -> SimpleGroup.get(this, i)).collect(Collectors.toList());
+        return this.nativeBot.getGroups().stream().map(i -> Objects.requireNonNull(SimpleGroup.get(this, i))).collect(Collectors.toUnmodifiableList());
     }
 
     @Override

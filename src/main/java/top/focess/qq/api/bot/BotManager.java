@@ -2,6 +2,7 @@ package top.focess.qq.api.bot;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.api.plugin.Plugin;
 
 import java.util.List;
@@ -76,6 +77,7 @@ public interface BotManager {
      *
      * @return the list of bots
      */
+    @UnmodifiableView
     List<Bot> getBots();
 
     /**

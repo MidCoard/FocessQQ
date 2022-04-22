@@ -3,6 +3,7 @@ package top.focess.qq.core.net;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.net.Client;
 import top.focess.qq.api.net.PackHandler;
@@ -13,6 +14,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.scheduler.Scheduler;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,12 +100,13 @@ public class FocessUDPMultiReceiver extends AServerReceiver implements ServerMul
     }
 
     @Override
+    @UnmodifiableView
     public List<Client> getClients(final String name) {
         final List<Client> ret = Lists.newArrayList();
         for (final SimpleClient client : this.clientInfos.values())
             if (client.getName().equals(name))
                 ret.add(client);
-        return ret;
+        return Collections.unmodifiableList(ret);
     }
 
 

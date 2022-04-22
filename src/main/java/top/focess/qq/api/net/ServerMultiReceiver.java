@@ -1,5 +1,6 @@
 package top.focess.qq.api.net;
 
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.api.net.packet.Packet;
 
 import java.util.List;
@@ -23,5 +24,6 @@ public interface ServerMultiReceiver extends ServerReceiver {
      * @param name the client name
      * @return the list of the clients with given name
      */
+    @UnmodifiableView
     List<Client> getClients(String name);
 }

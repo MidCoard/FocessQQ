@@ -10,6 +10,7 @@ import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.LoginSolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
@@ -357,6 +358,7 @@ public class SimpleBotManager implements BotManager {
     }
 
     @Override
+    @UnmodifiableView
     public List<Bot> getBots() {
         return Collections.unmodifiableList(Lists.newArrayList(BOTS.values()));
     }

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.DataConverter;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.command.Command;
@@ -97,7 +98,7 @@ public abstract class Plugin implements FocessSerializable {
      * @return all the loaded plugins
      */
     @NotNull
-    public static List<Plugin> getPlugins() {
+    public static @UnmodifiableView List<Plugin> getPlugins() {
         return PluginClassLoader.getPlugins();
     }
 

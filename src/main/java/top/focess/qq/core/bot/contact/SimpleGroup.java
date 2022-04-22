@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.contact.Member;
@@ -59,8 +60,9 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
     }
 
     @Override
+    @UnmodifiableView
     public @NonNull List<Member> getMembers() {
-        return this.nativeGroup.getMembers().stream().map(i -> SimpleMember.get(this, i)).collect(Collectors.toList());
+        return this.nativeGroup.getMembers().stream().map(i -> Objects.requireNonNull(SimpleMember.get(this, i))).collect(Collectors.toUnmodifiableList());
     }
 
     @Override

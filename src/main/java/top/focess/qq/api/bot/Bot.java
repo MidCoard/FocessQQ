@@ -2,6 +2,7 @@ package top.focess.qq.api.bot;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.plugin.Plugin;
@@ -87,6 +88,7 @@ public interface Bot {
      * @return all the friends
      */
     @NonNull
+    @UnmodifiableView
     List<Friend> getFriends();
 
     /**
@@ -95,6 +97,7 @@ public interface Bot {
      * @return all the groups
      */
     @NonNull
+    @UnmodifiableView
     List<Group> getGroups();
 
     /**
@@ -139,4 +142,12 @@ public interface Bot {
      * @return true if this is the Administrator, false otherwise
      */
     boolean isAdministrator();
+
+    /**
+     * Indicate the bot is offline
+     * @return true if the bot is offline, false otherwise
+     */
+    default boolean isOffline() {
+        return !isOnline();
+    }
 }

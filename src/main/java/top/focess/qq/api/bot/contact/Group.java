@@ -1,6 +1,7 @@
 package top.focess.qq.api.bot.contact;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ public interface Group extends Speaker {
      * @return the all members
      */
     @NonNull
+    @UnmodifiableView
     List<Member> getMembers();
 
 
