@@ -42,6 +42,7 @@ import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.scheduler.FocessScheduler;
 import top.focess.scheduler.Scheduler;
+import top.focess.scheduler.Task;
 import top.focess.util.Pair;
 import top.focess.util.option.Option;
 import top.focess.util.option.OptionParserClassifier;
@@ -570,6 +571,7 @@ public class FocessQQ {
             this.registerCommand(new DebugCommand());
             this.registerCommand(new ExecCommand());
             this.registerCommand(new PauseCommand());
+            this.registerCommand(new TestCommand());
             getLogger().debugLang("register-default-commands");
             this.registerSpecialArgumentComplexHandler("previous", new PreviousArgumentHandler());
             this.registerSpecialArgumentComplexHandler("next", new NextArgumentHandler());
@@ -630,19 +632,19 @@ public class FocessQQ {
                 consoleListener.unregister();
             if (chatListener != null)
                 chatListener.unregister();
-            Pair<IOHandler, Long> consoleElement = ConsoleListener.QUESTS.poll();
-            while (consoleElement != null) {
-                consoleElement.getKey().input((String) null);
-                consoleElement = ConsoleListener.QUESTS.poll();
+            Pair<IOHandler, Task> consoleElement;
+            while ((consoleElement = ConsoleListener.QUESTS.poll()) != null) {
+                if (consoleElement.getValue().cancel())
+                    consoleElement.getKey().input((String) null);
             }
             for (final CommandSender sender : ChatListener.QUESTS.keySet())
                 ChatListener.QUESTS.compute(sender, (k, v) -> {
                     if (v != null) {
-                        Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
-                        while (element != null) {
-                            element.getKey().input((String) null);
-                            element = v.poll();
-                        }
+                        Pair<IOHandler, Pair<Boolean, Task>> element;
+                        while ((element = v.poll()) != null)
+                            if (element.getValue().getValue().cancel()) {
+                                element.getKey().input((String) null);
+                            }
                     }
                     return v;
                 });

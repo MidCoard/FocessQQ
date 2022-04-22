@@ -21,6 +21,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.debug.Section;
 import top.focess.scheduler.Scheduler;
+import top.focess.scheduler.Task;
 import top.focess.util.Pair;
 
 import java.time.Duration;
@@ -32,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
     private static boolean pauseMode = false;
-    public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean, Long>>>> QUESTS = Maps.newConcurrentMap();
+    public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean, Task>>>> QUESTS = Maps.newConcurrentMap();
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 5, true, "ChatListener");
 
     /**
@@ -41,12 +42,13 @@ public class ChatListener implements Listener {
      * @param ioHandler     the receiver
      * @param commandSender the commandSender
      * @param flag          true if you want to get the string value of this message, false if you want to get MiraiCode of this message
+     * @param task          the timeout task
      */
-    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final boolean flag) {
+    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final boolean flag, Task task) {
         QUESTS.compute(commandSender, (k, v) -> {
             if (v == null)
                 v = Queues.newLinkedBlockingDeque();
-            v.offer(Pair.of(ioHandler, Pair.of(flag, System.currentTimeMillis())));
+            v.offer(Pair.of(ioHandler, Pair.of(flag, task)));
             return v;
         });
     }
@@ -54,13 +56,16 @@ public class ChatListener implements Listener {
     private static void updateInput(final CommandSender sender, final String content, final String miraiContent, final AtomicBoolean flag) {
         QUESTS.compute(sender, (k, v) -> {
             if (v != null) {
-                Pair<IOHandler, Pair<Boolean, Long>> element = v.poll();
-                if (element == null)
-                    return v;
-                if (element.getValue().getKey())
-                    element.getKey().input(miraiContent);
-                else element.getKey().input(content);
-                flag.set(true);
+                Pair<IOHandler, Pair<Boolean, Task>> element;
+                while ((element = v.poll()) != null) {
+                    if (element.getValue().getValue().cancel()) {
+                        if (element.getValue().getKey())
+                            element.getKey().input(miraiContent);
+                        else element.getKey().input(content);
+                        flag.set(true);
+                        return v;
+                    }
+                }
             }
             return v;
         });

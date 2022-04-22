@@ -16,6 +16,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.debug.Section;
 import top.focess.scheduler.Scheduler;
+import top.focess.scheduler.Task;
 import top.focess.util.Pair;
 
 import java.time.Duration;
@@ -24,25 +25,27 @@ import java.util.concurrent.Future;
 
 public class ConsoleListener implements Listener {
 
-    public static final Queue<Pair<IOHandler, Long>> QUESTS = Queues.newLinkedBlockingQueue();
+    public static final Queue<Pair<IOHandler, Task>> QUESTS = Queues.newLinkedBlockingQueue();
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 5, true, "ConsoleListener");
 
     /**
      * Register input String listener. (Used to communicate with CommandSender with ioHandler)
      *
      * @param ioHandler the {@link CommandSender#CONSOLE} CommandSender
+     * @param task the timeout task
      */
-    public static void registerInputListener(final IOHandler ioHandler) {
-        QUESTS.offer(Pair.of(ioHandler, System.currentTimeMillis()));
+    public static void registerInputListener(final IOHandler ioHandler, Task task) {
+        QUESTS.offer(Pair.of(ioHandler,task));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onConsoleChat(final ConsoleChatEvent event) {
-        Pair<IOHandler, Long> element;
-        if ((element = QUESTS.poll()) != null) {
-            element.getKey().input(event.getMessage());
-            return;
-        }
+        Pair<IOHandler,Task> element;
+        while ((element = QUESTS.poll()) != null)
+            if (element.getValue().cancel()) {
+                element.getKey().input(event.getMessage());
+                return;
+            }
         try {
             final Future<CommandResult> ret = CommandLine.exec(event.getMessage());
             EXECUTOR.run(() -> {

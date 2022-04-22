@@ -249,15 +249,13 @@ public class CommandSender extends top.focess.command.CommandSender {
 
             @Override
             public synchronized boolean hasInput(boolean flag, int seconds) {
-                ChatListener.registerInputListener(this, CommandSender.this, flag);
-                IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds));
+                ChatListener.registerInputListener(this, CommandSender.this, flag,IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds)));
                 return super.hasInput(flag);
             }
 
             @Override
             public synchronized boolean hasInput(final boolean flag) {
-                ChatListener.registerInputListener(this, CommandSender.this, flag);
-                IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofMinutes(10));
+                ChatListener.registerInputListener(this, CommandSender.this, flag, IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofMinutes(10)));
                 return super.hasInput(flag);
             }
 
