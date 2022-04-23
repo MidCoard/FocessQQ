@@ -1,12 +1,9 @@
 package top.focess.qq;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.google.common.primitives.Bytes;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandResult;
 import top.focess.qq.api.bot.Bot;
@@ -56,9 +53,11 @@ import top.focess.util.option.type.LongOptionType;
 import top.focess.util.option.type.OptionType;
 import top.focess.util.serialize.SimpleFocessReader;
 import top.focess.util.version.Version;
+import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -74,7 +73,7 @@ public class FocessQQ {
 
     static {
         SimpleFocessReader.setDefaultClassFinder(PluginCoreClassLoader::forName);
-
+        SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
         Version version;
         final Properties properties = new Properties();
         try {
@@ -352,27 +351,7 @@ public class FocessQQ {
             exit();
         });
 
-        OutputStream out = new OutputStream() {
-
-            private final List<Byte> bytes = Lists.newArrayList();
-            @Override
-            public synchronized void write(int b) {
-                bytes.add((byte) b);
-            }
-
-            @Override
-            public synchronized void write(byte @NotNull [] b, int off, int len) throws IOException {
-                super.write(b, off, len);
-            }
-
-            @Override
-            public synchronized void flush() throws IOException {
-                LOGGER.info(new String(Bytes.toArray(bytes), StandardCharsets.UTF_8));
-                bytes.clear();
-            }
-        };
-//        System.out.println();
-//        System.setOut(new PrintStream(out));
+        System.out.println("[FocessQQ][Console] -> This is the context from sout.");
 
         try {
             getLogger().debugLang("setup-uncaught-exception-handler");

@@ -32,7 +32,7 @@ public class TestCommand extends Command {
                     CommandLine.exec("unload " + plugin.getName());
             ioHandler.output("unload all plugins");
             return CommandResult.ALLOW;
-        } );
+        },CommandArgument.of("unload"));
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             ioHandler.output("please input one message");
             try {

@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.2.4000</version>
+    <version>4.1.2.5000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -34,6 +34,7 @@
         <command.version>1.2.7</command.version>
         <util.version>1.1.1</util.version>
         <scheduler.version>1.0.7</scheduler.version>
+        <sysout.version>1.0.2</sysout.version>
     </properties>
 
     <repositories>
@@ -112,6 +113,11 @@
             <artifactId>annotations</artifactId>
             <version>RELEASE</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.lidalia</groupId>
+            <artifactId>sysout-over-slf4j</artifactId>
+            <version>${sysout.version}</version>
         </dependency>
     </dependencies>
 
