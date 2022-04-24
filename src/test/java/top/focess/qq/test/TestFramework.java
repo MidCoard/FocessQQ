@@ -1,318 +1,252 @@
 package top.focess.qq.test;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import top.focess.qq.core.debug.Section;
-import top.focess.qq.core.util.MethodCaller;
-import top.focess.scheduler.FocessScheduler;
-import top.focess.scheduler.Scheduler;
-import top.focess.scheduler.Task;
-import top.focess.scheduler.ThreadPoolScheduler;
-import top.focess.util.Base64;
-import top.focess.util.json.JSONObject;
-import top.focess.util.network.HttpResponse;
-import top.focess.util.network.NetworkHandler;
-import top.focess.util.option.Option;
-import top.focess.util.option.OptionParserClassifier;
-import top.focess.util.option.Options;
-import top.focess.util.option.type.IntegerOptionType;
-import top.focess.util.option.type.OptionType;
-import top.focess.util.serialize.*;
-import top.focess.util.version.Version;
-import top.focess.util.version.VersionFormatException;
-import top.focess.util.yaml.YamlConfiguration;
+import org.junit.jupiter.api.TestMethodOrder;
+import top.focess.command.CommandArgument;
+import top.focess.command.CommandDuplicateException;
+import top.focess.command.CommandResult;
+import top.focess.qq.FocessQQ;
+import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.command.Command;
+import top.focess.qq.api.command.CommandLine;
+import top.focess.qq.api.command.CommandSender;
+import top.focess.qq.api.event.*;
+import top.focess.qq.api.event.bot.BotLoginEvent;
+import top.focess.qq.api.event.chat.ConsoleChatEvent;
+import top.focess.qq.api.plugin.LazyPlugin;
+import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.test.environment.TestEnvironment;
+import top.focess.scheduler.AScheduler;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
+import static top.focess.command.CommandArgument.ofLong;
 
-@DisplayName("Default Test")
+@DisplayName("Framework Test")
+@TestMethodOrder(FocessMethodOrder.class)
 public class TestFramework {
 
+    @BeforeAll
+    static void init() {
+        TestEnvironment.setup(new String[]{
+                "--user", "123456789", "19283746", "--noDefaultPluginLoad", "--admin", "123456789"
+        });
+    }
+
     @Test
-    void testMethodCaller() {
-        Runnable runnable = () -> assertEquals(TestFramework.class,MethodCaller.getCallerClass());
-        runnable.run();
-        Runnable runnable1 = () -> {
-            Runnable runnable2 = () -> {
-                assertNotNull(MethodCaller.getCallerClass());
-                // because lambda expression is realized by method reference
-                assertEquals(TestFramework.class,MethodCaller.getCallerClass());
-            };
-            runnable2.run();
+    void testInit() {
+        assertEquals(FocessQQ.getBot().getId(), 123456789L);
+        assertTrue(FocessQQ.getBot().isAdministrator());
+    }
+
+    @Test
+    void testPlugin() {
+        assertNull(Plugin.thisPlugin());
+        assertNotNull(Plugin.plugin());
+        assertEquals(Plugin.plugin(), FocessQQ.getMainPlugin());
+    }
+
+    @Test
+    void testNewPlugin() {
+        assertThrows(IllegalArgumentException.class, () -> new LazyPlugin(){});
+        assertThrows(IllegalStateException.class, FocessQQ.MainPlugin::new);
+    }
+
+    @Test
+    void testPluginName() {
+        assertEquals("Main", Plugin.plugin().getName());
+    }
+
+    static class CustomEvent extends Event {
+        private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();
+        private final String customKey;
+
+        public CustomEvent(String customKey){
+            this.customKey = customKey;
+        }
+    }
+
+    static class ErrorEvent extends Event {
+
+    }
+
+    @Test
+    void testSubmitCustomEvent() {
+        AtomicBoolean flag = new AtomicBoolean(false);
+        Listener listener = new Listener() {
+            @EventHandler
+            public void onCustomEvent(CustomEvent event) {
+                flag.set(true);
+                assertEquals(event.customKey, "customKey");
+            }
         };
-        runnable1.run();
-        Runnable runnable2 = new Runnable() {
+        ListenerHandler.register(FocessQQ.getMainPlugin(), listener);
+        try {
+            EventManager.submit(new CustomEvent("customKey"));
+        } catch (EventSubmitException e) {
+            fail();
+        }
+        assertTrue(flag.get());
+    }
+
+    @Test
+    void testSubmitErrorEvent() {
+        assertThrows(EventSubmitException.class, () -> EventManager.submit(new ErrorEvent()));
+    }
+
+    @Test
+    void testBotLoginEvent() {
+        AtomicBoolean flag = new AtomicBoolean(false);
+        Listener listener = new Listener(){
+            @EventHandler
+            public void onBotLogin(BotLoginEvent event) {
+                flag.set(true);
+            }
+        };
+        ListenerHandler.register(FocessQQ.getMainPlugin(), listener);
+        try {
+            FocessQQ.getBotManager().loginDirectly(369087L, "123456",FocessQQ.getMainPlugin());
+        } catch (BotLoginException e) {
+            fail("login failed");
+        }
+        assertTrue(flag.get());
+    }
+
+    @Test
+    void testCommand() {
+        try {
+            CommandResult result = CommandLine.exec("plugin list").get();
+            assertEquals(result, CommandResult.ALLOW);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    void testNewErrorCommand() {
+        Command command = new Command("test") {
+
             @Override
-            public void run() {
-                Runnable runnable3 = new Runnable() {
-                    @Override
-                    public void run() {
-                        assertNotNull(MethodCaller.getCallerClass());
-                        assertTrue(Runnable.class.isAssignableFrom(MethodCaller.getCallerClass()));
-                    }
-                };
-                runnable3.run();
+            public void init() {
+
+            }
+
+            @Override
+            public @NotNull List<String> usage(CommandSender sender) {
+                return Lists.newArrayList();
             }
         };
-        runnable2.run();
+        assertThrows(CommandDuplicateException.class,() -> Command.register(Plugin.plugin(),command));
     }
 
     @Test
-    void testOptions() {
-        String[] args = new String[]{"--a","1","--b","--c","--d","hello","world"};
-        Options options = Options.parse(args,
-                new OptionParserClassifier("a", IntegerOptionType.INTEGER_OPTION_TYPE),
-                new OptionParserClassifier("b"),
-                new OptionParserClassifier("c"),
-                new OptionParserClassifier("d", OptionType.DEFAULT_OPTION_TYPE,OptionType.DEFAULT_OPTION_TYPE)
-        );
-        Option option = options.get("a");
-        assertNotNull(option);
-        assertEquals(1,option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-        option = options.get("b");
-        assertNotNull(option);
-        option = options.get("c");
-        assertNotNull(option);
-        option = options.get("d");
-        assertNotNull(option);
-        assertEquals("hello",option.get(OptionType.DEFAULT_OPTION_TYPE));
-        assertEquals("world",option.get(OptionType.DEFAULT_OPTION_TYPE));
-    }
+    void testNewCommand() {
+        Command command = new Command("test1","test2") {
 
-    @Test
-    void testScheduler() {
-        Scheduler scheduler = new FocessScheduler("Test");
-        Task task = scheduler.run(()->{
-            System.out.println(1);
-        });
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertFalse(task.cancel());
-        assertFalse(task.isCancelled());
-        assertTrue(task.isFinished());
-        assertFalse(task.isRunning());
-        Task task1 = scheduler.run(()->{
-            System.out.println(2);
-        }, Duration.ofSeconds(1));
-        assertTimeoutPreemptively(Duration.ofSeconds(2), task1::join);
-        assertTrue(task1.isFinished());
-        Task task2 = scheduler.run(()->{
-            try {
-                Thread.sleep(2000);
-                System.out.println(3);
-            } catch (InterruptedException e) {
-                fail();
+            @Override
+            public void init() {
+                this.addExecutor((sender, dataCollection, ioHandler) -> CommandResult.ALLOW);
             }
-        });
+
+            @Override
+            public @NotNull List<String> usage(CommandSender sender) {
+                return Lists.newArrayList();
+            }
+        };
+        assertDoesNotThrow(() -> Command.register(Plugin.plugin(),command));
         try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertTrue(task2.isRunning());
-        try {
-            task2.join();
+            CommandResult commandResult = CommandLine.exec("test1").get();
+            assertEquals(commandResult, CommandResult.ALLOW);
         } catch (Exception e) {
             fail();
         }
-        assertTrue(task2.isFinished());
-        Task task3 = scheduler.run(()->{
-            System.out.println(4);
-        }, Duration.ofSeconds(1));
-        assertTrue(task3.cancel());
-        assertTrue(task3.isCancelled());
-    }
-
-    @RepeatedTest(5)
-    void testScheduler2() {
-        Scheduler scheduler = new ThreadPoolScheduler("Test",10);
-        List<Task> taskList = Lists.newArrayList();
-        for (int i = 0; i < 20; i++) {
-            int finalI = i;
-            taskList.add(scheduler.run(()->{
-                try {
-                    sleep(3000);
-                } catch (InterruptedException e) {
-                    fail();
-                }
-                System.out.println(finalI);
-            }));
-        }
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertEquals(10,taskList.stream().filter(Task::isRunning).count());
-        assertTrue(taskList.get(0).cancel(true));
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertEquals(10,taskList.stream().filter(Task::isRunning).count());
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-    }
-
-    static class ErrorSerialize {
-
-        private final int value;
-
-        public ErrorSerialize(int value) {
-            this.value = value;
-        }
-    }
-
-    static class ErrorSerialize2 implements FocessSerializable {
-
-        private final int value;
-        private final ErrorSerialize errorSerialize;
-
-        public ErrorSerialize2(int value) {
-            this.value = value;
-            this.errorSerialize = new ErrorSerialize(value);
-        }
-    }
-
-    static class CustomSerialize implements FocessSerializable {
-        private final int value;
-        public CustomSerialize(int value) {
-            this.value = value;
-        }
     }
 
     @Test
-    void testYamlConfiguration() {
-        YamlConfiguration yamlConfiguration = new YamlConfiguration(null);
-        yamlConfiguration.set("test",1);
-        assertThrows(NotFocessSerializableException.class,() -> yamlConfiguration.set("a",new ErrorSerialize(1)));
-        assertDoesNotThrow(() -> yamlConfiguration.set("b",new CustomSerialize(1)));
-        CustomSerialize customSerialize = yamlConfiguration.get("b");
-        assertNotNull(customSerialize);
-        assertEquals(1,customSerialize.value);
-        assertThrows(NotFocessSerializableException.class, () -> yamlConfiguration.set("c",new ErrorSerialize2(1)));
-        List<CustomSerialize> customSerializes = Lists.newArrayList();
-        customSerializes.add(new CustomSerialize(1));
-        customSerializes.add(new CustomSerialize(2));
-        customSerializes.add(new CustomSerialize(3));
-        assertDoesNotThrow(()->yamlConfiguration.set("list",customSerializes));
-        List<CustomSerialize> customSerializes1 = yamlConfiguration.get("list");
-        assertNotNull(customSerializes1);
-        assertEquals(3,customSerializes1.size());
-        assertEquals(1,customSerializes1.get(0).value);
-        assertEquals(2,customSerializes1.get(1).value);
-        assertEquals(3,customSerializes1.get(2).value);
-    }
+    void testSession() {
+        assertNull(CommandSender.CONSOLE.getSession().get("hello"));
+        CommandSender.CONSOLE.getSession().set("hello", "world");
+        assertEquals(CommandSender.CONSOLE.getSession().get("hello"), "world");
+        Command command = new Command("test3") {
 
-    @Test
-    void testSerialization() {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        FocessWriter focessWriter = FocessWriter.newFocessWriter(byteArrayOutputStream);
-        focessWriter.write(new CustomSerialize(1));
-        FocessReader focessReader = FocessReader.newFocessReader(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-        CustomSerialize customSerialize = (CustomSerialize) focessReader.read();
-        assertNotNull(customSerialize);
-        assertEquals(1,customSerialize.value);
-        assertThrows(NotFocessSerializableException.class, () -> focessWriter.write(new ErrorSerialize(1)));
-        assertThrows(SerializationParseException.class, focessReader::read);
-    }
-
-    @Test
-    void testNetworkHandler() {
-        NetworkHandler networkHandler = new NetworkHandler();
-        HttpResponse httpResponse = networkHandler.request("https://www.baidu.com", NetworkHandler.RequestType.GET);
-        assertFalse(httpResponse.isError());
-        assertEquals(200,httpResponse.getCode());
-    }
-
-    @Test
-    void testSection() {
-        Scheduler scheduler = new ThreadPoolScheduler("test",1);
-        Task task = scheduler.run(() ->{
-            try {
-                sleep(10000);
-            } catch (InterruptedException e) {
-                fail();
+            @Override
+            public void init() {
+                this.addExecutor((sender, dataCollection, ioHandler) -> {
+                    sender.getSession().set("hello", "world2");
+                    return CommandResult.ALLOW;
+                });
             }
-        });
-        Section section = Section.startSection("test",task,Duration.ofSeconds(2));
-        assertTimeoutPreemptively(Duration.ofSeconds(3), () -> assertThrows(CancellationException.class,task::join));
-        assertTrue(task.isCancelled());
-    }
 
-    @Test
-    void testSection2() {
-        Scheduler scheduler = new ThreadPoolScheduler("test",1);
-        Task task = scheduler.run(() ->{
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                fail();
+            @Override
+            public @NotNull List<String> usage(CommandSender sender) {
+                return Lists.newArrayList();
             }
-        });
-        Section section = Section.startSection("test",task,Duration.ofSeconds(2));
+        };
+        Command.register(Plugin.plugin(),command);
         try {
-            task.join();
+            CommandLine.exec("test3").get();
         } catch (Exception e) {
             fail();
         }
-        section.stop();
-        assertFalse(task.isCancelled());
-        assertTrue(task.isFinished());
+        assertEquals(CommandSender.CONSOLE.getSession().get("hello"), "world2");
     }
 
     @Test
-    void testVersion() {
-        Version version = new Version("1.0.0");
-        assertEquals(1,version.getMajor());
-        assertEquals(0,version.getMinor());
-        assertEquals(0,version.getRevision());
-        assertEquals("1.0.0",version.toString());
-        assertEquals(0,version.compareTo(new Version("1.0.0")));
-        Version version1 = new Version("2.0.0");
-        assertEquals(1,version1.compareTo(version));
-        assertEquals(-1,version.compareTo(version1));
-        assertTrue(version1.higher(version));
-        assertFalse(version1.lower(version) || version1.equals(version));
-        assertDoesNotThrow(()->new Version("1.0.0"));
-        assertThrows(VersionFormatException.class,()->new Version("1.0.0.0.0"));
+    void testCommandArgument() {
+        AtomicBoolean flag = new AtomicBoolean(false);
+        Command command = new Command("test4") {
+
+            @Override
+            public void init() {
+                this.addExecutor((sender, dataCollection, ioHandler) -> CommandResult.REFUSE);
+                this.addExecutor((sender, dataCollection, ioHandler) -> CommandResult.ALLOW, CommandArgument.of("test"),CommandArgument.of("test"));
+                this.addExecutor((sender, dataCollection, ioHandler) -> CommandResult.ARGS, CommandArgument.of("test"),CommandArgument.of("test"),CommandArgument.ofInt());
+                this.addExecutor((sender, dataCollection, ioHandler) -> {
+                    if (dataCollection.getInt() != dataCollection.getLong())
+                        return CommandResult.COMMAND_REFUSED;
+                    return CommandResult.ALLOW;
+                }, CommandArgument.of("test"),CommandArgument.of("test"),CommandArgument.ofInt(),ofLong());
+            }
+
+            @Override
+            public @NotNull List<String> usage(CommandSender sender) {
+                flag.set(true);
+                return Lists.newArrayList("test4");
+            }
+        };
+        Command.register(Plugin.plugin(),command);
+        assertEquals(CommandResult.REFUSE,assertDoesNotThrow(()->CommandLine.exec("test4").get()));
+        assertEquals(CommandResult.ALLOW,assertDoesNotThrow(()->CommandLine.exec("test4 test test").get()));
+        assertEquals(CommandResult.ARGS_EXECUTED,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1").get()));
+        assertTrue(flag.get());
+        assertEquals(CommandResult.COMMAND_REFUSED,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1 2").get()));
+        assertEquals(CommandResult.ALLOW,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1 1").get()));
     }
 
     @Test
-    void testJson() {
-        JSONObject jsonObject = JSONObject.parse("{\"name\":\"focess\",\"age\":18}");
-        assertEquals("focess",jsonObject.get("name"));
-        assertEquals(18, (Integer) jsonObject.get("age"));
-        assertEquals("{\"name\":\"focess\",\"age\":18}",jsonObject.toJson());
-        JSONObject jsonObject1 = JSONObject.parse("[{\"name\":\"focess\",\"age\":18},{\"name\":\"focess2\",\"age\":19}]");
-        assertEquals("focess",jsonObject1.getJSON(0).get("name"));
-        assertEquals(18, (Integer) jsonObject1.getJSON(0).get("age"));
-        assertEquals("focess2",jsonObject1.getJSON(1).get("name"));
-        assertEquals(19, (Integer) jsonObject1.getJSON(1).get("age"));
+    void testExit() {
+        FocessQQ.preExit();
+        assertEquals(1, AScheduler.getSchedulers().size());
+        // why 1, because the scheduler in FocessCallback is not closed
+        assertEquals(0, Command.getCommands().size());
+        assertEquals(0, Plugin.getPlugins().size());
+        Field field = null;
+        try {
+            field = ConsoleChatEvent.class.getDeclaredField("LISTENER_HANDLER");
+            field.setAccessible(true);
+        } catch (Exception e) {
+            fail();
+        }
+        Field finalField = field;
+        ListenerHandler listenerHandler = (ListenerHandler) assertDoesNotThrow(()-> finalField.get(null));
+        assertEquals(0, listenerHandler.size());
     }
-
-    @Test
-    void testBase64() {
-        assertEquals("Zm9j", Base64.base64Encode("foc".getBytes(StandardCharsets.UTF_8)));
-        assertEquals("foc", new String(Base64.base64Decode("Zm9j"),StandardCharsets.UTF_8));
-    }
-
-
 
 }
