@@ -37,9 +37,7 @@ jobs:
         with:
           token: ${{ secrets.TOKEN }}
           id: ${{ github.event.release.id }}
-          files: ${{ env.FILES_NAME }}
-        env:
-          FILES_NAME: "focess-qq-" + ${{ github.event.release.tag_name }} + ".jar,libs.zip"
+          files: "focess-qq-${{ github.event.release.tag_name }}.jar,libs.zip"
 
       - name: Publish to Apache Maven Central
         run: mvn deploy
