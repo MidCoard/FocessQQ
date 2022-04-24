@@ -30,7 +30,7 @@ jobs:
       - name: Update release
         uses: johnwbyrd/update-release@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOKEN }}
           asset: ./*.jar
 
       - name: Publish to Apache Maven Central
