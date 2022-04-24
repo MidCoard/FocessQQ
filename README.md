@@ -1,4 +1,5 @@
-# FocessQQ - 轻量级QQ机器人框架
+# FocessQQ - 轻量级QQ机器人框架 
+[![Publish package to the Maven Central Repository](https://github.com/MidCoard/FocessQQ/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/MidCoard/FocessQQ/actions/workflows/maven-publish.yml)[![Java CI with Maven](https://github.com/MidCoard/FocessQQ/actions/workflows/maven.yml/badge.svg)](https://github.com/MidCoard/FocessQQ/actions/workflows/maven.yml)[![CodeQL](https://github.com/MidCoard/FocessQQ/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/MidCoard/FocessQQ/actions/workflows/codeql-analysis.yml)
 
 这是一个基于mirai的机器人框架，是一个面向开发者的框架。
 
