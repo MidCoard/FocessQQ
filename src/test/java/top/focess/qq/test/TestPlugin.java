@@ -10,7 +10,6 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.test.environment.TestEnvironment;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 @DisplayName("Plugin Test")
 public class TestPlugin {
 
@@ -41,6 +40,6 @@ public class TestPlugin {
 
     @AfterAll
     static void exit() {
-        FocessQQ.exit();
+        FocessQQ.preExit();
     }
 }

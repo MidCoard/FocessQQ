@@ -145,6 +145,6 @@ public class TestCommand {
 
     @AfterAll
     static void exit() {
-        FocessQQ.exit();
+        FocessQQ.preExit();
     }
 }

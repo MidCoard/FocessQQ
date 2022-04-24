@@ -81,6 +81,6 @@ public class TestEvent {
 
     @AfterAll
     static void exit() {
-        FocessQQ.exit();
+        FocessQQ.preExit();
     }
 }

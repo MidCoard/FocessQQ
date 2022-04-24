@@ -9,7 +9,6 @@ import top.focess.qq.test.environment.TestEnvironment;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @DisplayName("Init Test")
 public class TestInit {
 
@@ -28,7 +27,7 @@ public class TestInit {
 
     @AfterAll
     static void exit() {
-        FocessQQ.exit();
+        FocessQQ.preExit();
     }
 
 

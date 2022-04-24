@@ -483,9 +483,10 @@ public class FocessQQ {
     }
 
     /**
-     * Exit FocessQQ Framework.
+     * Note: this is for test only.
+     * @see #exit()
      */
-    public static void exit() {
+    public static void preExit() {
         synchronized (STOP_LOCK) {
             if (isStopped)
                 return;
@@ -501,6 +502,13 @@ public class FocessQQ {
         if (MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);
         SCHEDULER.close();
+    }
+
+    /**
+     * Exit FocessQQ Framework.
+     */
+    public static void exit() {
+        preExit();
         System.exit(0);
     }
 

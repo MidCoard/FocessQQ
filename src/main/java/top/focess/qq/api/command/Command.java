@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandArgument;
+import top.focess.command.CommandDuplicateException;
 import top.focess.command.CommandPermission;
 import top.focess.command.CommandResult;
 import top.focess.qq.FocessQQ;

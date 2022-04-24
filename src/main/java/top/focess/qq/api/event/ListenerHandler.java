@@ -30,6 +30,14 @@ public class ListenerHandler {
     }
 
     /**
+     * Note: this is for test only
+     * @return the listener handler list
+     */
+    public int size() {
+        return this.listeners.size();
+    }
+
+    /**
      * Unregister all listeners bundled to the plugin
      *
      * @param plugin the plugin which need to unregister all its listeners
