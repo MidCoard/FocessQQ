@@ -32,12 +32,29 @@ jobs:
         with:
           args: zip -qq -r libs.zip libs
 
-      - name: Add Files to Release
-        uses: irongut/EditRelease@v1.1.0
+      - name: Update Release
+        id: update_release
+        uses: tubone24/update_release@v1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Asset Libs
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          id: ${{ github.event.release.id }}
-          files: "focess-qq-${{ github.event.release.tag_name }}.jar,libs.zip"
+          upload_url: ${{ steps.update_release.outputs.upload_url }}
+          asset_path: libs.zip
+          asset_name: libs.zip
+
+      - name: Upload Release Asset Jar
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.update_release.outputs.upload_url }}
+          asset_path: focess-qq-${{ github.event.release.tag_name }}.jar
+          asset_name: focess-qq-${{ github.event.release.tag_name }}.jar
 
       - name: Publish to Apache Maven Central
         run: mvn deploy
