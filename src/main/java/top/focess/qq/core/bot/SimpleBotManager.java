@@ -47,13 +47,13 @@ import java.util.concurrent.Future;
 
 public class SimpleBotManager implements BotManager {
 
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
+    protected static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
 
     private static final Map<Bot, List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 
-    private static final Map<Plugin, List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
+    protected static final Map<Plugin, List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
 
-    private static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
+    protected static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
 
     public static void removeAll() {
         for (final Long id : BOTS.keySet())
@@ -348,7 +348,7 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public boolean relogin(@NotNull final Bot bot) throws BotLoginException {
-        final boolean ret = this.logout(bot) & this.login(bot);
+        final boolean ret = this.logout(bot) && this.login(bot);
         try {
             EventManager.submit(new BotReloginEvent(bot));
         } catch (final EventSubmitException e) {

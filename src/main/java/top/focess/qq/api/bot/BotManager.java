@@ -26,7 +26,8 @@ public interface BotManager {
 
     /**
      * Login and get the bot with id and password
-     * This is a blocking method
+     * <p>
+     * Note: this is a blocking method.
      *
      * @param id       the id of the bot
      * @param password the password of the bot

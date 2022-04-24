@@ -11,8 +11,6 @@ import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.DataCollection;
 import top.focess.qq.api.command.SpecialArgumentComplexHandler;
-import top.focess.qq.api.event.Event;
-import top.focess.qq.api.event.EventHandler;
 import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.config.DefaultConfig;
@@ -28,9 +26,6 @@ import top.focess.util.yaml.YamlLoadException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
@@ -200,25 +195,6 @@ public abstract class Plugin implements FocessSerializable {
      */
     public final void registerListener(final Listener listener) {
         ListenerHandler.register(this, listener);
-        for (final Method method : listener.getClass().getDeclaredMethods()) {
-            final EventHandler handler;
-            if ((handler = method.getAnnotation(EventHandler.class)) != null) {
-                if (method.getParameterTypes().length == 1) {
-                    final Class<?> eventClass = method.getParameterTypes()[0];
-                    if (Event.class.isAssignableFrom(eventClass) && !Modifier.isAbstract(eventClass.getModifiers())) {
-                        try {
-                            final Field field = eventClass.getDeclaredField("LISTENER_HANDLER");
-                            final boolean flag = field.canAccess(null);
-                            field.setAccessible(true);
-                            final ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
-                            field.setAccessible(flag);
-                            listenerHandler.register(listener, method, handler);
-                        } catch (final Exception ignored) {
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -346,10 +322,10 @@ public abstract class Plugin implements FocessSerializable {
         }
         if (this.name.isEmpty())
             throw new IllegalArgumentException("Plugin name cannot be empty");
-        if (FocessQQ.getVersion().lower(this.pluginDescription.getRequireVersion()) || !this.pluginDescription.getLimitVersion().equals(FocessQQ.getVersion()))
-            throw new IllegalStateException("Version limitation not satisfied");
         if (!(this.getClass().getClassLoader() instanceof PluginClassLoader) && this.getClass() != FocessQQ.MainPlugin.class)
             throw new PluginLoaderException(this.name);
+        if (FocessQQ.getVersion().lower(this.pluginDescription.getRequireVersion()) || !this.pluginDescription.getLimitVersion().equals(FocessQQ.getVersion()))
+            throw new IllegalStateException("Version limitation not satisfied");
         if (!this.getClass().getName().equals(this.pluginDescription.getMain()))
             throw new IllegalStateException("Cannot new a plugin at runtime");
         if (!this.getDefaultFolder().exists())

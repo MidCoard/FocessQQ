@@ -1,6 +1,7 @@
 package top.focess.qq.api.bot.contact;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface Group extends Speaker {
      * @param id the member's id
      * @return the member or null if not found
      */
+    @Nullable
     Member getMember(long id);
 
     /**

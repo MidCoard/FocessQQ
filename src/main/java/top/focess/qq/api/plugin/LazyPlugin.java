@@ -18,6 +18,7 @@ public abstract class LazyPlugin extends Plugin {
      * @throws PluginLoaderException if the classloader of the plugin is not {@link PluginClassLoader} and the plugin is not the MainPlugin.
      * @throws PluginDuplicateException if the plugin is already loaded
      * @throws IllegalStateException if the plugin is newed in runtime
+     * @throws IllegalArgumentException if the plugin name is empty
      */
     public LazyPlugin() {}
 

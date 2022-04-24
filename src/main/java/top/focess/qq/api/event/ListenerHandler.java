@@ -6,7 +6,9 @@ import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.util.Pair;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +74,25 @@ public class ListenerHandler {
             return v;
         });
         LISTENER_PLUGIN_MAP.put(listener, plugin);
+        for (final Method method : listener.getClass().getDeclaredMethods()) {
+            final EventHandler handler;
+            if ((handler = method.getAnnotation(EventHandler.class)) != null) {
+                if (method.getParameterTypes().length == 1) {
+                    final Class<?> eventClass = method.getParameterTypes()[0];
+                    if (Event.class.isAssignableFrom(eventClass) && !Modifier.isAbstract(eventClass.getModifiers())) {
+                        try {
+                            final Field field = eventClass.getDeclaredField("LISTENER_HANDLER");
+                            final boolean flag = field.canAccess(null);
+                            field.setAccessible(true);
+                            final ListenerHandler listenerHandler = (ListenerHandler) field.get(null);
+                            field.setAccessible(flag);
+                            listenerHandler.register(listener, method, handler);
+                        } catch (final Exception ignored) {
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

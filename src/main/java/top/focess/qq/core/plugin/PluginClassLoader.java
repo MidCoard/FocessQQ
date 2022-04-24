@@ -7,6 +7,7 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import top.focess.command.CommandDuplicateException;
 import top.focess.command.DataConverter;
 import top.focess.command.data.DataBuffer;
 import top.focess.qq.FocessQQ;
