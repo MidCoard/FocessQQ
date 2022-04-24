@@ -19,27 +19,27 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
           server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
-          server-username: MAVEN_USERNAME # env variable for username in deploy
-          server-password: MAVEN_PASSWORD # env variable for token in deploy
+          server-username: ${{ secrets.OSSRH_USERNAME }} # env variable for username in deploy
+          server-password: ${{ secrets.OSSRH_TOKEN }} # env variable for token in deploy
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }} # env variable for GPG private key passphrase
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Add Test Report to Release
+      - name: Zip Libs
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r libs.zip libs
+
+      - name: Add Files to Release
         uses: irongut/EditRelease@v1.1.0
         with:
           token: ${{ secrets.TOKEN }}
           id: ${{ github.event.release.id }}
-          files: FILE_NAME
+          files: ${{ env.FILES_NAME }}
         env:
-          FILE_NAME: "focess-qq-*.jar"
-
+          FILES_NAME: "focess-qq-" + ${{ github.event.release.tag_name }} + ".jar,libs.zip"
 
       - name: Publish to Apache Maven Central
         run: mvn deploy
