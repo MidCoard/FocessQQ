@@ -232,11 +232,6 @@ public class TestFramework {
 
     @Test
     void testExit() {
-        FocessQQ.preExit();
-        assertEquals(1, AScheduler.getSchedulers().size());
-        // why 1, because the scheduler in FocessCallback is not closed
-        assertEquals(0, Command.getCommands().size());
-        assertEquals(0, Plugin.getPlugins().size());
         Field field = null;
         try {
             field = ConsoleChatEvent.class.getDeclaredField("LISTENER_HANDLER");
@@ -246,6 +241,15 @@ public class TestFramework {
         }
         Field finalField = field;
         ListenerHandler listenerHandler = (ListenerHandler) assertDoesNotThrow(()-> finalField.get(null));
+        assertNotEquals(0,listenerHandler.size());
+        assertNotEquals(1,AScheduler.getSchedulers().size());
+        assertNotEquals(0, Command.getCommands().size());
+        assertNotEquals(0, Plugin.getPlugins().size());
+        FocessQQ.preExit();
+        assertEquals(1, AScheduler.getSchedulers().size());
+        // why 1, because the scheduler in FocessCallback is not closed
+        assertEquals(0, Command.getCommands().size());
+        assertEquals(0, Plugin.getPlugins().size());
         assertEquals(0, listenerHandler.size());
     }
 
