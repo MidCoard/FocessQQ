@@ -46,6 +46,7 @@ jobs:
           upload_url: ${{ steps.update_release.outputs.upload_url }}
           asset_path: libs.zip
           asset_name: libs.zip
+          asset_content_type: application/zip
 
       - name: Upload Release Asset Jar
         uses: actions/upload-release-asset@v1
@@ -55,6 +56,7 @@ jobs:
           upload_url: ${{ steps.update_release.outputs.upload_url }}
           asset_path: focess-qq-${{ github.event.release.tag_name }}.jar
           asset_name: focess-qq-${{ github.event.release.tag_name }}.jar
+          asset_content_type: application/java-archive
 
       - name: Publish to Apache Maven Central
         run: mvn deploy
