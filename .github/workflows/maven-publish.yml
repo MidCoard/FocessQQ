@@ -23,20 +23,24 @@ jobs:
           server-password: MAVEN_PASSWORD # env variable for token in deploy
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
           gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
-
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - name: Update release
-        uses: johnwbyrd/update-release@v1
-        with:
-          token: ${{ secrets.TOKEN }}
-          asset: ./*.jar
-
-      - name: Publish to Apache Maven Central
-        run: mvn deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Add Test Report to Release
+        uses: irongut/EditRelease@v1.1.0
+        with:
+          token: ${{ secrets.TOKEN }}
+          id: ${{ github.event.release.id }}
+          files: ${{ FILE_NAME }}
+        env:
+          FILE_NAME: "focess-qq-*.jar"
+
+
+      - name: Publish to Apache Maven Central
+        run: mvn deploy
 

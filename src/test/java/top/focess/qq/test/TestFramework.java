@@ -2,10 +2,7 @@ package top.focess.qq.test;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import top.focess.command.CommandArgument;
 import top.focess.command.CommandDuplicateException;
 import top.focess.command.CommandResult;
@@ -96,7 +93,7 @@ public class TestFramework {
         assertTrue(flag.get());
     }
 
-    @Test
+    @RepeatedTest(100)
     void testSubmitErrorEvent() {
         assertThrows(EventSubmitException.class, () -> EventManager.submit(new ErrorEvent()));
     }
