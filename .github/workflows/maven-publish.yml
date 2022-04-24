@@ -35,7 +35,7 @@ jobs:
       - name: Add Files to Release
         uses: irongut/EditRelease@v1.1.0
         with:
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           id: ${{ github.event.release.id }}
           files: "focess-qq-${{ github.event.release.tag_name }}.jar,libs.zip"
 
