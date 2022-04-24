@@ -36,7 +36,7 @@ jobs:
         with:
           token: ${{ secrets.TOKEN }}
           id: ${{ github.event.release.id }}
-          files: ${{ FILE_NAME }}
+          files: FILE_NAME
         env:
           FILE_NAME: "focess-qq-*.jar"
 
