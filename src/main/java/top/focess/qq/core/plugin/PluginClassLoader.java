@@ -53,7 +53,7 @@ public class PluginClassLoader extends URLClassLoader {
     private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
     private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
-    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 2, false, "PluginLoader");
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "PluginLoader");
     private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "GC");
     private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
     private static Field
@@ -239,7 +239,7 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     public static void enablePlugin(@NotNull final Plugin plugin) {
-        if (plugin.getClass() != FocessQQ.MainPlugin.class) {
+        if (plugin != FocessQQ.getMainPlugin()) {
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin), "enable-plugin-" + plugin.getName());
             final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(15));
             try {
@@ -282,24 +282,23 @@ public class PluginClassLoader extends URLClassLoader {
     public static File disablePlugin(final Plugin plugin) {
         if (plugin == FocessQQ.getMainPlugin() && MethodCaller.getCallerClass() != FocessQQ.class)
             throw new IllegalStateException("You don't have permission to disable the MainPlugin");
-        final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin),"disable-plugin-" + plugin.getName());
-        final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
-        File file = null;
-        try {
-            file = callback.waitCall();
-        } catch (final InterruptedException | ExecutionException | CancellationException e) {
-            if (e instanceof ExecutionException && e.getCause() instanceof IncompatibleClassChangeError)
-                FocessQQ.getLogger().thrLang("exception-section",e, section.getName(), e.getCause().getMessage());
-            else if (!(e instanceof CancellationException))
-                FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
-        }
-        section.stop();
-        String name = plugin.getName();
-        synchronized (GC_SCHEDULER) {
-            if (!GC_SCHEDULER.isClosed())
-                GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1),name);
-        }
-        return file;
+        if (plugin != FocessQQ.getMainPlugin()) {
+            final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin), "disable-plugin-" + plugin.getName());
+            final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
+            File file = null;
+            try {
+                file = callback.waitCall();
+            } catch (final InterruptedException | ExecutionException | CancellationException e) {
+                if (e instanceof ExecutionException && e.getCause() instanceof IncompatibleClassChangeError)
+                    FocessQQ.getLogger().thrLang("exception-section", e, section.getName(), e.getCause().getMessage());
+                else if (!(e instanceof CancellationException))
+                    FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+            }
+            section.stop();
+            String name = plugin.getName();
+            GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1), name);
+            return file;
+        }  else return disablePlugin0(plugin);
     }
 
     @Nullable
@@ -347,11 +346,13 @@ public class PluginClassLoader extends URLClassLoader {
             }
         FocessQQ.getLogger().debugLang("remove-plugin-loader");
         FocessQQ.getLogger().debugLang("end-disable-plugin", plugin.getName());
-        final PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
-        try {
-            EventManager.submit(pluginUnloadEvent);
-        } catch (final EventSubmitException e) {
-            FocessQQ.getLogger().thrLang("exception-submit-plugin-unload-event", e);
+        if (FocessQQ.isRunning()) {
+            final PluginUnloadEvent pluginUnloadEvent = new PluginUnloadEvent(plugin);
+            try {
+                EventManager.submit(pluginUnloadEvent);
+            } catch (final EventSubmitException e) {
+                FocessQQ.getLogger().thrLang("exception-submit-plugin-unload-event", e);
+            }
         }
         return ret;
     }
@@ -473,10 +474,7 @@ public class PluginClassLoader extends URLClassLoader {
                     // this plugin is null and PluginLoadException means there is something wrong in the new instance of the plugin
                     FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
                 PluginCoreClassLoader.LOADERS.remove(this);
-                synchronized (GC_SCHEDULER) {
-                    if (!GC_SCHEDULER.isClosed())
-                        GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1),"load-failed");
-                }
+                GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1),"load-failed");
                 return false;
             }
             FocessQQ.getLogger().debugLang("end-load-plugin", this.file.getName());
