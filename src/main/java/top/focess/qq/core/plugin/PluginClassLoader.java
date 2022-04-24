@@ -80,7 +80,6 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     private static final AnnotationHandler PLUGIN_TYPE_HANDLER = (c, annotation, classLoader) -> {
-        PluginType pluginType = (PluginType) annotation;
         boolean flag = false;
         for (String p : classLoader.getPluginDescription().getDependencies())
             if (Plugin.getPlugin(p) == null) {
