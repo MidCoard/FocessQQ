@@ -1,28 +1,17 @@
-name: Publish package to the Maven Central Repository
+name: Publish
 on:
   release:
     types: [ created ]
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Import GPG Key
-        uses: crazy-max/ghaction-import-gpg@v1
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
+      - uses: actions/checkout@v3
       - name: Set up Apache Maven Central
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with: # running setup-java again overwrites the settings.xml
           distribution: 'temurin'
           java-version: '11'
-          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
-          server-username: ${{ secrets.OSSRH_USERNAME }} # env variable for username in deploy
-          server-password: ${{ secrets.OSSRH_TOKEN }} # env variable for token in deploy
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }} # env variable for GPG private key passphrase
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
@@ -58,15 +47,39 @@ jobs:
           asset_name: focess-qq-${{ github.event.release.tag_name }}.jar
           asset_content_type: application/java-archive
 
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Import GPG Key
+        uses: crazy-max/ghaction-import-gpg@v1
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Set up Apache Maven Central
+        uses: actions/setup-java@v3
+        with: # running setup-java again overwrites the settings.xml
+          distribution: 'temurin'
+          java-version: '11'
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+          server-username: ${{ secrets.OSSRH_USERNAME }} # env variable for username in deploy
+          server-password: ${{ secrets.OSSRH_TOKEN }} # env variable for token in deploy
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }} # env variable for GPG private key passphrase
+
       - name: Publish to Apache Maven Central
         run: mvn deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-  run-if-failed:
+
+# remove the release and the tag
+  run-if-publish-failed:
     needs: [ publish ]
-    if: always() && needs.publish.result == 'failure'
+    if: always() && needs.publish.result != 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: dev-drprasad/delete-tag-and-release@v0.2.0
