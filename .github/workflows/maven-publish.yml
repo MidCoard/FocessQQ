@@ -66,7 +66,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
   run-if-failed:
     needs: [ publish ]
-    if: always() && needs.publish.status == 'fail'
+    if: always() && needs.publish.result == 'failure'
     runs-on: ubuntu-latest
     steps:
       - uses: dev-drprasad/delete-tag-and-release@v0.2.0
