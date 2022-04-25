@@ -6,9 +6,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import top.focess.command.CommandResult;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.event.EventManager;
-import top.focess.qq.api.event.EventSubmitException;
-import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
@@ -179,21 +176,10 @@ public class CommandLine {
                         else args[i] = args[i].substring(1);
                     }
                 FocessQQ.getLogger().debugLang("command-after-special-handler", sender.toString(), command, Arrays.toString(args),id);
-                final CommandPrepostEvent event = new CommandPrepostEvent(sender, com, args, ioHandler);
-                try {
-                    EventManager.submit(event);
-                } catch (final EventSubmitException e) {
-                    FocessQQ.getLogger().thrLang("exception-submit-command-prepost-event", e);
-                }
-                // if not want to execute, it should be cancelled
-                if (event.isCancelled())
-                    continue;
-                FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args),id);
-                sender.getSession().set("@previous_command", rawCommand);
                 flag = true;
                 ret = EXECUTOR.submit(() -> {
                     try {
-                        CommandResult result = com.execute(sender, args, ioHandler);
+                        CommandResult result = com.execute(sender, args, ioHandler,id,rawCommand);
                         FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString(), id);
                         return result;
                     } catch (final Exception e) {
@@ -201,7 +187,12 @@ public class CommandLine {
                         FocessQQ.getLogger().thrLang("exception-command-execute", e);
                         return CommandResult.REFUSE_EXCEPTION;
                     }
-                },"execute-" + command + "-with-" + id);
+                },"execute-" + command + "-with-" + id, (exception) -> {
+                    Throwable e = exception.getCause();
+                    ioHandler.outputLang("command-execute-exception", e.getMessage());
+                    FocessQQ.getLogger().thrLang("exception-command-execute", e);
+                    return CommandResult.REFUSE_EXCEPTION;
+                });
                 break;
             }
         if (!flag && sender == CommandSender.CONSOLE)

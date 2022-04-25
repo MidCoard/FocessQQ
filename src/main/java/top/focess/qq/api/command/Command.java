@@ -12,9 +12,11 @@ import top.focess.qq.FocessQQ;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.command.CommandExecutedEvent;
+import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.IOHandler;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -186,12 +188,23 @@ public abstract class Command {
      *
      * @throws Exception the exception that occurred when executing the command
      */
-    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler) throws Exception {
+    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler, int id, String rawCommand) throws Exception {
+        final CommandPrepostEvent event = new CommandPrepostEvent(sender, this, args, ioHandler);
+        try {
+            EventManager.submit(event);
+        } catch (final EventSubmitException e) {
+            FocessQQ.getLogger().thrLang("exception-submit-command-prepost-event", e);
+        }
+        // if not want to execute, it should be cancelled
+        if (event.isCancelled())
+            return CommandResult.NONE;
+        FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args),id);
+        sender.getSession().set("@previous_command", rawCommand);
         CommandResult result = this.command.execute(sender, args,ioHandler);
         if (result.isExecuted()) {
-            final CommandExecutedEvent event = new CommandExecutedEvent(this,args, ioHandler, sender, result);
+            final CommandExecutedEvent event2 = new CommandExecutedEvent(this,args, ioHandler, sender, result);
             try {
-                EventManager.submit(event);
+                EventManager.submit(event2);
             } catch (final EventSubmitException e) {
                 FocessQQ.getLogger().thrLang("exception-submit-command-executed-event", e);
             }

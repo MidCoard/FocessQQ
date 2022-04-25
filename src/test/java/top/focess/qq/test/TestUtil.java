@@ -6,10 +6,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.util.MethodCaller;
-import top.focess.scheduler.FocessScheduler;
-import top.focess.scheduler.Scheduler;
-import top.focess.scheduler.Task;
-import top.focess.scheduler.ThreadPoolScheduler;
+import top.focess.scheduler.*;
 import top.focess.util.Base64;
 import top.focess.util.json.JSONObject;
 import top.focess.util.network.HttpResponse;
@@ -26,10 +23,15 @@ import top.focess.util.yaml.YamlConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,7 +108,7 @@ public class TestUtil {
         Task task1 = scheduler.run(() -> {
             System.out.println(2);
         }, Duration.ofSeconds(1));
-        assertTimeoutPreemptively(Duration.ofSeconds(2), task1::join);
+        assertTimeoutPreemptively(Duration.ofSeconds(2), ()->task1.join());
         assertTrue(task1.isFinished());
         Task task2 = scheduler.run(() -> {
             try {
@@ -138,7 +140,7 @@ public class TestUtil {
 
     @RepeatedTest(5)
     void testScheduler2() {
-        Scheduler scheduler = new ThreadPoolScheduler("Test", 10);
+        Scheduler scheduler = new ThreadPoolScheduler( 10,false,"test-2");
         List<Task> taskList = Lists.newArrayList();
         for (int i = 0; i < 20; i++) {
             int finalI = i;
@@ -169,6 +171,81 @@ public class TestUtil {
         } catch (InterruptedException e) {
             fail();
         }
+        scheduler.close();
+    }
+
+    @RepeatedTest(5)
+    void testScheduler3() {
+        Scheduler scheduler = new ThreadPoolScheduler( 5,false,"test-3");
+
+        Task task = scheduler.run(()->{
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                fail();
+            }
+            throw new NullPointerException();
+        });
+
+        assertThrows(ExecutionException.class, task::join);
+        assertTrue(task.isFinished());
+
+        Task task1 = scheduler.run(()->{
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                fail();
+            }
+            throw new InternalError();
+        });
+        assertThrows(ExecutionException.class, task::join);
+        assertTrue(task.isFinished());
+        AtomicInteger count = new AtomicInteger(0);
+        List<Task> tasks = Lists.newArrayList();
+        for (int i = 0; i<5;i++) {
+            int finalI = i;
+            tasks.add(scheduler.run(()->{
+                try {
+                    sleep(1000 * (finalI));
+                } catch (InterruptedException e) {
+                    fail();
+                }
+                throw new InternalError();
+            }, "test-" + i, (executionException)->{
+                assertInstanceOf(InternalError.class, executionException.getCause());
+                count.incrementAndGet();
+            }));
+        }
+        for (Task task2 : tasks)
+            assertDoesNotThrow(()->task2.join());
+        assertEquals(5, count.get());
+        scheduler.close();
+    }
+
+    @Test
+    void testScheduler4() throws Exception {
+        Scheduler scheduler = new ThreadPoolScheduler(10, true, "test-4");
+        Field field = AScheduler.class.getDeclaredField("tasks");
+        field.setAccessible(true);
+        Field field1 = ComparableTask.class.getDeclaredField("time");
+        field1.setAccessible(true);
+        Field field2 = ComparableTask.class.getDeclaredField("task");
+        field2.setAccessible(true);
+        PriorityBlockingQueue<ComparableTask> tasks2 = (PriorityBlockingQueue<ComparableTask>) field.get(scheduler);
+        List<Task> tasks = Lists.newArrayList();
+        for (int i = 0;i<5;i++) {
+            int finalI = i;
+            tasks.add(scheduler.run(()-> System.out.println(finalI),Duration.ofSeconds(1),finalI + ""));
+            System.out.println(tasks2.stream().map(t -> {
+                try {
+                    return field1.get(t).toString() + " " + field2.get(t).toString();
+                } catch (IllegalAccessException e) {
+                    return "";
+                }
+            }).collect(Collectors.toList()));
+        }
+        for (Task task : tasks)
+            assertDoesNotThrow(()->task.join());
         scheduler.close();
     }
 
@@ -246,7 +323,7 @@ public class TestUtil {
 
     @Test
     void testSection() {
-        Scheduler scheduler = new ThreadPoolScheduler("test", 1);
+        Scheduler scheduler = new ThreadPoolScheduler(1, false,"test-section-1");
         Task task = scheduler.run(() -> {
             try {
                 sleep(10000);
@@ -262,7 +339,7 @@ public class TestUtil {
 
     @Test
     void testSection2() {
-        Scheduler scheduler = new ThreadPoolScheduler("test", 1);
+        Scheduler scheduler = new ThreadPoolScheduler( 1,false,"test-2");
         Task task = scheduler.run(() -> {
             try {
                 sleep(1000);
@@ -317,6 +394,5 @@ public class TestUtil {
         assertEquals("Zm9j", Base64.base64Encode("foc".getBytes(StandardCharsets.UTF_8)));
         assertEquals("foc", new String(Base64.base64Decode("Zm9j"), StandardCharsets.UTF_8));
     }
-
 
 }

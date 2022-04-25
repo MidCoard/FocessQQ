@@ -15,6 +15,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class AScheduler implements Scheduler {
 
@@ -128,6 +131,16 @@ public class AScheduler implements Scheduler {
     @Override
     public @UnmodifiableView List<Task> getRemainingTasks() {
         return this.scheduler.getRemainingTasks();
+    }
+
+    @Override
+    public Task run(Runnable runnable, Duration duration, String s, Consumer<ExecutionException> consumer) {
+        return this.scheduler.run(runnable, duration, s, consumer);
+    }
+
+    @Override
+    public <V> Callback<V> submit(Callable<V> callable, Duration duration, String s, Function<ExecutionException, V> function) {
+        return this.scheduler.submit(callable, duration, s, function);
     }
 
     /**

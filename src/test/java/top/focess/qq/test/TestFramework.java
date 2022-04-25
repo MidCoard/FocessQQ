@@ -221,7 +221,7 @@ public class TestFramework {
         Command.register(Plugin.plugin(),command);
         assertEquals(CommandResult.REFUSE,assertDoesNotThrow(()->CommandLine.exec("test4").get()));
         assertEquals(CommandResult.ALLOW,assertDoesNotThrow(()->CommandLine.exec("test4 test test").get()));
-        assertEquals(CommandResult.ARGS_EXECUTED,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1").get()));
+        assertEquals(CommandResult.ARGS,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1").get()));
         assertTrue(flag.get());
         assertEquals(CommandResult.COMMAND_REFUSED,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1 2").get()));
         assertEquals(CommandResult.ALLOW,assertDoesNotThrow(()->CommandLine.exec("test4 test test 1 1").get()));
@@ -243,6 +243,7 @@ public class TestFramework {
         assertNotEquals(0, Command.getCommands().size());
         assertNotEquals(0, Plugin.getPlugins().size());
         FocessQQ.preExit();
+        System.out.println(AScheduler.getSchedulers());
         assertEquals(1, AScheduler.getSchedulers().size());
         // why 1, because the scheduler in FocessCallback is not closed
         assertEquals(0, Command.getCommands().size());
