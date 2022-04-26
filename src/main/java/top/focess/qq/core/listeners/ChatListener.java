@@ -71,7 +71,7 @@ public class ChatListener implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.HIGHER, notCallIfPrevented = true)
+    @EventHandler(priority = EventPriority.HIGHER)
     public void onStrangerChat(@NotNull final StrangerChatEvent event) {
         if (isPauseMode())
             return;
@@ -86,7 +86,7 @@ public class ChatListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHER, notCallIfPrevented = true)
+    @EventHandler(priority = EventPriority.HIGHER)
     public void onGroupChat(@NotNull final GroupChatEvent event) {
         if (isPauseMode())
             return;
@@ -121,7 +121,7 @@ public class ChatListener implements Listener {
             }
     }
 
-    @EventHandler(priority = EventPriority.HIGHER, notCallIfPrevented = true)
+    @EventHandler(priority = EventPriority.HIGHER)
     public void onFriendChat(@NotNull final FriendChatEvent event) {
         if (isPauseMode())
             return;

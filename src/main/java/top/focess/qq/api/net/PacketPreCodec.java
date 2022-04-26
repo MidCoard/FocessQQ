@@ -20,16 +20,16 @@ public class PacketPreCodec {
     private static final Map<Integer, PacketCodec<? extends Packet>> PACKET_CODECS = Maps.newHashMap();
 
     static {
-        registerPacketCodec(MessagePacket.PACKET_ID, new MessagePacketCodec());
-        registerPacketCodec(HeartPacket.PACKET_ID, new HeartPacketCodec());
-        registerPacketCodec(ConnectPacket.PACKET_ID, new ConnectPacketCodec());
-        registerPacketCodec(ConnectedPacket.PACKET_ID, new ConnectedPacketCodec());
-        registerPacketCodec(DisconnectPacket.PACKET_ID, new DisconnectPacketCodec());
-        registerPacketCodec(DisconnectedPacket.PACKET_ID, new DisconnectedPacketCodec());
-        registerPacketCodec(ClientPackPacket.PACKET_ID, new ClientPackPacketCodec());
-        registerPacketCodec(ServerPackPacket.PACKET_ID, new ServerPackPacketCodec());
-        registerPacketCodec(SidedConnectPacket.PACKET_ID, new SidedConnectPacketCodec());
-        registerPacketCodec(WaitPacket.PACKET_ID, new WaitPacketCodec());
+        register(MessagePacket.PACKET_ID, new MessagePacketCodec());
+        register(HeartPacket.PACKET_ID, new HeartPacketCodec());
+        register(ConnectPacket.PACKET_ID, new ConnectPacketCodec());
+        register(ConnectedPacket.PACKET_ID, new ConnectedPacketCodec());
+        register(DisconnectPacket.PACKET_ID, new DisconnectPacketCodec());
+        register(DisconnectedPacket.PACKET_ID, new DisconnectedPacketCodec());
+        register(ClientPackPacket.PACKET_ID, new ClientPackPacketCodec());
+        register(ServerPackPacket.PACKET_ID, new ServerPackPacketCodec());
+        register(SidedConnectPacket.PACKET_ID, new SidedConnectPacketCodec());
+        register(WaitPacket.PACKET_ID, new WaitPacketCodec());
     }
 
     private final List<Byte> data = Lists.newArrayList();
@@ -43,7 +43,7 @@ public class PacketPreCodec {
      * @param packetCodec the packet codec
      * @param <T>         the packet type
      */
-    public static <T extends Packet> void registerPacketCodec(final int packetId, final PacketCodec<T> packetCodec) {
+    public static <T extends Packet> void register(final int packetId, final PacketCodec<T> packetCodec) {
         PACKET_CODECS.put(packetId, packetCodec);
     }
 

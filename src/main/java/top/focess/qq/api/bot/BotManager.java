@@ -13,6 +13,17 @@ import java.util.concurrent.Future;
  */
 public interface BotManager {
 
+
+    /**
+     * Login and get the bot with id and password
+     * @param id the id of the bot
+     * @param password the password of the bot
+     * @param plugin the plugin
+     * @param botProtocol the bot protocol
+     * @return the bot
+     */
+    Future<Bot> login(long id, String password, Plugin plugin, BotProtocol botProtocol);
+
     /**
      * Login and get the bot with id and password
      *
@@ -22,7 +33,25 @@ public interface BotManager {
      * @return the bot
      */
     @NotNull
-    Future<Bot> login(long id, String password, Plugin plugin);
+    default Future<Bot> login(long id, String password, Plugin plugin) {
+        return this.login(id, password, plugin, BotProtocol.ANDROID_PAD);
+    }
+
+    /**
+     * Login and get the bot with id and password
+     * <p>
+     * Note: this is a blocking method.
+     *
+     * @param id       the id of the bot
+     * @param password the password of the bot
+     * @param plugin   the plugin
+     * @param botProtocol the bot protocol
+     * @return the bot
+     * @throws BotLoginException if the bot login failed
+     */
+    @NotNull
+    Bot loginDirectly(long id, String password, Plugin plugin, BotProtocol botProtocol) throws BotLoginException;
+
 
     /**
      * Login and get the bot with id and password
@@ -36,7 +65,9 @@ public interface BotManager {
      * @throws BotLoginException if the bot login failed
      */
     @NotNull
-    Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException;
+    default Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException {
+        return this.loginDirectly(id, password, plugin, BotProtocol.ANDROID_PAD);
+    }
 
     /**
      * Login the bot

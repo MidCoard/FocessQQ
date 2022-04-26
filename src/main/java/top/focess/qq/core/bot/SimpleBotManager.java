@@ -16,6 +16,7 @@ import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
+import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.bot.message.MessageChain;
 import top.focess.qq.api.bot.message.MessageSource;
@@ -72,15 +73,15 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     @NotNull
-    public Future<Bot> login(final long id, final String password, final Plugin plugin) {
-        return SCHEDULER.submit(() -> this.loginDirectly(id, password, plugin),"login-bot-" + id);
+    public Future<Bot> login(final long id, final String password, final Plugin plugin,final BotProtocol protocol) {
+        return SCHEDULER.submit(() -> this.loginDirectly(id, password, plugin, protocol),"login-bot-" + id);
     }
 
     @Override
     @NotNull
-    public Bot loginDirectly(final long id, final String password, final Plugin plugin) throws BotLoginException {
+    public Bot loginDirectly(final long id, final String password, final Plugin plugin,final BotProtocol botProtocol) throws BotLoginException {
         final BotConfiguration configuration = BotConfiguration.getDefault();
-        configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
+        configuration.setProtocol(botProtocol.getNativeProtocol());
         final File cache = new File("devices/" + id + "/cache");
         if (!cache.exists())
             if (!cache.mkdirs())

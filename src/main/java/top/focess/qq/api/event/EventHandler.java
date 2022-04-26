@@ -31,5 +31,5 @@ public @interface EventHandler {
      *
      * @return true if this method should be called when the event is prevented, false otherwise
      */
-    boolean notCallIfPrevented() default false;
+    boolean notCallIfPrevented() default true;
 }
