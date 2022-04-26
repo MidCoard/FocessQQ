@@ -242,7 +242,7 @@ public class TestFramework {
         assertNotEquals(1,AScheduler.getSchedulers().size());
         assertNotEquals(0, Command.getCommands().size());
         assertNotEquals(0, Plugin.getPlugins().size());
-        FocessQQ.preExit();
+        FocessQQ.exit();
         System.out.println(AScheduler.getSchedulers());
         assertEquals(1, AScheduler.getSchedulers().size());
         // why 1, because the scheduler in FocessCallback is not closed
