@@ -102,17 +102,36 @@ public class FocessQQ {
      * The lang config
      */
     private static final LangConfig LANG_CONFIG = MAIN_PLUGIN.getLangConfig();
+
+    private static final Scanner SCANNER = new Scanner(System.in);
+
+
+    private static boolean hasNextLine() {
+        while (true) {
+            try {
+                if (!(System.in.available() == 0)) break;
+            } catch (IOException e) {
+                return false;
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+        return SCANNER.hasNextLine();
+    }
+
     private static final Thread CONSOLE_INPUT_THREAD = new Thread(() -> {
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine();
+        while (hasNextLine()) {
+            String input = SCANNER.nextLine();
             try {
                 EventManager.submit(new ConsoleChatEvent(input));
             } catch (EventSubmitException e) {
                 getLogger().thrLang("exception-submit-console-chat-event", e);
             }
         }
-    });
+    },"ConsoleInputThread");
     private static final Object STOP_LOCK = new Object();
     /**
      * The administrator QQ number
@@ -483,10 +502,9 @@ public class FocessQQ {
     }
 
     /**
-     * Note: this is for test only.
-     * @see #exit()
+     * Exit FocessQQ Framework.
      */
-    public static void preExit() {
+    public static void exit() {
         synchronized (STOP_LOCK) {
             if (isStopped)
                 return;
@@ -502,14 +520,7 @@ public class FocessQQ {
         if (MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);
         SCHEDULER.close();
-    }
-
-    /**
-     * Exit FocessQQ Framework.
-     */
-    public static void exit() {
-        preExit();
-        System.exit(0);
+        CONSOLE_INPUT_THREAD.interrupt();
     }
 
     private static void saveLogFile() {
