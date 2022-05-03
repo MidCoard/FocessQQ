@@ -3,7 +3,7 @@ fatal-delete-temp-log-file-failed: Failed to delete temp log file %s.
 fatal-default-bot-login-failed: Failed to login default bot %d. Force shutdown!
 fatal-exit-failed: Main Thread waits for more than 5 sec before shutdown. Force shutdown!
 fatal-save-data: Main Thread shuts down without saving Data. Try to save data now!
-fatal-main-plugin-already-running: Main Plugin is already running. Force shutdown!
+fatal-main-plugin-already-running: Main Plugin cannot be newed manually. Force shutdown!
 fatal-create-cache-dir-failed: Failed to create cache directory %s.
 fatal-reload-plugin: Failed to reload plugin %s.
 exception-uncaught-exception: Uncaught exception

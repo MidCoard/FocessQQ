@@ -41,6 +41,7 @@ import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
+import top.focess.qq.core.util.MethodCaller;
 import top.focess.scheduler.FocessScheduler;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
@@ -353,8 +354,10 @@ public class FocessQQ {
         try {
             IOHandler.getConsoleIoHandler().outputLang("input-account-username");
             final String str = IOHandler.getConsoleIoHandler().input().trim();
-            if (str.equals("stop"))
+            if (str.equals("stop")) {
                 exit();
+                return;
+            }
             username = Long.parseLong(str);
             IOHandler.getConsoleIoHandler().outputLang("input-account-password");
             password = IOHandler.getConsoleIoHandler().input();
@@ -370,13 +373,14 @@ public class FocessQQ {
             exit();
         });
 
-        System.out.println("[FocessQQ][Console] -> This is the context from sout.");
+        System.out.println("[FocessQQ][Console] -> This is the context from System.out.");
 
         try {
             getLogger().debugLang("setup-uncaught-exception-handler");
         } catch (final Exception e) {
             e.printStackTrace();
             exit();
+            return;
         }
 
         CONSOLE_INPUT_THREAD.start();
@@ -401,7 +405,7 @@ public class FocessQQ {
             getLogger().info("--user <id> <password>");
             getLogger().info("--admin <id>");
             getLogger().info("--server <port>");
-            getLogger().info("--client <localhost> <localport> <host> <port> <name>");
+            getLogger().info("--client <localhost> <local-port> <host> <port> <name>");
             getLogger().info("--client <host> <port> <name>");
             getLogger().info("--udp <port>");
             getLogger().info("--sided");
@@ -411,6 +415,7 @@ public class FocessQQ {
             saveLogFile();
             getLogger().debugLang("save-log");
             exit();
+            return;
         }
         getLogger().infoLang("start-main", getVersion());
         option = options.get("user");
@@ -490,6 +495,7 @@ public class FocessQQ {
             }
         }
         try {
+            running = true;
             PluginClassLoader.enablePlugin(MAIN_PLUGIN);
             getLogger().debugLang("load-main-plugin");
         } catch (final Exception e) {
@@ -519,7 +525,18 @@ public class FocessQQ {
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
         if (MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);
+        running = false;
+        if (getSocket() != null)
+            getSocket().close();
+        if (getUdpSocket() != null)
+            getUdpSocket().close();
+        // make sure scheduler is stopped at the end
+        Schedulers.closeAll();
         SCHEDULER.close();
+        if (!saved) {
+            saveLogFile();
+            saved = true;
+        }
         CONSOLE_INPUT_THREAD.interrupt();
     }
 
@@ -539,12 +556,10 @@ public class FocessQQ {
                 inputStream.close();
                 gzipOutputStream.finish();
                 gzipOutputStream.close();
-                if (!target.delete())
-                    getLogger().fatalLang("fatal-delete-log-file-failed", target.getName());
+                // ignore if failed
+                target.delete();
             }
-        } catch (final IOException e) {
-            getLogger().thrLang("exception-save-log", e);
-        }
+        } catch (final IOException ignored) {}
     }
 
     public static LangConfig getLangConfig() {
@@ -562,7 +577,7 @@ public class FocessQQ {
         private ConsoleListener consoleListener;
 
         public MainPlugin() {
-            if (running) {
+            if (MethodCaller.getCallerClass() != FocessQQ.class) {
                 getLogger().fatalLang("fatal-main-plugin-already-running");
                 exit();
             }
@@ -575,7 +590,6 @@ public class FocessQQ {
         @Override
         public void enable() {
             getLogger().debugLang("start-enable-main-plugin");
-            running = true;
             properties = this.getDefaultConfig().getValues();
             if (properties == null)
                 properties = Maps.newHashMap();
@@ -613,6 +627,8 @@ public class FocessQQ {
             // first register listener then request account information because the request process may need the listener, especially ConsoleListener
             if (username == null || password == null) {
                 requestAccountInformation();
+                if (username == null || password == null)
+                    return;
                 getLogger().debugLang("request-account-information");
             }
             try {
@@ -620,6 +636,7 @@ public class FocessQQ {
             } catch (final BotLoginException e) {
                 getLogger().thrLang("exception-login-default-bot", e);
                 exit();
+                return;
             }
             getLogger().debugLang("login-default-bot");
             if (options.get("debug") != null)
@@ -705,23 +722,6 @@ public class FocessQQ {
                 this.getDefaultConfig().set(key, properties.get(key));
             this.getDefaultConfig().save();
             getLogger().debugLang("save-default-properties");
-            if (getSocket() != null)
-                if (getSocket().close())
-                    getLogger().debugLang("socket-packet-handler-not-empty");
-            if (getUdpSocket() != null)
-                if (getUdpSocket().close())
-                    getLogger().debugLang("udp-socket-packet-handler-not-empty");
-            getLogger().debugLang("close-all-sockets");
-            if (!saved) {
-                getLogger().debugLang("save-log");
-                saveLogFile();
-                saved = true;
-            }
-            running = false;
-            // make sure scheduler is stopped at end of disable
-            if (Schedulers.closeAll())
-                getLogger().debugLang("schedulers-not-empty");
-            getLogger().debugLang("unregister-all-schedulers");
         }
 
     }
