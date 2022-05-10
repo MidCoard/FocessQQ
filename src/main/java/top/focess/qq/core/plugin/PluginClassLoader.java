@@ -19,7 +19,7 @@ import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 import top.focess.qq.api.plugin.*;
 import top.focess.qq.api.schedule.Schedulers;
-import top.focess.qq.core.bot.SimpleBotManager;
+import top.focess.qq.core.bot.BotManagerFactory;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.util.MethodCaller;
 import top.focess.scheduler.Callback;
@@ -318,7 +318,7 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().debugLang("unregister-commands");
             Schedulers.close(plugin);
             FocessQQ.getLogger().debugLang("close-schedulers");
-            SimpleBotManager.remove(plugin);
+            BotManagerFactory.remove(plugin);
             FocessQQ.getLogger().debugLang("remove-bot");
             CommandLine.unregister(plugin);
             FocessQQ.getLogger().debugLang("unregister-special-argument-handlers");
@@ -463,7 +463,7 @@ public class PluginClassLoader extends URLClassLoader {
                     DataCollection.unregister(this.plugin);
                     Command.unregister(this.plugin);
                     Schedulers.close(this.plugin);
-                    SimpleBotManager.remove(this.plugin);
+                    BotManagerFactory.remove(this.plugin);
                     CommandLine.unregister(this.plugin);
                     if (FocessQQ.getSocket() != null)
                         FocessQQ.getSocket().unregister(this.plugin);

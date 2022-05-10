@@ -46,34 +46,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
 
-public class SimpleBotManager implements BotManager {
+public class MiraiBotManager implements BotManager {
 
-    protected static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
+    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
 
     private static final Map<Bot, List<Listener<?>>> BOT_LISTENER_MAP = Maps.newHashMap();
 
-    protected static final Map<Plugin, List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
+    private static final Map<Plugin, List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
 
-    protected static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
+    private static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
 
-    public static void removeAll() {
+    public void removeAll() {
         for (final Long id : BOTS.keySet())
-            FocessQQ.getBotManager().remove(id);
+            this.remove(id);
         //remove default bot
         final Bot b = BOTS.remove(FocessQQ.getBot().getId());
         if (b != null)
             b.logout();
     }
 
-    public static void remove(final Plugin plugin) {
+    public void remove(final Plugin plugin) {
         for (final Bot b : PLUGIN_BOT_MAP.getOrDefault(plugin, Lists.newArrayList()))
-            FocessQQ.getBotManager().remove(b.getId());
+            this.remove(b.getId());
         PLUGIN_BOT_MAP.remove(plugin);
     }
 
     @Override
     @NotNull
-    public Future<Bot> login(final long id, final String password, final Plugin plugin,final BotProtocol protocol) {
+    public Future<Bot> login(final long id, final String password, final Plugin plugin, final BotProtocol protocol) {
         return SCHEDULER.submit(() -> this.loginDirectly(id, password, plugin, protocol),"login-bot-" + id);
     }
 
@@ -81,7 +81,7 @@ public class SimpleBotManager implements BotManager {
     @NotNull
     public Bot loginDirectly(final long id, final String password, final Plugin plugin,final BotProtocol botProtocol) throws BotLoginException {
         final BotConfiguration configuration = BotConfiguration.getDefault();
-        configuration.setProtocol(botProtocol.getNativeProtocol());
+        configuration.setProtocol(getProtocol(botProtocol));
         final File cache = new File("devices/" + id + "/cache");
         if (!cache.exists())
             if (!cache.mkdirs())
@@ -91,7 +91,7 @@ public class SimpleBotManager implements BotManager {
         configuration.setLoginSolver(new LoginSolver() {
             @NotNull
             @Override
-            public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final byte[] bytes, @NotNull final Continuation<? super String> continuation) {
+            public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, final byte @NotNull [] bytes, @NotNull final Continuation<? super String> continuation) {
                 try {
                     final FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
                     outputStream.write(bytes);
@@ -136,7 +136,7 @@ public class SimpleBotManager implements BotManager {
         } catch (final Exception e) {
             throw new BotLoginException(id, e);
         }
-        final Bot b = new SimpleBot(id, password, bot, plugin);
+        final MiraiBot b = new MiraiBot(id, password, bot, botProtocol, plugin,this);
         this.setup(b, bot);
         PLUGIN_BOT_MAP.compute(plugin, (k, v) -> {
             if (v == null)
@@ -150,72 +150,72 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public boolean login(final Bot b) throws BotLoginException {
-        if (!b.isOnline() && b instanceof SimpleBot) {
-            final long id = b.getId();
-            final BotConfiguration configuration = BotConfiguration.getDefault();
-            configuration.setProtocol(BotConfiguration.MiraiProtocol.ANDROID_PAD);
-            final File cache = new File("devices/" + id + "/cache");
-            if (!cache.exists())
-                if (!cache.mkdirs())
-                    throw new BotLoginException(id, FocessQQ.getLangConfig().get("fatal-create-cache-dir-failed"));
-            configuration.fileBasedDeviceInfo("devices/" + id + "/device.json");
-            configuration.setCacheDir(cache);
-            configuration.setLoginSolver(new LoginSolver() {
-                @Nullable
-                @Override
-                public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final byte[] bytes, @NotNull final Continuation<? super String> continuation) {
-                    try {
-                        final FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
-                        outputStream.write(bytes);
-                        outputStream.close();
-                    } catch (final IOException e) {
-                        FocessQQ.getLogger().thrLang("exception-load-captcha-picture", e);
-                    }
-                    FocessQQ.getLogger().infoLang("input-captcha-code");
-                    try {
-                        return IOHandler.getConsoleIoHandler().input();
-                    } catch (final InputTimeoutException e) {
-                        return null;
-                    }
+        checkBot(b);
+        if (b.isOnline())
+            return false;
+        final long id = b.getId();
+        final BotConfiguration configuration = BotConfiguration.getDefault();
+        configuration.setProtocol(getProtocol(((QQBot)b).getBotProtocol()));
+        final File cache = new File("devices/" + id + "/cache");
+        if (!cache.exists())
+            if (!cache.mkdirs())
+                throw new BotLoginException(id, FocessQQ.getLangConfig().get("fatal-create-cache-dir-failed"));
+        configuration.fileBasedDeviceInfo("devices/" + id + "/device.json");
+        configuration.setCacheDir(cache);
+        configuration.setLoginSolver(new LoginSolver() {
+            @Nullable
+            @Override
+            public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, final byte @NotNull [] bytes, @NotNull final Continuation<? super String> continuation) {
+                try {
+                    final FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
+                    outputStream.write(bytes);
+                    outputStream.close();
+                } catch (final IOException e) {
+                    FocessQQ.getLogger().thrLang("exception-load-captcha-picture", e);
                 }
-
-                @Nullable
-                @Override
-                public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
-                    FocessQQ.getLogger().info(s);
-                    try {
-                        IOHandler.getConsoleIoHandler().input();
-                    } catch (final InputTimeoutException ignored) {
-                    }
+                FocessQQ.getLogger().infoLang("input-captcha-code");
+                try {
+                    return IOHandler.getConsoleIoHandler().input();
+                } catch (final InputTimeoutException e) {
                     return null;
                 }
-
-                @Nullable
-                @Override
-                public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
-                    FocessQQ.getLogger().info(s);
-                    try {
-                        IOHandler.getConsoleIoHandler().input();
-                    } catch (final InputTimeoutException ignored) {
-                    }
-                    return null;
-                }
-            });
-            final net.mamoe.mirai.Bot bot;
-            try {
-                bot = BotFactory.INSTANCE.newBot(id, ((SimpleBot) b).getPassword(), configuration);
-                bot.login();
-                ((SimpleBot) b).setNativeBot(bot);
-            } catch (final Exception e) {
-                throw new BotLoginException(id, e);
             }
-            this.setup(b, bot);
-            return true;
+
+            @Nullable
+            @Override
+            public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
+                FocessQQ.getLogger().info(s);
+                try {
+                    IOHandler.getConsoleIoHandler().input();
+                } catch (final InputTimeoutException ignored) {
+                }
+                return null;
+            }
+
+            @Nullable
+            @Override
+            public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
+                FocessQQ.getLogger().info(s);
+                try {
+                    IOHandler.getConsoleIoHandler().input();
+                } catch (final InputTimeoutException ignored) {
+                }
+                return null;
+            }
+        });
+        final net.mamoe.mirai.Bot bot;
+        try {
+            bot = BotFactory.INSTANCE.newBot(id, ((MiraiBot) b).getPassword(), configuration);
+            bot.login();
+        } catch (final Exception e) {
+            throw new BotLoginException(id, e);
         }
-        return false;
+        this.setup((MiraiBot) b, bot);
+        return true;
     }
 
-    private void setup(Bot b, net.mamoe.mirai.Bot bot) {
+    private void setup(MiraiBot b, net.mamoe.mirai.Bot bot) {
+        b.setNativeBot(bot);
         try {
             EventManager.submit(new BotLoginEvent(b));
         } catch (final EventSubmitException e) {
@@ -323,9 +323,10 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public boolean logout(@NotNull final Bot bot) {
+        checkBot(bot);
         if (!bot.isOnline())
             return false;
-        bot.getNativeBot().close();
+        ((MiraiBot)bot).getNativeBot().close();
         for (final Listener<?> listener : BOT_LISTENER_MAP.getOrDefault(bot, Lists.newArrayList()))
             listener.complete();
         BOT_LISTENER_MAP.remove(bot);
@@ -349,6 +350,7 @@ public class SimpleBotManager implements BotManager {
 
     @Override
     public boolean relogin(@NotNull final Bot bot) throws BotLoginException {
+        checkBot(bot);
         final boolean ret = this.logout(bot) && this.login(bot);
         try {
             EventManager.submit(new BotReloginEvent(bot));
@@ -375,5 +377,25 @@ public class SimpleBotManager implements BotManager {
         return b;
     }
 
+    private void checkBot(@NotNull final Bot bot) {
+        if (!(bot instanceof MiraiBot))
+            throw new IllegalArgumentException("Bot must be instanced of MiraiBot");
+    }
+
+    private static BotConfiguration.MiraiProtocol getProtocol(BotProtocol botProtocol) {
+        switch (botProtocol) {
+            case IPAD:
+                return BotConfiguration.MiraiProtocol.IPAD;
+            case MACOS:
+                return BotConfiguration.MiraiProtocol.MACOS;
+            case ANDROID_PAD:
+                return BotConfiguration.MiraiProtocol.ANDROID_PAD;
+            case ANDROID_PHONE:
+                return BotConfiguration.MiraiProtocol.ANDROID_PHONE;
+            case ANDROID_WATCH:
+                return BotConfiguration.MiraiProtocol.ANDROID_WATCH;
+        }
+        throw new IllegalArgumentException("Unknown bot protocol: " + botProtocol);
+    }
 
 }

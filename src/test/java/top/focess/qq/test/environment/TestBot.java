@@ -6,8 +6,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.event.EventManager;
@@ -16,27 +16,23 @@ import top.focess.qq.api.event.bot.BotLoginEvent;
 import top.focess.qq.api.event.bot.BotLogoutEvent;
 import top.focess.qq.api.event.bot.BotReloginEvent;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.core.bot.QQBot;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class TestBot implements Bot {
+public class TestBot extends QQBot {
 
 
-    private final long id;
-    private final String password;
-    private final Plugin plugin;
     private final Set<Friend> friends = Sets.newConcurrentHashSet();
     private final Set<Group> groups = Sets.newConcurrentHashSet();
 
     private boolean isOnline = false;
 
-    public TestBot(long id, String password, Plugin plugin) {
-        this.id = id;
-        this.password = password;
-        this.plugin = plugin;
+    public TestBot(long id, String password, Plugin plugin, BotProtocol botProtocol, TestBotManager botManager) {
+        super(id, password, plugin,botProtocol, botManager);
         Random random = new Random();
         int friendsSize = random.nextInt(50) + 1;
         for (int i = 0; i < friendsSize; i++)
@@ -44,11 +40,6 @@ public class TestBot implements Bot {
         int groupsSize = random.nextInt(20) + 1;
         for (int i = 0; i < groupsSize; i++)
             this.groups.add(new TestGroup(random.nextLong(),this));
-    }
-
-    @Override
-    public net.mamoe.mirai.Bot getNativeBot() {
-        return null;
     }
 
     @Override
@@ -137,27 +128,7 @@ public class TestBot implements Bot {
 
     @Override
     public @NonNull Friend getAsFriend() {
-        return new TestFriend(this.id,this);
-    }
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public boolean isDefaultBot() {
-        return this == FocessQQ.getBot();
-    }
-
-    @Override
-    public Plugin getPlugin() {
-        return this.plugin;
-    }
-
-    @Override
-    public boolean isAdministrator() {
-        return FocessQQ.hasAdministratorId() && this.getId() == FocessQQ.getAdministratorId();
+        return new TestFriend(this.getId(),this);
     }
 
     public void removeGroup(Group group) {

@@ -1,24 +1,37 @@
 package top.focess.qq.test.environment;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.bot.BotManager;
+import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.core.bot.SimpleBotManager;
+import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.core.bot.BotManagerFactory;
+import top.focess.scheduler.Scheduler;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
-public class TestBotManager extends SimpleBotManager {
+public class TestBotManager implements BotManager {
 
+    static {
+        BotManagerFactory.register("test", TestBotManager::new);
+    }
+
+    protected static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
+    protected static final Map<Plugin, List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
+    protected static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
     @Override
     public @NotNull Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException {
-        Bot bot = new TestBot(id, password, plugin);
+        Bot bot = new TestBot(id, password, plugin,BotProtocol.ANDROID_PAD,this);
         bot.login();
         BOTS.put(id, bot);
         PLUGIN_BOT_MAP.compute(plugin, (k, v) -> {
@@ -31,8 +44,18 @@ public class TestBotManager extends SimpleBotManager {
     }
 
     @Override
+    public Future<Bot> login(long id, String password, Plugin plugin, BotProtocol botProtocol) {
+        return this.login(id, password, plugin);
+    }
+
+    @Override
     public @NotNull Future<Bot> login(long id, String password, Plugin plugin) {
         return SCHEDULER.submit(() -> loginDirectly(id, password, plugin), "login-bot-" + id);
+    }
+
+    @Override
+    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin, BotProtocol botProtocol) throws BotLoginException {
+        return this.loginDirectly(id, password, plugin);
     }
 
     @Override
@@ -68,7 +91,17 @@ public class TestBotManager extends SimpleBotManager {
         return bot;
     }
 
-    public static void remove(final Plugin plugin) {
+    @Override
+    public void removeAll() {
+        for (final Long id : BOTS.keySet())
+            this.remove(id);
+        //remove default bot
+        final Bot b = BOTS.remove(FocessQQ.getBot().getId());
+        if (b != null)
+            b.logout();
+    }
+
+    public void remove(final Plugin plugin) {
         for (final Bot b : PLUGIN_BOT_MAP.getOrDefault(plugin, Lists.newArrayList()))
             FocessQQ.getBotManager().remove(b.getId());
         PLUGIN_BOT_MAP.remove(plugin);

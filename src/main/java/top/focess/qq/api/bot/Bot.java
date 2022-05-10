@@ -15,13 +15,6 @@ import java.util.List;
 public interface Bot {
 
     /**
-     * Get the Mirai Bot Instance
-     *
-     * @return the Mirai Bot Instance
-     */
-    net.mamoe.mirai.Bot getNativeBot();
-
-    /**
      * Relogin the bot
      *
      * @return true if the bot is online, false otherwise
@@ -150,4 +143,10 @@ public interface Bot {
     default boolean isOffline() {
         return !isOnline();
     }
+
+    /**
+     * Get the Bot Manager of the bot
+     * @return the Bot Manager of the bot
+     */
+    BotManager getBotManager();
 }

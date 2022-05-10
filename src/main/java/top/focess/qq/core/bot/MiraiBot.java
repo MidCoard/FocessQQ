@@ -1,12 +1,12 @@
 package top.focess.qq.core.bot;
 
+import net.mamoe.mirai.Bot;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
-import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.Bot;
-import top.focess.qq.api.bot.BotLoginException;
+import top.focess.qq.api.bot.BotManager;
+import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.plugin.Plugin;
@@ -17,43 +17,29 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SimpleBot implements Bot {
+public class MiraiBot extends QQBot {
 
-    private final long username;
-    private final String password;
-    private final Plugin plugin;
-    private net.mamoe.mirai.Bot nativeBot;
-
-    public SimpleBot(final long username, final String password, final net.mamoe.mirai.Bot bot, final Plugin plugin) {
-        this.username = username;
-        this.password = password;
-        this.nativeBot = bot;
-        this.plugin = plugin;
+    public BotProtocol getBotProtocol() {
+        return botProtocol;
     }
 
-    @Override
-    public net.mamoe.mirai.Bot getNativeBot() {
+    private final BotProtocol botProtocol;
+    private Bot nativeBot;
+
+    public MiraiBot(final long username, final String password, final Bot bot, BotProtocol botProtocol, final Plugin plugin, final BotManager botManager) {
+        super(username, password, plugin, botProtocol, botManager);
+        this.nativeBot = bot;
+        this.botProtocol = botProtocol;
+    }
+
+    public Bot getNativeBot() {
         return this.nativeBot;
     }
 
-    public void setNativeBot(final net.mamoe.mirai.Bot nativeBot) {
+    public void setNativeBot(final Bot nativeBot) {
         this.nativeBot = nativeBot;
     }
 
-    @Override
-    public boolean relogin() throws BotLoginException {
-        return FocessQQ.getBotManager().relogin(this);
-    }
-
-    @Override
-    public boolean login() throws BotLoginException {
-        return FocessQQ.getBotManager().login(this);
-    }
-
-    @Override
-    public boolean logout() {
-        return FocessQQ.getBotManager().logout(this);
-    }
 
     @Override
     public @NonNull Friend getFriendOrFail(final long id) {
@@ -98,50 +84,6 @@ public class SimpleBot implements Bot {
     @NotNull
     public Friend getAsFriend() {
         return Objects.requireNonNull(SimpleFriend.get(this, this.nativeBot.getAsFriend()));
-    }
-
-    @Override
-    public long getId() {
-        return this.nativeBot.getId();
-    }
-
-    @Override
-    public boolean isDefaultBot() {
-        return FocessQQ.getBot().equals(this);
-    }
-
-    public long getUsername() {
-        return this.username;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
-
-        final SimpleBot simpleBot = (SimpleBot) o;
-
-        return Objects.equals(this.nativeBot, simpleBot.nativeBot);
-    }
-
-    @Override
-    public int hashCode() {
-        return this.nativeBot != null ? this.nativeBot.hashCode() : 0;
-    }
-
-    public Plugin getPlugin() {
-        return this.plugin;
-    }
-
-    @Override
-    public boolean isAdministrator() {
-        if (FocessQQ.getAdministratorId() == null)
-            return false;
-        return this.getId() == FocessQQ.getAdministratorId();
     }
 
 }

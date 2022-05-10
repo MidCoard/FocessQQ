@@ -32,7 +32,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.logger.FocessLogger;
-import top.focess.qq.core.bot.SimpleBotManager;
+import top.focess.qq.core.bot.BotManagerFactory;
 import top.focess.qq.core.commands.*;
 import top.focess.qq.core.commands.special.*;
 import top.focess.qq.core.listeners.ChatListener;
@@ -97,7 +97,7 @@ public class FocessQQ {
     /**
      * The Bot Manager
      */
-    private static final BotManager BOT_MANAGER = new SimpleBotManager();
+    private static BotManager botManager;
     private static final Scheduler SCHEDULER = new FocessScheduler("FocessQQ");
     /**
      * The lang config
@@ -261,7 +261,7 @@ public class FocessQQ {
 
     @NonNull
     public static BotManager getBotManager() {
-        return BOT_MANAGER;
+        return botManager;
     }
 
     @Nullable
@@ -397,7 +397,8 @@ public class FocessQQ {
                 new OptionParserClassifier("multi"),
                 new OptionParserClassifier("admin", LongOptionType.LONG_OPTION_TYPE),
                 new OptionParserClassifier("noDefaultPluginLoad"),
-                new OptionParserClassifier("debug")
+                new OptionParserClassifier("debug"),
+                new OptionParserClassifier("botManager", OptionType.DEFAULT_OPTION_TYPE)
         );
         Option option = options.get("help");
         if (option != null) {
@@ -412,12 +413,20 @@ public class FocessQQ {
             getLogger().info("--multi");
             getLogger().info("--noDefaultPluginLoad");
             getLogger().info("--debug");
+            getLogger().info("--botManager <name>");
             saveLogFile();
             getLogger().debugLang("save-log");
             exit();
             return;
         }
         getLogger().infoLang("start-main", getVersion());
+        option = options.get("botManager");
+        if (option != null)
+            try {
+                botManager = Objects.requireNonNull(BotManagerFactory.get(option.get(OptionType.DEFAULT_OPTION_TYPE)));
+            } catch (final Exception e) {
+                botManager = Objects.requireNonNull(BotManagerFactory.get());
+            }
         option = options.get("user");
         if (option != null) {
             username = option.get(LongOptionType.LONG_OPTION_TYPE);
@@ -714,10 +723,8 @@ public class FocessQQ {
             if (CommandLine.unregisterAll())
                 getLogger().debugLang("special-argument-handlers-not-empty");
             getLogger().debugLang("unregister-all-special-argument-handlers");
-            if (bot != null) {
-                SimpleBotManager.removeAll();
-                getLogger().debugLang("remove-all-bots");
-            }
+            BotManagerFactory.removeAll();
+            getLogger().debugLang("remove-all-bots");
             for (final String key : properties.keySet())
                 this.getDefaultConfig().set(key, properties.get(key));
             this.getDefaultConfig().save();

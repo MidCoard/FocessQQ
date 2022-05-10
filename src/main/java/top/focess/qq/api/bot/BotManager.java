@@ -119,4 +119,15 @@ public interface BotManager {
      * @return the previous bot
      */
     Bot remove(long id);
+
+    /**
+     * Remove all the bots
+     */
+    void removeAll();
+
+    /**
+     * Remove all the bots logined by the plugin
+     * @param plugin the plugin
+     */
+    void remove(Plugin plugin);
 }
