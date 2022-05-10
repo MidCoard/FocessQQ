@@ -13,9 +13,12 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
 
     private final String name;
 
-    private SimpleGroup(final Bot bot, final long id, String name) {
+    private final String avatarUrl;
+
+    public SimpleGroup(final Bot bot, final long id, String name, String avatarUrl) {
         super(bot, id);
         this.name = name;
+        this.avatarUrl = avatarUrl;
     }
 
     @Override
@@ -48,6 +51,10 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
     @Override
     public Member getAsMember() {
         return this.getBot().getAsMember(this);
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
 }

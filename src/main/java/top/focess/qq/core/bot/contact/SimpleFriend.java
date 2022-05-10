@@ -9,7 +9,7 @@ public class SimpleFriend extends SimpleSpeaker implements Friend {
     private final String avatarUrl;
     private final String rawName;
 
-    private SimpleFriend(final Bot bot, long id, String name, String rawName, String avatarUrl) {
+    public SimpleFriend(final Bot bot, long id, String name, String rawName, String avatarUrl) {
         super(bot, id);
         this.name = name;
         this.rawName = rawName;

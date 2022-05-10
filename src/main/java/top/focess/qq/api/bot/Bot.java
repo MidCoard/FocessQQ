@@ -159,12 +159,14 @@ public interface Bot {
 
     Image uploadImage(Transmitter transmitter, InputStream resource);
 
+    @Nullable
     Audio uploadAudio(Speaker speaker, InputStream inputStream);
 
     void deleteFriend(Friend friend);
 
     void quitGroup(Group group);
 
+    @Nullable
     Member getMember(Group group, long id);
 
     Member getMemberOrFail(Group group, long id);

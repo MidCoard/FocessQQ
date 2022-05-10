@@ -10,20 +10,20 @@ import java.util.stream.Stream;
 /**
  * Represents a message chain.
  */
-public class MessageChain extends Message implements Iterable<Message> {
+public class MessageChain implements Message,Iterable<Message> {
 
     private final List<Message> messageList;
 
-    public MessageChain(Message... messages) {
+    MessageChain(Message... messages) {
         this.messageList = Lists.newArrayList(messages);
     }
 
-    public MessageChain(MessageChain messageChain, Message message) {
+    MessageChain(MessageChain messageChain, Message message) {
         this.messageList = Lists.newArrayList(messageChain.messageList);
         this.messageList.add(message);
     }
 
-    public MessageChain(Message message, MessageChain messageChain) {
+    MessageChain(Message message, MessageChain messageChain) {
         this.messageList = Lists.newArrayList(message);
         this.messageList.addAll(messageChain.messageList);
     }
@@ -66,6 +66,14 @@ public class MessageChain extends Message implements Iterable<Message> {
     @Override
     public String toString() {
         return this.messageList.toString();
+    }
+
+    /**
+     * Indicates whether this message chain is empty
+     * @return true if this message chain is empty, false otherwise
+     */
+    public boolean isEmpty() {
+        return this.messageList.isEmpty();
     }
 
     @Override
