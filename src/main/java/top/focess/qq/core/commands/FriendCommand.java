@@ -9,9 +9,9 @@ import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Friend;
-import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandSender;
+import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class FriendCommand extends Command {
                     ioHandler.outputLang("friend-command-friend-not-found");
                     return CommandResult.REFUSE;
                 }
-                friend.sendMessage(Message.of(MiraiCode.deserializeMiraiCode(message)));
+                friend.sendMessage(new MiraiMessage(MiraiCode.deserializeMiraiCode(message)));
                 ioHandler.outputLang("friend-command-send-success",friendId);
             } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("friend-command-input-timeout");

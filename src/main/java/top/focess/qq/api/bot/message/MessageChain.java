@@ -1,7 +1,9 @@
 package top.focess.qq.api.bot.message;
 
 import com.google.common.collect.Lists;
+import net.mamoe.mirai.message.code.MiraiCode;
 import org.jetbrains.annotations.NotNull;
+import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 
 import java.util.Iterator;
 import java.util.List;
@@ -84,8 +86,20 @@ public class MessageChain implements Message,Iterable<Message> {
 
     @Override
     public String toMiraiCode() {
-        //todo
-        return null;
+        if (this.isEmpty())
+            return "";
+        Message first = this.messageList.get(0);
+        if (first instanceof MiraiMessage) {
+            net.mamoe.mirai.message.data.Message message = ((MiraiMessage) first).getMessage();
+            for (int i = 1; i < this.messageList.size(); i++) {
+                Message next = this.messageList.get(i);
+                if (next instanceof MiraiMessage)
+                    message = message.plus(((MiraiMessage) next).getMessage());
+                else throw new IllegalArgumentException("MessageChain can only contain MiraiMessage");
+            }
+            return MiraiCode.serializeToMiraiCode(new net.mamoe.mirai.message.data.Message[]{message});
+        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

@@ -9,9 +9,9 @@ import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
-import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandSender;
+import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 
 import java.util.List;
 
@@ -55,7 +55,7 @@ public class GroupCommand extends Command {
                     ioHandler.outputLang("group-command-group-not-found", groupId);
                     return CommandResult.REFUSE;
                 }
-                group.sendMessage(Message.of(MiraiCode.deserializeMiraiCode(message)));
+                group.sendMessage(new MiraiMessage(MiraiCode.deserializeMiraiCode(message)));
                 ioHandler.outputLang("group-command-send-success",groupId);
             } catch (final InputTimeoutException exception) {
                 ioHandler.outputLang("group-command-input-timeout");
