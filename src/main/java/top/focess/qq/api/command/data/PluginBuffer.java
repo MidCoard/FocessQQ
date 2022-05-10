@@ -44,7 +44,7 @@ public class PluginBuffer extends DataBuffer<Plugin> {
     @NotNull
     @Override
     public Plugin get() {
-        String name = this.stringBuffer.get();
+        final String name = this.stringBuffer.get();
         try {
             return Objects.requireNonNull(Plugin.getPlugin(name));
         } catch (final NullPointerException e) {
@@ -55,7 +55,7 @@ public class PluginBuffer extends DataBuffer<Plugin> {
     @NotNull
     @Override
     public Plugin get(final int index) {
-        String name = this.stringBuffer.get(index);
+        final String name = this.stringBuffer.get(index);
         try {
             return Objects.requireNonNull(Plugin.getPlugin(name));
         } catch (final NullPointerException e) {

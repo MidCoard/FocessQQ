@@ -6,5 +6,5 @@ public enum BotProtocol {
     ANDROID_PAD,
     ANDROID_WATCH,
     IPAD,
-    MACOS;
+    MACOS
 }

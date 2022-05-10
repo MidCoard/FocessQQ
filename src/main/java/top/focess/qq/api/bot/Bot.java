@@ -144,7 +144,7 @@ public interface Bot {
      * @return true if the bot is offline, false otherwise
      */
     default boolean isOffline() {
-        return !isOnline();
+        return !this.isOnline();
     }
 
     /**

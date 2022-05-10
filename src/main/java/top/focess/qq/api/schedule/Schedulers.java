@@ -61,13 +61,9 @@ public class Schedulers {
     @NotNull
     @Contract("_, _ -> new")
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize) {
-        ThreadPoolScheduler scheduler = new ThreadPoolScheduler(plugin.getName(),poolSize);
-        scheduler.setThreadUncaughtExceptionHandler((t, e) -> {
-            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName());
-        });
-        scheduler.setThreadCatchExceptionHandler((t, e) -> {
-            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e);
-        });
+        final ThreadPoolScheduler scheduler = new ThreadPoolScheduler(plugin.getName(),poolSize);
+        scheduler.setThreadUncaughtExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName()));
+        scheduler.setThreadCatchExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e));
         return new AScheduler(plugin, scheduler);
     }
 
@@ -86,13 +82,9 @@ public class Schedulers {
     @NotNull
     @Contract("_, _, _, _ -> new")
     public static Scheduler newThreadPoolScheduler(@NotNull final Plugin plugin, final int poolSize, final boolean immediate, @NotNull final String name) {
-        ThreadPoolScheduler scheduler = new ThreadPoolScheduler(poolSize, immediate, name);
-        scheduler.setThreadUncaughtExceptionHandler((t, e) -> {
-            FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName());
-        });
-        scheduler.setThreadCatchExceptionHandler((t, e) -> {
-           FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e);
-        });
+        final ThreadPoolScheduler scheduler = new ThreadPoolScheduler(poolSize, immediate, name);
+        scheduler.setThreadUncaughtExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName()));
+        scheduler.setThreadCatchExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e));
         return new AScheduler(plugin,scheduler);
     }
 

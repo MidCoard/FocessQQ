@@ -20,17 +20,17 @@ public class SimpleOtherClient extends SimpleContact implements OtherClient {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public String getDeviceKind() {
-        return deviceKind;
+        return this.deviceKind;
     }
 
     @Override
     public int getAppId() {
-        return appId;
+        return this.appId;
     }
 
 }

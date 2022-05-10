@@ -27,7 +27,7 @@ public abstract class SimpleTransmitter extends SimpleContact implements Transmi
 
 
     @Override
-    public Image uploadImage(InputStream inputStream) {
+    public Image uploadImage(final InputStream inputStream) {
         return this.getBot().uploadImage(this, inputStream);
     }
 }

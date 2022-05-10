@@ -27,7 +27,7 @@ public class TestCommand extends Command {
     public void init() {
         this.setExecutorPermission(i->i.isConsole() || i.isAdministrator());
         this.addExecutor((sender,dataCollection,ioHandler)->{
-            for (Plugin plugin : Plugin.getPlugins())
+            for (final Plugin plugin : Plugin.getPlugins())
                 if (plugin != FocessQQ.getMainPlugin())
                     CommandLine.exec("unload " + plugin.getName());
             ioHandler.output("unload all plugins");
@@ -36,10 +36,10 @@ public class TestCommand extends Command {
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             ioHandler.output("please input one message");
             try {
-                String input = ioHandler.input();
+                final String input = ioHandler.input();
                 ioHandler.output("you input: " + input);
                 ioHandler.output("please input one integer");
-                Integer input2 = ioHandler.input(DataConverter.INTEGER_DATA_CONVERTER);
+                final Integer input2 = ioHandler.input(DataConverter.INTEGER_DATA_CONVERTER);
                 if (input2 == null)
                     ioHandler.output("input error");
                 else {
@@ -52,19 +52,19 @@ public class TestCommand extends Command {
                         ioHandler.hasInput(true, 10);
                         try {
                             ioHandler.output("You input: " + ioHandler.input());
-                        } catch (InputTimeoutException e) {
+                        } catch (final InputTimeoutException e) {
                             ioHandler.output("input timeout for 10 seconds");
                         }
                     }
                 }
-            } catch (InputTimeoutException e) {
+            } catch (final InputTimeoutException e) {
                 ioHandler.output("input timeout");
             }
             return CommandResult.ALLOW;
         }, CommandArgument.of("input"));
         this.addExecutor((sender, dataCollection, ioHandler) -> {
             System.out.println(FocessTask.getTasks());
-            for (Scheduler scheduler : AScheduler.getSchedulers()) {
+            for (final Scheduler scheduler : AScheduler.getSchedulers()) {
                 ioHandler.output("scheduler: " + scheduler.getName());
                 ioHandler.output("scheduler remaining tasks" + scheduler.getRemainingTasks());
             }
@@ -79,7 +79,7 @@ public class TestCommand extends Command {
 
     @NotNull
     @Override
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: test");
     }
 }

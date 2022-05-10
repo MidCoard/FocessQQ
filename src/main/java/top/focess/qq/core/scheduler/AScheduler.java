@@ -26,15 +26,11 @@ public class AScheduler implements Scheduler {
     private final Plugin plugin;
     private final Scheduler scheduler;
 
-    public AScheduler(Plugin plugin, Scheduler scheduler) {
+    public AScheduler(final Plugin plugin, final Scheduler scheduler) {
         this.plugin = plugin;
         this.scheduler = scheduler;
-        this.scheduler.setUncaughtExceptionHandler((t, e) -> {
-            FocessQQ.getLogger().thrLang("exception-scheduler-uncaught", e, this.getName());
-        });
-        this.scheduler.setCatchExceptionHandler((t, e) -> {
-            FocessQQ.getLogger().thrLang("exception-scheduler", e, this.getName());
-        });
+        this.scheduler.setUncaughtExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-scheduler-uncaught", e, this.getName()));
+        this.scheduler.setCatchExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-scheduler", e, this.getName()));
         PLUGIN_SCHEDULER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newCopyOnWriteArrayList();
@@ -44,36 +40,36 @@ public class AScheduler implements Scheduler {
     }
 
     public Plugin getPlugin() {
-        return plugin;
+        return this.plugin;
     }
 
     @Override
-    public Task run(Runnable runnable, Duration delay) {
+    public Task run(final Runnable runnable, final Duration delay) {
         return this.scheduler.run(runnable, delay);
     }
 
     @Override
-    public Task run(Runnable runnable, Duration duration, String name) {
+    public Task run(final Runnable runnable, final Duration duration, final String name) {
         return this.scheduler.run(runnable, duration, name);
     }
 
     @Override
-    public Task runTimer(Runnable runnable, Duration delay, Duration period) {
+    public Task runTimer(final Runnable runnable, final Duration delay, final Duration period) {
         return this.scheduler.runTimer(runnable, delay, period);
     }
 
     @Override
-    public Task runTimer(Runnable runnable, Duration delay, Duration period, String name) {
+    public Task runTimer(final Runnable runnable, final Duration delay, final Duration period, final String name) {
         return this.scheduler.runTimer(runnable, delay, period, name);
     }
 
     @Override
-    public <V> Callback<V> submit(Callable<V> callable, Duration delay) {
+    public <V> Callback<V> submit(final Callable<V> callable, final Duration delay) {
         return this.scheduler.submit(callable, delay);
     }
 
     @Override
-    public <V> Callback<V> submit(Callable<V> callable, Duration duration, String name) {
+    public <V> Callback<V> submit(final Callable<V> callable, final Duration duration, final String name) {
         return this.scheduler.submit(callable, duration, name);
     }
 
@@ -108,7 +104,7 @@ public class AScheduler implements Scheduler {
     }
 
     @Override
-    public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler uncaughtExceptionHandler) {
+    public void setUncaughtExceptionHandler(final Thread.UncaughtExceptionHandler uncaughtExceptionHandler) {
         this.scheduler.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     }
 
@@ -124,7 +120,7 @@ public class AScheduler implements Scheduler {
     }
 
     @Override
-    public void setCatchExceptionHandler(CatchExceptionHandler catchExceptionHandler) {
+    public void setCatchExceptionHandler(final CatchExceptionHandler catchExceptionHandler) {
         this.scheduler.setCatchExceptionHandler(catchExceptionHandler);
     }
 
@@ -134,12 +130,12 @@ public class AScheduler implements Scheduler {
     }
 
     @Override
-    public Task run(Runnable runnable, Duration duration, String s, Consumer<ExecutionException> consumer) {
+    public Task run(final Runnable runnable, final Duration duration, final String s, final Consumer<ExecutionException> consumer) {
         return this.scheduler.run(runnable, duration, s, consumer);
     }
 
     @Override
-    public <V> Callback<V> submit(Callable<V> callable, Duration duration, String s, Function<ExecutionException, V> function) {
+    public <V> Callback<V> submit(final Callable<V> callable, final Duration duration, final String s, final Function<ExecutionException, V> function) {
         return this.scheduler.submit(callable, duration, s, function);
     }
 

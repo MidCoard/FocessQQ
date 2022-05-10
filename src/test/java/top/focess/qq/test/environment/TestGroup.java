@@ -118,7 +118,7 @@ public class TestGroup implements Group {
     }
 
     @Override
-    public Audio uploadAudio(InputStream inputStream) {
+    public @org.checkerframework.checker.nullness.qual.Nullable Audio uploadAudio(InputStream inputStream) {
         throw new UnsupportedOperationException();
     }
 }

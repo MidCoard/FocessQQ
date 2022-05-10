@@ -22,7 +22,7 @@ public class BotManagerFactory {
         register("mirai", MiraiBotManager::new);
     }
 
-    public static void register(String name, Supplier<BotManager> supplier) {
+    public static void register(final String name, final Supplier<BotManager> supplier) {
         BOT_MANAGER_MAP.put(name, supplier);
     }
 
@@ -32,8 +32,8 @@ public class BotManagerFactory {
     }
 
     @Nullable
-    public static BotManager get(String key) {
-        BotManager botManager = BOT_MANAGER_MAP.get(key).get();
+    public static BotManager get(final String key) {
+        final BotManager botManager = BOT_MANAGER_MAP.get(key).get();
         if (botManager != null)
             BOT_MANAGER_LIST.add(botManager);
         return botManager;
@@ -43,7 +43,7 @@ public class BotManagerFactory {
         BOT_MANAGER_LIST.forEach(BotManager::removeAll);
     }
 
-    public static void remove(Plugin plugin) {
+    public static void remove(final Plugin plugin) {
         BOT_MANAGER_LIST.forEach(botManager -> botManager.remove(plugin));
     }
 }

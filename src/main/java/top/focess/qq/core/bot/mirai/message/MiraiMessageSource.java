@@ -6,11 +6,11 @@ public class MiraiMessageSource extends MessageSource {
 
     private final net.mamoe.mirai.message.data.MessageSource source;
 
-    private MiraiMessageSource(net.mamoe.mirai.message.data.MessageSource source) {
+    private MiraiMessageSource(final net.mamoe.mirai.message.data.MessageSource source) {
         this.source = source;
     }
 
-    public static MessageSource of(net.mamoe.mirai.message.data.MessageSource source) {
+    public static MessageSource of(final net.mamoe.mirai.message.data.MessageSource source) {
         return new MiraiMessageSource(source);
     }
 

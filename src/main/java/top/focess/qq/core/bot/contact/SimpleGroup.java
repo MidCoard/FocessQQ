@@ -15,7 +15,7 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
 
     private final String avatarUrl;
 
-    public SimpleGroup(final Bot bot, final long id, String name, String avatarUrl) {
+    public SimpleGroup(final Bot bot, final long id, final String name, final String avatarUrl) {
         super(bot, id);
         this.name = name;
         this.avatarUrl = avatarUrl;
@@ -54,7 +54,7 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
     }
 
     public String getAvatarUrl() {
-        return avatarUrl;
+        return this.avatarUrl;
     }
 
 }

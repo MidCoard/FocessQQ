@@ -27,7 +27,7 @@ public class PauseCommand extends Command {
 
     @NotNull
     @Override
-    public List<String> usage(CommandSender sender) {
+    public List<String> usage(final CommandSender sender) {
         return Lists.newArrayList("Use: pause");
     }
 }

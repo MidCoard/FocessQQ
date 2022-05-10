@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
-    private static boolean pauseMode = false;
+    private static boolean pauseMode;
     public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean, Task>>>> QUESTS = Maps.newConcurrentMap();
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 5, true, "ChatListener");
 
@@ -44,7 +44,7 @@ public class ChatListener implements Listener {
      * @param flag          true if you want to get the string value of this message, false if you want to get MiraiCode of this message
      * @param task          the timeout task
      */
-    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final boolean flag, Task task) {
+    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final boolean flag, final Task task) {
         QUESTS.compute(commandSender, (k, v) -> {
             if (v == null)
                 v = Queues.newLinkedBlockingDeque();

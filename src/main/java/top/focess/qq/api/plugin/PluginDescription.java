@@ -83,11 +83,11 @@ public class PluginDescription {
     }
 
     public List<String> getDependencies() {
-        return dependencies;
+        return this.dependencies;
     }
 
     public List<String> getSoftDependencies() {
-        return softDependencies;
+        return this.softDependencies;
     }
 
 
@@ -104,10 +104,10 @@ public class PluginDescription {
     }
 
     public Version getRequireVersion() {
-        return requireVersion;
+        return this.requireVersion;
     }
 
     public Version getLimitVersion() {
-        return limitVersion;
+        return this.limitVersion;
     }
 }

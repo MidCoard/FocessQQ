@@ -16,22 +16,22 @@ public class MessageChain implements Message,Iterable<Message> {
 
     private final List<Message> messageList;
 
-    public MessageChain(@NotNull Message message) {
+    public MessageChain(@NotNull final Message message) {
         if (message instanceof MessageChain)
             this.messageList = Lists.newArrayList(((MessageChain) message).messageList);
          else this.messageList = Lists.newArrayList(message);
     }
 
-    MessageChain(Message... messages) {
+    MessageChain(final Message... messages) {
         this.messageList = Lists.newArrayList(messages);
     }
 
-    MessageChain(MessageChain messageChain, Message message) {
+    MessageChain(final MessageChain messageChain, final Message message) {
         this.messageList = Lists.newArrayList(messageChain.messageList);
         this.messageList.add(message);
     }
 
-    MessageChain(Message message, MessageChain messageChain) {
+    MessageChain(final Message message, final MessageChain messageChain) {
         this.messageList = Lists.newArrayList(message);
         this.messageList.addAll(messageChain.messageList);
     }
@@ -88,11 +88,11 @@ public class MessageChain implements Message,Iterable<Message> {
     public String toMiraiCode() {
         if (this.isEmpty())
             return "";
-        Message first = this.messageList.get(0);
+        final Message first = this.messageList.get(0);
         if (first instanceof MiraiMessage) {
             net.mamoe.mirai.message.data.Message message = ((MiraiMessage) first).getMessage();
             for (int i = 1; i < this.messageList.size(); i++) {
-                Message next = this.messageList.get(i);
+                final Message next = this.messageList.get(i);
                 if (next instanceof MiraiMessage)
                     message = message.plus(((MiraiMessage) next).getMessage());
                 else throw new IllegalArgumentException("MessageChain can only contain MiraiMessage");

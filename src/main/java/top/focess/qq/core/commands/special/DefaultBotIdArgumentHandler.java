@@ -8,7 +8,7 @@ import top.focess.qq.api.command.SpecialArgumentHandler;
 
 public class DefaultBotIdArgumentHandler implements SpecialArgumentHandler {
     @Override
-    public @NonNull String handle(CommandSender sender, Command command, String[] args, int i) {
+    public @NonNull String handle(final CommandSender sender, final Command command, final String[] args, final int i) {
         return String.valueOf(FocessQQ.getBot().getId());
     }
 }

@@ -49,7 +49,7 @@ public class CommandExecutedEvent extends Event {
      * @param sender    the executor
      * @param result    the result
      */
-    public CommandExecutedEvent(Command command, @NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
+    public CommandExecutedEvent(final Command command, @NotNull final String[] args, final IOHandler ioHandler, final CommandSender sender, final CommandResult result) {
         this.command = command;
         this.args = args;
         this.ioHandler = ioHandler;
@@ -75,6 +75,6 @@ public class CommandExecutedEvent extends Event {
     }
 
     public Command getCommand() {
-        return command;
+        return this.command;
     }
 }

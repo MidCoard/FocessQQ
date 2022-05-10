@@ -61,8 +61,8 @@ public class PluginClassLoader extends URLClassLoader {
     private final boolean ignoreSoftDependencies;
 
     public static void loadSoftDependentPlugins() {
-        for (String dependency : AFTER_PLUGINS_MAP.keySet())
-            for (Pair<File, Boolean> pair : AFTER_PLUGINS_MAP.get(dependency)){
+        for (final String dependency : AFTER_PLUGINS_MAP.keySet())
+            for (final Pair<File, Boolean> pair : AFTER_PLUGINS_MAP.get(dependency)){
                 if (!pair.getRight()) {
                     try {
                         final PluginClassLoader pluginClassLoader = new PluginClassLoader(pair.getFirst(), true);
@@ -72,7 +72,7 @@ public class PluginClassLoader extends URLClassLoader {
                             FocessQQ.getLogger().infoLang("load-soft-depend-plugin-failed", pair.getFirst().getName());
                             pluginClassLoader.close();
                         }
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         FocessQQ.getLogger().thrLang("exception-load-soft-depend-plugin",e, pair.getFirst().getName());
                     }
                 }
@@ -146,13 +146,13 @@ public class PluginClassLoader extends URLClassLoader {
                     final Plugin plugin = classLoader.plugin;
                     final Command command = (Command) PROVIDER.newInstance(c);
                     if (!commandType.name().isEmpty()) {
-                        top.focess.command.Command command1 = new top.focess.command.Command(commandType.name(),commandType.aliases()) {
+                        final top.focess.command.Command command1 = new top.focess.command.Command(commandType.name(),commandType.aliases()) {
                             @Override
                             public void init() {
                             }
 
                             @Override
-                            public @NotNull List<String> usage(top.focess.command.CommandSender commandSender) {
+                            public @NotNull List<String> usage(final top.focess.command.CommandSender commandSender) {
                                 return command.usage((CommandSender) commandSender);
                             }
                         };
@@ -229,7 +229,7 @@ public class PluginClassLoader extends URLClassLoader {
         this(file, false);
     }
 
-    public PluginClassLoader(@NotNull final File file, boolean ignoreSoftDependencies) throws IOException {
+    public PluginClassLoader(@NotNull final File file, final boolean ignoreSoftDependencies) throws IOException {
         super(new URL[]{file.toURI().toURL()}, PluginCoreClassLoader.DEFAULT_CLASS_LOADER);
         this.ignoreSoftDependencies = ignoreSoftDependencies;
         this.file = file;
@@ -294,7 +294,7 @@ public class PluginClassLoader extends URLClassLoader {
                     FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
             }
             section.stop();
-            String name = plugin.getName();
+            final String name = plugin.getName();
             GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1), name);
             return file;
         }  else return disablePlugin0(plugin);

@@ -9,7 +9,7 @@ public class MiraiMessage implements Message {
 
     private final net.mamoe.mirai.message.data.Message message;
 
-    public MiraiMessage(net.mamoe.mirai.message.data.Message message) {
+    public MiraiMessage(final net.mamoe.mirai.message.data.Message message) {
         this.message = message;
     }
 

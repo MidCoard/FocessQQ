@@ -111,12 +111,12 @@ public class FocessQQ {
         while (true) {
             try {
                 if (!(System.in.available() == 0)) break;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 return false;
             }
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 return false;
             }
         }
@@ -603,8 +603,8 @@ public class FocessQQ {
             if (properties == null)
                 properties = Maps.newHashMap();
             getLogger().debugLang("load-default-properties");
-            this.registerListener(consoleListener = new ConsoleListener());
-            this.registerListener(chatListener = new ChatListener());
+            this.registerListener(this.consoleListener = new ConsoleListener());
+            this.registerListener(this.chatListener = new ChatListener());
             this.registerListener(new PluginListener());
             getLogger().debugLang("register-default-listeners");
             this.registerBuffer(PluginDataConverter.PLUGIN_DATA_CONVERTER, PluginBuffer::allocate);
@@ -682,10 +682,10 @@ public class FocessQQ {
                 getLogger().thrLang("exception-submit-server-stop-event", e);
             }
             // first unregister listener then clear all input requests, because the listener may influence the input requests, especially ConsoleListener and ChatListener
-            if (consoleListener != null)
-                consoleListener.unregister();
-            if (chatListener != null)
-                chatListener.unregister();
+            if (this.consoleListener != null)
+                this.consoleListener.unregister();
+            if (this.chatListener != null)
+                this.chatListener.unregister();
             Pair<IOHandler, Task> consoleElement;
             while ((consoleElement = ConsoleListener.QUESTS.poll()) != null) {
                 if (consoleElement.getValue().cancel())

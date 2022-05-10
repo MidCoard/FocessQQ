@@ -36,14 +36,14 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
         }
 
         @Override
-        public synchronized boolean hasInput(boolean flag) {
-            ConsoleListener.registerInputListener(this,SCHEDULER.run(() -> input((String) null),Duration.ofMinutes(10),"input-10-min"));
+        public synchronized boolean hasInput(final boolean flag) {
+            ConsoleListener.registerInputListener(this,SCHEDULER.run(() -> this.input((String) null),Duration.ofMinutes(10),"input-10-min"));
             return super.hasInput(flag);
         }
 
         @Override
-        public synchronized boolean hasInput(boolean flag, int seconds) {
-            ConsoleListener.registerInputListener(this, SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
+        public synchronized boolean hasInput(final boolean flag, final int seconds) {
+            ConsoleListener.registerInputListener(this, SCHEDULER.run(() -> this.input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
             return super.hasInput(flag);
         }
     };
@@ -56,8 +56,8 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
      * @throws InputTimeoutException if the input timeout
      */
     @Nullable
-    public <T> T input(DataConverter<T> dataConverter) throws InputTimeoutException {
-        String input = input();
+    public <T> T input(final DataConverter<T> dataConverter) throws InputTimeoutException {
+        final String input = this.input();
         if (dataConverter.accept(input))
             return dataConverter.convert(input);
         return null;
@@ -71,7 +71,7 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
         CONSOLE_IO_HANDLER = consoleIoHandler;
     }
 
-    public void async(Consumer<IOHandler> consumer) {
+    public void async(final Consumer<IOHandler> consumer) {
         ASYNC_SCHEDULER.run(() -> consumer.accept(this), "async");
     }
 

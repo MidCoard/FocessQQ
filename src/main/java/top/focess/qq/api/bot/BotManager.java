@@ -33,7 +33,7 @@ public interface BotManager {
      * @return the bot
      */
     @NotNull
-    default Future<Bot> login(long id, String password, Plugin plugin) {
+    default Future<Bot> login(final long id, final String password, final Plugin plugin) {
         return this.login(id, password, plugin, BotProtocol.ANDROID_PAD);
     }
 
@@ -65,7 +65,7 @@ public interface BotManager {
      * @throws BotLoginException if the bot login failed
      */
     @NotNull
-    default Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException {
+    default Bot loginDirectly(final long id, final String password, final Plugin plugin) throws BotLoginException {
         return this.loginDirectly(id, password, plugin, BotProtocol.ANDROID_PAD);
     }
 

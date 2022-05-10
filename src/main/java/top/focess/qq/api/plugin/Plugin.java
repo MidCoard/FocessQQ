@@ -73,7 +73,7 @@ public abstract class Plugin implements FocessSerializable {
     private boolean isEnabled;
 
 
-    private boolean initialized = false;
+    private boolean initialized;
 
     /**
      * Initialize a Plugin Instance.
@@ -277,14 +277,14 @@ public abstract class Plugin implements FocessSerializable {
     @Nullable
     @Override
     public Map<String, Object> serialize() {
-        Map<String,Object> map = Maps.newHashMap();
+        final Map<String,Object> map = Maps.newHashMap();
         map.put("name",this.name);
         return map;
     }
 
     @Nullable
-    public static Plugin deserialize(Map<String,Object> map){
-        return Plugin.getPlugin((String) map.get("name"));
+    public static Plugin deserialize(final Map<String,Object> map){
+        return getPlugin((String) map.get("name"));
     }
 
     /**
@@ -303,7 +303,7 @@ public abstract class Plugin implements FocessSerializable {
      * @return true if the plugin is initialized, false otherwise
      */
     public boolean isInitialized() {
-        return initialized;
+        return this.initialized;
     }
 
     public void initialize() {

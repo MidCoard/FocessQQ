@@ -1,5 +1,6 @@
 package top.focess.qq.api.bot.contact;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.message.Audio;
 
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.io.InputStream;
  */
 public interface Speaker extends Transmitter {
 
+    @Nullable
     Audio uploadAudio(InputStream inputStream);
 
 }

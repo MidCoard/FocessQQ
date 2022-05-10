@@ -26,8 +26,8 @@ public interface CommandExecutor extends top.focess.command.CommandExecutor {
 
     @Override
     @NotNull
-    default CommandResult execute(top.focess.command.CommandSender commandSender, DataCollection dataCollection, @NotNull top.focess.command.IOHandler ioHandler) {
-        return execute((CommandSender) commandSender, dataCollection,(IOHandler) ioHandler);
+    default CommandResult execute(final top.focess.command.CommandSender commandSender, final DataCollection dataCollection, @NotNull final top.focess.command.IOHandler ioHandler) {
+        return this.execute((CommandSender) commandSender, dataCollection,(IOHandler) ioHandler);
     }
 
 }

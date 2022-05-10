@@ -13,7 +13,7 @@ public class SimpleMember extends SimpleContact implements Member {
     private final String cardName;
     private final CommandPermission commandPermission;
 
-    public SimpleMember(@NotNull final Group group,long id, String name, String rawName, String cardName, CommandPermission permission) {
+    public SimpleMember(@NotNull final Group group, final long id, final String name, final String rawName, final String cardName, final CommandPermission permission) {
         super(group.getBot(), id);
         this.simpleGroup = group;
         this.name = name;

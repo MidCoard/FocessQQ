@@ -206,9 +206,9 @@ public class CommandSender extends top.focess.command.CommandSender {
 
     @Override
     public int hashCode() {
-        int result = member != null ? member.hashCode() : 0;
-        result = 31 * result + (friend != null ? friend.hashCode() : 0);
-        result = 31 * result + (stranger != null ? stranger.hashCode() : 0);
+        int result = this.member != null ? this.member.hashCode() : 0;
+        result = 31 * result + (this.friend != null ? this.friend.hashCode() : 0);
+        result = 31 * result + (this.stranger != null ? this.stranger.hashCode() : 0);
         return result;
     }
 
@@ -248,14 +248,14 @@ public class CommandSender extends top.focess.command.CommandSender {
             }
 
             @Override
-            public synchronized boolean hasInput(boolean flag, int seconds) {
-                ChatListener.registerInputListener(this, CommandSender.this, flag,IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
+            public synchronized boolean hasInput(final boolean flag, final int seconds) {
+                ChatListener.registerInputListener(this, CommandSender.this, flag,IOHandler.SCHEDULER.run(() -> this.input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
                 return super.hasInput(flag);
             }
 
             @Override
             public synchronized boolean hasInput(final boolean flag) {
-                ChatListener.registerInputListener(this, CommandSender.this, flag, IOHandler.SCHEDULER.run(() -> input((String) null), Duration.ofMinutes(10), "input-10-min"));
+                ChatListener.registerInputListener(this, CommandSender.this, flag, IOHandler.SCHEDULER.run(() -> this.input((String) null), Duration.ofMinutes(10), "input-10-min"));
                 return super.hasInput(flag);
             }
 

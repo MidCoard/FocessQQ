@@ -65,7 +65,7 @@ public class CommandLine {
     @NotNull
     public static Future<CommandResult> exec(final CommandSender sender, final String command, final IOHandler ioHandler) {
         // not check sender's bot
-        int id = COMMAND_ID.getAndIncrement();
+        final int id = COMMAND_ID.getAndIncrement();
         FocessQQ.getLogger().debugLang("command-line-exec",sender.toString(), command, id);
         if (sender == CommandSender.CONSOLE)
             FocessQQ.getLogger().consoleInput(command);
@@ -156,7 +156,7 @@ public class CommandLine {
         return new Pair<>(name, args);
     }
 
-    private static Future<CommandResult> exec0(final CommandSender sender, final String command, final String[] args, final IOHandler ioHandler, final String rawCommand, int id) {
+    private static Future<CommandResult> exec0(final CommandSender sender, final String command, final String[] args, final IOHandler ioHandler, final String rawCommand, final int id) {
         FocessQQ.getLogger().debugLang("command-pre-exec", sender.toString(), command, Arrays.toString(args),id);
         boolean flag = false;
         Future<CommandResult> ret = CompletableFuture.completedFuture(CommandResult.NONE);
@@ -179,7 +179,7 @@ public class CommandLine {
                 flag = true;
                 ret = EXECUTOR.submit(() -> {
                     try {
-                        CommandResult result = com.execute(sender, args, ioHandler,id,rawCommand);
+                        final CommandResult result = com.execute(sender, args, ioHandler,id,rawCommand);
                         FocessQQ.getLogger().debugLang("command-after-exec", sender.toString(), command, Arrays.toString(args), result.toString(), id);
                         return result;
                     } catch (final Exception e) {
@@ -188,7 +188,7 @@ public class CommandLine {
                         return CommandResult.REFUSE_EXCEPTION;
                     }
                 },"execute-" + command + "-with-" + id, (exception) -> {
-                    Throwable e = exception.getCause();
+                    final Throwable e = exception.getCause();
                     ioHandler.outputLang("command-execute-exception", e.getMessage());
                     FocessQQ.getLogger().thrLang("exception-command-execute", e);
                     return CommandResult.REFUSE_EXCEPTION;

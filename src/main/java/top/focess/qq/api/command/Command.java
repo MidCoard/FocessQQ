@@ -53,7 +53,7 @@ public abstract class Command {
             }
 
             @Override
-            public @NotNull List<String> usage(top.focess.command.CommandSender commandSender) {
+            public @NotNull List<String> usage(final top.focess.command.CommandSender commandSender) {
                 return Command.this.usage((CommandSender) commandSender);
             }
         };
@@ -188,7 +188,7 @@ public abstract class Command {
      *
      * @throws Exception the exception that occurred when executing the command
      */
-    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler, int id, String rawCommand) throws Exception {
+    public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler, final int id, final String rawCommand) throws Exception {
         final CommandPrepostEvent event = new CommandPrepostEvent(sender, this, args, ioHandler);
         try {
             EventManager.submit(event);
@@ -198,9 +198,9 @@ public abstract class Command {
         // if not want to execute, it should be cancelled
         if (event.isCancelled())
             return CommandResult.NONE;
-        FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), command, Arrays.toString(args),id);
+        FocessQQ.getLogger().debugLang("command-before-exec", sender.toString(), this.command, Arrays.toString(args),id);
         sender.getSession().set("@previous_command", rawCommand);
-        CommandResult result = this.command.execute(sender, args,ioHandler);
+        final CommandResult result = this.command.execute(sender, args,ioHandler);
         if (result.isExecuted()) {
             final CommandExecutedEvent event2 = new CommandExecutedEvent(this,args, ioHandler, sender, result);
             try {

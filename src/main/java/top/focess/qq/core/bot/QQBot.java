@@ -17,7 +17,7 @@ public abstract class QQBot implements Bot {
     private final BotManager botManager;
     private final BotProtocol botProtocol;
 
-    public QQBot(long username, String password, Plugin plugin, BotProtocol botProtocol, BotManager botManager) {
+    public QQBot(final long username, final String password, final Plugin plugin, final BotProtocol botProtocol, final BotManager botManager) {
         this.username = username;
         this.password = password;
         this.plugin = plugin;
@@ -68,20 +68,20 @@ public abstract class QQBot implements Bot {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
 
-        QQBot qqBot = (QQBot) o;
+        final QQBot qqBot = (QQBot) o;
 
-        if (username != qqBot.username) return false;
-        return Objects.equals(botManager, qqBot.botManager);
+        if (this.username != qqBot.username) return false;
+        return Objects.equals(this.botManager, qqBot.botManager);
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (username ^ (username >>> 32));
-        result = 31 * result + (botManager != null ? botManager.hashCode() : 0);
+        int result = (int) (this.username ^ (this.username >>> 32));
+        result = 31 * result + (this.botManager != null ? this.botManager.hashCode() : 0);
         return result;
     }
 
@@ -90,6 +90,6 @@ public abstract class QQBot implements Bot {
     }
 
     public BotProtocol getBotProtocol() {
-        return botProtocol;
+        return this.botProtocol;
     }
 }

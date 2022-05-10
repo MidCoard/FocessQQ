@@ -34,7 +34,7 @@ public class ConsoleListener implements Listener {
      * @param ioHandler the {@link CommandSender#CONSOLE} CommandSender
      * @param task the timeout task
      */
-    public static void registerInputListener(final IOHandler ioHandler, Task task) {
+    public static void registerInputListener(final IOHandler ioHandler, final Task task) {
         QUESTS.offer(Pair.of(ioHandler,task));
     }
 

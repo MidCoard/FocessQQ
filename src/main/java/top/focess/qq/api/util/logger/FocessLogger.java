@@ -14,7 +14,7 @@ public class FocessLogger {
 
     private static final Logger LOG = LoggerFactory.getLogger(FocessLogger.class);
 
-    private boolean debugOutput = false;
+    private boolean debugOutput;
 
     /**
      * Log a message with INFO level
@@ -52,7 +52,7 @@ public class FocessLogger {
      */
     public void thr(final String message, final Throwable e) {
         LOG.error(message, e);
-        if (debugOutput && FocessQQ.getAdministrator() != null)
+        if (this.debugOutput && FocessQQ.getAdministrator() != null)
             FocessQQ.getAdministrator().sendMessage(message + ", " + e.getMessage());
     }
 
@@ -94,7 +94,7 @@ public class FocessLogger {
      * @param message the message need to debug
      */
     public void debug(final String message) {
-        if (debugOutput)
+        if (this.debugOutput)
             this.info(ChatConstants.DEBUG_HEADER + message);
         else
             LOG.debug(ChatConstants.CONSOLE_DEBUG_HEADER + message);
@@ -126,7 +126,7 @@ public class FocessLogger {
      * Note: if debug output is true, the debug message will be outputted as INFO level and DEBUG level, otherwise, it will be outputted as DEBUG level
      */
     public void toggleDebugOutput() {
-        debugOutput = !debugOutput;
+        this.debugOutput = !this.debugOutput;
     }
 
     /**
@@ -134,6 +134,6 @@ public class FocessLogger {
      * @return true if debug output as INFO level and DEBUG level, false otherwise
      */
     public boolean isDebugOutput() {
-        return debugOutput;
+        return this.debugOutput;
     }
 }
