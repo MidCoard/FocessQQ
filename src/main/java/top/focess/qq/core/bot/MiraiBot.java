@@ -18,18 +18,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MiraiBot extends QQBot {
-
-    public BotProtocol getBotProtocol() {
-        return botProtocol;
-    }
-
-    private final BotProtocol botProtocol;
     private Bot nativeBot;
 
     public MiraiBot(final long username, final String password, final Bot bot, BotProtocol botProtocol, final Plugin plugin, final BotManager botManager) {
         super(username, password, plugin, botProtocol, botManager);
         this.nativeBot = bot;
-        this.botProtocol = botProtocol;
     }
 
     public Bot getNativeBot() {

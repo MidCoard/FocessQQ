@@ -33,7 +33,7 @@ public class TestFramework {
     @BeforeAll
     static void init() {
         TestEnvironment.setup(new String[]{
-                "--user", "123456789", "19283746", "--noDefaultPluginLoad", "--admin", "123456789"
+                "--user", "123456789", "19283746", "--noDefaultPluginLoad", "--admin", "123456789","--botManager","test"
         });
     }
 

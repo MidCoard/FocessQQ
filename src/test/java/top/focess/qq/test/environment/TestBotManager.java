@@ -29,9 +29,15 @@ public class TestBotManager implements BotManager {
     protected static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");
     protected static final Map<Plugin, List<Bot>> PLUGIN_BOT_MAP = Maps.newHashMap();
     protected static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
+
     @Override
-    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin) throws BotLoginException {
-        Bot bot = new TestBot(id, password, plugin,BotProtocol.ANDROID_PAD,this);
+    public Future<Bot> login(long id, String password, Plugin plugin, BotProtocol botProtocol) {
+        return SCHEDULER.submit(() -> loginDirectly(id, password, plugin, botProtocol), "login-bot-" + id);
+    }
+
+    @Override
+    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin, BotProtocol botProtocol) throws BotLoginException {
+        Bot bot = new TestBot(id, password, plugin, botProtocol,this);
         bot.login();
         BOTS.put(id, bot);
         PLUGIN_BOT_MAP.compute(plugin, (k, v) -> {
@@ -41,21 +47,6 @@ public class TestBotManager implements BotManager {
             return v;
         });
         return bot;
-    }
-
-    @Override
-    public Future<Bot> login(long id, String password, Plugin plugin, BotProtocol botProtocol) {
-        return this.login(id, password, plugin);
-    }
-
-    @Override
-    public @NotNull Future<Bot> login(long id, String password, Plugin plugin) {
-        return SCHEDULER.submit(() -> loginDirectly(id, password, plugin), "login-bot-" + id);
-    }
-
-    @Override
-    public @NotNull Bot loginDirectly(long id, String password, Plugin plugin, BotProtocol botProtocol) throws BotLoginException {
-        return this.loginDirectly(id, password, plugin);
     }
 
     @Override
