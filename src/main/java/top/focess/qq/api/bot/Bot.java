@@ -3,10 +3,13 @@ package top.focess.qq.api.bot;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
-import top.focess.qq.api.bot.contact.Friend;
-import top.focess.qq.api.bot.contact.Group;
+import top.focess.qq.api.bot.contact.*;
+import top.focess.qq.api.bot.message.Audio;
+import top.focess.qq.api.bot.message.Image;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.plugin.Plugin;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -149,4 +152,24 @@ public interface Bot {
      * @return the Bot Manager of the bot
      */
     BotManager getBotManager();
+
+    void sendMessage(Transmitter transmitter, Message message);
+
+    void sendMessage(Transmitter transmitter, String message);
+
+    Image uploadImage(Transmitter transmitter, InputStream resource);
+
+    Audio uploadAudio(Speaker speaker, InputStream inputStream);
+
+    void deleteFriend(Friend friend);
+
+    void quitGroup(Group group);
+
+    Member getMember(Group group, long id);
+
+    Member getMemberOrFail(Group group, long id);
+
+    Member getAsMember(Group group);
+
+    List<Member> getMembers(Group group);
 }

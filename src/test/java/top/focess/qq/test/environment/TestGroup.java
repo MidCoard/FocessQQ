@@ -2,8 +2,6 @@ package top.focess.qq.test.environment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import net.mamoe.mirai.message.data.Image;
-import net.mamoe.mirai.utils.ExternalResource;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -11,8 +9,11 @@ import top.focess.command.CommandPermission;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.contact.Member;
+import top.focess.qq.api.bot.message.Audio;
+import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
 
+import java.io.InputStream;
 import java.util.*;
 
 public class TestGroup implements Group {
@@ -90,7 +91,7 @@ public class TestGroup implements Group {
     }
 
     @Override
-    public Image uploadImage(ExternalResource resource) {
+    public Image uploadImage(InputStream resource) {
         throw new UnsupportedOperationException();
     }
 
@@ -110,5 +111,10 @@ public class TestGroup implements Group {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + bot.hashCode();
         return result;
+    }
+
+    @Override
+    public Audio uploadAudio(InputStream inputStream) {
+        throw new UnsupportedOperationException();
     }
 }

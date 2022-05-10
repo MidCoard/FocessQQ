@@ -1,19 +1,19 @@
 package top.focess.qq.core.bot.contact;
 
-import net.mamoe.mirai.contact.AudioSupported;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Speaker;
+import top.focess.qq.api.bot.message.Audio;
+
+import java.io.InputStream;
 
 public abstract class SimpleSpeaker extends SimpleTransmitter implements Speaker {
 
-    private final AudioSupported audioSupported;
-
-    public SimpleSpeaker(final Bot bot, final AudioSupported contact) {
-        super(bot, contact);
-        this.audioSupported = contact;
+    public SimpleSpeaker(final Bot bot, final long id) {
+        super(bot, id);
     }
 
-    public AudioSupported getNativeContact() {
-        return this.audioSupported;
+    @Override
+    public Audio uploadAudio(InputStream inputStream) {
+        return this.getBot().uploadAudio(this, inputStream);
     }
 }

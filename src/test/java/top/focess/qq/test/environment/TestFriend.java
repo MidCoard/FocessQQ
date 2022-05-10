@@ -1,12 +1,13 @@
 package top.focess.qq.test.environment;
 
-import net.mamoe.mirai.message.data.Image;
-import net.mamoe.mirai.utils.ExternalResource;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Friend;
+import top.focess.qq.api.bot.message.Audio;
+import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 public class TestFriend implements Friend {
@@ -61,7 +62,12 @@ public class TestFriend implements Friend {
     }
 
     @Override
-    public Image uploadImage(ExternalResource resource) {
+    public Image uploadImage(InputStream resource) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Audio uploadAudio(InputStream inputStream) {
         throw new UnsupportedOperationException();
     }
 }

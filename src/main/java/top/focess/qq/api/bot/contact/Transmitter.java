@@ -1,8 +1,9 @@
 package top.focess.qq.api.bot.contact;
 
-import net.mamoe.mirai.message.data.Image;
-import net.mamoe.mirai.utils.ExternalResource;
+import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
+
+import java.io.InputStream;
 
 /**
  * Represents a contact, which can send message and upload image.
@@ -26,5 +27,5 @@ public interface Transmitter extends Contact {
      * @param resource the image to upload
      * @return the uploaded image
      */
-    Image uploadImage(ExternalResource resource);
+    Image uploadImage(InputStream resource);
 }

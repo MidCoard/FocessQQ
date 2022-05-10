@@ -1,9 +1,10 @@
 package top.focess.qq.api.bot.message;
 
-import org.jetbrains.annotations.Contract;
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -11,12 +12,20 @@ import java.util.stream.Stream;
  */
 public class MessageChain extends Message implements Iterable<Message> {
 
-    /**
-     * Constructs a MessageChain
-     * @param message the native message
-     */
-    private MessageChain(final net.mamoe.mirai.message.data.MessageChain message) {
-        super(message);
+    private final List<Message> messageList;
+
+    public MessageChain(Message... messages) {
+        this.messageList = Lists.newArrayList(messages);
+    }
+
+    public MessageChain(MessageChain messageChain, Message message) {
+        this.messageList = Lists.newArrayList(messageChain.messageList);
+        this.messageList.add(message);
+    }
+
+    public MessageChain(Message message, MessageChain messageChain) {
+        this.messageList = Lists.newArrayList(message);
+        this.messageList.addAll(messageChain.messageList);
     }
 
     /**
@@ -26,7 +35,7 @@ public class MessageChain extends Message implements Iterable<Message> {
     @NotNull
     @Override
     public Iterator<Message> iterator() {
-        return ((net.mamoe.mirai.message.data.MessageChain) this.message).stream().map(Message::new).iterator();
+        return this.messageList.iterator();
     }
 
     /**
@@ -34,15 +43,7 @@ public class MessageChain extends Message implements Iterable<Message> {
      * @return the stream of this message chain
      */
     public Stream<Message> stream() {
-        return ((net.mamoe.mirai.message.data.MessageChain) this.message).stream().map(Message::new);
-    }
-
-    /**
-     * Get the message as MiraiCode
-     * @return the message as MiraiCode
-     */
-    public String toMiraiCode() {
-        return ((net.mamoe.mirai.message.data.MessageChain) this.message).serializeToMiraiCode();
+        return this.messageList.stream();
     }
 
     /**
@@ -51,7 +52,7 @@ public class MessageChain extends Message implements Iterable<Message> {
      * @return the message at the specified index
      */
     public Message get(final int index) {
-        return new Message(((net.mamoe.mirai.message.data.MessageChain) this.message).get(index));
+        return this.messageList.get(index);
     }
 
     /**
@@ -59,17 +60,18 @@ public class MessageChain extends Message implements Iterable<Message> {
      * @return the size of this message chain
      */
     public int size() {
-        return ((net.mamoe.mirai.message.data.MessageChain) this.message).size();
+        return this.messageList.size();
     }
 
-    /**
-     * Wrap a message chain
-     * @param message the native message chain
-     * @return the wrapped message chain
-     */
-    @NotNull
-    @Contract("_ -> new")
-    public static MessageChain of(net.mamoe.mirai.message.data.MessageChain message) {
-        return new MessageChain(message);
+    @Override
+    public String toString() {
+        return this.messageList.toString();
     }
+
+    @Override
+    public String toMiraiCode() {
+        //todo
+        return null;
+    }
+
 }

@@ -1,44 +1,36 @@
 package top.focess.qq.core.bot.contact;
 
-import com.google.common.collect.Maps;
-import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.OtherClient;
 
-import java.util.Map;
-
 public class SimpleOtherClient extends SimpleContact implements OtherClient {
 
+    private final String name;
+    private final String deviceKind;
 
-    private static final Map<Long, Map<Long, SimpleOtherClient>> OTHER_CLIENT_MAP = Maps.newConcurrentMap();
-    private final net.mamoe.mirai.contact.OtherClient nativeOtherClient;
+    private final int appId;
 
-    public SimpleOtherClient(final Bot bot, final net.mamoe.mirai.contact.OtherClient contact) {
-        super(bot, contact);
-        this.nativeOtherClient = contact;
+    public SimpleOtherClient(final Bot bot, final long id, final String name, final String deviceKind, final int appId) {
+        super(bot, id);
+        this.name = name;
+        this.deviceKind = deviceKind;
+        this.appId = appId;
     }
 
-    @Nullable
-    public static SimpleOtherClient get(final Bot bot, @Nullable final net.mamoe.mirai.contact.OtherClient otherClient) {
-        if (otherClient == null)
-            return null;
-        if (otherClient.getBot().getId() != bot.getId())
-            return null;
-        return OTHER_CLIENT_MAP.computeIfAbsent(bot.getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(otherClient.getId(), k -> new SimpleOtherClient(bot, otherClient));
-    }
 
     @Override
     public String getName() {
-        return this.nativeOtherClient.getInfo().getDeviceName();
+        return name;
     }
 
     @Override
     public String getDeviceKind() {
-        return this.nativeOtherClient.getInfo().getDeviceKind();
+        return deviceKind;
     }
 
     @Override
     public int getAppId() {
-        return this.nativeOtherClient.getInfo().getAppId();
+        return appId;
     }
+
 }

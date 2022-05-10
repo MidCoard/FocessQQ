@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.core.bot.mirai.MiraiBotManager;
 
 import java.util.List;
 import java.util.Map;

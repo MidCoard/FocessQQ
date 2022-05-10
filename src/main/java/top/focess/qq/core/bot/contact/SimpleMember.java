@@ -1,66 +1,40 @@
 package top.focess.qq.core.bot.contact;
 
-import com.google.common.collect.Maps;
-import net.mamoe.mirai.contact.MemberPermission;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import top.focess.command.CommandPermission;
-import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.contact.Member;
 
-import java.util.Map;
-
-import static top.focess.command.CommandPermission.*;
-
 public class SimpleMember extends SimpleContact implements Member {
 
-    private static final Map<Long, Map<Long, SimpleMember>> GROUP_MEMBER_MAP = Maps.newConcurrentMap();
-    private final net.mamoe.mirai.contact.Member nativeMember;
     private final Group simpleGroup;
+    private final String name;
+    private final String rawName;
+    private final String cardName;
+    private final CommandPermission commandPermission;
 
-    private SimpleMember(@NotNull final Group simpleGroup, final net.mamoe.mirai.contact.Member nativeMember) {
-        super(simpleGroup.getBot(), nativeMember);
+    private SimpleMember(@NotNull final Group simpleGroup,long id, String name, String rawName, String cardName, CommandPermission permission) {
+        super(simpleGroup.getBot(), id);
         this.simpleGroup = simpleGroup;
-        this.nativeMember = nativeMember;
-    }
-
-    @Nullable
-    public static Member get(final Group group, @Nullable final net.mamoe.mirai.contact.Member member) {
-        if (member == null)
-            return null;
-        if (group.getBot().getId() != member.getBot().getId())
-            return null;
-        return GROUP_MEMBER_MAP.computeIfAbsent(group.getBot().getId(), k -> Maps.newConcurrentMap()).computeIfAbsent(member.getId(), k -> new SimpleMember(group, member));
-    }
-
-    @Nullable
-    public static Member get(final Bot bot, @Nullable final net.mamoe.mirai.contact.Member member) {
-        if (member == null)
-            return null;
-        final Group group = bot.getGroup(member.getGroup().getId());
-        if (group == null)
-            return null;
-        return get(group, member);
-    }
-
-    public static void remove(@NotNull final Bot bot) {
-        GROUP_MEMBER_MAP.remove(bot.getId());
+        this.name = name;
+        this.rawName = rawName;
+        this.cardName = cardName;
+        this.commandPermission = permission;
     }
 
     @Override
     public String getName() {
-        return this.nativeMember.getRemark();
+        return this.name;
     }
 
     @Override
     public String getRawName() {
-        return this.nativeMember.getNick();
+        return this.rawName;
     }
 
     @Override
     public String getCardName() {
-        return this.nativeMember.getNameCard();
+        return this.cardName;
     }
 
     @Override
@@ -70,11 +44,6 @@ public class SimpleMember extends SimpleContact implements Member {
 
     @Override
     public CommandPermission getPermission() {
-        final MemberPermission permission = this.nativeMember.getPermission();
-        if (permission == MemberPermission.OWNER)
-            return OWNER;
-        else if (permission == MemberPermission.ADMINISTRATOR)
-            return ADMINISTRATOR;
-        else return MEMBER;
+        return this.commandPermission;
     }
 }

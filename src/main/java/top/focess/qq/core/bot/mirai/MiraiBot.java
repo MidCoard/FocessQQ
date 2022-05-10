@@ -1,4 +1,4 @@
-package top.focess.qq.core.bot;
+package top.focess.qq.core.bot.mirai;
 
 import net.mamoe.mirai.Bot;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -10,6 +10,7 @@ import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.core.bot.QQBot;
 import top.focess.qq.core.bot.contact.SimpleFriend;
 import top.focess.qq.core.bot.contact.SimpleGroup;
 
