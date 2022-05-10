@@ -14,6 +14,12 @@ public class MessageChain implements Message,Iterable<Message> {
 
     private final List<Message> messageList;
 
+    public MessageChain(@NotNull Message message) {
+        if (message instanceof MessageChain)
+            this.messageList = Lists.newArrayList(((MessageChain) message).messageList);
+         else this.messageList = Lists.newArrayList(message);
+    }
+
     MessageChain(Message... messages) {
         this.messageList = Lists.newArrayList(messages);
     }

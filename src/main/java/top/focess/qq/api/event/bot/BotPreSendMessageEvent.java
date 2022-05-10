@@ -1,6 +1,5 @@
 package top.focess.qq.api.event.bot;
 
-import net.mamoe.mirai.event.events.MessagePreSendEvent;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Contact;
 import top.focess.qq.api.bot.message.Message;
@@ -16,17 +15,13 @@ public class BotPreSendMessageEvent extends BotEvent {
     /**
      * The pre-send message
      */
-    private final Message message;
+    private Message message;
 
     /**
      * The target contact
      */
     private final Contact target;
-
-    /**
-     * The raw event
-     */
-    private final MessagePreSendEvent event;
+    private boolean needUpdate;
 
     /**
      * Constructs a BotPreSendMessageEvent
@@ -34,13 +29,11 @@ public class BotPreSendMessageEvent extends BotEvent {
      * @param b       the bot
      * @param message the message
      * @param target  the target contact
-     * @param event   the raw event
      */
-    public BotPreSendMessageEvent(final Bot b, final Message message, final Contact target, final MessagePreSendEvent event) {
+    public BotPreSendMessageEvent(final Bot b, final Message message, final Contact target) {
         super(b);
         this.message = message;
         this.target = target;
-        this.event = event;
     }
 
     public Message getMessage() {
@@ -48,10 +41,17 @@ public class BotPreSendMessageEvent extends BotEvent {
     }
 
     public void setMessage(final Message message) {
-        this.event.setMessage(message.getNativeMessage());
+        if (this.message != message) {
+            this.message = message;
+            this.needUpdate = true;
+        }
     }
 
     public Contact getTarget() {
         return this.target;
+    }
+
+    public boolean isNeedUpdate() {
+        return this.needUpdate;
     }
 }

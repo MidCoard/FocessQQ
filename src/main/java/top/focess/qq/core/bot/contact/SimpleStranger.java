@@ -8,7 +8,7 @@ public class SimpleStranger extends SimpleTransmitter implements Stranger {
     private final String name;
     private final String rawName;
 
-    private SimpleStranger(final Bot bot, final long id, final String name, final String rawName) {
+    public SimpleStranger(final Bot bot, final long id, final String name, final String rawName) {
         super(bot, id);
         this.name = name;
         this.rawName = rawName;

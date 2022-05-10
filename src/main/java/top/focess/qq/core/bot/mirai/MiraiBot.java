@@ -2,6 +2,7 @@ package top.focess.qq.core.bot.mirai;
 
 import com.google.common.collect.Maps;
 import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.contact.ContactList;
 import net.mamoe.mirai.contact.MemberPermission;
 import net.mamoe.mirai.message.data.PlainText;
 import net.mamoe.mirai.utils.ExternalResource;
@@ -19,9 +20,7 @@ import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.bot.message.MessageChain;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.bot.QQBot;
-import top.focess.qq.core.bot.contact.SimpleFriend;
-import top.focess.qq.core.bot.contact.SimpleGroup;
-import top.focess.qq.core.bot.contact.SimpleMember;
+import top.focess.qq.core.bot.contact.*;
 import top.focess.qq.core.bot.mirai.message.MiraiAudio;
 import top.focess.qq.core.bot.mirai.message.MiraiImage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessage;
@@ -37,6 +36,8 @@ public class MiraiBot extends QQBot {
     private final Map<Long,Friend> friendMap = Maps.newHashMap();
     private final Map<Long,Group> groupMap = Maps.newHashMap();
     private final Map<Long,Member> memberMap = Maps.newHashMap();
+    private final Map<Long,Stranger> strangerMap = Maps.newHashMap();
+    private final Map<Long,OtherClient> clientMap =   Maps.newHashMap();
     private Bot nativeBot;
 
     public MiraiBot(final long username, final String password, final Bot bot, BotProtocol botProtocol, final Plugin plugin, final BotManager botManager) {
@@ -248,4 +249,26 @@ public class MiraiBot extends QQBot {
         throw new IllegalArgumentException("Unknown message type: " + message.getClass());
     }
 
+    @Override
+    public @Nullable Stranger getStranger(long id) {
+        net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStranger(id);
+        if (stranger == null)
+            return null;
+        return strangerMap.computeIfAbsent(id, i -> new SimpleStranger(this,stranger.getId(), stranger.getRemark(), stranger.getNick()));
+    }
+
+    @Override
+    public Stranger getStrangerOrFail(long id) {
+        net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStrangerOrFail(id);
+        return strangerMap.computeIfAbsent(id, i -> new SimpleStranger(this,stranger.getId(), stranger.getRemark(), stranger.getNick()));
+    }
+
+    @Override
+    public OtherClient getOtherClientOrFail(long id) {
+        ContactList<net.mamoe.mirai.contact.OtherClient> clients = this.nativeBot.getOtherClients();
+        for (net.mamoe.mirai.contact.OtherClient client : clients)
+            if (client.getId() == id)
+                return clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this,client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(),client.getInfo().getAppId()));
+       throw new NullPointerException("No such client");
+    }
 }

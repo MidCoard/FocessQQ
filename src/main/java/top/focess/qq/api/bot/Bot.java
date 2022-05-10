@@ -174,4 +174,10 @@ public interface Bot {
     Member getAsMember(Group group);
 
     List<Member> getMembers(Group group);
+
+    @Nullable Stranger getStranger(long id);
+
+    Stranger getStrangerOrFail(long id);
+
+    OtherClient getOtherClientOrFail(long id);
 }
