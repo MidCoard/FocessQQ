@@ -180,4 +180,7 @@ public interface Bot {
     Stranger getStrangerOrFail(long id);
 
     OtherClient getOtherClientOrFail(long id);
+
+    @Nullable
+    OtherClient getOtherClient(long id);
 }

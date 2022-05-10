@@ -8,8 +8,10 @@ import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotProtocol;
-import top.focess.qq.api.bot.contact.Friend;
-import top.focess.qq.api.bot.contact.Group;
+import top.focess.qq.api.bot.contact.*;
+import top.focess.qq.api.bot.message.Audio;
+import top.focess.qq.api.bot.message.Image;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.bot.BotLoginEvent;
@@ -17,14 +19,12 @@ import top.focess.qq.api.event.bot.BotLogoutEvent;
 import top.focess.qq.api.event.bot.BotReloginEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.bot.QQBot;
+import top.focess.qq.core.bot.contact.SimpleFriend;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.io.InputStream;
+import java.util.*;
 
 public class TestBot extends QQBot {
-
 
     private final Set<Friend> friends = Sets.newConcurrentHashSet();
     private final Set<Group> groups = Sets.newConcurrentHashSet();
@@ -35,8 +35,10 @@ public class TestBot extends QQBot {
         super(id, password, plugin,botProtocol, botManager);
         Random random = new Random();
         int friendsSize = random.nextInt(50) + 1;
-        for (int i = 0; i < friendsSize; i++)
-            this.friends.add(new TestFriend(random.nextLong(),this));
+        for (int i = 0; i < friendsSize; i++) {
+            String name = UUID.randomUUID().toString().substring(0, 8);
+            this.friends.add(new SimpleFriend(this, random.nextLong(), name, name, "avatarUrl/" + name));
+        }
         int groupsSize = random.nextInt(20) + 1;
         for (int i = 0; i < groupsSize; i++)
             this.groups.add(new TestGroup(random.nextLong(),this));
@@ -128,7 +130,77 @@ public class TestBot extends QQBot {
 
     @Override
     public @NonNull Friend getAsFriend() {
-        return new TestFriend(this.getId(),this);
+        return new SimpleFriend(this,this.getId(),this.getId() + "",this.getId() + "","avatarUrl/" + this.getId());
+    }
+
+    @Override
+    public void sendMessage(Transmitter transmitter, Message message) {
+        System.out.println(this.getId() + " send message " + transmitter.getName() + "(" + transmitter.getId() + "): " + message);
+    }
+
+    @Override
+    public void sendMessage(Transmitter transmitter, String message) {
+        System.out.println(this.getId() + " send message " + transmitter.getName() + "(" + transmitter.getId() + "): " + message);
+    }
+
+    @Override
+    public Image uploadImage(Transmitter transmitter, InputStream resource) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @Nullable Audio uploadAudio(Speaker speaker, InputStream inputStream) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteFriend(Friend friend) {
+        this.removeFriend(friend);
+    }
+
+    @Override
+    public void quitGroup(Group group) {
+        this.removeGroup(group);
+    }
+
+    @Override
+    public @Nullable Member getMember(Group group, long id) {
+        return group.getMember(id);
+    }
+
+    @Override
+    public Member getMemberOrFail(Group group, long id) {
+        return group.getMemberOrFail(id);
+    }
+
+    @Override
+    public Member getAsMember(Group group) {
+        return group.getAsMember();
+    }
+
+    @Override
+    public List<Member> getMembers(Group group) {
+        return group.getMembers();
+    }
+
+    @Override
+    public @Nullable Stranger getStranger(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Stranger getStrangerOrFail(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public OtherClient getOtherClientOrFail(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @Nullable OtherClient getOtherClient(long id) {
+        throw new UnsupportedOperationException();
     }
 
     public void removeGroup(Group group) {

@@ -271,4 +271,13 @@ public class MiraiBot extends QQBot {
                 return clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this,client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(),client.getInfo().getAppId()));
        throw new NullPointerException("No such client");
     }
+
+    @Override
+    public @Nullable OtherClient getOtherClient(long id) {
+        ContactList<net.mamoe.mirai.contact.OtherClient> clients = this.nativeBot.getOtherClients();
+        for (net.mamoe.mirai.contact.OtherClient client : clients)
+            if (client.getId() == id)
+                return clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this,client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(),client.getInfo().getAppId()));
+        return null;
+    }
 }

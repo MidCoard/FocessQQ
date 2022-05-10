@@ -12,6 +12,7 @@ import top.focess.qq.api.bot.contact.Member;
 import top.focess.qq.api.bot.message.Audio;
 import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
+import top.focess.qq.core.bot.contact.SimpleMember;
 
 import java.io.InputStream;
 import java.util.*;
@@ -21,7 +22,7 @@ public class TestGroup implements Group {
     private final TestBot bot;
     private final String name;
 
-    private final Set<TestMember> members = Sets.newConcurrentHashSet();
+    private final Set<Member> members = Sets.newConcurrentHashSet();
 
     public TestGroup(long id, TestBot bot) {
         this.id = id;
@@ -29,9 +30,12 @@ public class TestGroup implements Group {
         this.name = UUID.randomUUID().toString().substring(0,8);
         Random random = new Random();
         int size = random.nextInt(30) + 1;
-        for (int i = 0; i < size; i++)
-            this.members.add(new TestMember(random.nextLong(), this));
-        this.members.stream().findAny().ifPresent(member -> member.setPermission(CommandPermission.OWNER));
+        String name = UUID.randomUUID().toString().substring(0,8);
+        this.members.add(new SimpleMember(this, random.nextLong(),name,name,name ,CommandPermission.OWNER));
+        for (int i = 1; i < size; i++) {
+            name = UUID.randomUUID().toString().substring(0,8);
+            this.members.add(new SimpleMember(this,random.nextLong(), name,name,name,CommandPermission.MEMBER));
+        }
     }
 
     @Override
@@ -77,7 +81,7 @@ public class TestGroup implements Group {
 
     @Override
     public Member getAsMember() {
-        return new TestMember(this.bot.getId(), this);
+        return new SimpleMember(this, this.bot.getId(), "" + this.bot.getId(),"" + this.bot.getId(), "" + this.bot.getId(), CommandPermission.MEMBER);
     }
 
     @Override
