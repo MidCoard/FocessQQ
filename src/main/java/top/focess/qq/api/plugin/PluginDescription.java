@@ -9,9 +9,9 @@ import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.permission.Permission;
 import top.focess.util.version.Version;
 import top.focess.util.yaml.YamlConfiguration;
-import top.focess.util.yaml.YamlLoadException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +100,8 @@ public class PluginDescription {
                 permissions.remove(permission);
             }
         }
+        if (permissions.isEmpty())
+            return;
         IOHandler.getConsoleIoHandler().outputLang("permission-before-request",this.name, permissions.size());
         Boolean isAll = null;
         try {
@@ -147,8 +149,11 @@ public class PluginDescription {
         this.limitVersion = FocessQQ.getVersion();
         this.permissions.put(Permission.ALL,true);
         try {
-            permissionsConfig = YamlConfiguration.loadFile(new File("plugins/Main","permissions.yml"));
-        } catch (YamlLoadException e) {
+            File file = new File("plugins/Main","permissions.yml");
+            if (!file.exists())
+                file.createNewFile();
+            permissionsConfig = YamlConfiguration.loadFile(file);
+        } catch (IOException e) {
             System.err.println("[FocessQQ][Console] -> Failed to load permissions.yml. Force shutdown.");
             FocessQQ.exit();
         }

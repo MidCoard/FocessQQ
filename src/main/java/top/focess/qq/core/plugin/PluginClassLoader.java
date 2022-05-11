@@ -53,7 +53,7 @@ public class PluginClassLoader extends URLClassLoader {
     private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
     private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
-    private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "PluginLoader");
+    private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 1,false,"PluginLoader");
     private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "GC");
     private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
     private static Field
