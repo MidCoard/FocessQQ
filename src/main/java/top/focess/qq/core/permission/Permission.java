@@ -1,6 +1,7 @@
 package top.focess.qq.core.permission;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -74,7 +75,7 @@ public enum Permission {
     private final String name;
     private final int priority;
 
-    Permission(String name, int priority, final Permission permission, final Permission... permissions) {
+    Permission(String name, int priority, final @NotNull Permission permission, final Permission @NotNull ... permissions) {
         this.permissions = Lists.newArrayList(permission.permissions);
         for (Permission per : permissions)
             this.permissions.addAll(per.permissions);
@@ -88,9 +89,14 @@ public enum Permission {
         this.priority = priority;
     }
 
-    public static Permission getPermission(final String name) {
+    public static Permission getPermission(final @NotNull String name) {
         String key = name.trim().replace(" ", "_").toUpperCase();
         return Permission.valueOf(key);
+    }
+
+    public static void checkPermission(@NotNull Plugin plugin, Permission permission) {
+        if (!plugin.getPluginDescription().hasPermission(permission))
+            throw new PermissionException(plugin, permission);
     }
 
     public String getName() {

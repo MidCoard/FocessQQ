@@ -44,6 +44,7 @@ import top.focess.qq.core.net.*;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
+import top.focess.qq.core.util.FocessSecurityManager;
 import top.focess.qq.core.util.MethodCaller;
 import top.focess.scheduler.FocessScheduler;
 import top.focess.scheduler.Scheduler;
@@ -371,13 +372,14 @@ public class FocessQQ {
     }
 
     public static void main(final String[] args) {
+        if (isStopped)
+            return;
+        System.setSecurityManager(new FocessSecurityManager());
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
             getLogger().thrLang("exception-uncaught-exception", e);
             getLogger().fatalLang("fatal-uncaught-exception");
             exit();
         });
-        if (isStopped)
-            return;
         System.out.println("[FocessQQ][Console] -> This is the context from System.out.");
 
         try {
