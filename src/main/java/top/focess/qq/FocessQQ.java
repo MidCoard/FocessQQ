@@ -427,6 +427,7 @@ public class FocessQQ {
             } catch (final Exception e) {
                 botManager = Objects.requireNonNull(BotManagerFactory.get());
             }
+        else botManager = Objects.requireNonNull(BotManagerFactory.get());
         option = options.get("user");
         if (option != null) {
             username = option.get(LongOptionType.LONG_OPTION_TYPE);

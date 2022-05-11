@@ -344,7 +344,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class, event -> {
-            final Contact contact = Objects.requireNonNull(getContact(b, event.getSubject()));
+            final Contact contact = getContact(b, event.getSubject());
             final BotSendMessageEvent e = new BotSendMessageEvent(b, new MiraiMessage(event.getMessage()), contact);
             try {
                 EventManager.submit(e);
@@ -434,7 +434,7 @@ public class MiraiBotManager implements BotManager {
         else if (contact instanceof net.mamoe.mirai.contact.Friend)
             bot.getFriendOrFail(contact.getId());
         else if (contact instanceof Member)
-            bot.getGroupOrFail(contact.getId()).getMember(contact.getId());
+            bot.getGroupOrFail(((Member) contact).getGroup().getId()).getMember(contact.getId());
         else if (contact instanceof Stranger)
             bot.getStrangerOrFail(contact.getId());
         else if (contact instanceof OtherClient)
