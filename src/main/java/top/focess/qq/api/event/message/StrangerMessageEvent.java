@@ -2,7 +2,7 @@ package top.focess.qq.api.event.message;
 
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Stranger;
-import top.focess.qq.api.bot.message.MessageChain;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.bot.message.MessageSource;
 import top.focess.qq.api.event.ListenerHandler;
 
@@ -26,7 +26,7 @@ public class StrangerMessageEvent extends MessageEvent {
      * @param stranger the stranger who chats with bot
      * @param source   the message source
      */
-    public StrangerMessageEvent(final Bot bot, final MessageChain message, final Stranger stranger, final MessageSource source) {
+    public StrangerMessageEvent(final Bot bot, final Message message, final Stranger stranger, final MessageSource source) {
         super(bot, message, source);
         this.stranger = stranger;
     }

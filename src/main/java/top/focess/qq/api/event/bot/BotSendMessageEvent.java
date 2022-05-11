@@ -1,6 +1,5 @@
 package top.focess.qq.api.event.bot;
 
-import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Contact;
 import top.focess.qq.api.bot.message.Message;
@@ -29,7 +28,7 @@ public class BotSendMessageEvent extends BotEvent {
      * @param message  the message
      * @param contract the target contact
      */
-    public BotSendMessageEvent(final Bot bot, final Message message, final @Nullable Contact contract) {
+    public BotSendMessageEvent(final Bot bot, final Message message, final Contact contract) {
         super(bot);
         this.message = message;
         this.contract = contract;
@@ -39,7 +38,7 @@ public class BotSendMessageEvent extends BotEvent {
         return this.message;
     }
 
-    public @Nullable Contact getContact() {
+    public Contact getContact() {
         return this.contract;
     }
 }

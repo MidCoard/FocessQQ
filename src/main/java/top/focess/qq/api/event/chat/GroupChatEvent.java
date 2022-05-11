@@ -3,7 +3,7 @@ package top.focess.qq.api.event.chat;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.contact.Member;
-import top.focess.qq.api.bot.message.MessageChain;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.bot.message.MessageSource;
 import top.focess.qq.api.event.ListenerHandler;
 
@@ -26,7 +26,7 @@ public class GroupChatEvent extends ChatEvent {
      * @param message the chat message
      * @param source  the source of the message
      */
-    public GroupChatEvent(final Bot bot, final Member member, final MessageChain message, final MessageSource source) {
+    public GroupChatEvent(final Bot bot, final Member member, final Message message, final MessageSource source) {
         super(bot, message, source);
         this.member = member;
     }

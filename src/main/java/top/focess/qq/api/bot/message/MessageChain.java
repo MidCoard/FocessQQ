@@ -73,7 +73,7 @@ public class MessageChain implements Message,Iterable<Message> {
 
     @Override
     public String toString() {
-        return this.messageList.toString();
+        return this.messageList.stream().map(Message::toString).reduce("", (a, b) -> a + b);
     }
 
     /**

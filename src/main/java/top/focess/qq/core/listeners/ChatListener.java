@@ -77,7 +77,7 @@ public class ChatListener implements Listener {
             return;
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getStranger().getRawName(), event.getStranger().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
-        event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
+        IOHandler.getConsoleIoHandler().output(event.getMessage().toString());
         final StrangerMessageEvent strangerMessageEvent = new StrangerMessageEvent(event.getBot(), event.getMessage(), event.getStranger(), event.getSource());
         try {
             EventManager.submit(strangerMessageEvent);
@@ -92,7 +92,7 @@ public class ChatListener implements Listener {
             return;
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d,%s) in %s(%d): %s", event.getMember().getCardName(), event.getMember().getId(), event.getMember().getPermission(), event.getGroup().getName(), event.getGroup().getId(), event.getMessage()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
-        event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
+        IOHandler.getConsoleIoHandler().output(event.getMessage().toString());
         final CommandSender sender = event.getMember().getCommandSender();
         final AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
@@ -127,7 +127,7 @@ public class ChatListener implements Listener {
             return;
         IOHandler.getConsoleIoHandler().output(String.format("%s(%d)", event.getFriend().getRawName(), event.getFriend().getId()));
         IOHandler.getConsoleIoHandler().outputLang("message-chain");
-        event.getMessage().stream().map(Object::toString).filter(i -> !i.isEmpty()).forEach(IOHandler.getConsoleIoHandler()::output);
+        IOHandler.getConsoleIoHandler().output(event.getMessage().toString());
         final CommandSender sender = event.getFriend().getCommandSender();
         final AtomicBoolean flag = new AtomicBoolean(false);
         updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);

@@ -2,7 +2,7 @@ package top.focess.qq.api.event.message;
 
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Friend;
-import top.focess.qq.api.bot.message.MessageChain;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.bot.message.MessageSource;
 import top.focess.qq.api.event.ListenerHandler;
 
@@ -26,7 +26,7 @@ public class FriendMessageEvent extends MessageEvent {
      * @param friend  the friend who chats with bot
      * @param source  the source of the message
      */
-    public FriendMessageEvent(final Bot bot, final Friend friend, final MessageChain message, final MessageSource source) {
+    public FriendMessageEvent(final Bot bot, final Friend friend, final Message message, final MessageSource source) {
         super(bot, message, source);
         this.friend = friend;
     }
