@@ -272,4 +272,6 @@ public interface Bot {
      */
     @Nullable
     OtherClient getOtherClient(long id);
+
+    BotProtocol getBotProtocol();
 }

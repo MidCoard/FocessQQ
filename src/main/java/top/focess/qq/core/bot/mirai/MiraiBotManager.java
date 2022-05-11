@@ -37,7 +37,6 @@ import top.focess.qq.api.event.request.GroupRequestEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.core.bot.QQBot;
 import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageChain;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageSource;
@@ -69,6 +68,7 @@ public class MiraiBotManager implements BotManager {
         final Bot b = BOTS.remove(FocessQQ.getBot().getId());
         if (b != null)
             b.logout();
+        PLUGIN_BOT_MAP.clear();
     }
 
     public void remove(final Plugin plugin) {
@@ -86,62 +86,7 @@ public class MiraiBotManager implements BotManager {
     @Override
     @NotNull
     public Bot loginDirectly(final long id, final String password, final Plugin plugin,final BotProtocol botProtocol) throws BotLoginException {
-        final BotConfiguration configuration = BotConfiguration.getDefault();
-        configuration.setProtocol(getProtocol(botProtocol));
-        final File cache = new File("devices/" + id + "/cache");
-        if (!cache.exists())
-            if (!cache.mkdirs())
-                throw new BotLoginException(id, FocessQQ.getLangConfig().get("fatal-create-cache-dir-failed"));
-        configuration.fileBasedDeviceInfo("devices/" + id + "/device.json");
-        configuration.setCacheDir(cache);
-        configuration.setLoginSolver(new LoginSolver() {
-            @NotNull
-            @Override
-            public Object onSolvePicCaptcha(@NotNull final net.mamoe.mirai.Bot bot, final byte @NotNull [] bytes, @NotNull final Continuation<? super String> continuation) {
-                try {
-                    final FileImageOutputStream outputStream = new FileImageOutputStream(new File("captcha.jpg"));
-                    outputStream.write(bytes);
-                    outputStream.close();
-                } catch (final IOException e) {
-                    FocessQQ.getLogger().thrLang("exception-load-captcha-picture", e);
-                }
-                FocessQQ.getLogger().infoLang("input-captcha-code");
-                try {
-                    return IOHandler.getConsoleIoHandler().input();
-                } catch (final InputTimeoutException e) {
-                    return "";
-                }
-            }
-
-            @Nullable
-            @Override
-            public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
-                FocessQQ.getLogger().info(s);
-                try {
-                    IOHandler.getConsoleIoHandler().input();
-                } catch (final InputTimeoutException ignored) {
-                }
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
-                FocessQQ.getLogger().info(s);
-                try {
-                    IOHandler.getConsoleIoHandler().input();
-                } catch (final InputTimeoutException ignored) {
-                }
-                return null;
-            }
-        });
-        final net.mamoe.mirai.Bot bot;
-        try {
-            bot = BotFactory.INSTANCE.newBot(id, password, configuration);
-            bot.login();
-        } catch (final Exception e) {
-            throw new BotLoginException(id, e);
-        }
+        final net.mamoe.mirai.Bot bot = login0(id, password, botProtocol);
         final MiraiBot b = new MiraiBot(id, password, bot, botProtocol, plugin,this);
         this.setup(b, bot);
         PLUGIN_BOT_MAP.compute(plugin, (k, v) -> {
@@ -160,8 +105,15 @@ public class MiraiBotManager implements BotManager {
         if (b.isOnline())
             return false;
         final long id = b.getId();
+        final String password = ((MiraiBot) b).getPassword();
+        final BotProtocol botProtocol = b.getBotProtocol();
+        this.setup((MiraiBot) b, this.login0(id, password, botProtocol));
+        return true;
+    }
+
+    private net.mamoe.mirai.Bot login0(long id, String password, BotProtocol botProtocol) throws BotLoginException {
         final BotConfiguration configuration = BotConfiguration.getDefault();
-        configuration.setProtocol(getProtocol(((QQBot)b).getBotProtocol()));
+        configuration.setProtocol(getProtocol(botProtocol));
         final File cache = new File("devices/" + id + "/cache");
         if (!cache.exists())
             if (!cache.mkdirs())
@@ -181,7 +133,7 @@ public class MiraiBotManager implements BotManager {
                 }
                 FocessQQ.getLogger().infoLang("input-captcha-code");
                 try {
-                    return IOHandler.getConsoleIoHandler().input();
+                    return IOHandler.getConsoleIoHandler().inputMessage();
                 } catch (final InputTimeoutException e) {
                     return null;
                 }
@@ -192,7 +144,7 @@ public class MiraiBotManager implements BotManager {
             public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
                 try {
-                    IOHandler.getConsoleIoHandler().input();
+                    IOHandler.getConsoleIoHandler().inputMessage();
                 } catch (final InputTimeoutException ignored) {
                 }
                 return null;
@@ -203,7 +155,7 @@ public class MiraiBotManager implements BotManager {
             public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
                 try {
-                    IOHandler.getConsoleIoHandler().input();
+                    IOHandler.getConsoleIoHandler().inputMessage();
                 } catch (final InputTimeoutException ignored) {
                 }
                 return null;
@@ -211,13 +163,12 @@ public class MiraiBotManager implements BotManager {
         });
         final net.mamoe.mirai.Bot bot;
         try {
-            bot = BotFactory.INSTANCE.newBot(id, ((MiraiBot) b).getPassword(), configuration);
+            bot = BotFactory.INSTANCE.newBot(id, password, configuration);
             bot.login();
         } catch (final Exception e) {
             throw new BotLoginException(id, e);
         }
-        this.setup((MiraiBot) b, bot);
-        return true;
+        return bot;
     }
 
     private void setup(final MiraiBot b, final net.mamoe.mirai.Bot bot) {
@@ -416,13 +367,13 @@ public class MiraiBotManager implements BotManager {
     private static @Nullable Contact getContact(final Bot bot, final net.mamoe.mirai.contact.Contact contact) {
         if (contact instanceof net.mamoe.mirai.contact.Group)
             return bot.getGroupOrFail(contact.getId());
-        else if (contact instanceof net.mamoe.mirai.contact.Friend)
+        if (contact instanceof net.mamoe.mirai.contact.Friend)
             return bot.getFriendOrFail(contact.getId());
-        else if (contact instanceof Member)
+        if (contact instanceof Member)
             return bot.getGroupOrFail(((Member) contact).getGroup().getId()).getMember(contact.getId());
-        else if (contact instanceof Stranger)
+        if (contact instanceof Stranger)
             return bot.getStrangerOrFail(contact.getId());
-        else if (contact instanceof OtherClient)
+        if (contact instanceof OtherClient)
             return bot.getOtherClientOrFail(contact.getId());
         return null;
 

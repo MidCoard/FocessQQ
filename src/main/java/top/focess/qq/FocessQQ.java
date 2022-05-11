@@ -355,14 +355,14 @@ public class FocessQQ {
     private static void requestAccountInformation() {
         try {
             IOHandler.getConsoleIoHandler().outputLang("input-account-username");
-            final String str = IOHandler.getConsoleIoHandler().input().trim();
+            final String str = IOHandler.getConsoleIoHandler().inputMessage().toString();
             if (str.equals("stop")) {
                 exit();
                 return;
             }
             username = Long.parseLong(str);
             IOHandler.getConsoleIoHandler().outputLang("input-account-password");
-            password = IOHandler.getConsoleIoHandler().input();
+            password = IOHandler.getConsoleIoHandler().inputMessage().toString();
         } catch (final Exception e) {
             requestAccountInformation();
         }
