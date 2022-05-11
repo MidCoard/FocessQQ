@@ -232,7 +232,7 @@ public class CommandLine {
      * @param handler the special argument handler
      */
     public static void unregister(final SpecialArgumentComplexHandler handler) {
-        Permission.checkPermission(Permission.REGISTER_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
+        Permission.checkPermission(Permission.REMOVE_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
         PLUGIN_SPECIAL_ARGUMENT_MAP.forEach((k, v) -> v.removeIf(i -> i.getRight() == handler));
         SPECIAL_ARGUMENT_HANDLERS.forEach((k, v) -> {
             if (v == handler)
@@ -247,7 +247,7 @@ public class CommandLine {
      * @param name   the name of the special argument handler
      */
     public static void unregister(final Plugin plugin, final String name) {
-        Permission.checkPermission(Permission.REGISTER_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
+        Permission.checkPermission(Permission.REMOVE_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
         PLUGIN_SPECIAL_ARGUMENT_MAP.computeIfPresent(plugin, (k, v) -> {
             v.removeIf(i -> i.getLeft().equals(name));
             return v;
@@ -261,7 +261,7 @@ public class CommandLine {
      * @param plugin the plugin
      */
     public static void unregister(final Plugin plugin) {
-        Permission.checkPermission(Permission.REGISTER_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
+        Permission.checkPermission(Permission.REMOVE_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
         for (final Pair<String, SpecialArgumentComplexHandler> pair : PLUGIN_SPECIAL_ARGUMENT_MAP.getOrDefault(plugin, Lists.newArrayList()))
             SPECIAL_ARGUMENT_HANDLERS.remove(pair.getLeft());
         PLUGIN_SPECIAL_ARGUMENT_MAP.remove(plugin);
@@ -273,7 +273,7 @@ public class CommandLine {
      * @return true if there are some special argument handlers not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {
-        Permission.checkPermission(Permission.REGISTER_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
+        Permission.checkPermission(Permission.REMOVE_SPECIAL_ARGUMENT_COMPLEX_HANDLER);
         boolean flag = false;
         for (final Plugin plugin : PLUGIN_SPECIAL_ARGUMENT_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())

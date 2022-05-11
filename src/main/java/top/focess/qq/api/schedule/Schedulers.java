@@ -99,6 +99,7 @@ public class Schedulers {
      * @param plugin the plugin
      */
     public static void close(final Plugin plugin) {
+        Permission.checkPermission(Permission.REMOVE_SCHEDULER);
         AScheduler.close(plugin);
     }
 
@@ -108,6 +109,7 @@ public class Schedulers {
      * @return true if there are some schedulers not belonging to MainPlugin not been closed, false otherwise
      */
     public static boolean closeAll() {
+        Permission.checkPermission(Permission.REMOVE_SCHEDULER);
         return AScheduler.closeAll();
     }
 

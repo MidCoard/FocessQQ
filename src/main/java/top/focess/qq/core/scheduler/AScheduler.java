@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.core.permission.Permission;
 import top.focess.scheduler.Callback;
 import top.focess.scheduler.CatchExceptionHandler;
 import top.focess.scheduler.Scheduler;
@@ -85,6 +86,7 @@ public class AScheduler implements Scheduler {
 
     @Override
     public void close() {
+        Permission.checkPermission(Permission.REMOVE_SCHEDULER);
         this.scheduler.close();
         PLUGIN_SCHEDULER_MAP.compute(this.plugin, (k, v) -> {
             if (v != null)
@@ -145,6 +147,7 @@ public class AScheduler implements Scheduler {
      * @param plugin the plugin
      */
     public static void close(final Plugin plugin) {
+        Permission.checkPermission(Permission.REMOVE_SCHEDULER);
         for (final Scheduler scheduler : PLUGIN_SCHEDULER_MAP.getOrDefault(plugin, Lists.newCopyOnWriteArrayList()))
             scheduler.close();
         PLUGIN_SCHEDULER_MAP.remove(plugin);
@@ -156,6 +159,7 @@ public class AScheduler implements Scheduler {
      * @return true if there are some schedulers not belonging to MainPlugin not been closed, false otherwise
      */
     public static boolean closeAll() {
+        Permission.checkPermission(Permission.REMOVE_SCHEDULER);
         boolean ret = false;
         for (final Plugin plugin : PLUGIN_SCHEDULER_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
