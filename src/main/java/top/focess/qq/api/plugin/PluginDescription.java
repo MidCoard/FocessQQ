@@ -149,7 +149,7 @@ public class PluginDescription {
         try {
             permissionsConfig = YamlConfiguration.loadFile(new File("plugins/Main","permissions.yml"));
         } catch (YamlLoadException e) {
-            FocessQQ.getLogger().fatalLang("fatal-read-permissions-config", e);
+            System.err.println("[FocessQQ][Console] -> Failed to load permissions.yml. Force shutdown.");
             FocessQQ.exit();
         }
     }

@@ -69,6 +69,8 @@ import java.util.concurrent.Future;
 import java.util.zip.GZIPOutputStream;
 public class FocessQQ {
 
+    private static final Object STOP_LOCK = new Object();
+    private static boolean isStopped;
 
     /**
      * Version of Focess
@@ -93,6 +95,31 @@ public class FocessQQ {
      * The Focess Logger
      */
     private static final FocessLogger LOGGER = new FocessLogger();
+    private static final Scheduler SCHEDULER = new FocessScheduler("FocessQQ");
+
+    private static final Scanner SCANNER = new Scanner(System.in);
+    private static final Thread CONSOLE_INPUT_THREAD = new Thread(() -> {
+        while (hasNextLine()) {
+            String input = SCANNER.nextLine();
+            try {
+                EventManager.submit(new ConsoleChatEvent(new TextMessage(input)));
+            } catch (EventSubmitException e) {
+                getLogger().thrLang("exception-submit-console-chat-event", e);
+            }
+        }
+    },"ConsoleInputThread");
+    private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
+        @Override
+        public void run() {
+            if (running) {
+                getLogger().fatalLang("fatal-save-data");
+                getLogger().debugLang("save-log");
+                saveLogFile();
+                saved = true;
+                disableMainPlugin();
+            }
+        }
+    };
     /**
      * The Main Plugin Instance
      */
@@ -101,13 +128,11 @@ public class FocessQQ {
      * The Bot Manager
      */
     private static BotManager botManager;
-    private static final Scheduler SCHEDULER = new FocessScheduler("FocessQQ");
     /**
      * The lang config
      */
     private static final LangConfig LANG_CONFIG = MAIN_PLUGIN.getLangConfig();
 
-    private static final Scanner SCANNER = new Scanner(System.in);
 
 
     private static boolean hasNextLine() {
@@ -126,17 +151,6 @@ public class FocessQQ {
         return SCANNER.hasNextLine();
     }
 
-    private static final Thread CONSOLE_INPUT_THREAD = new Thread(() -> {
-        while (hasNextLine()) {
-            String input = SCANNER.nextLine();
-            try {
-                EventManager.submit(new ConsoleChatEvent(new TextMessage(input)));
-            } catch (EventSubmitException e) {
-                getLogger().thrLang("exception-submit-console-chat-event", e);
-            }
-        }
-    },"ConsoleInputThread");
-    private static final Object STOP_LOCK = new Object();
     /**
      * The administrator QQ number
      */
@@ -194,20 +208,7 @@ public class FocessQQ {
         PluginClassLoader.disablePlugin(MAIN_PLUGIN);
     }
 
-    private static final Thread SHUTDOWN_HOOK = new Thread("SavingData") {
-        @Override
-        public void run() {
-            if (running) {
-                getLogger().fatalLang("fatal-save-data");
-                getLogger().debugLang("save-log");
-                saveLogFile();
-                saved = true;
-                disableMainPlugin();
-            }
-        }
-    };
     private static Options options;
-    private static Boolean isStopped = false;
 
     /**
      * Get the Friend Mirai instance by its id
@@ -375,7 +376,8 @@ public class FocessQQ {
             getLogger().fatalLang("fatal-uncaught-exception");
             exit();
         });
-
+        if (isStopped)
+            return;
         System.out.println("[FocessQQ][Console] -> This is the context from System.out.");
 
         try {
@@ -537,7 +539,7 @@ public class FocessQQ {
             System.exit(0);
         }, Duration.ofSeconds(5), "force-exit");
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
-        if (MAIN_PLUGIN.isEnabled())
+        if (MAIN_PLUGIN != null && MAIN_PLUGIN.isEnabled())
             PluginClassLoader.disablePlugin(MAIN_PLUGIN);
         running = false;
         if (getSocket() != null)
