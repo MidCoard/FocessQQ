@@ -14,7 +14,6 @@ import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.*;
 import top.focess.qq.api.event.bot.BotLoginEvent;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
-import top.focess.qq.api.plugin.LazyPlugin;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.test.environment.TestEnvironment;
 import top.focess.scheduler.AScheduler;
@@ -52,7 +51,6 @@ public class TestFramework {
 
     @Test
     void testNewPlugin() {
-        assertThrows(IllegalArgumentException.class, () -> new LazyPlugin(){});
         assertThrows(IllegalStateException.class, FocessQQ.MainPlugin::new);
     }
 

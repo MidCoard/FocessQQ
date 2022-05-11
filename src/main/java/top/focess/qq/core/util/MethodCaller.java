@@ -1,7 +1,6 @@
 package top.focess.qq.core.util;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import top.focess.qq.FocessQQ;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 
 import java.util.Arrays;
@@ -28,7 +27,6 @@ public class MethodCaller {
             try {
                 return PluginCoreClassLoader.forName(i);
             } catch (ClassNotFoundException e) {
-                FocessQQ.getLogger().thrLang("exception-get-null-caller-class",e);
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
