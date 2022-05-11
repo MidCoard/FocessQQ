@@ -17,7 +17,6 @@ import top.focess.qq.api.bot.contact.*;
 import top.focess.qq.api.bot.message.Audio;
 import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
-import top.focess.qq.api.bot.message.MessageChain;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.bot.QQBot;
 import top.focess.qq.core.bot.contact.*;
@@ -232,20 +231,6 @@ public class MiraiBot extends QQBot {
     private static net.mamoe.mirai.message.data.Message toMiraiMessage(final Message message) {
         if (message instanceof MiraiMessage)
             return ((MiraiMessage) message).getMessage();
-        if (message instanceof MessageChain) {
-            if (((MessageChain) message).isEmpty())
-                throw new IllegalArgumentException("MessageChain is empty");
-            final Message first = ((MessageChain) message).get(0);
-            if (!(first instanceof MiraiMessage))
-                throw new IllegalArgumentException("MessageChain's first element is not a MiraiMessage");
-            net.mamoe.mirai.message.data.Message ret = ((MiraiMessage) first).getMessage();
-            for (int i = 1; i < ((MessageChain) message).size(); i++)
-                if (!(((MessageChain) message).get(i) instanceof MiraiMessage))
-                    throw new IllegalArgumentException("MessageChain's element is not a MiraiMessage");
-                else
-                    ret = ret.plus(((MiraiMessage) ((MessageChain) message).get(i)).getMessage());
-            return ret;
-        }
         throw new IllegalArgumentException("Unknown message type: " + message.getClass());
     }
 
@@ -269,7 +254,7 @@ public class MiraiBot extends QQBot {
         for (final net.mamoe.mirai.contact.OtherClient client : clients)
             if (client.getId() == id)
                 return this.clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this,client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(),client.getInfo().getAppId()));
-       throw new NullPointerException("No such client");
+       throw new NullPointerException();
     }
 
     @Override
