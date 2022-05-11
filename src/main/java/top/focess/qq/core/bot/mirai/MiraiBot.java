@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.ContactList;
 import net.mamoe.mirai.contact.MemberPermission;
-import net.mamoe.mirai.message.data.PlainText;
 import net.mamoe.mirai.utils.ExternalResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -16,13 +15,12 @@ import top.focess.qq.api.bot.contact.*;
 import top.focess.qq.api.bot.message.Audio;
 import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
-import top.focess.qq.api.bot.message.TextMessage;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.bot.QQBot;
 import top.focess.qq.core.bot.contact.*;
 import top.focess.qq.core.bot.mirai.message.MiraiAudio;
 import top.focess.qq.core.bot.mirai.message.MiraiImage;
-import top.focess.qq.core.bot.mirai.message.MiraiMessage;
+import top.focess.qq.core.bot.mirai.message.MiraiMessageUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,7 +95,9 @@ public class MiraiBot extends QQBot {
 
     @Override
     public void sendMessage(final Transmitter transmitter, final Message message) {
-        final net.mamoe.mirai.message.data.Message mess = toMiraiMessage(message);
+        final net.mamoe.mirai.message.data.Message mess = MiraiMessageUtil.toNativeMessage(message);
+        if (mess == null)
+            return;
         if (transmitter instanceof Group) {
             final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(transmitter.getId());
             group.sendMessage(mess);
@@ -201,14 +201,6 @@ public class MiraiBot extends QQBot {
                 return CommandPermission.MEMBER;
         }
         throw new IllegalArgumentException("Unknown permission: " + permission);
-    }
-
-    private static net.mamoe.mirai.message.data.Message toMiraiMessage(final Message message) {
-        if (message instanceof MiraiMessage)
-            return ((MiraiMessage) message).getMessage();
-        if (message instanceof TextMessage)
-            return new PlainText(((TextMessage) message).getText());
-        throw new IllegalArgumentException("Unknown message type: " + message.getClass());
     }
 
     @Override

@@ -13,6 +13,6 @@ public class MiraiMessageChain extends MiraiMessage{
 
     @Override
     public String toString() {
-        return ((MessageChain)this.getMessage()).stream().filter(i -> !(i instanceof MessageSource)).map(Objects::toString).collect(Collectors.joining("\n"));
+        return ((MessageChain)this.getMessage()).stream().filter(i -> !(i instanceof MessageSource)).map(Objects::toString).collect(Collectors.joining(""));
     }
 }
