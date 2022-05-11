@@ -58,7 +58,7 @@ public class PluginDescription {
      */
     private final Version limitVersion;
 
-    private final Map<Permission,Boolean> permissions = Maps.newHashMap();
+    private final Map<Permission, Boolean> permissions = Maps.newHashMap();
 
     private static YamlConfiguration permissionsConfig;
 
@@ -69,13 +69,13 @@ public class PluginDescription {
      */
     public PluginDescription(@NotNull final YamlConfiguration pluginConfig) {
         this.main = pluginConfig.get("main");
-        this.author = pluginConfig.getOrDefault("author","");
+        this.author = pluginConfig.getOrDefault("author", "");
         this.dependencies = pluginConfig.getListOrEmpty("depend");
         this.softDependencies = pluginConfig.getListOrEmpty("soft-depend");
-        this.version = new Version(pluginConfig.getOrDefault("version","1.0.0"));
-        this.name = pluginConfig.getOrDefault("name","");
-        this.requireVersion = new Version(pluginConfig.getOrDefault("require-version",FocessQQ.getVersion().toString()));
-        this.limitVersion = new Version(pluginConfig.getOrDefault("limit-version",FocessQQ.getVersion().toString()));
+        this.version = new Version(pluginConfig.getOrDefault("version", "1.0.0"));
+        this.name = pluginConfig.getOrDefault("name", "");
+        this.requireVersion = new Version(pluginConfig.getOrDefault("require-version", FocessQQ.getVersion().toString()));
+        this.limitVersion = new Version(pluginConfig.getOrDefault("limit-version", FocessQQ.getVersion().toString()));
         YamlConfiguration permissionsStatus = permissionsConfig.getSection(this.name);
         List<String> yeses = permissionsStatus.getListOrEmpty("yes");
         List<String> nos = permissionsStatus.getListOrEmpty("no");
@@ -102,7 +102,7 @@ public class PluginDescription {
         }
         if (permissions.isEmpty())
             return;
-        IOHandler.getConsoleIoHandler().outputLang("permission-before-request",this.name, permissions.size());
+        IOHandler.getConsoleIoHandler().outputLang("permission-before-request", this.name, permissions.size());
         Boolean isAll = null;
         try {
             IOHandler.getConsoleIoHandler().hasInput(10);
@@ -114,36 +114,32 @@ public class PluginDescription {
         } catch (InputTimeoutException ignored) {
             IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
         }
-        try {
-            for (String permission : permissions) {
-                if (isAll == null) {
-                    IOHandler.getConsoleIoHandler().outputLang("permission-request", this.name, permission);
-                    try {
-                        IOHandler.getConsoleIoHandler().hasInput(10);
-                        String yes = IOHandler.getConsoleIoHandler().input();
-                        if (yes.equalsIgnoreCase("yes")) {
-                            yeses.add(permission);
-                            this.permissions.put(Permission.getPermission(permission), true);
-                        } else if (yes.equalsIgnoreCase("no")) {
-                            nos.add(permission);
-                            this.permissions.put(Permission.getPermission(permission), false);
-                        }
-                    } catch (InputTimeoutException ignored) {
-                        IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
-                    }
-                } else {
-                    if (isAll)
+        for (String permission : permissions) {
+            if (isAll == null) {
+                IOHandler.getConsoleIoHandler().outputLang("permission-request", this.name, permission);
+                try {
+                    IOHandler.getConsoleIoHandler().hasInput(10);
+                    String yes = IOHandler.getConsoleIoHandler().input();
+                    if (yes.equalsIgnoreCase("yes")) {
                         yeses.add(permission);
-                    else nos.add(permission);
-                    this.permissions.put(Permission.getPermission(permission), isAll);
+                        this.permissions.put(Permission.getPermission(permission), true);
+                    } else if (yes.equalsIgnoreCase("no")) {
+                        nos.add(permission);
+                        this.permissions.put(Permission.getPermission(permission), false);
+                    }
+                } catch (InputTimeoutException ignored) {
+                    IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
                 }
+            } else {
+                if (isAll)
+                    yeses.add(permission);
+                else nos.add(permission);
+                this.permissions.put(Permission.getPermission(permission), isAll);
             }
-            permissionsStatus.setList("yes", yeses);
-            permissionsStatus.setList("no", nos);
-            permissionsConfig.save(new File("plugins/Main", "permissions.yml"));
-        } catch (Exception r) {
-            r.printStackTrace();
         }
+        permissionsStatus.setList("yes", yeses);
+        permissionsStatus.setList("no", nos);
+        permissionsConfig.save(new File("plugins/Main", "permissions.yml"));
     }
 
     PluginDescription() {
@@ -155,15 +151,14 @@ public class PluginDescription {
         this.name = "Main";
         this.requireVersion = FocessQQ.getVersion();
         this.limitVersion = FocessQQ.getVersion();
-        this.permissions.put(Permission.ALL,true);
+        this.permissions.put(Permission.ALL, true);
         try {
-            File file = new File("plugins/Main","permissions.yml");
+            File file = new File("plugins/Main", "permissions.yml");
             if (!file.exists())
                 file.createNewFile();
             permissionsConfig = YamlConfiguration.loadFile(file);
         } catch (IOException e) {
-            System.err.println("[FocessQQ][Console] -> Failed to load permissions.yml. Force shutdown.");
-            FocessQQ.exit();
+            permissionsConfig = new YamlConfiguration(null);
         }
     }
 
