@@ -76,7 +76,7 @@ public class PluginDescription {
         this.name = pluginConfig.getOrDefault("name","");
         this.requireVersion = new Version(pluginConfig.getOrDefault("require-version",FocessQQ.getVersion().toString()));
         this.limitVersion = new Version(pluginConfig.getOrDefault("limit-version",FocessQQ.getVersion().toString()));
-        YamlConfiguration permissionsStatus = permissionsConfig.getSection("name");
+        YamlConfiguration permissionsStatus = permissionsConfig.getSection(this.name);
         List<String> yeses = permissionsStatus.getListOrEmpty("yes");
         List<String> nos = permissionsStatus.getListOrEmpty("no");
         List<String> permissions = Lists.newCopyOnWriteArrayList(pluginConfig.getListOrEmpty("permissions"));
@@ -135,7 +135,7 @@ public class PluginDescription {
         }
         permissionsStatus.set("yes",yeses);
         permissionsStatus.set("no",nos);
-        permissionsStatus.save(new File("plugins/Main","permissions.yml"));
+        permissionsConfig.save(new File("plugins/Main","permissions.yml"));
     }
 
     PluginDescription() {
