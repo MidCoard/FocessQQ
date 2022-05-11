@@ -105,37 +105,45 @@ public class PluginDescription {
         IOHandler.getConsoleIoHandler().outputLang("permission-before-request",this.name, permissions.size());
         Boolean isAll = null;
         try {
+            IOHandler.getConsoleIoHandler().hasInput(10);
             String yes = IOHandler.getConsoleIoHandler().input();
             if (yes.equalsIgnoreCase("yes"))
                 isAll = true;
             else if (yes.equalsIgnoreCase("no"))
                 isAll = false;
         } catch (InputTimeoutException ignored) {
+            IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
         }
-        for (String permission : permissions) {
-            if (isAll == null) {
-                IOHandler.getConsoleIoHandler().outputLang("permission-request",this.name,permission);
-                try {
-                    String yes = IOHandler.getConsoleIoHandler().input();
-                    if (yes.equalsIgnoreCase("yes")) {
-                        yeses.add(permission);
-                        this.permissions.put(Permission.getPermission(permission), true);
-                    } else if (yes.equalsIgnoreCase("no")) {
-                        nos.add(permission);
-                        this.permissions.put(Permission.getPermission(permission), false);
+        try {
+            for (String permission : permissions) {
+                if (isAll == null) {
+                    IOHandler.getConsoleIoHandler().outputLang("permission-request", this.name, permission);
+                    try {
+                        IOHandler.getConsoleIoHandler().hasInput(10);
+                        String yes = IOHandler.getConsoleIoHandler().input();
+                        if (yes.equalsIgnoreCase("yes")) {
+                            yeses.add(permission);
+                            this.permissions.put(Permission.getPermission(permission), true);
+                        } else if (yes.equalsIgnoreCase("no")) {
+                            nos.add(permission);
+                            this.permissions.put(Permission.getPermission(permission), false);
+                        }
+                    } catch (InputTimeoutException ignored) {
+                        IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
                     }
-                } catch (InputTimeoutException ignored) {
+                } else {
+                    if (isAll)
+                        yeses.add(permission);
+                    else nos.add(permission);
+                    this.permissions.put(Permission.getPermission(permission), isAll);
                 }
-            } else {
-                if (isAll)
-                    yeses.add(permission);
-                else nos.add(permission);
-                this.permissions.put(Permission.getPermission(permission), isAll);
             }
+            permissionsStatus.setList("yes", yeses);
+            permissionsStatus.setList("no", nos);
+            permissionsConfig.save(new File("plugins/Main", "permissions.yml"));
+        } catch (Exception r) {
+            r.printStackTrace();
         }
-        permissionsStatus.set("yes",yeses);
-        permissionsStatus.set("no",nos);
-        permissionsConfig.save(new File("plugins/Main","permissions.yml"));
     }
 
     PluginDescription() {

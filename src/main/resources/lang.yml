@@ -206,6 +206,7 @@ command-before-special-handler: "BeforeSpecialHandle: %s exec: Command: \"%s\", 
 command-after-special-handler: "AfterSpecialHandle: %s exec: Command: \"%s\", Args: %s, ID: %d"
 command-before-exec: "BeforeExec: %s exec: Command: \"%s\", Args: %s, ID: %d"
 command-after-exec: "AfterExec: %s exec: Command: \"%s\", Args: %s, Result: %s, ID: %d"
-permission-before-request: "Plugin %s requests %s permission(s), input \"yes\" to grant all, or input \"no\" to deny all, other to check each permission. We will remember your decision."
-permission-request: "Plugin % s requests %s permission, input \"yes\" to grant, or input \"other\" to deny. We will remember your decision."
+permission-before-request: "Plugin %s requests %s permission(s), input \"yes\" to grant all, or input \"no\" to deny all, other to check each permission in 10 seconds. We will remember your decision."
+permission-request: "Plugin %s requests %s permission, input \"yes\" to grant, or input \"other\" to deny in 10 seconds. We will remember your decision."
+permission-timeout: "Input timeout, ignore the permission."
 

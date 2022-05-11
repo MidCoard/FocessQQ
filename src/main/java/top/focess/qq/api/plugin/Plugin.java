@@ -21,7 +21,6 @@ import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
 import top.focess.util.serialize.FocessSerializable;
 import top.focess.util.version.Version;
-import top.focess.util.yaml.YamlConfiguration;
 import top.focess.util.yaml.YamlLoadException;
 
 import java.io.File;
@@ -86,7 +85,8 @@ public abstract class Plugin implements FocessSerializable {
      * @throws IllegalArgumentException if the plugin name is empty
      */
     public Plugin() {
-        this.initialize();
+        if (this.getClass() == FocessQQ.MainPlugin.class)
+            this.initialize(new PluginDescription());
     }
     /**
      * Get all the loaded plugins
@@ -307,16 +307,16 @@ public abstract class Plugin implements FocessSerializable {
         return this.initialized;
     }
 
-    public void initialize() {
+    public void initialize(@NonNull PluginDescription pluginDescription) {
+        Permission.checkPermission(Permission.INIT_PLUGIN);
+        this.pluginDescription = pluginDescription;
         if (this.getClass() != FocessQQ.MainPlugin.class || FocessQQ.isRunning()) {
-            this.pluginDescription = new PluginDescription(YamlConfiguration.load(this.loadResource("plugin.yml")));
             this.name = this.pluginDescription.getName();
             this.author = this.pluginDescription.getAuthor();
             this.version = this.pluginDescription.getVersion();
             if (getPlugin(this.getClass()) != null)
                 throw new PluginDuplicateException(this.name, "Cannot new a plugin at runtime");
         } else {
-            this.pluginDescription = new PluginDescription();
             this.name = this.pluginDescription.getName();
             this.author = this.pluginDescription.getAuthor();
             this.version = this.pluginDescription.getVersion();

@@ -110,7 +110,7 @@ public class PluginClassLoader extends URLClassLoader {
             try {
                 classLoader.plugin = (Plugin) PROVIDER.newInstance(c);
                 if (!classLoader.plugin.isInitialized())
-                    classLoader.plugin.initialize();
+                    classLoader.plugin.initialize(classLoader.getPluginDescription());
                 return true;
             } catch (Exception e) {
                 throw new PluginLoadException((Class<? extends Plugin>) c, e);
@@ -242,10 +242,11 @@ public class PluginClassLoader extends URLClassLoader {
         if (plugin != FocessQQ.getMainPlugin()) {
             Permission.checkPermission(Permission.ENABLE_PLUGIN);
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin), "enable-plugin-" + plugin.getName());
-            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
+            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(15));
             try {
                 task.join();
             } catch (final ExecutionException | InterruptedException | CancellationException e) {
+                section.stop();
                 if (e instanceof ExecutionException)
                     if (e.getCause() instanceof PluginLoadException)
                         throw (PluginLoadException) e.getCause();

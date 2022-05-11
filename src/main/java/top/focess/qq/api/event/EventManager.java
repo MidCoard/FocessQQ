@@ -49,6 +49,7 @@ public class EventManager {
         try {
             task.join();
         } catch (final ExecutionException | InterruptedException | CancellationException e) {
+            section.stop();
             if (e.getCause() instanceof EventSubmitRuntimeException)
                 throw (EventSubmitException) e.getCause().getCause();
             else FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
