@@ -47,7 +47,7 @@ public class ConsoleListener implements Listener {
                 return;
             }
         try {
-            final Future<CommandResult> ret = CommandLine.exec(event.getMessage());
+            final Future<CommandResult> ret = CommandLine.exec(event.getMessage().toString());
             EXECUTOR.run(() -> {
                 final Section section = Section.startSection("command-console-exec", ret, Duration.ofMinutes(10));
                 try {

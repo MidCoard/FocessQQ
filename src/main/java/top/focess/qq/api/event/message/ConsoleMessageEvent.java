@@ -1,5 +1,6 @@
 package top.focess.qq.api.event.message;
 
+import top.focess.qq.api.bot.message.TextMessage;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
 
@@ -13,13 +14,13 @@ public class ConsoleMessageEvent extends Event {
     /**
      * The console message
      */
-    private final String message;
+    private final TextMessage message;
 
-    public ConsoleMessageEvent(final String message) {
+    public ConsoleMessageEvent(final TextMessage message) {
         this.message = message;
     }
 
-    public String getMessage() {
+    public TextMessage getMessage() {
         return this.message;
     }
 }
