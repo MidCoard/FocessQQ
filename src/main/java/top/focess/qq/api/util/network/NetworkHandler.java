@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.commands.util.ChatConstants;
+import top.focess.qq.core.permission.Permission;
 import top.focess.util.network.HttpHandler;
 import top.focess.util.network.HttpResponse;
 
@@ -36,6 +37,7 @@ public class NetworkHandler {
      * @param options the options
      */
     public NetworkHandler(final Plugin plugin, final top.focess.util.network.NetworkHandler.Options options) {
+        Permission.checkPermission(Permission.NETWORK);
         this.plugin = plugin;
         this.networkHandler = new top.focess.util.network.NetworkHandler(options);
         this.networkHandler.addHandler(new HttpHandler() {

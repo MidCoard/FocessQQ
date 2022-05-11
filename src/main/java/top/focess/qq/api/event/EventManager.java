@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.core.debug.Section;
+import top.focess.qq.core.permission.Permission;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 
@@ -36,6 +37,7 @@ public class EventManager {
      * @throws EventSubmitException if class of this event is abstract or there is no LISTENER_HANDLER in this event
      */
     public static <T extends Event> void submit(final T event) throws EventSubmitException {
+        Permission.checkPermission(Permission.EVENT_SUBMIT);
         final Task task = SCHEDULER.run(() -> {
             try {
                 submit(cast(event.getClass()), event);

@@ -6,6 +6,7 @@ import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.bot.BotEvent;
+import top.focess.qq.core.permission.Permission;
 
 /**
  * Called when a friend-request comes
@@ -77,6 +78,7 @@ public class FriendRequestEvent extends BotEvent {
      * Accept this request
      */
     public void accept() {
+        Permission.checkPermission(Permission.FRIEND_REQUEST_ACCEPT);
         this.accept = true;
     }
 
@@ -89,6 +91,7 @@ public class FriendRequestEvent extends BotEvent {
      * Refuse this request
      */
     public void refuse() {
+        Permission.checkPermission(Permission.FRIEND_REQUEST_REFUSE);
         this.refuse(false);
     }
 

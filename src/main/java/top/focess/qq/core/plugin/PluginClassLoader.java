@@ -21,7 +21,7 @@ import top.focess.qq.api.plugin.*;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.core.bot.BotManagerFactory;
 import top.focess.qq.core.debug.Section;
-import top.focess.qq.core.util.MethodCaller;
+import top.focess.qq.core.permission.Permission;
 import top.focess.scheduler.Callback;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
@@ -61,6 +61,7 @@ public class PluginClassLoader extends URLClassLoader {
     private final boolean ignoreSoftDependencies;
 
     public static void loadSoftDependentPlugins() {
+        Permission.checkPermission(Permission.LOAD_SOFT_DEPENDENCIES);
         for (final String dependency : AFTER_PLUGINS_MAP.keySet())
             for (final Pair<File, Boolean> pair : AFTER_PLUGINS_MAP.get(dependency)){
                 if (!pair.getRight()) {
@@ -239,8 +240,9 @@ public class PluginClassLoader extends URLClassLoader {
 
     public static void enablePlugin(@NotNull final Plugin plugin) {
         if (plugin != FocessQQ.getMainPlugin()) {
+            Permission.checkPermission(Permission.ENABLE_PLUGIN);
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin), "enable-plugin-" + plugin.getName());
-            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(15));
+            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(30));
             try {
                 task.join();
             } catch (final ExecutionException | InterruptedException | CancellationException e) {
@@ -259,7 +261,10 @@ public class PluginClassLoader extends URLClassLoader {
                     FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
             }
             section.stop();
-        } else enablePlugin0(plugin);
+        } else {
+            Permission.checkPermission(Permission.ENABLE_MAIN_PLUGIN);
+            enablePlugin0(plugin);
+        }
     }
 
     private static void enablePlugin0(final Plugin plugin) {
@@ -279,9 +284,8 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Nullable
     public static File disablePlugin(final Plugin plugin) {
-        if (plugin == FocessQQ.getMainPlugin() && MethodCaller.getCallerClass() != FocessQQ.class)
-            throw new IllegalStateException("You don't have permission to disable the MainPlugin");
         if (plugin != FocessQQ.getMainPlugin()) {
+            Permission.checkPermission(Permission.DISABLE_PLUGIN);
             final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin), "disable-plugin-" + plugin.getName());
             final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
             File file = null;
@@ -297,7 +301,10 @@ public class PluginClassLoader extends URLClassLoader {
             final String name = plugin.getName();
             GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1), name);
             return file;
-        }  else return disablePlugin0(plugin);
+        }  else {
+            Permission.checkPermission(Permission.DISABLE_MAIN_PLUGIN);
+            return disablePlugin0(plugin);
+        }
     }
 
     @Nullable

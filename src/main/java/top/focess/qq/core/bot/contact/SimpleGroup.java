@@ -6,6 +6,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.contact.Member;
+import top.focess.qq.core.permission.Permission;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class SimpleGroup extends SimpleSpeaker implements Group {
 
     @Override
     public void quit() {
+        Permission.checkPermission(Permission.QUIT_GROUP);
         this.getBot().quitGroup(this);
     }
 

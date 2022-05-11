@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
+import top.focess.qq.core.permission.Permission;
 import top.focess.util.Pair;
 
 import java.lang.reflect.Field;
@@ -43,6 +44,7 @@ public class ListenerHandler {
      * @param plugin the plugin which need to unregister all its listeners
      */
     public static void unregister(final Plugin plugin) {
+        Permission.checkPermission(Permission.REMOVE_LISTENER);
         final List<Listener> listeners = PLUGIN_LISTENER_MAP.getOrDefault(plugin, Lists.newArrayList());
         for (final ListenerHandler handler : LISTENER_HANDLER_LIST)
             for (final Listener listener : listeners) {
@@ -59,6 +61,7 @@ public class ListenerHandler {
      * @param listener the listener need to be unregistered
      */
     public static void unregister(final Plugin plugin, final Listener listener) {
+        Permission.checkPermission(Permission.REMOVE_LISTENER);
         PLUGIN_LISTENER_MAP.computeIfPresent(plugin, (k, v) -> {
             v.remove(listener);
             return v;
@@ -75,6 +78,7 @@ public class ListenerHandler {
      * @param listener the listener
      */
     public static void register(final Plugin plugin, final Listener listener) {
+        Permission.checkPermission(Permission.REGISTER_LISTENER);
         PLUGIN_LISTENER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newArrayList();
@@ -109,6 +113,7 @@ public class ListenerHandler {
      * @return true if there are some listeners not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {
+        Permission.checkPermission(Permission.REMOVE_LISTENER);
         boolean ret = false;
         for (final Plugin plugin : PLUGIN_LISTENER_MAP.keySet()) {
             if (plugin != FocessQQ.getMainPlugin())
@@ -125,6 +130,7 @@ public class ListenerHandler {
      * @param listener the listener need to be unregistered
      */
     public void unregister(final Listener listener) {
+        Permission.checkPermission(Permission.REMOVE_LISTENER);
         this.listeners.remove(listener);
     }
 

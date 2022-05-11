@@ -15,6 +15,7 @@ import top.focess.qq.api.event.command.CommandExecutedEvent;
 import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.core.permission.Permission;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,6 +74,7 @@ public abstract class Command {
      * @param plugin the plugin that the commands that need to be unregistered belongs to
      */
     public static void unregister(final Plugin plugin) {
+        Permission.checkPermission(Permission.REMOVE_COMMAND);
         for (final Command command : COMMANDS_MAP.values())
             if (command.getPlugin().equals(plugin))
                 command.unregister();
@@ -84,6 +86,7 @@ public abstract class Command {
      * @return true if there are some commands not belonging to MainPlugin not been unregistered, false otherwise
      */
     public static boolean unregisterAll() {
+        Permission.checkPermission(Permission.REMOVE_COMMAND);
         boolean ret = false;
         for (final Command command : COMMANDS_MAP.values()) {
             if (command.getPlugin() != FocessQQ.getMainPlugin())
@@ -113,6 +116,7 @@ public abstract class Command {
      * @throws IllegalStateException    if the command is not initialized
      */
     public static void register(@NotNull final Plugin plugin, @NotNull final Command command) {
+        Permission.checkPermission(Permission.REGISTER_COMMAND);
         top.focess.command.Command.register(command.command);
         command.plugin = plugin;
         COMMANDS_MAP.put(command.getName(), command);
@@ -131,6 +135,7 @@ public abstract class Command {
      * Unregister this command
      */
     public void unregister() {
+        Permission.checkPermission(Permission.REMOVE_COMMAND);
         this.command.unregister();
         COMMANDS_MAP.remove(this.getName());
     }
@@ -189,6 +194,11 @@ public abstract class Command {
      * @throws Exception the exception that occurred when executing the command
      */
     public final CommandResult execute(@NotNull final CommandSender sender, @NotNull final String[] args, @NotNull final IOHandler ioHandler, final int id, final String rawCommand) throws Exception {
+        Permission.checkPermission(Permission.EXECUTE_NORMAL_COMMAND);
+        if (sender.isConsole())
+            Permission.checkPermission(Permission.EXECUTE_CONSOLE_COMMAND);
+        if (sender.isAdministrator())
+            Permission.checkPermission(Permission.EXECUTE_ADMINISTRATOR_COMMAND);
         final CommandPrepostEvent event = new CommandPrepostEvent(sender, this, args, ioHandler);
         try {
             EventManager.submit(event);

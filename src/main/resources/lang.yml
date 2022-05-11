@@ -6,6 +6,7 @@ fatal-save-data: Main Thread shuts down without saving Data. Try to save data no
 fatal-main-plugin-already-running: Main Plugin cannot be newed manually. Force shutdown!
 fatal-create-cache-dir-failed: Failed to create cache directory %s.
 fatal-reload-plugin: Failed to reload plugin %s.
+fatal-read-permissions-config: Failed to read permissions config. Force shutdown!
 exception-uncaught-exception: Uncaught exception
 exception-submit-console-chat-event: Submit console input event exception
 exception-submit-plugin-unload-event: Submit plugin unload event exception
@@ -72,6 +73,7 @@ exception-thread-pool-scheduler-thread-uncaught: ThreadPoolSchedulerThread %s un
 exception-scheduler-uncaught: Scheduler %s uncaught exception
 exception-load-soft-depend-plugin: Load soft-dependent plugin file %s exception
 exception-section: Section %s exception, %s
+exception-get-null-caller-class: Get null caller class exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
@@ -204,4 +206,6 @@ command-before-special-handler: "BeforeSpecialHandle: %s exec: Command: \"%s\", 
 command-after-special-handler: "AfterSpecialHandle: %s exec: Command: \"%s\", Args: %s, ID: %d"
 command-before-exec: "BeforeExec: %s exec: Command: \"%s\", Args: %s, ID: %d"
 command-after-exec: "AfterExec: %s exec: Command: \"%s\", Args: %s, Result: %s, ID: %d"
+permission-before-request: "Plugin %s requests %s permission(s), input \"yes\" to grant all, or input \"no\" to deny all, other to check each permission. We will remember your decision."
+permission-request: "Plugin % s requests %s permission, input \"yes\" to grant, or input \"other\" to deny. We will remember your decision."
 

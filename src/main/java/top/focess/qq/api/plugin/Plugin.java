@@ -15,6 +15,7 @@ import top.focess.qq.api.event.Listener;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.config.LangConfig;
+import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -170,7 +171,7 @@ public abstract class Plugin implements FocessSerializable {
 
     @NonNull
     public final File getDefaultFolder() {
-        return new File(new File("plugins"), this.getName());
+        return new File("plugins", this.getName());
     }
 
     @Override

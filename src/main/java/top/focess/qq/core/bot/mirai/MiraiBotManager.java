@@ -40,6 +40,7 @@ import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageChain;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageSource;
+import top.focess.qq.core.permission.Permission;
 import top.focess.scheduler.Scheduler;
 
 import javax.imageio.stream.FileImageOutputStream;
@@ -62,6 +63,7 @@ public class MiraiBotManager implements BotManager {
     private static final Map<Long, Bot> BOTS = Maps.newConcurrentMap();
 
     public void removeAll() {
+        Permission.checkPermission(Permission.REMOVE_BOT_MANAGER);
         for (final Long id : BOTS.keySet())
             this.remove(id);
         //remove default bot
@@ -72,6 +74,7 @@ public class MiraiBotManager implements BotManager {
     }
 
     public void remove(final Plugin plugin) {
+        Permission.checkPermission(Permission.REMOVE_BOT_MANAGER);
         for (final Bot b : PLUGIN_BOT_MAP.getOrDefault(plugin, Lists.newArrayList()))
             this.remove(b.getId());
         PLUGIN_BOT_MAP.remove(plugin);
@@ -80,12 +83,14 @@ public class MiraiBotManager implements BotManager {
     @Override
     @NotNull
     public Future<Bot> login(final long id, final String password, final Plugin plugin, final BotProtocol protocol) {
+        Permission.checkPermission(Permission.BOT_LOGIN);
         return SCHEDULER.submit(() -> this.loginDirectly(id, password, plugin, protocol),"login-bot-" + id);
     }
 
     @Override
     @NotNull
     public Bot loginDirectly(final long id, final String password, final Plugin plugin,final BotProtocol botProtocol) throws BotLoginException {
+        Permission.checkPermission(Permission.BOT_LOGIN);
         final net.mamoe.mirai.Bot bot = login0(id, password, botProtocol);
         final MiraiBot b = new MiraiBot(id, password, bot, botProtocol, plugin,this);
         this.setup(b, bot);
@@ -101,6 +106,7 @@ public class MiraiBotManager implements BotManager {
 
     @Override
     public boolean login(final Bot b) throws BotLoginException {
+        Permission.checkPermission(Permission.BOT_LOGIN);
         this.checkBot(b);
         if (b.isOnline())
             return false;
@@ -293,6 +299,7 @@ public class MiraiBotManager implements BotManager {
 
     @Override
     public boolean logout(@NotNull final Bot bot) {
+        Permission.checkPermission(Permission.BOT_LOGOUT);
         this.checkBot(bot);
         if (!bot.isOnline())
             return false;
@@ -316,6 +323,7 @@ public class MiraiBotManager implements BotManager {
 
     @Override
     public boolean relogin(@NotNull final Bot bot) throws BotLoginException {
+        Permission.checkPermission(Permission.BOT_RELOGIN);
         this.checkBot(bot);
         final boolean ret = this.logout(bot) && this.login(bot);
         try {
@@ -335,6 +343,7 @@ public class MiraiBotManager implements BotManager {
     @Nullable
     @Override
     public Bot remove(final long id) {
+        Permission.checkPermission(Permission.REMOVE_BOT_MANAGER);
         if (FocessQQ.getBot().getId() == id)
             return null;
         final Bot b = BOTS.remove(id);

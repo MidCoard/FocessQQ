@@ -41,6 +41,7 @@ import top.focess.qq.core.listeners.ChatListener;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
+import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -523,6 +524,7 @@ public class FocessQQ {
      * Exit FocessQQ Framework.
      */
     public static void exit() {
+        Permission.checkPermission(Permission.EXIT);
         synchronized (STOP_LOCK) {
             if (isStopped)
                 return;

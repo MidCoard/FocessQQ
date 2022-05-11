@@ -6,6 +6,7 @@ import top.focess.qq.api.event.Cancellable;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.core.permission.Permission;
 
 /**
  * Called before command executing
@@ -61,6 +62,7 @@ public class CommandPrepostEvent extends Event implements Cancellable {
 
     @Override
     public void setCancelled(final boolean cancelled) {
+        Permission.checkPermission(Permission.CANCEL_COMMAND_EXECUTE);
         this.cancelled = cancelled;
     }
 

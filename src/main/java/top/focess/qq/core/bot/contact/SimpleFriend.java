@@ -3,6 +3,7 @@ package top.focess.qq.core.bot.contact;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Friend;
+import top.focess.qq.core.permission.Permission;
 
 public class SimpleFriend extends SimpleSpeaker implements Friend {
     private final String name;
@@ -34,6 +35,7 @@ public class SimpleFriend extends SimpleSpeaker implements Friend {
 
     @Override
     public void delete() {
+        Permission.checkPermission(Permission.DELETE_FRIEND);
         this.getBot().deleteFriend(this);
     }
 }
