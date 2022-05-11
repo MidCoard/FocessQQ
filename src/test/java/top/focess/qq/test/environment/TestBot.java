@@ -82,22 +82,6 @@ public class TestBot extends QQBot {
     }
 
     @Override
-    public @NonNull Friend getFriendOrFail(long id) {
-        for (Friend friend : friends)
-            if (friend.getId() == id)
-                return friend;
-        throw new NullPointerException();
-    }
-
-    @Override
-    public @NonNull Group getGroupOrFail(long id) {
-        for (Group group: groups)
-            if (group.getId() == id)
-                return group;
-        throw new NullPointerException();
-    }
-
-    @Override
     public @Nullable Group getGroup(long id) {
         for (Group group: groups)
             if (group.getId() == id)
@@ -139,11 +123,6 @@ public class TestBot extends QQBot {
     }
 
     @Override
-    public void sendMessage(Transmitter transmitter, String message) {
-        System.out.println(this.getId() + " send message " + transmitter.getName() + "(" + transmitter.getId() + "): " + message);
-    }
-
-    @Override
     public Image uploadImage(Transmitter transmitter, InputStream resource) {
         throw new UnsupportedOperationException();
     }
@@ -169,11 +148,6 @@ public class TestBot extends QQBot {
     }
 
     @Override
-    public Member getMemberOrFail(Group group, long id) {
-        return group.getMemberOrFail(id);
-    }
-
-    @Override
     public Member getAsMember(Group group) {
         return group.getAsMember();
     }
@@ -185,16 +159,6 @@ public class TestBot extends QQBot {
 
     @Override
     public @Nullable Stranger getStranger(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Stranger getStrangerOrFail(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public OtherClient getOtherClientOrFail(long id) {
         throw new UnsupportedOperationException();
     }
 

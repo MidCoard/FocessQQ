@@ -6,7 +6,6 @@ import net.mamoe.mirai.contact.ContactList;
 import net.mamoe.mirai.contact.MemberPermission;
 import net.mamoe.mirai.message.data.PlainText;
 import net.mamoe.mirai.utils.ExternalResource;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -17,6 +16,7 @@ import top.focess.qq.api.bot.contact.*;
 import top.focess.qq.api.bot.message.Audio;
 import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
+import top.focess.qq.api.bot.message.TextMessage;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.bot.QQBot;
 import top.focess.qq.core.bot.contact.*;
@@ -50,19 +50,6 @@ public class MiraiBot extends QQBot {
 
     public void setNativeBot(final Bot nativeBot) {
         this.nativeBot = nativeBot;
-    }
-
-
-    @Override
-    public @NonNull Friend getFriendOrFail(final long id) {
-        final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(id);
-        return this.friendMap.computeIfAbsent(id, i -> new SimpleFriend(this,friend.getId(), friend.getRemark(), friend.getNick(), friend.getAvatarUrl()));
-    }
-
-    @Override
-    public @NonNull Group getGroupOrFail(final long id) {
-        final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(id);
-        return this.groupMap.computeIfAbsent(id, i -> new SimpleGroup(this,group.getId(), group.getName(), group.getAvatarUrl()));
     }
 
     @Override
@@ -121,11 +108,6 @@ public class MiraiBot extends QQBot {
             final net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStrangerOrFail(transmitter.getId());
             stranger.sendMessage(mess);
         }
-    }
-
-    @Override
-    public void sendMessage(final Transmitter transmitter, final String message) {
-        this.sendMessage(transmitter, new MiraiMessage(new PlainText(message)));
     }
 
     @Override
@@ -197,13 +179,6 @@ public class MiraiBot extends QQBot {
     }
 
     @Override
-    public Member getMemberOrFail(final Group group, final long id) {
-        final net.mamoe.mirai.contact.Group nativeGroup = this.nativeBot.getGroupOrFail(group.getId());
-        final net.mamoe.mirai.contact.Member member = nativeGroup.getOrFail(id);
-        return this.memberMap.computeIfAbsent(id, i -> new SimpleMember(group,member.getId(),member.getRemark(),member.getNick(),member.getNameCard(), toCommandPermission(member.getPermission())));
-    }
-
-    @Override
     public Member getAsMember(final Group group) {
         final net.mamoe.mirai.contact.Group nativeGroup = this.nativeBot.getGroupOrFail(group.getId());
         final net.mamoe.mirai.contact.Member member = nativeGroup.getBotAsMember();
@@ -231,6 +206,8 @@ public class MiraiBot extends QQBot {
     private static net.mamoe.mirai.message.data.Message toMiraiMessage(final Message message) {
         if (message instanceof MiraiMessage)
             return ((MiraiMessage) message).getMessage();
+        if (message instanceof TextMessage)
+            return new PlainText(((TextMessage) message).getText());
         throw new IllegalArgumentException("Unknown message type: " + message.getClass());
     }
 
@@ -240,21 +217,6 @@ public class MiraiBot extends QQBot {
         if (stranger == null)
             return null;
         return this.strangerMap.computeIfAbsent(id, i -> new SimpleStranger(this,stranger.getId(), stranger.getRemark(), stranger.getNick()));
-    }
-
-    @Override
-    public Stranger getStrangerOrFail(final long id) {
-        final net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStrangerOrFail(id);
-        return this.strangerMap.computeIfAbsent(id, i -> new SimpleStranger(this,stranger.getId(), stranger.getRemark(), stranger.getNick()));
-    }
-
-    @Override
-    public OtherClient getOtherClientOrFail(final long id) {
-        final ContactList<net.mamoe.mirai.contact.OtherClient> clients = this.nativeBot.getOtherClients();
-        for (final net.mamoe.mirai.contact.OtherClient client : clients)
-            if (client.getId() == id)
-                return this.clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this,client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(),client.getInfo().getAppId()));
-       throw new NullPointerException();
     }
 
     @Override
