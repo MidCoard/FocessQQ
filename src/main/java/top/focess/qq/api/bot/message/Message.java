@@ -11,10 +11,4 @@ public interface Message {
      */
     @Override
     String toString();
-
-    /**
-     * Get the mirai code of this message.
-     * @return the mirai code of this message
-     */
-    String toMiraiCode();
 }

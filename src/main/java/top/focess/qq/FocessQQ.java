@@ -11,6 +11,8 @@ import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Group;
+import top.focess.qq.api.bot.message.Message;
+import top.focess.qq.api.bot.message.TextMessage;
 import top.focess.qq.api.command.Command;
 import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandSender;
@@ -127,7 +129,7 @@ public class FocessQQ {
         while (hasNextLine()) {
             String input = SCANNER.nextLine();
             try {
-                EventManager.submit(new ConsoleChatEvent(input));
+                EventManager.submit(new ConsoleChatEvent(new TextMessage(input)));
             } catch (EventSubmitException e) {
                 getLogger().thrLang("exception-submit-console-chat-event", e);
             }
@@ -690,15 +692,15 @@ public class FocessQQ {
             Pair<IOHandler, Task> consoleElement;
             while ((consoleElement = ConsoleListener.QUESTS.poll()) != null) {
                 if (consoleElement.getValue().cancel())
-                    consoleElement.getKey().input((String) null);
+                    consoleElement.getKey().input((Message) null);
             }
             for (final CommandSender sender : ChatListener.QUESTS.keySet())
                 ChatListener.QUESTS.compute(sender, (k, v) -> {
                     if (v != null) {
-                        Pair<IOHandler, Pair<Boolean, Task>> element;
+                        Pair<IOHandler, Task> element;
                         while ((element = v.poll()) != null)
-                            if (element.getValue().getValue().cancel()) {
-                                element.getKey().input((String) null);
+                            if (element.getValue().cancel()) {
+                                element.getKey().input((Message) null);
                             }
                     }
                     return v;

@@ -1,10 +1,12 @@
 package top.focess.qq.api.util;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.focess.command.DataConverter;
 import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
@@ -13,6 +15,7 @@ import top.focess.scheduler.Scheduler;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -36,17 +39,18 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
         }
 
         @Override
-        public synchronized boolean hasInput(final boolean flag) {
-            ConsoleListener.registerInputListener(this,SCHEDULER.run(() -> this.input((String) null),Duration.ofMinutes(10),"input-10-min"));
-            return super.hasInput(flag);
+        public synchronized boolean hasInput() {
+            ConsoleListener.registerInputListener(this,SCHEDULER.run(() -> this.input((Message) null),Duration.ofMinutes(10),"input-10-min"));
+            return super.hasInput();
         }
 
         @Override
-        public synchronized boolean hasInput(final boolean flag, final int seconds) {
-            ConsoleListener.registerInputListener(this, SCHEDULER.run(() -> this.input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
-            return super.hasInput(flag);
+        public synchronized boolean hasInput(final int seconds) {
+            ConsoleListener.registerInputListener(this, SCHEDULER.run(() -> this.input((Message) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
+            return super.hasInput();
         }
     };
+    private @Nullable Message message;
 
     /**
      * Used to convert the input String into the target type
@@ -89,9 +93,35 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
      * Indicate there needs an input String and wait for the seconds
      *
      * @param seconds the timeout seconds
-     * @param flag true if you need the MiraiCode of this input when it is a Mirai Message, false if you need the string value of this input
      * @return true if there is an input String, false otherwise
-     * @see #hasInput(boolean)
      */
-    public abstract boolean hasInput(boolean flag, int seconds);
+    public abstract boolean hasInput(int seconds);
+
+    public void input(@Nullable Message message) {
+        this.message = message;
+        if (message == null)
+            this.input((String) null);
+        else
+            this.input(message.toString());
+    }
+
+    @NonNull
+    public synchronized Message inputMessage() throws InputTimeoutException {
+        // one of the callers can get the input String
+        if (this.flag) {
+            this.flag = false;
+            if (this.value == null)
+                throw new InputTimeoutException();
+            // this.message cannot be null, because the change of value is synchronized
+            return Objects.requireNonNull(this.message);
+        } else {
+            if (this.hasInput()) {
+                this.flag = false;
+                if (this.value == null)
+                    throw new InputTimeoutException();
+                // this.message cannot be null, because the change of value is synchronized
+                return Objects.requireNonNull(this.message);
+            } else throw new InputTimeoutException();
+        }
+    }
 }

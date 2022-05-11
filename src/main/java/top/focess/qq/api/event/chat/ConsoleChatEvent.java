@@ -1,6 +1,7 @@
 package top.focess.qq.api.event.chat;
 
 import org.jetbrains.annotations.NotNull;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
 
@@ -13,19 +14,19 @@ public class ConsoleChatEvent extends Event {
     /**
      * The console message
      */
-    private final String message;
+    private final Message message;
 
     /**
      * Constructs a ConsoleInputEvent
      *
      * @param message the console message
      */
-    public ConsoleChatEvent(final String message) {
+    public ConsoleChatEvent(final Message message) {
         this.message = message;
     }
 
     @NotNull
-    public String getMessage() {
+    public Message getMessage() {
         return this.message;
     }
 }

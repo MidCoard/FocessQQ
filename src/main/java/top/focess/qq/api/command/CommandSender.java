@@ -13,6 +13,7 @@ import top.focess.qq.api.bot.contact.CommandExecutor;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.api.bot.contact.Member;
 import top.focess.qq.api.bot.contact.Stranger;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.session.Session;
@@ -248,15 +249,15 @@ public class CommandSender extends top.focess.command.CommandSender {
             }
 
             @Override
-            public synchronized boolean hasInput(final boolean flag, final int seconds) {
-                ChatListener.registerInputListener(this, CommandSender.this, flag,IOHandler.SCHEDULER.run(() -> this.input((String) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
-                return super.hasInput(flag);
+            public synchronized boolean hasInput(final int seconds) {
+                ChatListener.registerInputListener(this, CommandSender.this, IOHandler.SCHEDULER.run(() -> this.input((Message) null), Duration.ofSeconds(seconds),"input-" + seconds + "-sec"));
+                return super.hasInput();
             }
 
             @Override
-            public synchronized boolean hasInput(final boolean flag) {
-                ChatListener.registerInputListener(this, CommandSender.this, flag, IOHandler.SCHEDULER.run(() -> this.input((String) null), Duration.ofMinutes(10), "input-10-min"));
-                return super.hasInput(flag);
+            public synchronized boolean hasInput() {
+                ChatListener.registerInputListener(this, CommandSender.this, IOHandler.SCHEDULER.run(() -> this.input((Message) null), Duration.ofMinutes(10), "input-10-min"));
+                return super.hasInput();
             }
 
         };

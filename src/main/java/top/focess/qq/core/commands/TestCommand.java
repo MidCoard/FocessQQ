@@ -49,7 +49,7 @@ public class TestCommand extends Command {
                         ioHandler.output("you have input");
                         ioHandler.output("You input: " + ioHandler.input());
                         ioHandler.output("please input one message in 10 seconds");
-                        ioHandler.hasInput(true, 10);
+                        ioHandler.hasInput(10);
                         try {
                             ioHandler.output("You input: " + ioHandler.input());
                         } catch (final InputTimeoutException e) {

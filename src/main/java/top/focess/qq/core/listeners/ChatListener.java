@@ -7,6 +7,7 @@ import top.focess.command.CommandResult;
 import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.contact.CommandExecutor;
+import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.event.*;
@@ -33,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
     private static boolean pauseMode;
-    public static final Map<CommandSender, Queue<Pair<IOHandler, Pair<Boolean, Task>>>> QUESTS = Maps.newConcurrentMap();
+    public static final Map<CommandSender, Queue<Pair<IOHandler, Task>>> QUESTS = Maps.newConcurrentMap();
     private static final Scheduler EXECUTOR = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 5, true, "ChatListener");
 
     /**
@@ -41,27 +42,24 @@ public class ChatListener implements Listener {
      *
      * @param ioHandler     the receiver
      * @param commandSender the commandSender
-     * @param flag          true if you want to get the string value of this message, false if you want to get MiraiCode of this message
      * @param task          the timeout task
      */
-    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final boolean flag, final Task task) {
+    public static void registerInputListener(final IOHandler ioHandler, final CommandSender commandSender, final Task task) {
         QUESTS.compute(commandSender, (k, v) -> {
             if (v == null)
                 v = Queues.newLinkedBlockingDeque();
-            v.offer(Pair.of(ioHandler, Pair.of(flag, task)));
+            v.offer(Pair.of(ioHandler, task));
             return v;
         });
     }
 
-    private static void updateInput(final CommandSender sender, final String content, final String miraiContent, final AtomicBoolean flag) {
+    private static void updateInput(final CommandSender sender, final Message message, final AtomicBoolean flag) {
         QUESTS.compute(sender, (k, v) -> {
             if (v != null) {
-                Pair<IOHandler, Pair<Boolean, Task>> element;
+                Pair<IOHandler, Task> element;
                 while ((element = v.poll()) != null) {
-                    if (element.getValue().getValue().cancel()) {
-                        if (element.getValue().getKey())
-                            element.getKey().input(miraiContent);
-                        else element.getKey().input(content);
+                    if (element.getValue().cancel()) {
+                        element.getKey().input(message);
                         flag.set(true);
                         return v;
                     }
@@ -95,7 +93,7 @@ public class ChatListener implements Listener {
         IOHandler.getConsoleIoHandler().output(event.getMessage().toString());
         final CommandSender sender = event.getMember().getCommandSender();
         final AtomicBoolean flag = new AtomicBoolean(false);
-        updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
+        updateInput(sender, event.getMessage(), flag);
         if (!flag.get())
             try {
                 final Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
@@ -130,7 +128,7 @@ public class ChatListener implements Listener {
         IOHandler.getConsoleIoHandler().output(event.getMessage().toString());
         final CommandSender sender = event.getFriend().getCommandSender();
         final AtomicBoolean flag = new AtomicBoolean(false);
-        updateInput(sender, event.getMessage().toString(), event.getMessage().toMiraiCode(), flag);
+        updateInput(sender, event.getMessage(), flag);
         if (!flag.get())
             try {
                 final Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
