@@ -65,6 +65,11 @@ public class AScheduler implements Scheduler {
     }
 
     @Override
+    public Task runTimer(Runnable runnable, Duration duration, Duration duration1, String s, Consumer<ExecutionException> consumer) {
+        return this.scheduler.runTimer(runnable, duration, duration1, s, consumer);
+    }
+
+    @Override
     public <V> Callback<V> submit(final Callable<V> callable, final Duration delay) {
         return this.scheduler.submit(callable, delay);
     }

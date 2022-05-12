@@ -1,6 +1,7 @@
 package top.focess.qq.test;
 
 import com.google.common.collect.Lists;
+import com.sun.source.tree.AssertTree;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -394,5 +395,32 @@ public class TestUtil {
         assertEquals("Zm9j", Base64.base64Encode("foc".getBytes(StandardCharsets.UTF_8)));
         assertEquals("foc", new String(Base64.base64Decode("Zm9j"), StandardCharsets.UTF_8));
     }
+
+    @RepeatedTest(5)
+    void testScheduler5() {
+//        Scheduler scheduler = new ThreadPoolScheduler(1, false,"test-5");
+        Scheduler scheduler = new FocessScheduler("test-5");
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        Task task = scheduler.runTimer(()->{
+            atomicInteger.incrementAndGet();
+            throw new NullPointerException();
+        }, Duration.ofSeconds(0), Duration.ofSeconds(1),"test");
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            fail();
+        }
+        assertTrue(task.isPeriod());
+        task.cancel();
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            fail();
+        }
+        assertTrue(task.isCancelled());
+        assertNotEquals(1, atomicInteger.get());
+        scheduler.close();
+    }
+
 
 }
