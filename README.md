@@ -27,6 +27,10 @@
 --noDefaultPluginLoad 设置不加载默认插件
 
 --debug 设置调试模式
+
+--botManager <name> 设置启用机器人管理器
+
+--allowAll 设置允许插件所有询问权限
 ```
 
 ## 通信

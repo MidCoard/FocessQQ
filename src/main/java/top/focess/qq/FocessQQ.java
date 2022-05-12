@@ -210,6 +210,10 @@ public class FocessQQ {
 
     private static Options options;
 
+    public static Options getOptions() {
+        return options;
+    }
+
     /**
      * Get the Friend Mirai instance by its id
      *

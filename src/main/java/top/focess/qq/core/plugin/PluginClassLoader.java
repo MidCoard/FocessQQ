@@ -52,7 +52,8 @@ public class PluginClassLoader extends URLClassLoader {
     private static final Map<String, Set<Pair<File,Boolean>>> AFTER_PLUGINS_MAP = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, AnnotationHandler> HANDLERS = Maps.newHashMap();
     private static final Map<Class<? extends Annotation>, FieldAnnotationHandler> FIELD_ANNOTATION_HANDLERS = Maps.newHashMap();
-    private static final List<ResourceHandler> RESOURCE_HANDLERS = Lists.newArrayList();
+    private static final ResourceHandler PLUGIN_YML_HANDLER,
+            CLASS_HANDLER;
     private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 1,false,"PluginLoader");
     private static final Scheduler GC_SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "GC");
     private static final PureJavaReflectionProvider PROVIDER = new PureJavaReflectionProvider();
@@ -126,19 +127,19 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().thrLang("exception-init-classloader", e);
         }
 
-        RESOURCE_HANDLERS.add((name, inputStream, pluginClassLoader) -> {
+        CLASS_HANDLER = (name, inputStream, pluginClassLoader) -> {
             if (name.endsWith(".class"))
                 try {
                     pluginClassLoader.loadedClasses.add(pluginClassLoader.loadClass(name.replace("/", ".").substring(0, name.length() - 6), true));
                 } catch (final ClassNotFoundException e) {
                     FocessQQ.getLogger().thrLang("exception-load-class", e);
                 }
-        });
+        };
 
-        RESOURCE_HANDLERS.add((name, inputStream, pluginClassLoader) -> {
+        PLUGIN_YML_HANDLER = (name, inputStream, pluginClassLoader) -> {
             if (name.equals("plugin.yml"))
                 pluginClassLoader.pluginDescription = new PluginDescription(YamlConfiguration.load(inputStream));
-        });
+        };
 
         HANDLERS.put(CommandType.class, (c, annotation, classLoader) -> {
             final CommandType commandType = (CommandType) annotation;
@@ -405,18 +406,21 @@ public class PluginClassLoader extends URLClassLoader {
             FocessQQ.getLogger().debugLang("start-load-plugin", this.file.getName());
             try {
                 final Enumeration<JarEntry> entries = this.jarFile.entries();
+                List<Pair<String,InputStream>> inputStreams = Lists.newArrayList();
                 while (entries.hasMoreElements()) {
                     final JarEntry jarEntry = entries.nextElement();
                     final String name = jarEntry.getName();
-                    for (final ResourceHandler resourceHandler : RESOURCE_HANDLERS)
-                        resourceHandler.handle(name, this.jarFile.getInputStream(jarEntry), this);
+                    PLUGIN_YML_HANDLER.handle(name, this.jarFile.getInputStream(jarEntry), this);
+                    inputStreams.add(Pair.of(name, this.jarFile.getInputStream(jarEntry)));
                 }
-                FocessQQ.getLogger().debugLang("load-plugin-classes", this.loadedClasses.size());
                 if (this.pluginDescription == null) {
                     FocessQQ.getLogger().debugLang("plugin-description-not-found");
                     PluginCoreClassLoader.LOADERS.remove(this);
                     return false;
                 }
+                for (final Pair<String,InputStream> inputStream : inputStreams)
+                    CLASS_HANDLER.handle(inputStream.getFirst(),inputStream.getSecond(), this);
+                FocessQQ.getLogger().debugLang("load-plugin-classes", this.loadedClasses.size());
                 final Class<?> pluginClass = this.findClass(this.pluginDescription.getMain(), false);
                 final Annotation annotation = pluginClass.getAnnotation(PluginType.class);
                 if (annotation != null) {

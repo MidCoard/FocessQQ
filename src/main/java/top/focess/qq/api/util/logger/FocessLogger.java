@@ -52,7 +52,7 @@ public class FocessLogger {
      */
     public void thr(final String message, final Throwable e) {
         LOG.error(message, e);
-        if (this.debugOutput && FocessQQ.getAdministrator() != null)
+        if (this.debugOutput && FocessQQ.isRunning() && FocessQQ.getAdministrator() != null)
             FocessQQ.getAdministrator().sendMessage(message + ", " + e.getMessage());
     }
 
@@ -75,6 +75,8 @@ public class FocessLogger {
      */
     public void fatal(final String message) {
         LOG.error(ChatConstants.CONSOLE_FATAL_HEADER + message);
+        if (this.debugOutput && FocessQQ.getAdministrator() != null)
+            FocessQQ.getAdministrator().sendMessage(message);
     }
 
 

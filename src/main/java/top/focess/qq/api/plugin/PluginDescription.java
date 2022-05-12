@@ -7,6 +7,7 @@ import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.permission.Permission;
+import top.focess.util.option.Option;
 import top.focess.util.version.Version;
 import top.focess.util.yaml.YamlConfiguration;
 
@@ -102,17 +103,22 @@ public class PluginDescription {
         }
         if (permissions.isEmpty())
             return;
-        IOHandler.getConsoleIoHandler().outputLang("permission-before-request", this.name, permissions.size());
+        Option option = FocessQQ.getOptions().get("allowAll");
         Boolean isAll = null;
-        try {
-            IOHandler.getConsoleIoHandler().hasInput(10);
-            String yes = IOHandler.getConsoleIoHandler().input();
-            if (yes.equalsIgnoreCase("yes"))
-                isAll = true;
-            else if (yes.equalsIgnoreCase("no"))
-                isAll = false;
-        } catch (InputTimeoutException ignored) {
-            IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
+        if (option != null)
+            isAll = true;
+        else {
+            IOHandler.getConsoleIoHandler().outputLang("permission-before-request", this.name, permissions.size());
+            try {
+                IOHandler.getConsoleIoHandler().hasInput(10);
+                String yes = IOHandler.getConsoleIoHandler().input();
+                if (yes.equalsIgnoreCase("yes"))
+                    isAll = true;
+                else if (yes.equalsIgnoreCase("no"))
+                    isAll = false;
+            } catch (InputTimeoutException ignored) {
+                IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
+            }
         }
         for (String permission : permissions) {
             if (isAll == null) {
