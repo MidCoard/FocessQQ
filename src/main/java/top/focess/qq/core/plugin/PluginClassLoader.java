@@ -255,10 +255,10 @@ public class PluginClassLoader extends URLClassLoader {
                         throw (PluginDuplicateException) e.getCause();
                     else if (e.getCause() instanceof PluginUnloadException)
                         throw (PluginUnloadException) e.getCause();
-                    else if (e.getCause() instanceof IncompatibleClassChangeError)
-                        throw new PluginLoadException(plugin.getClass(), e.getCause());
-                    else
+                    else {
                         FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getCause().getMessage());
+                        throw new PluginLoadException(plugin.getClass(), e.getCause());
+                    }
                 else if (!(e instanceof CancellationException))
                     FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
             }
@@ -411,6 +411,7 @@ public class PluginClassLoader extends URLClassLoader {
                     final JarEntry jarEntry = entries.nextElement();
                     final String name = jarEntry.getName();
                     PLUGIN_YML_HANDLER.handle(name, this.jarFile.getInputStream(jarEntry), this);
+                    System.out.println(name);
                     inputStreams.add(Pair.of(name, this.jarFile.getInputStream(jarEntry)));
                 }
                 if (this.pluginDescription == null) {
@@ -419,7 +420,7 @@ public class PluginClassLoader extends URLClassLoader {
                     return false;
                 }
                 for (final Pair<String,InputStream> inputStream : inputStreams)
-                    CLASS_HANDLER.handle(inputStream.getFirst(),inputStream.getSecond(), this);
+                    CLASS_HANDLER.handle(inputStream.getFirst(), inputStream.getSecond(), this);
                 FocessQQ.getLogger().debugLang("load-plugin-classes", this.loadedClasses.size());
                 final Class<?> pluginClass = this.findClass(this.pluginDescription.getMain(), false);
                 final Annotation annotation = pluginClass.getAnnotation(PluginType.class);

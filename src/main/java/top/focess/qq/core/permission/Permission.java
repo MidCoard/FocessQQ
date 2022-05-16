@@ -51,6 +51,8 @@ public enum Permission {
     EVENT_SUBMIT("EVENT_SUBMIT",2),
     DISABLE_PLUGIN("UNLOAD_PLUGIN",4),
     ENABLE_PLUGIN("ENABLE_PLUGIN",4),
+
+    // no need for this permission
     NEW_PLUGIN("NEW_PLUGIN",4),
     LOAD_SOFT_DEPENDENCIES("LOAD_SOFT_DEPENDENCIES",4),
 
@@ -95,8 +97,10 @@ public enum Permission {
     }
 
     public static void checkPermission(@NotNull Plugin plugin, Permission permission) {
-        if (!plugin.getPluginDescription().hasPermission(permission))
+        if (!plugin.getPluginDescription().hasPermission(permission)) {
+            System.out.println(plugin.getName() + "  " + plugin.getPluginDescription().getPermissions());
             throw new PermissionException(plugin, permission);
+        }
     }
 
     public String getName() {
@@ -111,8 +115,7 @@ public enum Permission {
         for (Class<?> clazz : MethodCaller.getAllCallerClass()) {
             Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(clazz);
             if (plugin != null)
-                if (!plugin.getPluginDescription().hasPermission(permission))
-                    throw new PermissionException(plugin, permission);
+                checkPermission(plugin, permission);
         }
     }
 

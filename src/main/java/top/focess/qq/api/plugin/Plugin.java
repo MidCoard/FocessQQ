@@ -85,7 +85,7 @@ public abstract class Plugin implements FocessSerializable {
      * @throws IllegalArgumentException if the plugin name is empty
      */
     public Plugin() {
-        Permission.checkPermission(Permission.NEW_PLUGIN);
+        // no need for check permission
         if (this.getClass() == FocessQQ.MainPlugin.class)
             this.initialize(new PluginDescription());
     }

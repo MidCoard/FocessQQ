@@ -61,6 +61,10 @@ public class PluginDescription {
 
     private final Map<Permission, Boolean> permissions = Maps.newHashMap();
 
+    public Map<Permission, Boolean> getPermissions() {
+        return permissions;
+    }
+
     private static YamlConfiguration permissionsConfig;
 
     /**
