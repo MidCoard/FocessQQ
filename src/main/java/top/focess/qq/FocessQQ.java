@@ -408,7 +408,8 @@ public class FocessQQ {
                 new OptionParserClassifier("admin", LongOptionType.LONG_OPTION_TYPE),
                 new OptionParserClassifier("noDefaultPluginLoad"),
                 new OptionParserClassifier("debug"),
-                new OptionParserClassifier("botManager", OptionType.DEFAULT_OPTION_TYPE)
+                new OptionParserClassifier("botManager", OptionType.DEFAULT_OPTION_TYPE),
+                new OptionParserClassifier("allowAll")
         );
         Option option = options.get("help");
         if (option != null) {
@@ -424,6 +425,7 @@ public class FocessQQ {
             getLogger().info("--noDefaultPluginLoad");
             getLogger().info("--debug");
             getLogger().info("--botManager <name>");
+            getLogger().info("--allowAll");
             saveLogFile();
             getLogger().debugLang("save-log");
             exit();
