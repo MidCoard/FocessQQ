@@ -139,6 +139,8 @@ reload-command-reload-plugin-failed: Failed to reload plugin %s
 reload-command-plugin-loader-error: The classloader of the plugin %s is not PluginClassLoader
 plugin-command-no-plugin: There is no plugin
 plugin-command-list: "The following plugins are :"
+plugin-command-no-permission-matched: There is no plugin matched the permission %s
+plugin-command-list-permission: "The following plugins matched the permission %s are:"
 group-command-bot-not-found: Bot %d does not exist
 group-command-list: "The following groups are :"
 group-command-no-group: There is no group

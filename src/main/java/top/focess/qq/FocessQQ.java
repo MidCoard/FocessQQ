@@ -18,8 +18,10 @@ import top.focess.qq.api.command.CommandLine;
 import top.focess.qq.api.command.CommandSender;
 import top.focess.qq.api.command.DataCollection;
 import top.focess.qq.api.command.converter.CommandDataConverter;
+import top.focess.qq.api.command.converter.PermissionDataConverter;
 import top.focess.qq.api.command.converter.PluginDataConverter;
 import top.focess.qq.api.command.data.CommandBuffer;
+import top.focess.qq.api.command.data.PermissionBuffer;
 import top.focess.qq.api.command.data.PluginBuffer;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventSubmitException;
@@ -624,6 +626,7 @@ public class FocessQQ {
             getLogger().debugLang("register-default-listeners");
             this.registerBuffer(PluginDataConverter.PLUGIN_DATA_CONVERTER, PluginBuffer::allocate);
             this.registerBuffer(CommandDataConverter.COMMAND_DATA_CONVERTER, CommandBuffer::allocate);
+            this.registerBuffer(PermissionDataConverter.PERMISSION_DATA_CONVERTER, PermissionBuffer::allocate);
             getLogger().debugLang("register-default-buffers");
             this.registerCommand(new LoadCommand());
             this.registerCommand(new UnloadCommand());
