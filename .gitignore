@@ -20,3 +20,4 @@ NightClass.obj
 *.gz
 *.log
 temp.yml
+permissions.yml

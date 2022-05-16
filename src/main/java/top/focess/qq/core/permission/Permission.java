@@ -98,7 +98,6 @@ public enum Permission {
 
     public static void checkPermission(@NotNull Plugin plugin, Permission permission) {
         if (!plugin.getPluginDescription().hasPermission(permission)) {
-            System.out.println(plugin.getName() + "  " + plugin.getPluginDescription().getPermissions());
             throw new PermissionException(plugin, permission);
         }
     }

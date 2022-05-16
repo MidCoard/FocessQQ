@@ -411,7 +411,6 @@ public class PluginClassLoader extends URLClassLoader {
                     final JarEntry jarEntry = entries.nextElement();
                     final String name = jarEntry.getName();
                     PLUGIN_YML_HANDLER.handle(name, this.jarFile.getInputStream(jarEntry), this);
-                    System.out.println(name);
                     inputStreams.add(Pair.of(name, this.jarFile.getInputStream(jarEntry)));
                 }
                 if (this.pluginDescription == null) {
