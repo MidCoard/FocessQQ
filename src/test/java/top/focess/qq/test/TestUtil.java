@@ -1,7 +1,6 @@
 package top.focess.qq.test;
 
 import com.google.common.collect.Lists;
-import com.sun.source.tree.AssertTree;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -398,7 +397,6 @@ public class TestUtil {
 
     @RepeatedTest(5)
     void testScheduler5() {
-//        Scheduler scheduler = new ThreadPoolScheduler(1, false,"test-5");
         Scheduler scheduler = new FocessScheduler("test-5");
         AtomicInteger atomicInteger = new AtomicInteger(0);
         Task task = scheduler.runTimer(()->{

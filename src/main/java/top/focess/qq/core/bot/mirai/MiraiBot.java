@@ -112,49 +112,53 @@ public class MiraiBot extends QQBot {
 
     @Override
     public @Nullable Image uploadImage(final Transmitter transmitter, final InputStream resource) {
+        ExternalResource externalResource;
+        try {
+            externalResource = ExternalResource.create(resource);
+        } catch (IOException e) {
+            return null;
+        }
+        MiraiImage ret = null;
         if (transmitter instanceof Group) {
             final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(transmitter.getId());
-            try {
-                return new MiraiImage(group.uploadImage(ExternalResource.create(resource)));
-            } catch (final IOException e) {
-                return null;
-            }
+            ret = new MiraiImage(group.uploadImage(externalResource));
         } else if (transmitter instanceof Friend) {
             final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(transmitter.getId());
-            try {
-                return new MiraiImage(friend.uploadImage(ExternalResource.create(resource)));
-            } catch (final IOException e) {
-                return null;
-            }
+            ret = new MiraiImage(friend.uploadImage(externalResource));
         } else if (transmitter instanceof Stranger) {
             final net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStrangerOrFail(transmitter.getId());
-            try {
-                return new MiraiImage(stranger.uploadImage(ExternalResource.create(resource)));
-            } catch (final IOException e) {
-                return null;
-            }
+            ret = new MiraiImage(stranger.uploadImage(externalResource));
         }
-        return null;
+        try {
+            externalResource.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return ret;
     }
 
     @Override
     public @Nullable Audio uploadAudio(final Speaker speaker, final InputStream inputStream) {
+        ExternalResource externalResource;
+        try {
+            externalResource = ExternalResource.create(inputStream);
+        } catch (IOException e) {
+            return null;
+        }
+        MiraiAudio ret = null;
         if (speaker instanceof Friend) {
             final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(speaker.getId());
-            try {
-                return new MiraiAudio(friend.uploadAudio(ExternalResource.create(inputStream)));
-            } catch (final IOException e) {
-                return null;
-            }
+            ret = new MiraiAudio(friend.uploadAudio(externalResource));
         } else if (speaker instanceof Group) {
             final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(speaker.getId());
-            try {
-                return new MiraiAudio(group.uploadAudio(ExternalResource.create(inputStream)));
-            } catch (final IOException e) {
-                return null;
-            }
+            ret = new MiraiAudio(group.uploadAudio(externalResource));
         }
-        return null;
+        try {
+            externalResource.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return ret;
     }
 
     @Override
