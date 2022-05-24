@@ -186,8 +186,8 @@ public class MiraiBotManager implements BotManager {
         }
         final List<Listener<?>> listeners = Lists.newArrayList();
         listeners.add(bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, event -> {
-            final Group group = Objects.requireNonNull(b.getGroup(event.getGroup().getId()));
-            final GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(group.getMember(event.getSender().getId())), new MiraiMessageChain(event.getMessage()), MiraiMessageSource.of(event.getSource()));
+            final Group group = Objects.requireNonNull(b.getGroup(event.getGroup()));
+            final GroupChatEvent e = new GroupChatEvent(b, Objects.requireNonNull(b.getMember(event.getSender())), new MiraiMessageChain(event.getMessage()), MiraiMessageSource.of(event.getSource()));
             try {
                 EventManager.submit(e);
             } catch (final EventSubmitException eventSubmitException) {
@@ -195,7 +195,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(FriendMessageEvent.class, event -> {
-            final Friend friend = Objects.requireNonNull(b.getFriend(event.getSender().getId()));
+            final Friend friend = Objects.requireNonNull(b.getFriend(event.getSender()));
             final FriendChatEvent e = new FriendChatEvent(b, friend, new MiraiMessageChain(event.getMessage()), MiraiMessageSource.of(event.getSource()));
             try {
                 EventManager.submit(e);
@@ -204,8 +204,8 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.GroupRecall.class, event -> {
-            final Group group = Objects.requireNonNull(b.getGroup(event.getGroup().getId()));
-            final GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(group.getMember(event.getAuthor().getId())), event.getMessageIds(), event.getOperator() != null ? Objects.requireNonNull(group.getMember(event.getOperator().getId())) : null);
+            final Group group = Objects.requireNonNull(b.getGroup(event.getGroup()));
+            final GroupRecallEvent e = new GroupRecallEvent(b, Objects.requireNonNull(b.getMember(event.getAuthor())), event.getMessageIds(), b.getMember(event.getOperator()));
             try {
                 EventManager.submit(e);
             } catch (final EventSubmitException ex) {
@@ -213,7 +213,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageRecallEvent.FriendRecall.class, event -> {
-            final Friend friend = Objects.requireNonNull(b.getFriend(event.getAuthor().getId()));
+            final Friend friend = Objects.requireNonNull(b.getFriend(event.getAuthor()));
             final FriendRecallEvent e = new FriendRecallEvent(b, friend, event.getMessageIds());
             try {
                 EventManager.submit(e);
@@ -222,7 +222,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, event -> {
-            final Group group = Objects.requireNonNull(b.getGroup(event.getFromGroupId()));
+            final Group group = b.getGroup(event.getFromGroup());
             final FriendRequestEvent e = new FriendRequestEvent(b, event.getFromId(), event.getFromNick(), group, event.getMessage());
             try {
                 EventManager.submit(e);
@@ -235,7 +235,7 @@ public class MiraiBotManager implements BotManager {
                 else event.reject(e.isBlackList());
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(BotInvitedJoinGroupRequestEvent.class, event -> {
-            final Friend friend = Objects.requireNonNull(b.getFriend(event.getInvitorId()));
+            final Friend friend = b.getFriend(event.getInvitor());
             final GroupRequestEvent e = new GroupRequestEvent(b, event.getGroupId(), event.getGroupName(), friend);
             try {
                 EventManager.submit(e);
@@ -248,7 +248,7 @@ public class MiraiBotManager implements BotManager {
                 else event.ignore();
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(FriendInputStatusChangedEvent.class, event -> {
-            final Friend friend = Objects.requireNonNull(b.getFriend(event.getFriend().getId()));
+            final Friend friend = Objects.requireNonNull(b.getFriend(event.getFriend()));
             final FriendInputStatusEvent e = new FriendInputStatusEvent(b, friend, event.getInputting());
             try {
                 EventManager.submit(e);
@@ -257,7 +257,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(StrangerMessageEvent.class, event -> {
-            final Stranger stranger = Objects.requireNonNull(b.getStranger(event.getStranger().getId()));
+            final Stranger stranger = Objects.requireNonNull(b.getStranger(event.getStranger()));
             final StrangerChatEvent e = new StrangerChatEvent(b, stranger, new MiraiMessageChain(event.getMessage()), MiraiMessageSource.of(event.getSource()));
             try {
                 EventManager.submit(e);
@@ -385,6 +385,5 @@ public class MiraiBotManager implements BotManager {
         if (contact instanceof OtherClient)
             return bot.getOtherClientOrFail(contact.getId());
         return null;
-
     }
 }

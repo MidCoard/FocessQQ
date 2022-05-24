@@ -21,20 +21,22 @@ import top.focess.qq.core.bot.contact.*;
 import top.focess.qq.core.bot.mirai.message.MiraiAudio;
 import top.focess.qq.core.bot.mirai.message.MiraiImage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageUtil;
+import top.focess.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MiraiBot extends QQBot {
 
-    private final Map<Long,Friend> friendMap = Maps.newHashMap();
-    private final Map<Long,Group> groupMap = Maps.newHashMap();
-    private final Map<Long,Member> memberMap = Maps.newHashMap();
-    private final Map<Long,Stranger> strangerMap = Maps.newHashMap();
-    private final Map<Long,OtherClient> clientMap =   Maps.newHashMap();
+    private final Map<Long, Friend> friendMap = Maps.newHashMap();
+    private final Map<Long, Group> groupMap = Maps.newHashMap();
+    private final Map<Pair<Long,Long>, Member> memberMap = Maps.newHashMap();
+    private final Map<Long, Stranger> strangerMap = Maps.newHashMap();
+    private final Map<Long, OtherClient> clientMap = Maps.newHashMap();
     private Bot nativeBot;
 
     public MiraiBot(final long username, final String password, final Bot bot, final BotProtocol botProtocol, final Plugin plugin, final BotManager botManager) {
@@ -50,34 +52,44 @@ public class MiraiBot extends QQBot {
         this.nativeBot = nativeBot;
     }
 
+    public @Nullable Group getGroup(net.mamoe.mirai.contact.@Nullable Group group) {
+        if (group == null || group.getBot().getId() != this.getId())
+            return null;
+        return this.groupMap.computeIfAbsent(group.getId(), i -> new SimpleGroup(this, group.getId(), group.getName(), group.getAvatarUrl()));
+    }
+
     @Override
     public @Nullable Group getGroup(final long id) {
-        final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroup(id);
-        if (group == null)
+        if (groupMap.containsKey(id))
+            return groupMap.get(id);
+        return this.getGroup(this.nativeBot.getGroup(id));
+    }
+
+    public @Nullable Friend getFriend(net.mamoe.mirai.contact.@Nullable Friend friend) {
+        if (friend == null || friend.getBot().getId() != this.getId())
             return null;
-        return this.groupMap.computeIfAbsent(id, i -> new SimpleGroup(this,group.getId(), group.getName(), group.getAvatarUrl()));
+        return this.friendMap.computeIfAbsent(friend.getId(), i -> new SimpleFriend(this, friend.getId(), friend.getRemark(), friend.getNick(), friend.getAvatarUrl()));
     }
 
     @Override
     public @Nullable Friend getFriend(final long id) {
-        final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriend(id);
-        if (friend == null)
-            return null;
-        return this.friendMap.computeIfAbsent(id, i -> new SimpleFriend(this,friend.getId(), friend.getRemark(), friend.getNick(), friend.getAvatarUrl()));
+        if (friendMap.containsKey(id))
+            return friendMap.get(id);
+        return this.getFriend(this.nativeBot.getFriend(id));
     }
 
     @Override
     @NotNull
     @UnmodifiableView
     public List<Friend> getFriends() {
-        return this.nativeBot.getFriends().stream().map(friend -> new SimpleFriend(this,friend.getId(),friend.getRemark(),friend.getNick(),friend.getAvatarUrl())).collect(Collectors.toUnmodifiableList());
+        return this.nativeBot.getFriends().stream().map(this::getFriend).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
     }
 
     @Override
     @NotNull
     @UnmodifiableView
     public List<Group> getGroups() {
-        return this.nativeBot.getGroups().stream().map(group -> new SimpleGroup(this,group.getId(),group.getName(),group.getAvatarUrl())).collect(Collectors.toUnmodifiableList());
+        return this.nativeBot.getGroups().stream().map(this::getGroup).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
     }
 
     @Override
@@ -88,9 +100,9 @@ public class MiraiBot extends QQBot {
     @Override
     @NotNull
     public Friend getAsFriend() {
-        final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getAsFriend();
-        return this.friendMap.computeIfAbsent(this.getId(), i -> new SimpleFriend(this,friend.getId(), friend.getRemark(), friend.getNick(), friend.getAvatarUrl()));
-
+        if (this.friendMap.containsKey(this.getId()))
+            return this.friendMap.get(this.getId());
+        return Objects.requireNonNull(this.getFriend(this.nativeBot.getAsFriend()));
     }
 
     @Override
@@ -112,87 +124,74 @@ public class MiraiBot extends QQBot {
 
     @Override
     public @Nullable Image uploadImage(final Transmitter transmitter, final InputStream resource) {
-        ExternalResource externalResource;
-        try {
-            externalResource = ExternalResource.create(resource);
+        try (ExternalResource externalResource = ExternalResource.create(resource)) {
+            MiraiImage ret = null;
+            if (transmitter instanceof Group) {
+                final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(transmitter.getId());
+                ret = new MiraiImage(group.uploadImage(externalResource));
+            } else if (transmitter instanceof Friend) {
+                final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(transmitter.getId());
+                ret = new MiraiImage(friend.uploadImage(externalResource));
+            } else if (transmitter instanceof Stranger) {
+                final net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStrangerOrFail(transmitter.getId());
+                ret = new MiraiImage(stranger.uploadImage(externalResource));
+            }
+            return ret;
         } catch (IOException e) {
             return null;
         }
-        MiraiImage ret = null;
-        if (transmitter instanceof Group) {
-            final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(transmitter.getId());
-            ret = new MiraiImage(group.uploadImage(externalResource));
-        } else if (transmitter instanceof Friend) {
-            final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(transmitter.getId());
-            ret = new MiraiImage(friend.uploadImage(externalResource));
-        } else if (transmitter instanceof Stranger) {
-            final net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStrangerOrFail(transmitter.getId());
-            ret = new MiraiImage(stranger.uploadImage(externalResource));
-        }
-        try {
-            externalResource.close();
-        } catch (IOException e) {
-            return null;
-        }
-        return ret;
     }
 
     @Override
     public @Nullable Audio uploadAudio(final Speaker speaker, final InputStream inputStream) {
-        ExternalResource externalResource;
-        try {
-            externalResource = ExternalResource.create(inputStream);
+        try (ExternalResource externalResource = ExternalResource.create(inputStream)) {
+            MiraiAudio ret = null;
+            if (speaker instanceof Friend) {
+                final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(speaker.getId());
+                ret = new MiraiAudio(friend.uploadAudio(externalResource));
+            } else if (speaker instanceof Group) {
+                final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(speaker.getId());
+                ret = new MiraiAudio(group.uploadAudio(externalResource));
+            }
+            return ret;
         } catch (IOException e) {
             return null;
         }
-        MiraiAudio ret = null;
-        if (speaker instanceof Friend) {
-            final net.mamoe.mirai.contact.Friend friend = this.nativeBot.getFriendOrFail(speaker.getId());
-            ret = new MiraiAudio(friend.uploadAudio(externalResource));
-        } else if (speaker instanceof Group) {
-            final net.mamoe.mirai.contact.Group group = this.nativeBot.getGroupOrFail(speaker.getId());
-            ret = new MiraiAudio(group.uploadAudio(externalResource));
-        }
-        try {
-            externalResource.close();
-        } catch (IOException e) {
-            return null;
-        }
-        return ret;
     }
 
     @Override
-    public void deleteFriend(final Friend friend) {
+    public void deleteFriend(final @NotNull Friend friend) {
         this.nativeBot.getFriendOrFail(friend.getId()).delete();
         this.friendMap.remove(friend.getId());
     }
 
     @Override
-    public void quitGroup(final Group group) {
+    public void quitGroup(final @NotNull Group group) {
         this.nativeBot.getGroupOrFail(group.getId()).quit();
         this.groupMap.remove(group.getId());
     }
 
     @Override
     public @Nullable Member getMember(final Group group, final long id) {
+        if (this.memberMap.containsKey(Pair.of(group.getId(), id)))
+            return this.memberMap.get(Pair.of(group.getId(), id));
         final net.mamoe.mirai.contact.Group nativeGroup = this.nativeBot.getGroupOrFail(group.getId());
-        final net.mamoe.mirai.contact.Member member = nativeGroup.get(id);
-        if (member == null)
-            return null;
-        return this.memberMap.computeIfAbsent(id, i -> new SimpleMember(group,member.getId(),member.getRemark(),member.getNick(),member.getNameCard(), toCommandPermission(member.getPermission())));
+        return this.getMember(nativeGroup.get(id));
     }
 
     @Override
-    public Member getAsMember(final Group group) {
+    public @Nullable Member getAsMember(final @NotNull Group group) {
+        if (this.memberMap.containsKey(Pair.of(group.getId(), this.getId())))
+            return this.memberMap.get(Pair.of(group.getId(), this.getId()));
         final net.mamoe.mirai.contact.Group nativeGroup = this.nativeBot.getGroupOrFail(group.getId());
-        final net.mamoe.mirai.contact.Member member = nativeGroup.getBotAsMember();
-        return this.memberMap.computeIfAbsent(member.getId(), i -> new SimpleMember(group,member.getId(),member.getRemark(),member.getNick(),member.getNameCard(), toCommandPermission(member.getPermission())));
+        return this.getMember(nativeGroup.getBotAsMember());
     }
 
     @Override
-    public List<Member> getMembers(final Group group) {
+    @UnmodifiableView
+    public List<Member> getMembers(final @NotNull Group group) {
         final net.mamoe.mirai.contact.Group nativeGroup = this.nativeBot.getGroupOrFail(group.getId());
-        return nativeGroup.getMembers().stream().map(member -> this.memberMap.computeIfAbsent(member.getId(), i -> new SimpleMember(group,member.getId(),member.getRemark(),member.getNick(),member.getNameCard(), toCommandPermission(member.getPermission())))).collect(Collectors.toList());
+        return nativeGroup.getMembers().stream().map(this::getMember).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
     }
 
     private static CommandPermission toCommandPermission(final MemberPermission permission) {
@@ -209,18 +208,35 @@ public class MiraiBot extends QQBot {
 
     @Override
     public @Nullable Stranger getStranger(final long id) {
-        final net.mamoe.mirai.contact.Stranger stranger = this.nativeBot.getStranger(id);
-        if (stranger == null)
-            return null;
-        return this.strangerMap.computeIfAbsent(id, i -> new SimpleStranger(this,stranger.getId(), stranger.getRemark(), stranger.getNick()));
+        if (this.strangerMap.containsKey(id))
+            return this.strangerMap.get(id);
+        return this.getStranger(this.nativeBot.getStranger(id));
     }
 
     @Override
     public @Nullable OtherClient getOtherClient(final long id) {
+        if (this.clientMap.containsKey(id))
+            return this.clientMap.get(id);
         final ContactList<net.mamoe.mirai.contact.OtherClient> clients = this.nativeBot.getOtherClients();
         for (final net.mamoe.mirai.contact.OtherClient client : clients)
             if (client.getId() == id)
-                return this.clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this,client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(),client.getInfo().getAppId()));
+                return this.clientMap.computeIfAbsent(id, i -> new SimpleOtherClient(this, client.getId(), client.getInfo().getDeviceName(), client.getInfo().getDeviceKind(), client.getInfo().getAppId()));
         return null;
+    }
+
+    @Nullable
+    public Member getMember(net.mamoe.mirai.contact.@Nullable Member sender) {
+        if (sender == null || sender.getBot().getId() != this.getId())
+            return null;
+        Group group = this.getGroup(sender.getGroup());
+        if (group == null)
+            return null;
+        return this.memberMap.computeIfAbsent(Pair.of(group.getId(), sender.getId()), i -> new SimpleMember(group, sender.getId(), sender.getRemark(), sender.getNick(), sender.getNameCard(), toCommandPermission(sender.getPermission())));
+    }
+
+    public @Nullable Stranger getStranger(net.mamoe.mirai.contact.@Nullable Stranger stranger) {
+        if (stranger == null || stranger.getBot().getId() != this.getId())
+            return null;
+        return this.strangerMap.computeIfAbsent(stranger.getId(), i -> new SimpleStranger(this, stranger.getId(), stranger.getRemark(), stranger.getNick()));
     }
 }
