@@ -38,4 +38,5 @@ public class SimpleFriend extends SimpleSpeaker implements Friend {
         Permission.checkPermission(Permission.DELETE_FRIEND);
         this.getBot().deleteFriend(this);
     }
+
 }

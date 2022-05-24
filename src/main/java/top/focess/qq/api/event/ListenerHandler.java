@@ -10,9 +10,7 @@ import top.focess.util.Pair;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is used to help invoke listener methods
@@ -147,6 +145,7 @@ public class ListenerHandler {
             if (v == null)
                 v = Lists.newArrayList();
             v.add(Pair.of(method, handler));
+            v.sort(Comparator.comparing(pair -> pair.getValue().priority().getPriority()));
             return v;
         });
     }
@@ -159,20 +158,20 @@ public class ListenerHandler {
      */
     public <T extends Event> void submit(final T event) {
         for (final Listener listener : this.listeners.keySet()) {
-            this.listeners.get(listener).stream().sorted(Comparator.comparing(pair -> pair.getValue().priority().getPriority())).forEachOrdered(
-                    i -> {
-                        if (event.isPrevent() && i.getValue().notCallIfPrevented())
-                            return;
-                        if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
-                            return;
-                        final Method method = i.getKey();
-                        try {
-                            method.setAccessible(true);
-                            method.invoke(listener, event);
-                        } catch (final Exception e) {
-                            FocessQQ.getLogger().thrLang("exception-handle-event", e, event.getClass().getName());
-                        }
+            this.listeners.get(listener).forEach(
+                i -> {
+                    if (event.isPrevent() && i.getValue().notCallIfPrevented())
+                        return;
+                    if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
+                        return;
+                    final Method method = i.getKey();
+                    try {
+                        method.setAccessible(true);
+                        method.invoke(listener, event);
+                    } catch (final Exception e) {
+                        FocessQQ.getLogger().thrLang("exception-handle-event", e, event.getClass().getName());
                     }
+                }
             );
         }
     }

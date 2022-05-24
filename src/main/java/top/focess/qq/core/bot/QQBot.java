@@ -92,4 +92,13 @@ public abstract class QQBot implements Bot {
     public BotProtocol getBotProtocol() {
         return this.botProtocol;
     }
+
+    @Override
+    public String toString() {
+        return "QQBot{" +
+                "username=" + username +
+                ", plugin=" + plugin +
+                ", botProtocol=" + botProtocol +
+                '}';
+    }
 }

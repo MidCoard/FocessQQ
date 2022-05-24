@@ -21,4 +21,12 @@ public abstract class SimpleContact implements Contact {
     public Bot getBot() {
         return this.bot;
     }
+
+    @Override
+    public String toString() {
+        return "SimpleContact{" +
+                "bot=" + bot +
+                ", id=" + id +
+                '}';
+    }
 }
