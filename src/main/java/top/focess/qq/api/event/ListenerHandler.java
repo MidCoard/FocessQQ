@@ -10,7 +10,9 @@ import top.focess.util.Pair;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to help invoke listener methods
@@ -22,7 +24,8 @@ public class ListenerHandler {
     private static final List<ListenerHandler> LISTENER_HANDLER_LIST = Lists.newArrayList();
     private static final Map<Plugin, List<Listener>> PLUGIN_LISTENER_MAP = Maps.newConcurrentMap();
     //listeners only in one ListenerHandler, and one ListenerHandler is only accessed by synchronized
-    private final Map<Listener, List<Pair<Method, EventHandler>>> listeners = Maps.newHashMap();
+
+    private final List<Pair<Pair<Listener,Method>, EventHandler>> listeners = Lists.newCopyOnWriteArrayList();
 
     public ListenerHandler() {
         LISTENER_HANDLER_LIST.add(this);
@@ -129,7 +132,7 @@ public class ListenerHandler {
      */
     public void unregister(final Listener listener) {
         Permission.checkPermission(Permission.REMOVE_LISTENER);
-        this.listeners.remove(listener);
+        this.listeners.removeIf(i -> i.getKey().getKey().equals(listener));
     }
 
     /**
@@ -141,13 +144,8 @@ public class ListenerHandler {
      * @param <T>      the event type
      */
     public <T extends Event> void register(final Listener listener, final Method method, final EventHandler handler) {
-        this.listeners.compute(listener, (k, v) -> {
-            if (v == null)
-                v = Lists.newArrayList();
-            v.add(Pair.of(method, handler));
-            v.sort(Comparator.comparing(pair -> pair.getValue().priority().getPriority()));
-            return v;
-        });
+        this.listeners.add(Pair.of(Pair.of(listener,method), handler));
+        this.listeners.sort(Comparator.comparing(pair -> pair.getValue().priority().getPriority()));
     }
 
     /**
@@ -157,22 +155,20 @@ public class ListenerHandler {
      * @param <T>   the event type
      */
     public <T extends Event> void submit(final T event) {
-        for (final Listener listener : this.listeners.keySet()) {
-            this.listeners.get(listener).forEach(
-                i -> {
-                    if (event.isPrevent() && i.getValue().notCallIfPrevented())
-                        return;
-                    if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
-                        return;
-                    final Method method = i.getKey();
-                    try {
-                        method.setAccessible(true);
-                        method.invoke(listener, event);
-                    } catch (final Exception e) {
-                        FocessQQ.getLogger().thrLang("exception-handle-event", e, event.getClass().getName());
-                    }
+        this.listeners.forEach(
+            i -> {
+                if (event.isPrevent() && i.getValue().notCallIfPrevented())
+                    return;
+                if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
+                    return;
+                final Method method = i.getKey().getValue();
+                try {
+                    method.setAccessible(true);
+                    method.invoke(i.getKey().getKey(), event);
+                } catch (final Exception e) {
+                    FocessQQ.getLogger().thrLang("exception-handle-event", e, event.getClass().getName());
                 }
-            );
-        }
+            }
+        );
     }
 }
