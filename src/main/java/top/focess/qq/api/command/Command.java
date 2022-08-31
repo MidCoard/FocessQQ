@@ -16,6 +16,7 @@ import top.focess.qq.api.event.command.CommandPrepostEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.function.Predicate;
  * Represent a Plugin class that can execute. Just like we use the terminal, we could use it to executing some commands. This is an important way to interact with FocessQQ Bot.
  * You should declare {@link CommandType} to this class ,or you should register it with your plugin manually.
  */
+@PermissionEnv(values = {Permission.REMOVE_COMMAND, Permission.REGISTER_COMMAND, Permission.EXECUTE_NORMAL_COMMAND, Permission.EXECUTE_ADMINISTRATOR_COMMAND, Permission.EXECUTE_CONSOLE_COMMAND})
 public abstract class Command {
 
 

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.qq.core.scheduler.AScheduler;
 import top.focess.scheduler.FocessScheduler;
 import top.focess.scheduler.Scheduler;
@@ -13,6 +14,7 @@ import top.focess.scheduler.ThreadPoolScheduler;
 /**
  * Used to create Scheduler. The scheduler factory.
  */
+@PermissionEnv(values = {Permission.SCHEDULER, Permission.REMOVE_SCHEDULER})
 public class Schedulers {
 
     private Schedulers() {

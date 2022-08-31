@@ -7,10 +7,12 @@ import top.focess.qq.api.event.Event;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 /**
  * Called before command executing
  */
+@PermissionEnv(values = Permission.CANCEL_COMMAND_EXECUTE)
 public class CommandPrepostEvent extends Event implements Cancellable {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();

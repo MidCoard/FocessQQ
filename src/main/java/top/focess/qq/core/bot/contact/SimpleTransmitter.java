@@ -6,9 +6,11 @@ import top.focess.qq.api.bot.contact.Transmitter;
 import top.focess.qq.api.bot.message.Image;
 import top.focess.qq.api.bot.message.Message;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 import java.io.InputStream;
 
+@PermissionEnv(values = {Permission.UPLOAD_IMAGE, Permission.SEND_MESSAGE})
 public abstract class SimpleTransmitter extends SimpleContact implements Transmitter {
 
 

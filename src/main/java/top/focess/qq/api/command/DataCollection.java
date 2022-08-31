@@ -6,6 +6,7 @@ import top.focess.command.DataConverter;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  * Store and parser arguments for better CommandExecutor usage.
  */
+@PermissionEnv(values = {Permission.REMOVE_DATA_BUFFER, Permission.REGISTER_DATA_BUFFER})
 public class DataCollection {
 
     private static final Map<Plugin, List<DataConverter<?>>> PLUGIN_DATA_CONVERTER_MAP = Maps.newConcurrentMap();

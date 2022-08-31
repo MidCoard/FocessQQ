@@ -16,6 +16,7 @@ import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.util.config.DefaultConfig;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -35,6 +36,7 @@ import java.util.Objects;
  * Represent a Plugin class that can be load, enable and disable. Also, provide plenty of API for the plugin to get better with this framework.
  * You should declare {@link PluginType} to this class.
  */
+@PermissionEnv(values = Permission.INIT_PLUGIN)
 public abstract class Plugin implements FocessSerializable {
 
     /**

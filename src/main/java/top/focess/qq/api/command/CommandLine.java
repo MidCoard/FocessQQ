@@ -10,6 +10,7 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Scheduler;
 import top.focess.util.Pair;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * The CommandLine Tool Class can be used to exec command with customize executor, arguments and receiver.
  */
+@PermissionEnv(values = {Permission.EXECUTE_NORMAL_COMMAND, Permission.EXECUTE_ADMINISTRATOR_COMMAND, Permission.EXECUTE_CONSOLE_COMMAND, Permission.REGISTER_SPECIAL_ARGUMENT_COMPLEX_HANDLER, Permission.REMOVE_SPECIAL_ARGUMENT_COMPLEX_HANDLER})
 public class CommandLine {
 
     private static final AtomicInteger COMMAND_ID = new AtomicInteger();

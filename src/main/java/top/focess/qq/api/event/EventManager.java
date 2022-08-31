@@ -6,6 +6,7 @@ import top.focess.qq.FocessQQ;
 import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * This class is used to submit Event for developers.
  */
+@PermissionEnv(values = Permission.EVENT_SUBMIT)
 public class EventManager {
 
     private static final Scheduler SCHEDULER = Schedulers.newThreadPoolScheduler(FocessQQ.getMainPlugin(), 10, false, "EventManager");

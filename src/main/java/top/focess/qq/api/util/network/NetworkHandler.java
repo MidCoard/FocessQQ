@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.commands.util.ChatConstants;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.util.network.HttpHandler;
 import top.focess.util.network.HttpResponse;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 /**
  * This is a network util class.
  */
+@PermissionEnv(values = Permission.NETWORK)
 public class NetworkHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);

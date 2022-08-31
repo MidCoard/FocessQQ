@@ -7,10 +7,12 @@ import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.bot.BotEvent;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 /**
  * Called when a friend-request comes
  */
+@PermissionEnv(values = {Permission.FRIEND_REQUEST_ACCEPT, Permission.FRIEND_REQUEST_REFUSE})
 public class FriendRequestEvent extends BotEvent {
 
     private static final ListenerHandler LISTENER_HANDLER = new ListenerHandler();

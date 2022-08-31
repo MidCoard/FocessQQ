@@ -22,6 +22,7 @@ import top.focess.qq.api.schedule.Schedulers;
 import top.focess.qq.core.bot.BotManagerFactory;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Callback;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+@PermissionEnv(values = {Permission.LOAD_SOFT_DEPENDENCIES, Permission.DISABLE_PLUGIN, Permission.ENABLE_PLUGIN})
 public class PluginClassLoader extends URLClassLoader {
     private static final Map<Class<? extends Plugin>, Plugin> CLASS_PLUGIN_MAP = Maps.newConcurrentMap();
     private static final Map<String, Plugin> NAME_PLUGIN_MAP = Maps.newConcurrentMap();

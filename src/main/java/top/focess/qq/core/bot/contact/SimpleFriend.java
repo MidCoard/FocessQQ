@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Friend;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
+@PermissionEnv(values = Permission.DELETE_FRIEND)
 public class SimpleFriend extends SimpleSpeaker implements Friend {
     private final String name;
     private final String avatarUrl;

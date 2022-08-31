@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.util.Pair;
 
 import java.lang.reflect.Field;
@@ -17,6 +18,7 @@ import java.util.Map;
 /**
  * This class is used to help invoke listener methods
  */
+@PermissionEnv(values = {Permission.REGISTER_LISTENER, Permission.REMOVE_LISTENER})
 public class ListenerHandler {
 
     static final Map<Listener, Plugin> LISTENER_PLUGIN_MAP = Maps.newConcurrentMap();

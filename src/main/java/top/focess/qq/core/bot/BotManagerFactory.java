@@ -7,11 +7,13 @@ import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.bot.mirai.MiraiBotManager;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+@PermissionEnv(values = {Permission.GET_BOT_MANAGER, Permission.REMOVE_BOT_MANAGER})
 public class BotManagerFactory {
 
     private static final Map<String, Supplier<BotManager>> BOT_MANAGER_MAP = Maps.newHashMap();

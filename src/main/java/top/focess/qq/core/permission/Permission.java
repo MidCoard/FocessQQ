@@ -6,6 +6,8 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.List;
 
 public enum Permission {
@@ -111,6 +113,15 @@ public enum Permission {
     }
 
     public static void checkPermission(final Permission permission) {
+        Class<?> permissionClass = MethodCaller.getCallerClass();
+        if (permissionClass == null)
+            throw new PermissionException(permission);
+        Annotation annotation = Arrays.stream(permissionClass.getAnnotations()).filter(i -> i.annotationType() == PermissionEnv.class).findAny().orElse(null);
+        if (annotation == null)
+            throw new PermissionException(permission);
+        PermissionEnv permissionEnv = (PermissionEnv) annotation;
+        if (Arrays.stream(permissionEnv.values()).allMatch(i -> i != permission))
+            throw new PermissionException(permission);
         for (Class<?> clazz : MethodCaller.getAllCallerClass()) {
             Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(clazz);
             if (plugin != null)

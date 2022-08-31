@@ -44,6 +44,7 @@ import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
 import top.focess.qq.core.net.*;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.FocessSecurityManager;
@@ -70,6 +71,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPOutputStream;
+
+@PermissionEnv(values = Permission.EXIT)
 public class FocessQQ {
 
     private static final Object STOP_LOCK = new Object();

@@ -7,9 +7,11 @@ import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.contact.Group;
 import top.focess.qq.api.bot.contact.Member;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 
 import java.util.List;
 
+@PermissionEnv(values = Permission.QUIT_GROUP)
 public class SimpleGroup extends SimpleSpeaker implements Group {
 
     private final String name;

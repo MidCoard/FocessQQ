@@ -41,6 +41,7 @@ import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageChain;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageSource;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Scheduler;
 
 import javax.imageio.stream.FileImageOutputStream;
@@ -52,6 +53,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
 
+@PermissionEnv(values = {Permission.REMOVE_BOT_MANAGER, Permission.BOT_LOGIN, Permission.BOT_LOGOUT, Permission.BOT_RELOGIN})
 public class MiraiBotManager implements BotManager {
 
     private static final Scheduler SCHEDULER = Schedulers.newFocessScheduler(FocessQQ.getMainPlugin(), "BotManager");

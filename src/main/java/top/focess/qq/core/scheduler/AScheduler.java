@@ -7,6 +7,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.permission.Permission;
+import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Callback;
 import top.focess.scheduler.CatchExceptionHandler;
 import top.focess.scheduler.Scheduler;
@@ -20,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@PermissionEnv(values = Permission.REMOVE_SCHEDULER)
 public class AScheduler implements Scheduler {
 
     private static final Map<Plugin, List<Scheduler>> PLUGIN_SCHEDULER_MAP = Maps.newConcurrentMap();
