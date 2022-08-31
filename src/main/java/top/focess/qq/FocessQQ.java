@@ -565,6 +565,13 @@ public class FocessQQ {
             saved = true;
         }
         CONSOLE_INPUT_THREAD.interrupt();
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+            }
+            System.exit(0);
+        }).start();
     }
 
     private static void saveLogFile() {
