@@ -1,44 +1,54 @@
 package top.focess.qq.api.net;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import top.focess.net.receiver.Receiver;
 import top.focess.qq.api.plugin.Plugin;
 
-/**
- * Represents a FocessSocket. This class is used to handle socket.
- */
-public interface Socket {
+import java.util.List;
+import java.util.Map;
 
-    /**
-     * Register packet receiver for this socket
-     *
-     * @param receiver the packet receiver for this socket
-     */
-    void registerReceiver(Receiver receiver);
+public class Socket {
 
-    /**
-     * Indicate this socket contains server side receiver
-     *
-     * @return true if it contains server side receiver, false otherwise
-     */
-    boolean containsServerSide();
+    private final top.focess.net.socket.Socket socket;
 
-    /**
-     * Indicate this socket contains client side receiver
-     *
-     * @return true if it contains client side receiver, false otherwise
-     */
-    boolean containsClientSide();
+    private final Map<Plugin, List<Receiver>> receivers = Maps.newConcurrentMap();
 
-    /**
-     * Close the socket
-     *
-     * @return true if there is some resources not closed before, false otherwise
-     */
-    boolean close();
+    public Socket(top.focess.net.socket.Socket socket) {
+        this.socket = socket;
+    }
 
-    /**
-     * Unregister the packet-handlers of the plugin
-     *
-     * @param plugin the plugin
-     */
-    void unregister(Plugin plugin);
+    public void registerReceiver(Plugin plugin, Receiver receiver) {
+        receivers.compute(plugin, (k,v)->{
+            if (v == null)
+                v = Lists.newCopyOnWriteArrayList();
+            v.add(receiver);
+            return v;
+        });
+        this.socket.registerReceiver(receiver);
+    }
+
+    public boolean containsServerSide() {
+        return this.socket.containsServerSide();
+    }
+
+    public boolean containsClientSide() {
+        return this.socket.containsClientSide();
+    }
+
+    public void close() {
+        this.socket.close();
+        this.receivers.clear();
+    }
+
+    public void unregister(Plugin plugin) {
+        List<Receiver> receivers = this.receivers.getOrDefault(plugin,Lists.newArrayList());
+        receivers.forEach(this.socket::unregister);
+        this.receivers.remove(plugin);
+    }
+
+    public void unregisterAll() {
+        this.socket.unregisterAll();
+        this.receivers.clear();
+    }
 }

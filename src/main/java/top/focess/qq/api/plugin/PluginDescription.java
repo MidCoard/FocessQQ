@@ -212,4 +212,17 @@ public class PluginDescription {
                     return true;
         return false;
     }
+
+    public boolean addPermission(Permission permission) {
+        this.permissions.put(permission, true);
+        YamlConfiguration permissionsStatus = permissionsConfig.getSection(this.name);
+        List<String> yeses = permissionsStatus.getListOrEmpty("yes");
+        List<String> nos = permissionsStatus.getListOrEmpty("no");
+        if (yeses.contains(permission.getName()))
+            return false;
+        nos.remove(permission.getName());
+        yeses.add(permission.getName());
+        permissionsConfig.save(new File("plugins/Main", "permissions.yml"));
+        return true;
+    }
 }

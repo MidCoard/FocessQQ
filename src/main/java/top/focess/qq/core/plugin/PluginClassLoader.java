@@ -18,7 +18,7 @@ import top.focess.qq.api.event.*;
 import top.focess.qq.api.event.plugin.PluginLoadEvent;
 import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 import top.focess.qq.api.plugin.*;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.core.bot.BotManagerFactory;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.permission.Permission;
@@ -332,6 +332,14 @@ public class PluginClassLoader extends URLClassLoader {
                 FocessQQ.getSocket().unregister(plugin);
             if (FocessQQ.getUdpSocket() != null)
                 FocessQQ.getUdpSocket().unregister(plugin);
+            if (FocessQQ.getClientReceiver() != null)
+                FocessQQ.getClientReceiver().unregister(plugin);
+            if (FocessQQ.getUdpServerMultiReceiver() != null)
+                FocessQQ.getUdpServerMultiReceiver().unregister(plugin);
+            if (FocessQQ.getServerReceiver() != null)
+                FocessQQ.getServerReceiver().unregister(plugin);
+            if (FocessQQ.getUdpServerReceiver() != null)
+                FocessQQ.getUdpServerReceiver().unregister(plugin);
         }
         CommandSender.clear(plugin);
         FocessQQ.getLogger().debugLang("clear-command-sender-session", plugin.getName());
@@ -478,6 +486,14 @@ public class PluginClassLoader extends URLClassLoader {
                         FocessQQ.getSocket().unregister(this.plugin);
                     if (FocessQQ.getUdpSocket() != null)
                         FocessQQ.getUdpSocket().unregister(this.plugin);
+                    if (FocessQQ.getClientReceiver() != null)
+                        FocessQQ.getClientReceiver().unregister(this.plugin);
+                    if (FocessQQ.getUdpServerMultiReceiver() != null)
+                        FocessQQ.getUdpServerMultiReceiver().unregister(this.plugin);
+                    if (FocessQQ.getServerReceiver() != null)
+                        FocessQQ.getServerReceiver().unregister(this.plugin);
+                    if (FocessQQ.getUdpServerReceiver() != null)
+                        FocessQQ.getUdpServerReceiver().unregister(this.plugin);
                 } else if (e instanceof PluginLoadException)
                     // this plugin is null and PluginLoadException means there is something wrong in the new instance of the plugin
                     FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);

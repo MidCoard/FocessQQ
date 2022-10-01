@@ -7,7 +7,7 @@ import top.focess.command.DataConverter;
 import top.focess.command.InputTimeoutException;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.bot.message.Message;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;

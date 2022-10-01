@@ -11,7 +11,7 @@ import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.core.bot.BotManagerFactory;
 import top.focess.scheduler.Scheduler;
 

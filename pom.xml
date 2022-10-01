@@ -35,6 +35,7 @@
         <util.version>1.1.12</util.version>
         <scheduler.version>1.1.6</scheduler.version>
         <sysout.version>1.0.2</sysout.version>
+        <socket.version>1.0.1</socket.version>
     </properties>
 
     <repositories>
@@ -129,6 +130,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>top.focess</groupId>
+            <artifactId>focess-socket</artifactId>
+            <version>${socket.version}</version>
         </dependency>
     </dependencies>
 

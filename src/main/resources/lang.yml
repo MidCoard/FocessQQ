@@ -84,9 +84,6 @@ start-load-plugin: Start loading file %s
 start-reload-plugin: Start reloading plugin %s
 start-enable-main-plugin: Start enabling main plugin
 start-disable-main-plugin: Start disabling main plugin
-start-focess-sided-socket: Start focess sided socket server on port %d
-start-focess-socket: Start focess socket server on port %d
-start-focess-udp-socket: Start focess udp socket server on port %d
 save-log: Save log
 save-default-properties: Save default properties
 use-given-account: Use given account as default bot account
@@ -214,5 +211,9 @@ permission-timeout: "Input timeout, ignore the permission."
 debug-submit-event: "Submit event: %s to %s"
 debug-prevent-event: "Prevent event: %s to %s"
 debug-cancel-event: "Cancel event: %s to %s"
+permission-command-no-permission: "The plugin %s does not have permissions"
+permission-command-list: "The plugin %s has the following permissions:%s"
+permission-command-set-success: "The plugin %s set the permission %s successfully"
+permission-command-set-failed: "The plugin %s set the permission %s failed, it may already have the permission"
 
 

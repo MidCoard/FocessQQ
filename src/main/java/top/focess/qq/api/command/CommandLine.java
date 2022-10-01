@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import top.focess.command.CommandResult;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.permission.PermissionEnv;

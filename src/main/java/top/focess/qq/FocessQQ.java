@@ -6,6 +6,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandResult;
+import top.focess.net.IllegalPortException;
+import top.focess.net.receiver.FocessClientReceiver;
+import top.focess.net.receiver.FocessReceiver;
+import top.focess.net.receiver.FocessUDPMultiReceiver;
+import top.focess.net.receiver.FocessUDPReceiver;
+import top.focess.net.socket.FocessSidedClientSocket;
+import top.focess.net.socket.FocessSidedSocket;
+import top.focess.net.socket.FocessSocket;
+import top.focess.net.socket.FocessUDPSocket;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
@@ -29,10 +38,13 @@ import top.focess.qq.api.event.ListenerHandler;
 import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.server.ServerStartEvent;
 import top.focess.qq.api.event.server.ServerStopEvent;
-import top.focess.qq.api.net.*;
+import top.focess.qq.api.net.ClientReceiver;
+import top.focess.qq.api.net.ServerMultiReceiver;
+import top.focess.qq.api.net.ServerReceiver;
+import top.focess.qq.api.net.Socket;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.plugin.PluginLoadException;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.api.util.config.LangConfig;
 import top.focess.qq.api.util.logger.FocessLogger;
@@ -42,7 +54,6 @@ import top.focess.qq.core.commands.special.*;
 import top.focess.qq.core.listeners.ChatListener;
 import top.focess.qq.core.listeners.ConsoleListener;
 import top.focess.qq.core.listeners.PluginListener;
-import top.focess.qq.core.net.*;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.qq.core.plugin.PluginClassLoader;
@@ -169,33 +180,28 @@ public class FocessQQ {
     /**
      * The default socket
      */
-    @Nullable
-    private static Socket socket;
+    private static @Nullable Socket socket;
     /**
      * The default udp socket
      */
-    @Nullable
-    private static Socket udpSocket;
+    private static @Nullable Socket udpSocket;
     /**
      * The default udp server receiver
      */
-    @Nullable
-    private static ServerReceiver udpServerReceiver;
+    private static @Nullable ServerReceiver udpServerReceiver;
     /**
      * The default server receiver
      */
-    @Nullable
-    private static ServerReceiver serverReceiver;
+
+    private static @Nullable ServerReceiver serverReceiver;
     /**
      * The default client receiver
      */
-    @Nullable
-    private static ClientReceiver clientReceiver;
+    private static @Nullable ClientReceiver clientReceiver;
     /**
      * The default server multi receiver
      */
-    @Nullable
-    private static ServerMultiReceiver udpServerMultiReceiver;
+    private static @Nullable ServerMultiReceiver udpServerMultiReceiver;
     /**
      * The Mirai Bot user or we call it QQ number
      */
@@ -278,33 +284,27 @@ public class FocessQQ {
         return botManager;
     }
 
-    @Nullable
-    public static Socket getSocket() {
+    public static @Nullable Socket getSocket() {
         return socket;
     }
 
-    @Nullable
-    public static ServerReceiver getServerReceiver() {
+    public static @Nullable ServerReceiver getServerReceiver() {
         return serverReceiver;
     }
 
-    @Nullable
-    public static ClientReceiver getClientReceiver() {
+    public static @Nullable ClientReceiver getClientReceiver() {
         return clientReceiver;
     }
 
-    @Nullable
-    public static Socket getUdpSocket() {
+    public static @Nullable Socket getUdpSocket() {
         return udpSocket;
     }
 
-    @Nullable
-    public static ServerReceiver getUdpServerReceiver() {
+    public static @Nullable ServerReceiver getUdpServerReceiver() {
         return udpServerReceiver;
     }
 
-    @Nullable
-    public static ServerMultiReceiver getUdpServerMultiReceiver() {
+    public static @Nullable ServerMultiReceiver getUdpServerMultiReceiver() {
         return udpServerMultiReceiver;
     }
 
@@ -462,8 +462,10 @@ public class FocessQQ {
             if (sidedOption == null)
                 try {
                     final FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-                    focessSocket.registerReceiver(serverReceiver = new FocessReceiver(focessSocket));
-                    socket = focessSocket;
+                    FocessReceiver receiver = new FocessReceiver(focessSocket);
+                    focessSocket.registerReceiver(receiver);
+                    serverReceiver = new ServerReceiver(receiver);
+                    socket = new Socket(focessSocket);
                     getLogger().infoLang("create-focess-socket-server");
                 } catch (final Exception e) {
                     getLogger().thrLang("exception-create-focess-socket-server", e);
@@ -471,8 +473,8 @@ public class FocessQQ {
             else {
                 try {
                     final FocessSidedSocket focessSidedSocket = new FocessSidedSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-                    focessSidedSocket.registerReceiver(serverReceiver = new FocessSidedReceiver());
-                    socket = focessSidedSocket;
+                    serverReceiver = new ServerReceiver(focessSidedSocket.getReceiver());
+                    socket = new Socket(focessSidedSocket);
                     getLogger().infoLang("create-focess-sided-socket-server");
                 } catch (final Exception e) {
                     getLogger().thrLang("exception-create-focess-sided-socket-server", e);
@@ -488,8 +490,10 @@ public class FocessQQ {
                     final String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     final int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     final String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
-                    focessSocket.registerReceiver(clientReceiver = new FocessClientReceiver(focessSocket, localhost, host, port, name));
-                    socket = focessSocket;
+                    FocessClientReceiver receiver = new FocessClientReceiver(focessSocket, localhost, host, port, name);
+                    focessSocket.registerReceiver(receiver);
+                    clientReceiver = new ClientReceiver(receiver);
+                    socket = new Socket(focessSocket);
                     getLogger().infoLang("create-focess-socket-client");
                 } catch (final Exception e) {
                     getLogger().thrLang("exception-create-focess-socket-client", e);
@@ -499,9 +503,9 @@ public class FocessQQ {
                     final String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     final int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     final String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
-                    final FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host, port);
-                    focessSidedClientSocket.registerReceiver(clientReceiver = new FocessSidedClientReceiver(focessSidedClientSocket, name));
-                    socket = focessSidedClientSocket;
+                    final FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host, port, name);
+                    clientReceiver = new ClientReceiver(focessSidedClientSocket.getReceiver());
+                    socket = new Socket(focessSidedClientSocket);
                     getLogger().infoLang("create-focess-sided-socket-client");
                 } catch (final Exception e) {
                     getLogger().thrLang("exception-create-focess-sided-socket-client", e);
@@ -512,11 +516,17 @@ public class FocessQQ {
         if (option != null) {
             try {
                 final FocessUDPSocket focessUDPSocket = new FocessUDPSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-                if (multiOption == null)
-                    focessUDPSocket.registerReceiver(udpServerReceiver = new FocessUDPReceiver(focessUDPSocket));
-                else
-                    focessUDPSocket.registerReceiver(udpServerMultiReceiver = new FocessUDPMultiReceiver(focessUDPSocket));
-                udpSocket = focessUDPSocket;
+                if (multiOption == null) {
+                    FocessUDPReceiver receiver = new FocessUDPReceiver(focessUDPSocket);
+                    focessUDPSocket.registerReceiver(receiver);
+                    udpServerReceiver = new ServerReceiver(receiver);
+                }
+                else {
+                    FocessUDPMultiReceiver receiver = new FocessUDPMultiReceiver(focessUDPSocket);
+                    focessUDPSocket.registerReceiver(receiver);
+                    udpServerMultiReceiver = new ServerMultiReceiver(receiver);
+                }
+                udpSocket = new Socket(focessUDPSocket);
                 getLogger().infoLang("create-focess-udp-socket-client");
             } catch (final IllegalPortException e) {
                 getLogger().thrLang("exception-create-focess-udp-socket-client", e);
@@ -573,6 +583,7 @@ public class FocessQQ {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
             }
+            System.err.println("Force Shutdown");
             System.exit(0);
         }).start();
     }
@@ -652,6 +663,7 @@ public class FocessQQ {
             this.registerCommand(new ExecCommand());
             this.registerCommand(new PauseCommand());
             this.registerCommand(new TestCommand());
+            this.registerCommand(new PermissionCommand());
             getLogger().debugLang("register-default-commands");
             this.registerSpecialArgumentComplexHandler("previous", new PreviousArgumentHandler());
             this.registerSpecialArgumentComplexHandler("next", new NextArgumentHandler());

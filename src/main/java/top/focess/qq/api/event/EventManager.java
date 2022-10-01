@@ -3,7 +3,7 @@ package top.focess.qq.api.event;
 import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.permission.PermissionEnv;

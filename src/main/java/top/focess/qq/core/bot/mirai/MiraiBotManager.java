@@ -35,7 +35,7 @@ import top.focess.qq.api.event.recall.GroupRecallEvent;
 import top.focess.qq.api.event.request.FriendRequestEvent;
 import top.focess.qq.api.event.request.GroupRequestEvent;
 import top.focess.qq.api.plugin.Plugin;
-import top.focess.qq.api.schedule.Schedulers;
+import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.api.util.IOHandler;
 import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageChain;
