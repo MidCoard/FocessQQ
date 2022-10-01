@@ -211,4 +211,8 @@ command-after-exec: "AfterExec: %s exec: Command: \"%s\", Args: %s, Result: %s, 
 permission-before-request: "Plugin %s requests %s permission(s), input \"yes\" to grant all, or input \"no\" to deny all, other to check each permission in 10 seconds. We will remember your decision."
 permission-request: "Plugin %s requests %s permission, input \"yes\" to grant, or input \"other\" to deny in 10 seconds. We will remember your decision."
 permission-timeout: "Input timeout, ignore the permission."
+debug-submit-event: "Submit event: %s to %s"
+debug-prevent-event: "Prevent event: %s to %s"
+debug-cancel-event: "Cancel event: %s to %s"
+
 

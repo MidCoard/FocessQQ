@@ -27,7 +27,7 @@ public class ListenerHandler {
     private static final Map<Plugin, List<Listener>> PLUGIN_LISTENER_MAP = Maps.newConcurrentMap();
     //listeners only in one ListenerHandler, and one ListenerHandler is only accessed by synchronized
 
-    private final List<Pair<Pair<Listener,Method>, EventHandler>> listeners = Lists.newCopyOnWriteArrayList();
+    protected final List<Pair<Pair<Listener,Method>, EventHandler>> listeners = Lists.newCopyOnWriteArrayList();
 
     public ListenerHandler() {
         LISTENER_HANDLER_LIST.add(this);
@@ -159,10 +159,15 @@ public class ListenerHandler {
     public <T extends Event> void submit(final T event) {
         this.listeners.forEach(
             i -> {
-                if (event.isPrevent() && i.getValue().notCallIfPrevented())
+                if (event.isPrevent() && i.getValue().notCallIfPrevented()) {
+                    FocessQQ.getLogger().debugLang("debug-prevent-event", event.toString(),  i.toString());
                     return;
-                if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled())
+                }
+                if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && i.getValue().notCallIfCancelled()) {
+                    FocessQQ.getLogger().debugLang("debug-cancel-event", event.toString(),  i.toString());
                     return;
+                }
+                FocessQQ.getLogger().debugLang("debug-submit-event", event.toString(),  i.toString());
                 final Method method = i.getKey().getValue();
                 try {
                     method.setAccessible(true);
