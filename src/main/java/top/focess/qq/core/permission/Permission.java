@@ -2,6 +2,7 @@ package top.focess.qq.core.permission;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.MethodCaller;
@@ -98,9 +99,13 @@ public enum Permission {
         this.priority = priority;
     }
 
-    public static Permission getPermission(final @NotNull String name) {
+    public static @Nullable Permission getPermission(final @NotNull String name) {
         String key = name.trim().replace(" ", "_").toUpperCase();
-        return Permission.valueOf(key);
+        try {
+            return Permission.valueOf(key);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public static void checkPermission(@NotNull Plugin plugin, Permission permission) {

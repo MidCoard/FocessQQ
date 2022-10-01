@@ -125,6 +125,9 @@ public class PluginDescription {
             }
         }
         for (String permission : permissions) {
+            Permission p = Permission.getPermission(permission);
+            if (p == null)
+                continue;
             if (isAll == null) {
                 IOHandler.getConsoleIoHandler().outputLang("permission-request", this.name, permission);
                 try {
@@ -132,10 +135,10 @@ public class PluginDescription {
                     String yes = IOHandler.getConsoleIoHandler().input();
                     if (yes.equalsIgnoreCase("yes")) {
                         yeses.add(permission);
-                        this.permissions.put(Permission.getPermission(permission), true);
+                        this.permissions.put(p, true);
                     } else if (yes.equalsIgnoreCase("no")) {
                         nos.add(permission);
-                        this.permissions.put(Permission.getPermission(permission), false);
+                        this.permissions.put(p, false);
                     }
                 } catch (InputTimeoutException ignored) {
                     IOHandler.getConsoleIoHandler().outputLang("permission-timeout");
@@ -144,7 +147,7 @@ public class PluginDescription {
                 if (isAll)
                     yeses.add(permission);
                 else nos.add(permission);
-                this.permissions.put(Permission.getPermission(permission), isAll);
+                this.permissions.put(p, isAll);
             }
         }
         permissionsStatus.setList("yes", yeses);

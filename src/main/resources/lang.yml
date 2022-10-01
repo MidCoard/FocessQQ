@@ -74,6 +74,7 @@ exception-scheduler-uncaught: Scheduler %s uncaught exception
 exception-load-soft-depend-plugin: Load soft-dependent plugin file %s exception
 exception-section: Section %s exception, %s
 exception-get-null-caller-class: Get null caller class exception
+exception-load-plugin-unexpected-exception: Load plugin with unexpected exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
