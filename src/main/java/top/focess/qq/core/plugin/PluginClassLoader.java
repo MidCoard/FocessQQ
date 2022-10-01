@@ -497,7 +497,8 @@ public class PluginClassLoader extends URLClassLoader {
                 } else if (e instanceof PluginLoadException)
                     // this plugin is null and PluginLoadException means there is something wrong in the new instance of the plugin
                     FocessQQ.getLogger().thrLang("exception-load-plugin-file", e);
-                else
+                else if (!(e instanceof IllegalStateException))
+                    // for internal load error
                     FocessQQ.getLogger().thrLang("exception-load-plugin-unexpected-exception", e);
                 PluginCoreClassLoader.LOADERS.remove(this);
                 GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1),"load-failed");
