@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.4.8000</version>
+    <version>4.1.4.9000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -35,7 +35,7 @@
         <util.version>1.1.12</util.version>
         <scheduler.version>1.1.6</scheduler.version>
         <sysout.version>1.0.2</sysout.version>
-        <socket.version>1.0.4</socket.version>
+        <socket.version>1.0.6</socket.version>
     </properties>
 
     <repositories>

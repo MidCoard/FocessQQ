@@ -55,14 +55,14 @@ Maven 依赖
 <dependency>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.4.8000</version>
+    <version>4.1.4.9000</version>
 </dependency>
 ```
 
 Gradle 依赖
 
 ```gradle
-implementation 'top.focess:focess-qq:4.1.4.8000'
+implementation 'top.focess:focess-qq:4.1.4.9000'
 ```
 
 开发文档移步本项目[Wiki](https://github.com/MIdCoard/MiraiQQ/wiki)
