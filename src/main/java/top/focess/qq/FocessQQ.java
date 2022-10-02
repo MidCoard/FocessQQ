@@ -580,7 +580,7 @@ public class FocessQQ {
         CONSOLE_INPUT_THREAD.interrupt();
         new Thread(() -> {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
             }
             System.err.println("Force Shutdown");
