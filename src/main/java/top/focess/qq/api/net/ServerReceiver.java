@@ -73,4 +73,8 @@ public class ServerReceiver {
         receiver.unregisterAll();
         this.handlers.clear();
     }
+
+    public void disconnect(String client) {
+        this.receiver.disconnect(client);
+    }
 }
