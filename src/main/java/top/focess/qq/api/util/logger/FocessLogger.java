@@ -2,6 +2,7 @@ package top.focess.qq.api.util.logger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.focess.net.socket.ASocket;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.core.commands.util.ChatConstants;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
@@ -128,6 +129,10 @@ public class FocessLogger {
      * Note: if debug output is true, the debug message will be outputted as INFO level and DEBUG level, otherwise, it will be outputted as DEBUG level
      */
     public void toggleDebugOutput() {
+        if (ASocket.isDebug())
+            ASocket.disableDebug();
+        else
+            ASocket.enableDebug();
         this.debugOutput = !this.debugOutput;
     }
 
