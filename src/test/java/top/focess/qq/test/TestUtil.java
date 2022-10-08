@@ -395,7 +395,6 @@ public class TestUtil {
         byte[] encode = Base64.encodeBase64(bytes);
         byte[] decode = Base64.decodeBase64(encode);
         assertEquals(s, new String(decode));
-        assertEquals(encode, new byte[]{102, 111, 99, 101, 115, 115});
     }
 
     @RepeatedTest(5)
