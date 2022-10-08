@@ -37,6 +37,7 @@ exception-create-focess-sided-socket-server: Create focess sided socket server e
 exception-create-focess-socket-client: Create focess socket client exception
 exception-create-focess-sided-socket-client: Create focess sided socket client exception
 exception-create-focess-udp-socket-client: Create focess udp socket client exception
+exception-create-focess-udp-socket-server: Create focess udp socket server exception
 exception-create-config-file: Create config file exception
 exception-load-main-plugin: Load main plugin exception
 exception-plugin-disable: Plugin disable exception

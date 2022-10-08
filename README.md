@@ -18,7 +18,11 @@
 
 --client <host> <port> <name> 设置客户端开放地址与端口 详情见通信
 
---udp <port> 设置UDP端口 详情见通信
+--udp 设置为UDP通信，默认TCP通信 详情见通信
+
+--serverHeart 设置客户端需要服务器心跳 详情见通信
+
+--encryptSocket 设置加密通信 详情见通信
 
 --sided 设置单端 详情见通信
 
@@ -41,11 +45,15 @@
 
 如果在启动时加上启动参数 **--client** 则会在相应的地址与端口启动一个相应名字的客户端。
 
-如果在启动时加上启动参数 **--udp** 则会在相应的端口启动一个UDP服务端。
+如果在启动时加上启动参数 **--udp** 则会启动UDP通信，默认为TCP通信。启动UDP通信后无视 **--sided**。
 
 如果启动UDP服务端的时候加上启动参数 **--multi** 则会**允许多个相同名字**的客户端链接。
 
-如果在启动时加上启动参数 **--sided** 则**客户端**或者**服务端**都会只含有**链接服务端**或者**链接客户端**的功能。没有 --sided 启动参数时既**可以链接服务端也可以链接客户端**
+如果在启动时加上启动参数 **--sided** 则**客户端**或者**服务端**都会只含有**链接服务端**或者**链接客户端**的功能。没有 --sided 启动参数时既**可以链接服务端也可以链接客户端**。
+
+如果在启动时加上启动参数 **--serverHeart** 则**服务端**会主动发送服务端心跳以便客户端在服务端断线后重连。
+
+如果在启动时加上启动参数 **--encryptSocket** 则**客户端**与**服务端**的通信会被加密。
 
 ## 开发
 
@@ -55,14 +63,14 @@ Maven 依赖
 <dependency>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.4.9000</version>
+    <version>4.1.5.0000</version>
 </dependency>
 ```
 
 Gradle 依赖
 
 ```gradle
-implementation 'top.focess:focess-qq:4.1.4.9000'
+implementation 'top.focess:focess-qq:4.1.5.0000'
 ```
 
 开发文档移步本项目[Wiki](https://github.com/MIdCoard/MiraiQQ/wiki)

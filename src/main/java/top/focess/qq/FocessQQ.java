@@ -7,14 +7,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.command.CommandResult;
 import top.focess.net.IllegalPortException;
-import top.focess.net.receiver.FocessClientReceiver;
 import top.focess.net.receiver.FocessReceiver;
 import top.focess.net.receiver.FocessUDPMultiReceiver;
-import top.focess.net.receiver.FocessUDPReceiver;
-import top.focess.net.socket.FocessSidedClientSocket;
-import top.focess.net.socket.FocessSidedSocket;
-import top.focess.net.socket.FocessSocket;
-import top.focess.net.socket.FocessUDPSocket;
+import top.focess.net.socket.*;
 import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
@@ -457,14 +452,33 @@ public class FocessQQ {
             administratorId = option.get(LongOptionType.LONG_OPTION_TYPE);
         final Option sidedOption = options.get("sided");
         final Option multiOption = options.get("multi");
+        final Option udpOption = options.get("udp");
+        final Option serverHeartOption = options.get("serverHeart");
+        final Option encryptSocketOption = options.get("encryptSocket");
         option = options.get("server");
         if (option != null) {
-            if (sidedOption == null)
+            if (udpOption != null) {
                 try {
-                    final FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-                    FocessReceiver receiver = new FocessReceiver(focessSocket);
-                    focessSocket.registerReceiver(receiver);
-                    serverReceiver = new ServerReceiver(receiver);
+                    final FocessUDPSocket focessUDPSocket = new FocessUDPSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                    if (multiOption == null) {
+                        FocessReceiver receiver = new FocessReceiver(focessUDPSocket);
+                        focessUDPSocket.registerReceiver(receiver);
+                        udpServerReceiver = new ServerReceiver(receiver);
+                    }
+                    else {
+                        FocessUDPMultiReceiver receiver = new FocessUDPMultiReceiver(focessUDPSocket);
+                        focessUDPSocket.registerReceiver(receiver);
+                        udpServerMultiReceiver = new ServerMultiReceiver(receiver);
+                    }
+                    udpSocket = new Socket(focessUDPSocket);
+                    getLogger().infoLang("create-focess-udp-socket-server");
+                } catch (final IllegalPortException e) {
+                    getLogger().thrLang("exception-create-focess-udp-socket-server", e);
+                }
+            } else if (sidedOption == null)
+                try {
+                    final FocessServerSocket focessSocket = new FocessServerSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                    serverReceiver = new ServerReceiver(focessSocket.getReceiver());
                     socket = new Socket(focessSocket);
                     getLogger().infoLang("create-focess-socket-server");
                 } catch (final Exception e) {
@@ -483,16 +497,28 @@ public class FocessQQ {
         }
         option = options.get("client");
         if (option != null) {
-            if (sidedOption == null)
+            if (udpOption != null) {
                 try {
-                    final FocessSocket focessSocket = new FocessSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
+                    final int localPort = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     final String localhost = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     final String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     final int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     final String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
-                    FocessClientReceiver receiver = new FocessClientReceiver(focessSocket, localhost, host, port, name);
-                    focessSocket.registerReceiver(receiver);
-                    clientReceiver = new ClientReceiver(receiver);
+                    final FocessUDPClientSocket focessSocket = new FocessUDPClientSocket(localhost,localPort, host, port, name, serverHeartOption != null, encryptSocketOption != null);
+                    clientReceiver = new ClientReceiver(focessSocket.getReceiver());
+                    udpSocket = new Socket(focessSocket);
+                } catch (final Exception e) {
+                    getLogger().thrLang("exception-create-focess-udp-socket-client", e);
+                }
+            } else if (sidedOption == null)
+                try {
+                    final int localPort = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
+                    final String localhost = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                    final String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                    final int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
+                    final String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
+                    final FocessClientSocket focessSocket = new FocessClientSocket(localhost, localPort, host, port, name, serverHeartOption != null, encryptSocketOption != null);
+                    clientReceiver = new ClientReceiver(focessSocket.getReceiver());
                     socket = new Socket(focessSocket);
                     getLogger().infoLang("create-focess-socket-client");
                 } catch (final Exception e) {
@@ -503,33 +529,13 @@ public class FocessQQ {
                     final String host = option.get(OptionType.DEFAULT_OPTION_TYPE);
                     final int port = option.get(IntegerOptionType.INTEGER_OPTION_TYPE);
                     final String name = option.get(OptionType.DEFAULT_OPTION_TYPE);
-                    final FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host, port, name);
+                    final FocessSidedClientSocket focessSidedClientSocket = new FocessSidedClientSocket(host, port, name, serverHeartOption != null, encryptSocketOption != null);
                     clientReceiver = new ClientReceiver(focessSidedClientSocket.getReceiver());
                     socket = new Socket(focessSidedClientSocket);
                     getLogger().infoLang("create-focess-sided-socket-client");
                 } catch (final Exception e) {
                     getLogger().thrLang("exception-create-focess-sided-socket-client", e);
                 }
-            }
-        }
-        option = options.get("udp");
-        if (option != null) {
-            try {
-                final FocessUDPSocket focessUDPSocket = new FocessUDPSocket(option.get(IntegerOptionType.INTEGER_OPTION_TYPE));
-                if (multiOption == null) {
-                    FocessUDPReceiver receiver = new FocessUDPReceiver(focessUDPSocket);
-                    focessUDPSocket.registerReceiver(receiver);
-                    udpServerReceiver = new ServerReceiver(receiver);
-                }
-                else {
-                    FocessUDPMultiReceiver receiver = new FocessUDPMultiReceiver(focessUDPSocket);
-                    focessUDPSocket.registerReceiver(receiver);
-                    udpServerMultiReceiver = new ServerMultiReceiver(receiver);
-                }
-                udpSocket = new Socket(focessUDPSocket);
-                getLogger().infoLang("create-focess-udp-socket-client");
-            } catch (final IllegalPortException e) {
-                getLogger().thrLang("exception-create-focess-udp-socket-client", e);
             }
         }
         try {

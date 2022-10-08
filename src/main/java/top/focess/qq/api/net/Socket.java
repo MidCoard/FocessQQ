@@ -28,12 +28,12 @@ public class Socket {
         this.socket.registerReceiver(receiver);
     }
 
-    public boolean containsServerSide() {
-        return this.socket.containsServerSide();
+    public boolean isServerSide() {
+        return this.socket.isServerSide();
     }
 
-    public boolean containsClientSide() {
-        return this.socket.containsClientSide();
+    public boolean isClientSide() {
+        return this.socket.isClientSide();
     }
 
     public void close() {

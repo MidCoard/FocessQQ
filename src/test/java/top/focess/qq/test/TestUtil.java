@@ -24,7 +24,6 @@ import top.focess.util.yaml.YamlConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -391,8 +390,12 @@ public class TestUtil {
 
     @Test
     void testBase64() {
-        assertEquals("Zm9j", Base64.base64Encode("foc".getBytes(StandardCharsets.UTF_8)));
-        assertEquals("foc", new String(Base64.base64Decode("Zm9j"), StandardCharsets.UTF_8));
+        String s = "focess";
+        byte[] bytes = s.getBytes();
+        byte[] encode = Base64.encodeBase64(bytes);
+        byte[] decode = Base64.decodeBase64(encode);
+        assertEquals(s, new String(decode));
+        assertEquals(encode, new byte[]{102, 111, 99, 101, 115, 115});
     }
 
     @RepeatedTest(5)
