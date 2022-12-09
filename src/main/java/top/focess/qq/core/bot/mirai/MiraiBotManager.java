@@ -171,11 +171,11 @@ public class MiraiBotManager implements BotManager {
                 return null;
             }
         });
-        final net.mamoe.mirai.Bot bot;
+        final net.mamoe.mirai.Bot bot = BotFactory.INSTANCE.newBot(id, password, configuration);
         try {
-            bot = BotFactory.INSTANCE.newBot(id, password, configuration);
             bot.login();
         } catch (final Exception e) {
+            bot.close();
             throw new BotLoginException(id, e);
         }
         return bot;
