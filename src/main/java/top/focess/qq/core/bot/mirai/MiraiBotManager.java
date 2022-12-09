@@ -69,9 +69,11 @@ public class MiraiBotManager implements BotManager {
         for (final Long id : BOTS.keySet())
             this.remove(id);
         //remove default bot
-        final Bot b = BOTS.remove(FocessQQ.getBot().getId());
-        if (b != null)
-            b.logout();
+        if (FocessQQ.getBot() != null) {
+            final Bot b = BOTS.remove(FocessQQ.getBot().getId());
+            if (b != null)
+                b.logout();
+        }
         PLUGIN_BOT_MAP.clear();
     }
 

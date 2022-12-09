@@ -584,14 +584,16 @@ public class FocessQQ {
             saved = true;
         }
         CONSOLE_INPUT_THREAD.interrupt();
-        new Thread(() -> {
+        Thread thread = new Thread(() -> {
             try {
                 Thread.sleep(10000);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
             System.err.println("Force Shutdown");
             System.exit(0);
-        }).start();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private static void saveLogFile() {
