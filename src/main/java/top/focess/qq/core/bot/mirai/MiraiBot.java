@@ -194,7 +194,7 @@ public class MiraiBot extends QQBot {
         return nativeGroup.getMembers().stream().map(this::getMember).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
     }
 
-    private static CommandPermission toCommandPermission(final MemberPermission permission) {
+    static CommandPermission toCommandPermission(final MemberPermission permission) {
         switch (permission) {
             case OWNER:
                 return CommandPermission.OWNER;

@@ -130,7 +130,7 @@ public abstract class Plugin implements FocessSerializable {
      */
     @Nullable
     public static Plugin thisPlugin() {
-        return PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        return PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
     }
 
     /**
@@ -142,7 +142,7 @@ public abstract class Plugin implements FocessSerializable {
      */
     @NonNull
     public static Plugin plugin() {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         return plugin == null ? FocessQQ.getMainPlugin() : plugin;
     }
 

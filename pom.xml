@@ -8,7 +8,7 @@
     <description>A simple QQ Bot framework</description>
     <groupId>top.focess</groupId>
     <artifactId>focess-qq</artifactId>
-    <version>4.1.5.1000</version>
+    <version>4.1.5.2000</version>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -24,7 +24,7 @@
         <version>${project.version}</version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <mirai.version>2.12.3</mirai.version>
+        <mirai.version>2.14.0</mirai.version>
         <poi.version>5.2.2</poi.version>
         <logback.version>1.2.11</logback.version>
         <checker.version>3.21.3</checker.version>

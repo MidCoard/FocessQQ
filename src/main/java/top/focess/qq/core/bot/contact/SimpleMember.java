@@ -10,8 +10,8 @@ public class SimpleMember extends SimpleContact implements Member {
     private final Group simpleGroup;
     private final String name;
     private final String rawName;
-    private final String cardName;
-    private final CommandPermission commandPermission;
+    private String cardName;
+    private CommandPermission permission;
 
     public SimpleMember(@NotNull final Group group, final long id, final String name, final String rawName, final String cardName, final CommandPermission permission) {
         super(group.getBot(), id);
@@ -19,7 +19,7 @@ public class SimpleMember extends SimpleContact implements Member {
         this.name = name;
         this.rawName = rawName;
         this.cardName = cardName;
-        this.commandPermission = permission;
+        this.permission = permission;
     }
 
     @Override
@@ -44,6 +44,14 @@ public class SimpleMember extends SimpleContact implements Member {
 
     @Override
     public CommandPermission getPermission() {
-        return this.commandPermission;
+        return this.permission;
+    }
+
+    public void setCardName(String cardName) {
+        this.cardName = cardName;
+    }
+
+    public void setPermission(CommandPermission permission) {
+        this.permission = permission;
     }
 }

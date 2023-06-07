@@ -24,7 +24,7 @@ public class FocessSecurityManager extends SecurityManager {
             String path = new File(perm.getName()).getAbsolutePath();
             if (path.startsWith(FocessQQ.getMainPlugin().getDefaultFolder().getAbsolutePath()))
                 for (Class<?> clazz : MethodCaller.getAllCallerClass()) {
-                    Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(clazz);
+                    Plugin plugin = PluginCoreClassLoader.getPluginByClass(clazz);
                     if (plugin != null)
                         if (!path.startsWith(plugin.getDefaultFolder().getAbsolutePath()))
                             top.focess.qq.core.permission.Permission.checkPermission(plugin, top.focess.qq.core.permission.Permission.ACCESS_MAIN_FILE);

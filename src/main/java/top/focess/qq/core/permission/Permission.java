@@ -133,7 +133,7 @@ public enum Permission {
         if (Arrays.stream(permissionEnv.values()).allMatch(i -> i != permission))
             throw new PermissionException(permission);
         for (Class<?> clazz : MethodCaller.getAllCallerClass()) {
-            Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(clazz);
+            Plugin plugin = PluginCoreClassLoader.getPluginByClass(clazz);
             if (plugin != null)
                 checkPermission(plugin, permission);
         }

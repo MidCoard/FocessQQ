@@ -33,7 +33,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void infoLang(final String key, final Object... objects) {
-        this.info(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+        this.info(String.format(PluginCoreClassLoader.getPluginByClassOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -65,7 +65,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void thrLang(final String key, final Throwable e, final Object... objects) {
-        this.thr(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects), e);
+        this.thr(String.format(PluginCoreClassLoader.getPluginByClassOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects), e);
     }
 
 
@@ -88,7 +88,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void fatalLang(final String key, final Object... objects) {
-        this.fatal(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+        this.fatal(String.format(PluginCoreClassLoader.getPluginByClassOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**
@@ -110,7 +110,7 @@ public class FocessLogger {
      * @param objects the objects need to replace
      */
     public void debugLang(final String key, final Object... objects) {
-        this.debug(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+        this.debug(String.format(PluginCoreClassLoader.getPluginByClassOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**

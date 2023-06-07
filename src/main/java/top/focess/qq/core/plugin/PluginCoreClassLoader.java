@@ -22,7 +22,7 @@ public class PluginCoreClassLoader extends ClassLoader {
     }
 
     @Nullable
-    public static Plugin getClassLoadedBy(@Nullable final Class<?> clazz) {
+    public static Plugin getPluginByClass(@Nullable final Class<?> clazz) {
         if (clazz == null)
             return null;
         if (clazz.getClassLoader() instanceof PluginClassLoader)
@@ -33,8 +33,8 @@ public class PluginCoreClassLoader extends ClassLoader {
     }
 
     @NonNull
-    public static Plugin getClassLoadedByOrDefault(@Nullable final Class<?> clazz) {
-        final Plugin plugin = getClassLoadedBy(clazz);
+    public static Plugin getPluginByClassOrDefault(@Nullable final Class<?> clazz) {
+        final Plugin plugin = getPluginByClass(clazz);
         if (plugin == null)
             return FocessQQ.getMainPlugin();
         return plugin;

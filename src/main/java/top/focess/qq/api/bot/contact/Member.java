@@ -5,7 +5,7 @@ import top.focess.command.CommandPermission;
 /**
  * Represents a member in a group.
  */
-public interface Member extends Contact,CommandExecutor {
+public interface Member extends Contact, CommandExecutor {
 
     /**
      * Get the member's raw name (its nickname)

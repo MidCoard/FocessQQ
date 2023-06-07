@@ -31,6 +31,7 @@ exception-submit-stranger-message-event: Submit stranger message event exception
 exception-submit-server-stop-event: Submit server stop event exception
 exception-submit-bot-send-message-event: Submit bot send message event exception
 exception-submit-bot-pre-send-message-event: Submit bot presend message event exception
+exception-submit-member-permission-change-event: Submit member permission change event exception
 exception-save-log: Save log exception
 exception-create-focess-socket-server: Create focess socket server exception
 exception-create-focess-sided-socket-server: Create focess sided socket server exception
@@ -217,5 +218,3 @@ permission-command-no-permission: "The plugin %s does not have permissions"
 permission-command-list: "The plugin %s has the following permissions:%s"
 permission-command-set-success: "The plugin %s set the permission %s successfully"
 permission-command-set-failed: "The plugin %s set the permission %s failed, it may already have the permission"
-
-

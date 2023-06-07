@@ -60,7 +60,7 @@ public class Session implements SectionMap {
 
     @Override
     public void set(final String key, final Object value) {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         if (plugin != null)
             SectionMap.super.set(plugin.getName() + ":" + key, value);
         else SectionMap.super.set(key, value);
@@ -68,7 +68,7 @@ public class Session implements SectionMap {
 
     @Override
     public <T> T get(final String key) {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         if (plugin != null)
             return SectionMap.super.get(plugin.getName() + ":" + key);
         else return SectionMap.super.get(key);
@@ -76,7 +76,7 @@ public class Session implements SectionMap {
 
     @Override
     public <T> T getOrDefault(final String key, final T defaultValue) {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         if (plugin != null)
             return SectionMap.super.getOrDefault(plugin.getName() + ":" + key, defaultValue);
         else return SectionMap.super.getOrDefault(key, defaultValue);
@@ -84,7 +84,7 @@ public class Session implements SectionMap {
 
     @Override
     public boolean contains(final String key) {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         if (plugin != null)
             return SectionMap.super.contains(plugin.getName() + ":" + key);
         else return SectionMap.super.contains(key);
@@ -92,7 +92,7 @@ public class Session implements SectionMap {
 
     @Override
     public void remove(final String key) {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         if (plugin != null)
             SectionMap.super.remove(plugin.getName() + ":" + key);
         else SectionMap.super.remove(key);
@@ -100,7 +100,7 @@ public class Session implements SectionMap {
 
     @Override
     public void compute(final String key, final BiFunction<? super String, ? super Object, ?> remappingFunction) {
-        final Plugin plugin = PluginCoreClassLoader.getClassLoadedBy(MethodCaller.getCallerClass());
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
         if (plugin != null)
             SectionMap.super.compute(plugin.getName() + ":" + key, remappingFunction);
         else SectionMap.super.compute(key, remappingFunction);

@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import kotlin.coroutines.Continuation;
 import net.mamoe.mirai.BotFactory;
-import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.OtherClient;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.*;
@@ -19,10 +18,7 @@ import top.focess.qq.api.bot.Bot;
 import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotManager;
 import top.focess.qq.api.bot.BotProtocol;
-import top.focess.qq.api.bot.contact.Contact;
-import top.focess.qq.api.bot.contact.Friend;
-import top.focess.qq.api.bot.contact.Group;
-import top.focess.qq.api.bot.contact.Stranger;
+import top.focess.qq.api.bot.contact.*;
 import top.focess.qq.api.event.EventManager;
 import top.focess.qq.api.event.EventSubmitException;
 import top.focess.qq.api.event.bot.BotReloginEvent;
@@ -30,6 +26,8 @@ import top.focess.qq.api.event.bot.*;
 import top.focess.qq.api.event.chat.FriendChatEvent;
 import top.focess.qq.api.event.chat.GroupChatEvent;
 import top.focess.qq.api.event.chat.StrangerChatEvent;
+import top.focess.qq.api.event.group.MemberCardNameChangeEvent;
+import top.focess.qq.api.event.group.MemberCommandPermissionChangeEvent;
 import top.focess.qq.api.event.recall.FriendRecallEvent;
 import top.focess.qq.api.event.recall.GroupRecallEvent;
 import top.focess.qq.api.event.request.FriendRequestEvent;
@@ -37,6 +35,7 @@ import top.focess.qq.api.event.request.GroupRequestEvent;
 import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.api.util.IOHandler;
+import top.focess.qq.core.bot.contact.SimpleMember;
 import top.focess.qq.core.bot.mirai.message.MiraiMessage;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageChain;
 import top.focess.qq.core.bot.mirai.message.MiraiMessageSource;
@@ -52,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
+
+import static top.focess.qq.core.bot.mirai.MiraiBot.toCommandPermission;
 
 @PermissionEnv(values = {Permission.REMOVE_BOT_MANAGER, Permission.BOT_LOGIN, Permission.BOT_LOGOUT, Permission.BOT_RELOGIN})
 public class MiraiBotManager implements BotManager {
@@ -270,7 +271,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessagePostSendEvent.class, event -> {
-            final Contact contact = Objects.requireNonNull(getContact(b, event.getTarget()));
+            final Contact contact = getContact(b, event.getTarget());
             final BotSendMessageEvent e = new BotSendMessageEvent(b, new MiraiMessageChain(event.getMessage()), contact);
             try {
                 EventManager.submit(e);
@@ -279,7 +280,7 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessagePreSendEvent.class, event -> {
-            final Contact contact = Objects.requireNonNull(getContact(b, event.getTarget()));
+            final Contact contact = getContact(b, event.getTarget());
             final BotPreSendMessageEvent e = new BotPreSendMessageEvent(b, new MiraiMessage(event.getMessage()), contact);
             try {
                 EventManager.submit(e);
@@ -290,12 +291,34 @@ public class MiraiBotManager implements BotManager {
             }
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(MessageSyncEvent.class, event -> {
-            final Contact contact = Objects.requireNonNull(getContact(b, event.getSubject()));
+            final Contact contact = getContact(b, event.getSubject());
             final BotSendMessageEvent e = new BotSendMessageEvent(b, new MiraiMessageChain(event.getMessage()), contact);
             try {
                 EventManager.submit(e);
             } catch (final EventSubmitException ex) {
                 FocessQQ.getLogger().thrLang("exception-submit-bot-send-message-event", ex);
+            }
+        }));
+        listeners.add(bot.getEventChannel().subscribeAlways(MemberPermissionChangeEvent.class, event -> {
+            final Group group = Objects.requireNonNull(b.getGroup(event.getGroup()));
+            final Member member = Objects.requireNonNull(group.getMember(event.getMember().getId()));
+            ((SimpleMember) member).setPermission(toCommandPermission(event.getNew()));
+            final MemberCommandPermissionChangeEvent e = new MemberCommandPermissionChangeEvent(member, toCommandPermission(event.getOrigin()), toCommandPermission(event.getNew()));
+            try {
+                EventManager.submit(e);
+            } catch (final EventSubmitException ex) {
+                FocessQQ.getLogger().thrLang("exception-submit-member-permission-change-event", ex);
+            }
+        }));
+        listeners.add(bot.getEventChannel().subscribeAlways(MemberCardChangeEvent.class, event -> {
+            final Group group = Objects.requireNonNull(b.getGroup(event.getGroup()));
+            final Member member = Objects.requireNonNull(group.getMember(event.getMember().getId()));
+            ((SimpleMember) member).setCardName(event.getNew());
+            final MemberCardNameChangeEvent e = new MemberCardNameChangeEvent(member, event.getOrigin(), event.getNew());
+            try {
+                EventManager.submit(e);
+            } catch (final EventSubmitException ex) {
+                FocessQQ.getLogger().thrLang("exception-submit-member-card-change-event", ex);
             }
         }));
         BOT_LISTENER_MAP.put(b, listeners);
@@ -377,17 +400,18 @@ public class MiraiBotManager implements BotManager {
         throw new IllegalArgumentException("Unknown bot protocol: " + botProtocol);
     }
 
-    private static @Nullable Contact getContact(final Bot bot, final net.mamoe.mirai.contact.Contact contact) {
+    @NotNull
+    private static Contact getContact(final Bot bot, final net.mamoe.mirai.contact.Contact contact) {
         if (contact instanceof net.mamoe.mirai.contact.Group)
             return bot.getGroupOrFail(contact.getId());
         if (contact instanceof net.mamoe.mirai.contact.Friend)
             return bot.getFriendOrFail(contact.getId());
-        if (contact instanceof Member)
-            return bot.getGroupOrFail(((Member) contact).getGroup().getId()).getMember(contact.getId());
+        if (contact instanceof net.mamoe.mirai.contact.Member)
+            return bot.getGroupOrFail(((net.mamoe.mirai.contact.Member) contact).getGroup().getId()).getMemberOrFail(contact.getId());
         if (contact instanceof Stranger)
             return bot.getStrangerOrFail(contact.getId());
         if (contact instanceof OtherClient)
             return bot.getOtherClientOrFail(contact.getId());
-        return null;
+        throw new NullPointerException();
     }
 }

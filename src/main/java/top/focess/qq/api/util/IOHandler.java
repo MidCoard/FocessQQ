@@ -86,7 +86,7 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
      * @param objects the objects need to replace
      */
     public void outputLang(final String key, final Object... objects) {
-        this.output(String.format(PluginCoreClassLoader.getClassLoadedByOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
+        this.output(String.format(PluginCoreClassLoader.getPluginByClassOrDefault(MethodCaller.getCallerClass()).getLangConfig().get(key), objects));
     }
 
     /**

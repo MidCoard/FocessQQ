@@ -45,7 +45,7 @@ public class CommandPrepostEvent extends Event implements Cancellable {
      * Constructs a CommandPrepostEvent
      *
      * @param sender    the executor
-     * @param command   the Command
+     * @param command   the command
      * @param args      the data of this executor
      * @param ioHandler the input and output handler
      */
