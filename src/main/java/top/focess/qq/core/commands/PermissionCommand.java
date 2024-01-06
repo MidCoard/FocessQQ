@@ -24,7 +24,7 @@ public class PermissionCommand extends Command {
         this.setExecutorPermission(i -> i.isAdministrator() || i.isConsole());
         this.addExecutor((sender,data,ioHandler)->{
             Plugin plugin = data.get(Plugin.class);
-            if (plugin.getPluginDescription().getPermissions().size() == 0)
+            if (plugin.getPluginDescription().getPermissions().isEmpty())
                 ioHandler.outputLang("permission-command-no-permission",plugin.getName());
             else {
                 StringBuilder stringBuilder = new StringBuilder();

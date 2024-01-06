@@ -55,8 +55,6 @@ import top.focess.qq.core.plugin.PluginClassLoader;
 import top.focess.qq.core.plugin.PluginCoreClassLoader;
 import top.focess.qq.core.util.FocessSecurityManager;
 import top.focess.qq.core.util.MethodCaller;
-import top.focess.scheduler.FocessScheduler;
-import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 import top.focess.util.Pair;
 import top.focess.util.option.Option;
@@ -73,7 +71,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPOutputStream;
@@ -107,7 +104,6 @@ public class FocessQQ {
      * The Focess Logger
      */
     private static final FocessLogger LOGGER = new FocessLogger();
-    private static final Scheduler SCHEDULER = new FocessScheduler("FocessQQ");
 
     private static final Scanner SCANNER = new Scanner(System.in);
     private static final Thread CONSOLE_INPUT_THREAD = new Thread(() -> {
@@ -561,12 +557,6 @@ public class FocessQQ {
                 return;
             isStopped = true;
         }
-        SCHEDULER.run(() -> {
-            try {
-                getLogger().fatalLang("fatal-exit-failed");
-            } catch (final Exception ignored) {}
-            System.exit(0);
-        }, Duration.ofSeconds(5), "force-exit");
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
         // need to check if Exit is called by Initialization
         if (MAIN_PLUGIN != null && MAIN_PLUGIN.isEnabled())
@@ -578,7 +568,6 @@ public class FocessQQ {
             getUdpSocket().close();
         // make sure scheduler is stopped at the end
         Schedulers.closeAll();
-        SCHEDULER.close();
         if (!saved) {
             saveLogFile();
             saved = true;
@@ -586,14 +575,15 @@ public class FocessQQ {
         CONSOLE_INPUT_THREAD.interrupt();
         Thread thread = new Thread(() -> {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
             } catch (InterruptedException ignored) {
             }
-            System.err.println("Force Shutdown");
+            System.out.println("Force Shutdown");
             System.exit(0);
         });
         thread.setDaemon(true);
         thread.start();
+        System.out.println("Wait for 5000ms to shut down.");
     }
 
     private static void saveLogFile() {

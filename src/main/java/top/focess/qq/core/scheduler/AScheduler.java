@@ -9,7 +9,6 @@ import top.focess.qq.api.plugin.Plugin;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Callback;
-import top.focess.scheduler.CatchExceptionHandler;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 
@@ -33,7 +32,6 @@ public class AScheduler implements Scheduler {
         this.plugin = plugin;
         this.scheduler = scheduler;
         this.scheduler.setUncaughtExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-scheduler-uncaught", e, this.getName()));
-        this.scheduler.setCatchExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-scheduler", e, this.getName()));
         PLUGIN_SCHEDULER_MAP.compute(plugin, (k, v) -> {
             if (v == null)
                 v = Lists.newCopyOnWriteArrayList();
@@ -121,16 +119,6 @@ public class AScheduler implements Scheduler {
     @Nullable
     public Thread.UncaughtExceptionHandler getUncaughtExceptionHandler() {
         return this.scheduler.getUncaughtExceptionHandler();
-    }
-
-    @Override
-    public @Nullable CatchExceptionHandler getCatchExceptionHandler() {
-        return this.scheduler.getCatchExceptionHandler();
-    }
-
-    @Override
-    public void setCatchExceptionHandler(final CatchExceptionHandler catchExceptionHandler) {
-        this.scheduler.setCatchExceptionHandler(catchExceptionHandler);
     }
 
     @Override

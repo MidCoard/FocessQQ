@@ -34,7 +34,7 @@ public interface BotManager {
      */
     @NotNull
     default Future<Bot> login(final long id, final String password, final Plugin plugin) {
-        return this.login(id, password, plugin, BotProtocol.ANDROID_PAD);
+        return this.login(id, password, plugin, BotProtocol.MACOS);
     }
 
     /**
@@ -66,7 +66,7 @@ public interface BotManager {
      */
     @NotNull
     default Bot loginDirectly(final long id, final String password, final Plugin plugin) throws BotLoginException {
-        return this.loginDirectly(id, password, plugin, BotProtocol.ANDROID_PAD);
+        return this.loginDirectly(id, password, plugin, BotProtocol.MACOS);
     }
 
     /**

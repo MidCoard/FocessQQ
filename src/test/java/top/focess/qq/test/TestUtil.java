@@ -26,9 +26,9 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -230,7 +230,7 @@ public class TestUtil {
         field1.setAccessible(true);
         Field field2 = ComparableTask.class.getDeclaredField("task");
         field2.setAccessible(true);
-        PriorityBlockingQueue<ComparableTask> tasks2 = (PriorityBlockingQueue<ComparableTask>) field.get(scheduler);
+        PriorityQueue<ComparableTask> tasks2 = (PriorityQueue<ComparableTask>) field.get(scheduler);
         List<Task> tasks = Lists.newArrayList();
         for (int i = 0;i<5;i++) {
             int finalI = i;

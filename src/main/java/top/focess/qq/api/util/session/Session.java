@@ -29,7 +29,10 @@ public class Session implements SectionMap {
     @Override
     public SessionSection createSection(final String key) {
         final Map<String, Object> values = Maps.newHashMap();
-        this.set(key, values);
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
+        if (plugin != null)
+            SectionMap.super.set(plugin.getName() + ":" + key, values);
+        else SectionMap.super.set(key, values);
         return new SessionSection(this, values);
     }
 
@@ -40,7 +43,11 @@ public class Session implements SectionMap {
 
     @Override
     public SectionMap getSection(final String key) {
-        final Object value = this.get(key);
+        Object value;
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
+        if (plugin != null)
+            value = SectionMap.super.get(plugin.getName() + ":" + key);
+        else value = SectionMap.super.get(key);
         if (value == null)
             this.containsSection(key);
         if (value instanceof Map)
@@ -50,7 +57,10 @@ public class Session implements SectionMap {
 
     @Override
     public boolean containsSection(final String key) {
-        return this.get(key) instanceof Map;
+        final Plugin plugin = PluginCoreClassLoader.getPluginByClass(MethodCaller.getCallerClass());
+        if (plugin != null)
+            return SectionMap.super.get(plugin.getName() + ":" + key) instanceof Map;
+        else return SectionMap.super.get(key) instanceof Map;
     }
 
     @Override

@@ -3,11 +3,17 @@ package top.focess.qq.core.bot.mirai;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
+import kotlin.coroutines.EmptyCoroutineContext;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.auth.BotAuthorization;
+import net.mamoe.mirai.auth.QRCodeLoginListener;
 import net.mamoe.mirai.contact.OtherClient;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.utils.BotConfiguration;
+import net.mamoe.mirai.utils.DeviceVerificationRequests;
+import net.mamoe.mirai.utils.DeviceVerificationResult;
 import net.mamoe.mirai.utils.LoginSolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -144,7 +150,7 @@ public class MiraiBotManager implements BotManager {
                 }
                 FocessQQ.getLogger().infoLang("input-captcha-code");
                 try {
-                    return IOHandler.getConsoleIoHandler().inputMessage();
+                    return IOHandler.getConsoleIoHandler().inputMessage().toString();
                 } catch (final InputTimeoutException e) {
                     return null;
                 }
@@ -155,10 +161,10 @@ public class MiraiBotManager implements BotManager {
             public Object onSolveSliderCaptcha(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
                 try {
-                    IOHandler.getConsoleIoHandler().inputMessage();
+                    return IOHandler.getConsoleIoHandler().inputMessage().toString();
                 } catch (final InputTimeoutException ignored) {
+                    return null;
                 }
-                return null;
             }
 
             @Nullable
@@ -166,13 +172,83 @@ public class MiraiBotManager implements BotManager {
             public Object onSolveUnsafeDeviceLoginVerify(@NotNull final net.mamoe.mirai.Bot bot, @NotNull final String s, @NotNull final Continuation<? super String> continuation) {
                 FocessQQ.getLogger().info(s);
                 try {
-                    IOHandler.getConsoleIoHandler().inputMessage();
+                    return IOHandler.getConsoleIoHandler().inputMessage().toString();
                 } catch (final InputTimeoutException ignored) {
+                    return null;
                 }
-                return null;
+            }
+
+            @Override
+            public @NotNull Object onSolveDeviceVerification(@NotNull net.mamoe.mirai.Bot bot, @NotNull DeviceVerificationRequests requests, @NotNull Continuation<? super DeviceVerificationResult> continuation) {
+                if (requests.getPreferSms()) {
+                    FocessQQ.getLogger().info(requests.getSms().getCountryCode() + " " + requests.getSms().getPhoneNumber());
+                    try {
+                        IOHandler.getConsoleIoHandler().inputMessage();
+                    } catch (final InputTimeoutException ignored) {
+                    }
+
+                    Object lock = new Object();
+                    requests.getSms().requestSms(new Continuation<>() {
+                        @Override
+                        public @NotNull CoroutineContext getContext() {
+                            return EmptyCoroutineContext.INSTANCE;
+                        }
+
+                        @Override
+                        public void resumeWith(@NotNull Object result) {
+                            synchronized (lock) {
+                                lock.notify();
+                            }
+                        }
+                    });
+                    synchronized (lock) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    String code;
+                    try {
+                        code = IOHandler.getConsoleIoHandler().inputMessage().toString();
+                    } catch (final InputTimeoutException ignored) {
+                        code = "";
+                    }
+                    return requests.getSms().solved(code);
+                } else {
+                    FocessQQ.getLogger().info(requests.getFallback().getUrl());
+                    try {
+                        IOHandler.getConsoleIoHandler().inputMessage();
+                    } catch (final InputTimeoutException ignored) {
+                    }
+                    return requests.getFallback().solved();
+                }
+            }
+
+            @NotNull
+            @Override
+            public QRCodeLoginListener createQRCodeLoginListener(@NotNull net.mamoe.mirai.Bot bot) {
+                return new QRCodeLoginListener() {
+                    @Override
+                    public void onStateChanged(@NotNull net.mamoe.mirai.Bot bot, @NotNull QRCodeLoginListener.State state) {
+                        FocessQQ.getLogger().infoLang("bot-login-qrcode-state", id, state.name());
+                    }
+
+                    @Override
+                    public void onFetchQRCode(@NotNull net.mamoe.mirai.Bot bot, @NotNull byte[] bytes) {
+                        System.out.println("????????");
+                        try {
+                            final FileImageOutputStream outputStream = new FileImageOutputStream(new File("qrcode.jpg"));
+                            outputStream.write(bytes);
+                            outputStream.close();
+                        } catch (final IOException e) {
+                            FocessQQ.getLogger().thrLang("exception-load-qrcode-picture", e);
+                        }
+                    }
+                };
             }
         });
-        final net.mamoe.mirai.Bot bot = BotFactory.INSTANCE.newBot(id, password, configuration);
+        final net.mamoe.mirai.Bot bot = BotFactory.INSTANCE.newBot(id, password.equalsIgnoreCase("qr") ? BotAuthorization.byQRCode() : BotAuthorization.byPassword(password), configuration);
         try {
             bot.login();
         } catch (final Exception e) {

@@ -69,7 +69,6 @@ public class Schedulers {
         Permission.checkPermission(Permission.SCHEDULER);
         final ThreadPoolScheduler scheduler = new ThreadPoolScheduler(plugin.getName(),poolSize);
         scheduler.setThreadUncaughtExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName()));
-        scheduler.setThreadCatchExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e));
         return new AScheduler(plugin, scheduler);
     }
 
@@ -91,7 +90,6 @@ public class Schedulers {
         Permission.checkPermission(Permission.SCHEDULER);
         final ThreadPoolScheduler scheduler = new ThreadPoolScheduler(poolSize, immediate, name);
         scheduler.setThreadUncaughtExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread-uncaught", e, t.getName()));
-        scheduler.setThreadCatchExceptionHandler((t, e) -> FocessQQ.getLogger().thrLang("exception-thread-pool-scheduler-thread", e));
         return new AScheduler(plugin,scheduler);
     }
 

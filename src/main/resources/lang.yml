@@ -47,6 +47,7 @@ exception-load-class: Load class exception
 exception-load-plugin: Load plugin exception
 exception-load-plugin-file: Load plugin file exception
 exception-load-captcha-picture: Load captcha picture exception
+exception-load-qrcode-picture: Load qrcode picture exception
 exception-reload-plugin: Reload plugin exception
 exception-load-default-plugin: Load default plugin exception
 exception-unload-default-plugin: Unload default plugin exception
@@ -157,7 +158,7 @@ friend-command-send-success: Send message to friend %d successfully
 debug-command-debug-output-status: "Debug Output Status: %b"
 pause-command-pause-mode-status: "Pause Mode Status: %b"
 plugin-description-not-found: File plugin.yml not found
-unknown-command: Unknown command %s
+unknown-command: "Unknown command: %s"
 command-exec: "%s exec: %s"
 input-account-username: Please input account username
 input-account-password: Please input account password
@@ -218,3 +219,4 @@ permission-command-no-permission: "The plugin %s does not have permissions"
 permission-command-list: "The plugin %s has the following permissions:%s"
 permission-command-set-success: "The plugin %s set the permission %s successfully"
 permission-command-set-failed: "The plugin %s set the permission %s failed, it may already have the permission"
+bot-login-qrcode-state: "Bot %d login qrcode state: %s"
