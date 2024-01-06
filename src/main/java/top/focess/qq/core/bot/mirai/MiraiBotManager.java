@@ -236,7 +236,6 @@ public class MiraiBotManager implements BotManager {
 
                     @Override
                     public void onFetchQRCode(@NotNull net.mamoe.mirai.Bot bot, @NotNull byte[] bytes) {
-                        System.out.println("????????");
                         try {
                             final FileImageOutputStream outputStream = new FileImageOutputStream(new File("qrcode.jpg"));
                             outputStream.write(bytes);

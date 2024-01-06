@@ -6,7 +6,10 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.util.MethodCaller;
-import top.focess.scheduler.*;
+import top.focess.scheduler.FocessScheduler;
+import top.focess.scheduler.Scheduler;
+import top.focess.scheduler.Task;
+import top.focess.scheduler.ThreadPoolScheduler;
 import top.focess.util.Base64;
 import top.focess.util.json.JSONObject;
 import top.focess.util.network.HttpResponse;
@@ -23,14 +26,11 @@ import top.focess.util.yaml.YamlConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
@@ -218,33 +218,6 @@ public class TestUtil {
         for (Task task2 : tasks)
             assertDoesNotThrow(()->task2.join());
         assertEquals(5, count.get());
-        scheduler.close();
-    }
-
-    @Test
-    void testScheduler4() throws Exception {
-        Scheduler scheduler = new ThreadPoolScheduler(10, true, "test-4");
-        Field field = AScheduler.class.getDeclaredField("tasks");
-        field.setAccessible(true);
-        Field field1 = ComparableTask.class.getDeclaredField("time");
-        field1.setAccessible(true);
-        Field field2 = ComparableTask.class.getDeclaredField("task");
-        field2.setAccessible(true);
-        PriorityQueue<ComparableTask> tasks2 = (PriorityQueue<ComparableTask>) field.get(scheduler);
-        List<Task> tasks = Lists.newArrayList();
-        for (int i = 0;i<5;i++) {
-            int finalI = i;
-            tasks.add(scheduler.run(()-> System.out.println(finalI),Duration.ofSeconds(1),finalI + ""));
-            System.out.println(tasks2.stream().map(t -> {
-                try {
-                    return field1.get(t).toString() + " " + field2.get(t).toString();
-                } catch (IllegalAccessException e) {
-                    return "";
-                }
-            }).collect(Collectors.toList()));
-        }
-        for (Task task : tasks)
-            assertDoesNotThrow(()->task.join());
         scheduler.close();
     }
 

@@ -50,8 +50,8 @@ public class AScheduler implements Scheduler {
     }
 
     @Override
-    public Task run(final Runnable runnable, final Duration duration, final String name) {
-        return this.scheduler.run(runnable, duration, name);
+    public Task run(final Runnable runnable, final Duration delay, final String name) {
+        return this.scheduler.run(runnable, delay, name);
     }
 
     @Override

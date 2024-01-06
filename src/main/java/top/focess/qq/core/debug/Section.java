@@ -8,6 +8,7 @@ import top.focess.scheduler.Task;
 
 import java.time.Duration;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Section {
 
@@ -32,10 +33,16 @@ public class Section {
 
     @NotNull
     public static Section startSection(final String name, final Task task, final Duration timeout) {
+        System.out.println(System.currentTimeMillis());
+        AtomicReference<Task> taskAtomicReference = new AtomicReference<>();
         final Task t = SCHEDULER.run(() -> {
+            Task task1 = taskAtomicReference.get();
+            System.out.println(task1.getName());
+            System.out.println(System.currentTimeMillis());
             task.cancel(true);
             FocessQQ.getLogger().debugLang("debug-section-timeout", name);
         }, timeout, name);
+        taskAtomicReference.set(t);
         return new Section(name, t);
     }
 
