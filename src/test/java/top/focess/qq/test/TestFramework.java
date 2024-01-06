@@ -236,8 +236,8 @@ public class TestFramework {
         }
         Field finalField = field;
         ListenerHandler listenerHandler = (ListenerHandler) assertDoesNotThrow(()-> finalField.get(null));
-        assertNotEquals(0,listenerHandler.size());
-        assertNotEquals(1,AScheduler.getSchedulers().size());
+        assertNotEquals(0, listenerHandler.size());
+        assertNotEquals(1, AScheduler.getSchedulers().size());
         assertNotEquals(0, Command.getCommands().size());
         assertNotEquals(0, Plugin.getPlugins().size());
         FocessQQ.exit();

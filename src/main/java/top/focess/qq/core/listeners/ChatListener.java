@@ -20,16 +20,15 @@ import top.focess.qq.api.event.message.GroupMessageEvent;
 import top.focess.qq.api.event.message.StrangerMessageEvent;
 import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.core.debug.Section;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 import top.focess.util.Pair;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChatListener implements Listener {
@@ -98,21 +97,19 @@ public class ChatListener implements Listener {
             try {
                 final Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
                 EXECUTOR.run(() -> {
-                    final Section section = Section.startSection("command-group-exec", ret, Duration.ofMinutes(10));
-                    try {
-                        if (ret.get() == CommandResult.NONE) {
-                            final GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(), event.getMember(), event.getMessage(), event.getSource());
-                            try {
-                                EventManager.submit(groupMessageEvent);
-                            } catch (final Exception e) {
-                                FocessQQ.getLogger().thrLang("exception-submit-group-message-event", e);
-                            }
+                try {
+                    if (ret.get(10, TimeUnit.MINUTES) == CommandResult.NONE) {
+                        final GroupMessageEvent groupMessageEvent = new GroupMessageEvent(event.getBot(), event.getMember(), event.getMessage(), event.getSource());
+                        try {
+                            EventManager.submit(groupMessageEvent);
+                        } catch (final Exception e) {
+                            FocessQQ.getLogger().thrLang("exception-submit-group-message-event", e);
                         }
-                    } catch (final Exception e) {
-                        if (!(e.getCause() instanceof InputTimeoutException))
-                            FocessQQ.getLogger().thrLang("exception-exec-group-command", e);
                     }
-                    section.stop();
+                } catch (final Exception e) {
+                    if (!(e.getCause() instanceof InputTimeoutException))
+                        FocessQQ.getLogger().thrLang("exception-exec-group-command", e);
+                }
                 },"command-group-exec");
             } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-group-command", e);
@@ -133,21 +130,19 @@ public class ChatListener implements Listener {
             try {
                 final Future<CommandResult> ret = CommandLine.exec(sender, event.getMessage().toString());
                 EXECUTOR.run(() -> {
-                    final Section section = Section.startSection("command-friend-exec", ret, Duration.ofMinutes(10));
-                    try {
-                        if (ret.get() == CommandResult.NONE) {
-                            final FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(), event.getFriend(), event.getMessage(), event.getSource());
-                            try {
-                                EventManager.submit(friendMessageEvent);
-                            } catch (final Exception e) {
-                                FocessQQ.getLogger().thrLang("exception-submit-friend-message-event", e);
-                            }
+                try {
+                    if (ret.get(10, TimeUnit.MINUTES) == CommandResult.NONE) {
+                        final FriendMessageEvent friendMessageEvent = new FriendMessageEvent(event.getBot(), event.getFriend(), event.getMessage(), event.getSource());
+                        try {
+                            EventManager.submit(friendMessageEvent);
+                        } catch (final Exception e) {
+                            FocessQQ.getLogger().thrLang("exception-submit-friend-message-event", e);
                         }
-                    } catch (final Exception e) {
-                        if (!(e.getCause() instanceof InputTimeoutException))
-                            FocessQQ.getLogger().thrLang("exception-exec-friend-command", e);
                     }
-                    section.stop();
+                } catch (final Exception e) {
+                    if (!(e.getCause() instanceof InputTimeoutException))
+                        FocessQQ.getLogger().thrLang("exception-exec-friend-command", e);
+                }
                 }, "command-friend-exec");
             } catch (final Exception e) {
                 FocessQQ.getLogger().thrLang("exception-exec-friend-command", e);

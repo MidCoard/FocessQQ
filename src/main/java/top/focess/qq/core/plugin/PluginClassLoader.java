@@ -20,7 +20,6 @@ import top.focess.qq.api.event.plugin.PluginUnloadEvent;
 import top.focess.qq.api.plugin.*;
 import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.core.bot.BotManagerFactory;
-import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Callback;
@@ -42,6 +41,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -245,11 +246,9 @@ public class PluginClassLoader extends URLClassLoader {
         Permission.checkPermission(Permission.ENABLE_PLUGIN);
         if (plugin != FocessQQ.getMainPlugin()) {
             final Task task = SCHEDULER.run(() -> enablePlugin0(plugin), "enable-plugin-" + plugin.getName());
-            final Section section = Section.startSection("plugin-enable", task, Duration.ofSeconds(15));
             try {
-                task.join();
-            } catch (final ExecutionException | InterruptedException | CancellationException e) {
-                section.stop();
+                task.join(15, TimeUnit.SECONDS);
+            } catch (final ExecutionException | InterruptedException | CancellationException | TimeoutException e) {
                 if (e instanceof ExecutionException)
                     if (e.getCause() instanceof PluginLoadException)
                         throw (PluginLoadException) e.getCause();
@@ -258,13 +257,12 @@ public class PluginClassLoader extends URLClassLoader {
                     else if (e.getCause() instanceof PluginUnloadException)
                         throw (PluginUnloadException) e.getCause();
                     else {
-                        FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getCause().getMessage());
+                        FocessQQ.getLogger().thrLang("exception-enable-plugin", e);
                         throw new PluginLoadException(plugin.getClass(), e.getCause());
                     }
-                else if (!(e instanceof CancellationException))
-                    FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+                else if (!(e instanceof TimeoutException))
+                    FocessQQ.getLogger().thrLang("exception-enable-plugin", e);
             }
-            section.stop();
         } else
             enablePlugin0(plugin);
     }
@@ -289,17 +287,15 @@ public class PluginClassLoader extends URLClassLoader {
         Permission.checkPermission(Permission.DISABLE_PLUGIN);
         if (plugin != FocessQQ.getMainPlugin()) {
             final Callback<File> callback = SCHEDULER.submit(() -> disablePlugin0(plugin), "disable-plugin-" + plugin.getName());
-            final Section section = Section.startSection("plugin-disable", (Task) callback, Duration.ofSeconds(5));
             File file = null;
             try {
-                file = callback.waitCall();
-            } catch (final InterruptedException | ExecutionException | CancellationException e) {
+                file = callback.get(5, TimeUnit.SECONDS);
+            } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
                 if (e instanceof ExecutionException && e.getCause() instanceof IncompatibleClassChangeError)
-                    FocessQQ.getLogger().thrLang("exception-section", e, section.getName(), e.getCause().getMessage());
-                else if (!(e instanceof CancellationException))
-                    FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+                    FocessQQ.getLogger().thrLang("exception-disable-plugin", e);
+                else if (!(e instanceof TimeoutException))
+                    FocessQQ.getLogger().thrLang("exception-disable-plugin", e);
             }
-            section.stop();
             final String name = plugin.getName();
             GC_SCHEDULER.run(System::gc, Duration.ofSeconds(1), name);
             return file;

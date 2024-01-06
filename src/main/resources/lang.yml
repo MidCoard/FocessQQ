@@ -8,6 +8,7 @@ fatal-create-cache-dir-failed: Failed to create cache directory %s.
 fatal-reload-plugin: Failed to reload plugin %s.
 fatal-read-permissions-config: Failed to read permissions config. Force shutdown!
 exception-uncaught-exception: Uncaught exception
+exception-submit-event: Submit event exception
 exception-submit-console-chat-event: Submit console input event exception
 exception-submit-plugin-unload-event: Submit plugin unload event exception
 exception-submit-plugin-load-event: Submit plugin load event exception
@@ -78,6 +79,8 @@ exception-load-soft-depend-plugin: Load soft-dependent plugin file %s exception
 exception-section: Section %s exception, %s
 exception-get-null-caller-class: Get null caller class exception
 exception-load-plugin-unexpected-exception: Load plugin with unexpected exception
+exception-enable-plugin: Enable plugin exception
+exception-disable-plugin: Disable plugin exception
 setup-uncaught-exception-handler: Setup uncaught exception handler
 setup-shutdown-hook: Setup shutdown hook
 start-console-input-thread: Start console input thread
@@ -201,7 +204,6 @@ unregister-all-special-argument-handlers: Unregister all special arguments
 register-default-special-argument-handlers: Register default special argument handlers
 exec-command-empty-command: The command is empty
 exec-command-error-command: Exec cannot execute command named itself
-section-exception: Section %s exception, %s
 clear-command-sender-session: Clear command sender session with plugin %s
 command-line-exec: "CommandLine#exec: %s exec: [%s], ID: %d"
 command-pre-exec: "CommandLine#exec0: %s exec: Command: \"%s\", Args: %s, ID: %d"

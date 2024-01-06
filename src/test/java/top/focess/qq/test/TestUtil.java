@@ -2,14 +2,8 @@ package top.focess.qq.test;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.util.MethodCaller;
-import top.focess.scheduler.FocessScheduler;
-import top.focess.scheduler.Scheduler;
-import top.focess.scheduler.Task;
-import top.focess.scheduler.ThreadPoolScheduler;
 import top.focess.util.Base64;
 import top.focess.util.json.JSONObject;
 import top.focess.util.network.HttpResponse;
@@ -26,13 +20,8 @@ import top.focess.util.yaml.YamlConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Util Test")
@@ -87,138 +76,6 @@ public class TestUtil {
         assertNotNull(option);
         assertEquals("hello", option.get(OptionType.DEFAULT_OPTION_TYPE));
         assertEquals("world", option.get(OptionType.DEFAULT_OPTION_TYPE));
-    }
-
-    @Test
-    void testScheduler() {
-        Scheduler scheduler = new FocessScheduler("Test");
-        Task task = scheduler.run(() -> {
-            System.out.println(1);
-        });
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertFalse(task.cancel());
-        assertFalse(task.isCancelled());
-        assertTrue(task.isFinished());
-        assertFalse(task.isRunning());
-        Task task1 = scheduler.run(() -> {
-            System.out.println(2);
-        }, Duration.ofSeconds(1));
-        assertTimeoutPreemptively(Duration.ofSeconds(2), ()->task1.join());
-        assertTrue(task1.isFinished());
-        Task task2 = scheduler.run(() -> {
-            try {
-                Thread.sleep(2000);
-                System.out.println(3);
-            } catch (InterruptedException e) {
-                fail();
-            }
-        });
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertTrue(task2.isRunning());
-        try {
-            task2.join();
-        } catch (Exception e) {
-            fail();
-        }
-        assertTrue(task2.isFinished());
-        Task task3 = scheduler.run(() -> {
-            System.out.println(4);
-        }, Duration.ofSeconds(1));
-        assertTrue(task3.cancel());
-        assertTrue(task3.isCancelled());
-        scheduler.close();
-    }
-
-    @RepeatedTest(5)
-    void testScheduler2() {
-        Scheduler scheduler = new ThreadPoolScheduler( 10,false,"test-2");
-        List<Task> taskList = Lists.newArrayList();
-        for (int i = 0; i < 20; i++) {
-            int finalI = i;
-            taskList.add(scheduler.run(() -> {
-                try {
-                    sleep(3000);
-                } catch (InterruptedException e) {
-                    fail();
-                }
-                System.out.println(finalI);
-            }));
-        }
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertEquals(10, taskList.stream().filter(Task::isRunning).count());
-        assertTrue(taskList.get(0).cancel(true));
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertEquals(10, taskList.stream().filter(Task::isRunning).count());
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        scheduler.close();
-    }
-
-    @RepeatedTest(5)
-    void testScheduler3() {
-        Scheduler scheduler = new ThreadPoolScheduler( 5,false,"test-3");
-
-        Task task = scheduler.run(()->{
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                fail();
-            }
-            throw new NullPointerException();
-        });
-
-        assertThrows(ExecutionException.class, task::join);
-        assertTrue(task.isFinished());
-
-        Task task1 = scheduler.run(()->{
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                fail();
-            }
-            throw new InternalError();
-        });
-        assertThrows(ExecutionException.class, task::join);
-        assertTrue(task.isFinished());
-        AtomicInteger count = new AtomicInteger(0);
-        List<Task> tasks = Lists.newArrayList();
-        for (int i = 0; i<5;i++) {
-            int finalI = i;
-            tasks.add(scheduler.run(()->{
-                try {
-                    sleep(1000 * (finalI));
-                } catch (InterruptedException e) {
-                    fail();
-                }
-                throw new InternalError();
-            }, "test-" + i, (executionException)->{
-                assertInstanceOf(InternalError.class, executionException.getCause());
-                count.incrementAndGet();
-            }));
-        }
-        for (Task task2 : tasks)
-            assertDoesNotThrow(()->task2.join());
-        assertEquals(5, count.get());
-        scheduler.close();
     }
 
     static class ErrorSerialize {
@@ -293,43 +150,7 @@ public class TestUtil {
         assertEquals(200, httpResponse.getCode());
     }
 
-    @Test
-    void testSection() {
-        Scheduler scheduler = new ThreadPoolScheduler(1, false,"test-section-1");
-        Task task = scheduler.run(() -> {
-            try {
-                sleep(10000);
-            } catch (InterruptedException e) {
-                fail();
-            }
-        });
-        Section section = Section.startSection("test", task, Duration.ofSeconds(2));
-        assertTimeoutPreemptively(Duration.ofSeconds(3), () -> assertThrows(CancellationException.class, task::join));
-        assertTrue(task.isCancelled());
-        scheduler.close();
-    }
 
-    @Test
-    void testSection2() {
-        Scheduler scheduler = new ThreadPoolScheduler( 1,false,"test-2");
-        Task task = scheduler.run(() -> {
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                fail();
-            }
-        });
-        Section section = Section.startSection("test", task, Duration.ofSeconds(2));
-        try {
-            task.join();
-        } catch (Exception e) {
-            fail();
-        }
-        section.stop();
-        assertFalse(task.isCancelled());
-        assertTrue(task.isFinished());
-        scheduler.close();
-    }
 
     @Test
     void testVersion() {
@@ -368,31 +189,6 @@ public class TestUtil {
         byte[] encode = Base64.encodeBase64(bytes);
         byte[] decode = Base64.decodeBase64(encode);
         assertEquals(s, new String(decode));
-    }
-
-    @RepeatedTest(5)
-    void testScheduler5() {
-        Scheduler scheduler = new FocessScheduler("test-5");
-        AtomicInteger atomicInteger = new AtomicInteger(0);
-        Task task = scheduler.runTimer(()->{
-            atomicInteger.incrementAndGet();
-            throw new NullPointerException();
-        }, Duration.ofSeconds(0), Duration.ofSeconds(1),"test");
-        try {
-            sleep(3000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertTrue(task.isPeriod());
-        task.cancel();
-        try {
-            sleep(500);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertTrue(task.isCancelled());
-        assertNotEquals(1, atomicInteger.get());
-        scheduler.close();
     }
 
 

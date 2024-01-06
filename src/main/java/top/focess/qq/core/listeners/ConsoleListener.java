@@ -14,14 +14,13 @@ import top.focess.qq.api.event.chat.ConsoleChatEvent;
 import top.focess.qq.api.event.message.ConsoleMessageEvent;
 import top.focess.qq.api.scheduler.Schedulers;
 import top.focess.qq.api.util.IOHandler;
-import top.focess.qq.core.debug.Section;
 import top.focess.scheduler.Scheduler;
 import top.focess.scheduler.Task;
 import top.focess.util.Pair;
 
-import java.time.Duration;
 import java.util.Queue;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class ConsoleListener implements Listener {
 
@@ -49,21 +48,19 @@ public class ConsoleListener implements Listener {
         try {
             final Future<CommandResult> ret = CommandLine.exec(event.getMessage().toString());
             EXECUTOR.run(() -> {
-                final Section section = Section.startSection("command-console-exec", ret, Duration.ofMinutes(10));
-                try {
-                    if (ret.get() == CommandResult.NONE) {
-                        final ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
-                        try {
-                            EventManager.submit(consoleMessageEvent);
-                        } catch (final Exception e) {
-                            FocessQQ.getLogger().thrLang("exception-submit-console-message-event", e);
-                        }
+            try {
+                if (ret.get(10, TimeUnit.MINUTES) == CommandResult.NONE) {
+                    final ConsoleMessageEvent consoleMessageEvent = new ConsoleMessageEvent(event.getMessage());
+                    try {
+                        EventManager.submit(consoleMessageEvent);
+                    } catch (final Exception e) {
+                        FocessQQ.getLogger().thrLang("exception-submit-console-message-event", e);
                     }
-                } catch (final Exception e) {
-                    if (!(e.getCause() instanceof InputTimeoutException))
-                        FocessQQ.getLogger().thrLang("exception-exec-console-command", e);
                 }
-                section.stop();
+            } catch (final Exception e) {
+                if (!(e.getCause() instanceof InputTimeoutException))
+                    FocessQQ.getLogger().thrLang("exception-exec-console-command", e);
+            }
             },"command-console-exec");
         } catch (final Exception e) {
             FocessQQ.getLogger().thrLang("exception-exec-console-command", e);

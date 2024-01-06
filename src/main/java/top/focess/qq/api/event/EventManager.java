@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NotNull;
 import top.focess.qq.FocessQQ;
 import top.focess.qq.api.scheduler.Schedulers;
-import top.focess.qq.core.debug.Section;
 import top.focess.qq.core.permission.Permission;
 import top.focess.qq.core.permission.PermissionEnv;
 import top.focess.scheduler.Scheduler;
@@ -12,10 +11,11 @@ import top.focess.scheduler.Task;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * This class is used to submit Event for developers.
@@ -47,16 +47,13 @@ public class EventManager {
                 throw new EventSubmitRuntimeException(e);
             }
         }, "submit-" + event.getClass().getName());
-        final Section section = Section.startSection("event-submit", task, Duration.ofSeconds(10));
         try {
-            task.join();
-        } catch (final ExecutionException | InterruptedException | CancellationException e) {
-            section.stop();
+            task.join(10, TimeUnit.SECONDS);
+        } catch (final ExecutionException | InterruptedException | CancellationException | TimeoutException e) {
             if (e.getCause() instanceof EventSubmitRuntimeException)
                 throw (EventSubmitException) e.getCause().getCause();
-            else FocessQQ.getLogger().debugLang("section-exception", section.getName(), e.getMessage());
+            else FocessQQ.getLogger().thrLang("exception-submit-event",e);
         }
-        section.stop();
     }
 
     private static <T extends Event> void submit(@NotNull final Class<T> cls, final T event) throws EventSubmitException {
