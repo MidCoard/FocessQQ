@@ -44,13 +44,13 @@ public class NetworkHandler {
         this.networkHandler = new top.focess.util.network.NetworkHandler(options);
         this.networkHandler.addHandler(new HttpHandler() {
             @Override
-            public void handle(final String url, final Map<String, Object> data, final Map<String, String> header, final String body) {
-                LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + plugin.getName() + "] " + url + " Get: " + data + " with Header: " + header + ", Response: " + body);
+            public void handle(final String url, final String data, final Map<String, String> header, final String body) {
+                LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + plugin.getName() + "] " + url + " Request: " + data + " with Header: " + header + ", Response: " + body);
             }
 
             @Override
-            public void handleException(final String url, final Map<String, Object> data, final Map<String, String> header, final Exception e) {
-                LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + plugin.getName() + "] " + url + " Post: " + data + " with Header: " + header + ", Error: " + e.getMessage());
+            public void handleException(final String url, final String data, final Map<String, String> header, final Exception e) {
+                LOGGER.debug(ChatConstants.NETWORK_DEBUG_HEADER + "[" + plugin.getName() + "] " + url + " Request: " + data + " with Header: " + header + ", Error: " + e.getMessage());
             }
         });
     }
@@ -67,27 +67,35 @@ public class NetworkHandler {
         return this.plugin;
     }
 
-    public HttpResponse request(final String url, final Map<String, Object> data, final top.focess.util.network.NetworkHandler.RequestType requestType) {
-        return this.networkHandler.request(url, data, requestType);
+    public HttpResponse request(String url, Map<String, Object> data, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, data, requestType);
     }
 
-    public HttpResponse request(final String url, final top.focess.util.network.NetworkHandler.RequestType requestType) {
-        return this.networkHandler.request(url, requestType);
+    public HttpResponse request(String url, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, requestType);
     }
 
-    public HttpResponse request(final String url, final Map<String, Object> data, final Map<String, String> header, final MediaType mediaType, final top.focess.util.network.NetworkHandler.RequestType requestType) {
-        return this.networkHandler.request(url, data, header, mediaType, requestType);
+    public HttpResponse request(String url, Map<String, Object> data, Map<String, String> header, MediaType mediaType, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, data, header, mediaType, requestType);
     }
 
-    public HttpResponse put(final String url, final Map<String, Object> data, final Map<String, String> header, @NotNull final MediaType mediaType) {
-        return this.networkHandler.put(url, data, header, mediaType);
+    public HttpResponse request(String url, String data, Map<String, String> header, MediaType mediaType, top.focess.util.network.NetworkHandler.RequestType requestType) {
+        return networkHandler.request(url, data, header, mediaType, requestType);
     }
 
-    public HttpResponse post(final String url, final Map<String, Object> data, final Map<String, String> header, @NotNull final MediaType mediaType) {
-        return this.networkHandler.post(url, data, header, mediaType);
+    public HttpResponse put(String url, String data, Map<String, String> header, @NotNull MediaType mediaType) {
+        return networkHandler.put(url, data, header, mediaType);
     }
 
-    public HttpResponse get(final String url, @NotNull final Map<String, Object> data, final Map<String, String> header) {
-        return this.networkHandler.get(url, data, header);
+    public HttpResponse post(String url, String data, Map<String, String> header, @NotNull MediaType mediaType) {
+        return networkHandler.post(url, data, header, mediaType);
+    }
+
+    public HttpResponse delete(String url, String data, Map<String, String> header, @NotNull MediaType mediaType) {
+        return networkHandler.delete(url, data, header, mediaType);
+    }
+
+    public HttpResponse get(String url, @NotNull Map<String, Object> data, Map<String, String> header) {
+        return networkHandler.get(url, data, header);
     }
 }
