@@ -30,10 +30,8 @@ public class BotCommand extends Command {
             }
             if (!flag)
                 ioHandler.outputLang("bot-command-no-bot");
-            else {
-
+            else
                 ioHandler.output(stringBuilder.substring(0, stringBuilder.length() - 1));
-            }
             return CommandResult.ALLOW;
         }, CommandArgument.of("list"));
         this.addExecutor((sender, dataCollection, ioHandler) -> {
@@ -47,6 +45,7 @@ public class BotCommand extends Command {
                 bot.login();
             } catch (final BotLoginException e) {
                 ioHandler.outputLang("bot-command-login-failed", id);
+                FocessQQ.getLogger().thrLang("bot-command-login-failed", e);
                 return CommandResult.REFUSE;
             }
             ioHandler.outputLang("bot-command-login-succeed", bot.getId());
@@ -79,6 +78,7 @@ public class BotCommand extends Command {
                 }
             } catch (final BotLoginException e) {
                 ioHandler.outputLang("bot-command-relogin-failed", bot.getId());
+                FocessQQ.getLogger().thrLang("bot-command-relogin-failed", e);
                 return CommandResult.REFUSE;
             }
             return CommandResult.ALLOW;
