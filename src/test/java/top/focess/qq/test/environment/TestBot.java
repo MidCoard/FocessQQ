@@ -6,7 +6,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import top.focess.qq.FocessQQ;
-import top.focess.qq.api.bot.BotLoginException;
 import top.focess.qq.api.bot.BotProtocol;
 import top.focess.qq.api.bot.contact.*;
 import top.focess.qq.api.bot.message.Audio;
@@ -45,7 +44,7 @@ public class TestBot extends QQBot {
     }
 
     @Override
-    public boolean relogin() throws BotLoginException {
+    public boolean relogin() {
         boolean ret = this.logout() && this.login();
         try {
             EventManager.submit(new BotReloginEvent(this));

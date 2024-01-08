@@ -396,6 +396,13 @@ public class MiraiBotManager implements BotManager {
                 FocessQQ.getLogger().thrLang("exception-submit-member-card-change-event", ex);
             }
         }));
+        listeners.add(bot.getEventChannel().subscribeAlways(BotOfflineEvent.class, event -> {
+            try {
+                bot.login();
+            } catch (Exception e) {
+                FocessQQ.getLogger().thrLang("exception-bot-accidentally-offline", e);
+            }
+        }));
         BOT_LISTENER_MAP.put(b, listeners);
     }
 
