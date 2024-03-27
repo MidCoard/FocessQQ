@@ -95,7 +95,7 @@ public class FocessQQ {
             properties.load(FocessQQ.class.getResourceAsStream("/default.properties"));
             version = new Version(properties.getProperty("version"));
         } catch (final Exception e) {
-            version = new Version("build");
+            version = Version.BUILD_VERSION;
         }
         VERSION = version;
     }
