@@ -13,7 +13,6 @@ import top.focess.util.network.HttpHandler;
 import top.focess.util.network.HttpResponse;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * This is a network util class.
@@ -23,9 +22,12 @@ public class NetworkHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkHandler.class);
     @NonNull
-    public static final MediaType JSON = Objects.requireNonNull(MediaType.parse("application/json; charset=utf-8"));
+    public static final MediaType JSON = top.focess.util.network.NetworkHandler.JSON;
     @NonNull
-    public static final MediaType TEXT = Objects.requireNonNull(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"));
+    public static final MediaType TEXT = top.focess.util.network.NetworkHandler.TEXT;
+    @NonNull
+    public static final MediaType URL_ENCODED = top.focess.util.network.NetworkHandler.URL_ENCODED;
+
 
     /**
      * The plugin
