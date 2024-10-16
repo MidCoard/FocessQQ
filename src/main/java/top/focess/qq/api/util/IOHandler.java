@@ -97,7 +97,7 @@ public abstract class IOHandler extends top.focess.command.IOHandler {
      */
     public abstract boolean hasInput(int seconds);
 
-    public void input(@Nullable Message message) {
+    public synchronized void input(@Nullable Message message) {
         this.message = message;
         if (message == null)
             this.input((String) null);

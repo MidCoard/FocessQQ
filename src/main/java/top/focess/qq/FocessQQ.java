@@ -79,7 +79,11 @@ import java.util.zip.GZIPOutputStream;
 public class FocessQQ {
 
     private static final Object STOP_LOCK = new Object();
-    private static boolean isStopped;
+    private static boolean stopped;
+
+    public static boolean isStopped() {
+        return stopped;
+    }
 
     /**
      * Version of Focess
@@ -372,7 +376,7 @@ public class FocessQQ {
     }
 
     public static void main(final String[] args) {
-        if (isStopped)
+        if (stopped)
             return;
         System.setSecurityManager(new FocessSecurityManager());
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> {
@@ -553,9 +557,9 @@ public class FocessQQ {
     public static void exit() {
         Permission.checkPermission(Permission.EXIT);
         synchronized (STOP_LOCK) {
-            if (isStopped)
+            if (stopped)
                 return;
-            isStopped = true;
+            stopped = true;
         }
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
         // need to check if Exit is called by Initialization

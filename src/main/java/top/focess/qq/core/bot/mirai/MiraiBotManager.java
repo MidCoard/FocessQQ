@@ -398,7 +398,8 @@ public class MiraiBotManager implements BotManager {
         }));
         listeners.add(bot.getEventChannel().subscribeAlways(BotOfflineEvent.class, event -> {
             try {
-                bot.login();
+                if (!FocessQQ.isStopped())
+                    bot.login();
             } catch (Exception e) {
                 FocessQQ.getLogger().thrLang("exception-bot-accidentally-offline", e);
             }
